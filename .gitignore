@@ -1,0 +1,42 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# next
+.next/
+out/
+next-env.d.ts
+
+# production
+build/
+dist/
+
+# payload
+/src/app/(payload)/admin/importMap.js
+/src/app/(payload)/hgp-studio/importMap.js
+
+# env — never commit secrets
+.env
+.env.*
+!.env.example
+
+# media uploads (served from disk, backed up separately — see DEPLOY.md)
+/media/
+/public/media/
+
+# logs
+*.log
+npm-debug.log*
+
+# os / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# misc
+*.tsbuildinfo
+/coverage/
+/.backups/

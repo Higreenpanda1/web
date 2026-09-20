@@ -1,0 +1,187 @@
+{
+  "site": {
+    "name": "HiGreenPanda",
+    "legalName": "HiGreen Panda Marketing",
+    "tagline": "Your first source for every kind of business service in China",
+    "description": "Your partner on the ground in Shenzhen and Shanghai: sourcing, manufacturing, inspection, shipping and company formation in China."
+  },
+  "nav": {
+    "home": "Home",
+    "services": "Services",
+    "about": "About",
+    "blog": "Blog",
+    "contact": "Contact",
+    "menu": "Menu",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "skipToContent": "Skip to content",
+    "primary": "Primary navigation",
+    "footer": "Footer links"
+  },
+  "locale": {
+    "switchTo": "العربية",
+    "label": "Change language",
+    "current": "English"
+  },
+  "cta": {
+    "whatsapp": "Message us on WhatsApp",
+    "whatsappAria": "Message us on WhatsApp at {number}",
+    "enquire": "Request a quote",
+    "allServices": "All services",
+    "readMore": "Read more",
+    "contactUs": "Contact us",
+    "learnMore": "Details",
+    "startNow": "Get started"
+  },
+  "home": {
+    "heroEyebrow": "Shenzhen · Shanghai",
+    "heroTitle": "Your first source for business services in China",
+    "heroLead": "Looking to source your next product from China, manufacture it, inspect it, or ship it? Looking for help setting up your own company in China? We're here for you.",
+    "heroPromise": "One accountable partner, from product idea to delivered goods.",
+    "statsTitle": "Experience on the ground, not from behind a screen",
+    "stats": {
+      "cities": "Chinese cities visited",
+      "fairs": "trade fairs attended",
+      "followers": "Instagram followers",
+      "subscribers": "YouTube subscribers"
+    },
+    "servicesTitle": "What we do for you",
+    "servicesLead": "Eight services covering the whole import journey. Take one, or hand us the entire process.",
+    "processTitle": "How it works",
+    "processLead": "No surprises. At every stage you know where your goods are and what you have paid.",
+    "process": {
+      "step1Title": "You tell us what you need",
+      "step1Body": "Product, quantity, budget and destination country. We reply on WhatsApp within one working day.",
+      "step2Title": "We source and price it",
+      "step2Body": "We find the right factories, negotiate the price, and send you a detailed quote with the full landed cost.",
+      "step3Title": "We inspect before you pay",
+      "step3Body": "A site visit to the factory and an inspection of the sample and the goods before shipping. You get the photos and the report.",
+      "step4Title": "We ship and follow through",
+      "step4Body": "Sea or air freight, customs clearance, and delivery to your warehouse. We stay with it until you have the goods."
+    },
+    "founderTitle": "Who is behind HiGreenPanda",
+    "founderCta": "Meet Sami",
+    "blogTitle": "From the blog",
+    "blogLead": "Practical articles about importing from China, written in Arabic.",
+    "testimonialsTitle": "What our clients say",
+    "contactTitle": "Tell us what you need",
+    "contactLead": "Fill in the form or message us directly on WhatsApp. We reply within one working day."
+  },
+  "services": {
+    "title": "Our services",
+    "lead": "From finding the product to delivering it in your country, and from inspecting the factory to setting up your company in China.",
+    "featured": "Flagship service",
+    "otherServices": "Other services",
+    "enquireAbout": "Ask about {service}",
+    "empty": "No services have been published yet."
+  },
+  "about": {
+    "title": "About us",
+    "lead": "A China-based trade services company serving Arabic-speaking traders and entrepreneurs.",
+    "founderTitle": "The founder",
+    "founderName": "Sami Al-Hajri",
+    "founderRole": "Founder",
+    "storyTitle": "Our story",
+    "valuesTitle": "How we work",
+    "teamTitle": "The team",
+    "contactTitle": "Talk to us directly"
+  },
+  "blog": {
+    "title": "Blog",
+    "lead": "Practical guides on importing from China, e-commerce, and company formation.",
+    "readingTime": "{minutes} min read",
+    "publishedOn": "Published {date}",
+    "updatedOn": "Updated {date}",
+    "by": "By {author}",
+    "categories": "Categories",
+    "allCategories": "All",
+    "empty": "No articles published yet.",
+    "relatedTitle": "Related articles",
+    "backToBlog": "Back to the blog",
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "page": "Page {current} of {total}",
+      "label": "Article pagination"
+    }
+  },
+  "contact": {
+    "title": "Contact",
+    "lead": "Tell us what you need and we will reply within one working day.",
+    "directTitle": "Direct contact",
+    "whatsappNote": "WhatsApp is the fastest way to reach us.",
+    "emailLabel": "Email",
+    "phoneLabel": "Phone / WhatsApp",
+    "officesLabel": "Offices",
+    "hoursLabel": "Working hours",
+    "form": {
+      "title": "Enquiry form",
+      "name": "Name",
+      "namePlaceholder": "Your full name",
+      "country": "Country",
+      "countryPlaceholder": "Select your country",
+      "whatsapp": "WhatsApp number",
+      "whatsappHint": "With country code, e.g. +966501234567",
+      "service": "Service you're interested in",
+      "servicePlaceholder": "Select a service",
+      "serviceOther": "Something else / not sure",
+      "message": "Details of your enquiry",
+      "messagePlaceholder": "What product? What quantity? To which country?",
+      "submit": "Send enquiry",
+      "submitting": "Sending…",
+      "required": "Required",
+      "optional": "Optional",
+      "successTitle": "We have your enquiry",
+      "successBody": "Thank you. We will contact you on WhatsApp within one working day. Your reference is {reference}.",
+      "successAgain": "Send another enquiry",
+      "errorTitle": "Could not send your enquiry",
+      "errorBody": "Something went wrong. Please try again, or message us directly on WhatsApp.",
+      "consent": "By sending this form you agree that we may contact you about your enquiry.",
+      "errors": {
+        "nameRequired": "Please enter your name.",
+        "nameTooLong": "That name is too long.",
+        "countryRequired": "Please select your country.",
+        "whatsappRequired": "Please enter a WhatsApp number.",
+        "whatsappInvalid": "Enter a valid number with country code, e.g. +966501234567.",
+        "messageRequired": "Please describe your enquiry.",
+        "messageTooShort": "Add a little more detail so we can help.",
+        "messageTooLong": "That message is too long.",
+        "rateLimited": "You have sent several enquiries in a short time. Please wait a moment and try again.",
+        "tooFast": "We could not verify the form. Please try again.",
+        "generic": "Could not send your enquiry. Please try again."
+      }
+    }
+  },
+  "footer": {
+    "aboutBlurb": "A trade services company in China, serving Arabic-speaking traders and entrepreneurs.",
+    "servicesTitle": "Services",
+    "companyTitle": "Company",
+    "contactTitle": "Contact",
+    "followTitle": "Follow us",
+    "rights": "All rights reserved.",
+    "privacy": "Privacy policy",
+    "terms": "Terms and conditions",
+    "builtNote": "Built securely and backed up daily."
+  },
+  "legal": {
+    "privacyTitle": "Privacy policy",
+    "termsTitle": "Terms and conditions",
+    "lastUpdated": "Last updated: {date}"
+  },
+  "error": {
+    "notFoundTitle": "Page not found",
+    "notFoundBody": "The link you opened no longer exists. The address may have changed when the site was rebuilt.",
+    "goneTitle": "This page has been permanently removed",
+    "goneBody": "This URL was never part of our site. It was injected in an earlier compromise and has been permanently removed.",
+    "genericTitle": "Something went wrong",
+    "genericBody": "Try reloading the page. If it keeps happening, message us on WhatsApp.",
+    "backHome": "Back to the homepage",
+    "retry": "Try again"
+  },
+  "a11y": {
+    "breadcrumb": "Breadcrumb",
+    "loading": "Loading",
+    "externalLink": "Opens in a new window",
+    "requiredField": "Required field"
+  }
+}
