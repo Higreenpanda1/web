@@ -4,7 +4,7 @@ Everything needed to put this site on its VPS, and to rebuild it from nothing
 if the server disappears.
 
 The server is a **Hostinger KVM 2** (2 vCPU, 8 GB RAM, 100 GB NVMe), bought
-20 September 2026. Nothing in the stack is tied to that provider — it needs
+20 September 2026, at **187.77.153.108**. Nothing in the stack is tied to that provider — it needs
 root, Docker and a public IP — so the few places where Hostinger specifically
 matters are called out by name and everything else says "the VPS".
 
@@ -38,34 +38,53 @@ When creating the VPS in hPanel:
   password. If you did not, add it now before locking down SSH below, or the
   next step will shut you out.
 
-hPanel has a browser-based terminal for the VPS. It is worth knowing where it
-is *before* you need it — it is the way back in if SSH ever breaks.
+hPanel has a browser-based terminal for the VPS. **Find it before you need
+it** — it is the way back in if SSH ever breaks.
+
+### Add your SSH key first
+
+Everything below disables SSH password login. Without a key you lock yourself
+out. Add your public key in hPanel (or append it to `/root/.ssh/authorized_keys`),
+then prove it works from your own machine **before** going further:
 
 ```bash
-# As root, immediately after first boot
-adduser deploy && usermod -aG sudo deploy
-rsync --archive --chown=deploy:deploy ~/.ssh /home/deploy
-
-# Lock down SSH: keys only, no root login
-sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
-sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config
-systemctl restart ssh
-
-# Firewall: SSH and HTTP(S) only. Postgres is never exposed.
-ufw default deny incoming && ufw default allow outgoing
-ufw allow OpenSSH && ufw allow 80/tcp && ufw allow 443/tcp
-ufw --force enable
-
-# Unattended security updates
-apt-get update && apt-get install -y unattended-upgrades fail2ban
-dpkg-reconfigure -plow unattended-upgrades
-systemctl enable --now fail2ban
+ssh root@187.77.153.108        # must succeed using the key, not a password
 ```
 
-Install Docker from Docker's own repository (the distribution package lags):
-<https://docs.docker.com/engine/install/ubuntu/>.
+### Then run the bootstrap script
 
-Then set up **Hostinger's own firewall in hPanel** as a second layer, allowing
+`ops/bootstrap.sh` is everything in this section, idempotent, with the lockout
+check built in — it refuses to touch the SSH config unless it can already see a
+usable key, and it validates the config with `sshd -t` before restarting the
+daemon.
+
+```bash
+scp ops/bootstrap.sh root@187.77.153.108:/root/
+ssh root@187.77.153.108 'bash /root/bootstrap.sh --dry-run'   # read it first
+ssh root@187.77.153.108 'bash /root/bootstrap.sh'
+```
+
+`--dry-run` prints every command and file it would write, and changes nothing.
+Run it first; the output is short and it is worth seeing what is about to
+happen to the machine you just bought.
+
+It creates the `deploy` user with your key and passwordless sudo, hardens SSH
+to key-only with no root login, sets `ufw` to allow only 22/80/443, enables
+unattended security upgrades and `fail2ban`, and installs Docker from Docker's
+own repository (the distribution package lags badly).
+
+> **Do not close that root session until you have confirmed the new login
+> works.** From a second terminal:
+>
+> ```bash
+> ssh deploy@187.77.153.108
+> ```
+>
+> If it fails you still have the first session open to fix it. If you have
+> already closed it, hPanel's browser terminal is the way in.
+
+Once that is confirmed, set up **Hostinger's own firewall in hPanel** as a
+second layer, allowing
 only 22, 80 and 443 inbound. It sits outside the operating system, so it
 survives a mistake in `ufw` — and `ufw` survives a mistake in it.
 
@@ -87,7 +106,7 @@ exercised. Expect to debug it here, with no traffic arriving, rather than
 after the domain is live.
 
 ```bash
-sudo -iu deploy
+ssh deploy@187.77.153.108
 git clone https://github.com/Higreenpanda1/web.git higreenpanda
 cd higreenpanda
 cp .env.example .env
@@ -231,8 +250,8 @@ else.**
 
 | Type | Name | Action |
 |------|------|--------|
-| A | @ | Replace `15.197.148.33` → `<VPS IPv4>` |
-| A | @ | Delete the second record, or replace it with the same VPS IPv4 |
+| A | @ | Replace `15.197.148.33` → `187.77.153.108` |
+| A | @ | Delete `3.33.130.190`, or replace it with `187.77.153.108` too |
 | CNAME | www | **Leave alone.** It points at the root, so it follows automatically — and a name holding a CNAME may not hold anything else, so adding an `A` for `www` would break it |
 
 TTL is 600, so the cutover takes effect in about ten minutes — and so does the
@@ -264,7 +283,7 @@ CAA  @  0 issue "letsencrypt.org"
 ### Verify against DNS, then watch the certificate
 
 ```bash
-dig +short A higreenpanda.com        # the VPS IPv4, nothing else
+dig +short A higreenpanda.com        # 187.77.153.108, nothing else
 dig +short A www.higreenpanda.com    # same address, via the CNAME
 dig +short MX higreenpanda.com       # unchanged: 1 smtp.google.com
 
