@@ -3,7 +3,7 @@
 # Brief section 8: "No backups you controlled" is what made the last outage
 # unrecoverable. This runs inside the stack so it cannot be forgotten, and the
 # restore procedure in DEPLOY.md is written to be rehearsed, not read.
-FROM postgres:16.10-alpine
+FROM postgres:18.4-alpine
 
 RUN apk add --no-cache aws-cli tar gzip coreutils tzdata
 
