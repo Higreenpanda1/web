@@ -5,7 +5,7 @@
 # no source and no dev dependencies, and runs as a non-root user.
 # ─────────────────────────────────────────────────────────────────────────────
 
-FROM node:22.20.0-bookworm-slim AS base
+FROM node:26.8.2-bookworm-slim AS base
 ENV PNPM_HOME=/pnpm NEXT_TELEMETRY_DISABLED=1
 WORKDIR /app
 
@@ -32,7 +32,7 @@ RUN npm run build
 # node_modules/.bin and no src/, so migrations, seeding and TOTP enrolment
 # cannot run here — they run in the `tools` service, which is built from the
 # `build` stage above. See docker-compose.prod.yml.
-FROM node:22.20.0-bookworm-slim AS runtime
+FROM node:26.8.2-bookworm-slim AS runtime
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000 HOSTNAME=0.0.0.0
 WORKDIR /app
 
