@@ -1,0 +1,15 @@
+node_modules
+.next
+.git
+.github
+.env
+.env.*
+!.env.example
+media
+.backups
+*.log
+brand-assets
+README.md
+DEPLOY.md
+WEBSITE-BRIEF.md
+BUILD-PROMPT.md

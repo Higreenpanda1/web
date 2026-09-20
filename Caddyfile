@@ -1,0 +1,56 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# HiGreenPanda — Caddy reverse proxy
+# TLS certificates are issued and renewed automatically. HSTS, the CSP and the
+# rest of the security headers are set by the application (src/middleware.ts)
+# so they stay in version control with the code that depends on them; Caddy
+# adds only what it is better placed to do.
+# ─────────────────────────────────────────────────────────────────────────────
+
+{
+	email contact@higreenpanda.com
+	servers {
+		protocols h1 h2 h3
+	}
+}
+
+# Canonical host. www redirects to the apex so there is one set of URLs.
+www.{$SITE_DOMAIN} {
+	redir https://{$SITE_DOMAIN}{uri} permanent
+}
+
+# The .net mirror pointed at the same business. Fold it in rather than letting
+# it rot into another hijackable surface.
+higreenpanda.net, www.higreenpanda.net {
+	redir https://{$SITE_DOMAIN}{uri} permanent
+}
+
+{$SITE_DOMAIN} {
+	encode zstd gzip
+
+	# Optional network-level gate on the admin panel, on top of the app's own
+	# 2FA and rate limiting. Set ADMIN_IP_ALLOWLIST_CADDY in .env to lock it to
+	# known addresses; the default allows all so a first deploy is not locked out.
+	@admin path /hgp-studio /hgp-studio/*
+	@admin_blocked {
+		path /hgp-studio /hgp-studio/*
+		not remote_ip {$ADMIN_IP_ALLOWLIST_CADDY}
+	}
+	respond @admin_blocked 404
+
+	# Immutable build output. Everything else is cached by the app's own headers.
+	@static path /_next/static/* /fonts/* /brand/*
+	header @static Cache-Control "public, max-age=31536000, immutable"
+
+	reverse_proxy app:3000 {
+		header_up X-Real-IP {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+	}
+
+	log {
+		output file /data/access.log {
+			roll_size 20mb
+			roll_keep 10
+		}
+		format json
+	}
+}

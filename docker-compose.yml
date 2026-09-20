@@ -1,0 +1,35 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# HiGreenPanda — local development stack
+#
+#   cp .env.example .env    # then fill in POSTGRES_PASSWORD and PAYLOAD_SECRET
+#   docker compose up -d db
+#   npm run dev
+#
+# For the Hetzner deployment use docker-compose.prod.yml, which adds Caddy and
+# runs the app from the built image instead of the host's `npm run dev`.
+# ─────────────────────────────────────────────────────────────────────────────
+name: higreenpanda
+
+services:
+  db:
+    image: postgres:16.10-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-higreenpanda}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-higreenpanda}
+      # Deterministic collation so a dump restores byte-identically on any host.
+      POSTGRES_INITDB_ARGS: '--encoding=UTF8 --locale=C'
+    ports:
+      # Bound to localhost only. Postgres is never reachable from the network.
+      - '127.0.0.1:5432:5432'
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-higreenpanda} -d ${POSTGRES_DB:-higreenpanda}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  db_data:

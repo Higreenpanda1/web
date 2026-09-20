@@ -2,6 +2,7 @@
   "name": "higreenpanda-web",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "HiGreenPanda — Arabic-first bilingual marketing site for a China trade-services company. Next.js + Payload CMS + PostgreSQL.",
   "engines": {
     "node": ">=20.9.0"

@@ -13,8 +13,6 @@ build/
 dist/
 
 # payload
-/src/app/(payload)/admin/importMap.js
-/src/app/(payload)/hgp-studio/importMap.js
 
 # env — never commit secrets
 .env
