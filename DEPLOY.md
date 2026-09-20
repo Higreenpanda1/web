@@ -247,6 +247,31 @@ Sign in at `https://higreenpanda.com/hgp-studio-gate`.
 
 ---
 
+### Look at the site first, without touching DNS
+
+Hostinger gives every VPS a hostname that already resolves to it —
+`srv1994320.hstgr.cloud`. Caddy can get a real certificate for that name, so
+the site is viewable over HTTPS before the domain moves:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Higreenpanda1/web/claude/practical-newton-m55sbw/ops/preview.sh | bash
+```
+
+It updates `PREVIEW_HOSTNAME` in `.env`, validates the Caddyfile in a
+throwaway container, restarts only the proxy, and prints the address. No
+rebuild, and nothing else in the stack is touched. `| bash -s -- off` turns it
+back off, which is worth doing once the real domain is live.
+
+It refuses a hostname that does not resolve back to this server, because an
+address Caddy cannot prove it owns means an hour of failed certificate
+challenges rather than a working preview.
+
+The preview is marked `noindex`, and canonical URLs still say
+`higreenpanda.com` — it is a way to look at the site, not a second home for
+it.
+
+---
+
 ## 3. DNS — only once the stack is healthy
 
 Now, and not before: with the stack already proven on the box, pointing DNS is
