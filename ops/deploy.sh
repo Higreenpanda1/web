@@ -15,7 +15,7 @@
 # Safe to run again. On a second run it reuses the existing .env, pulls the
 # latest code, re-applies migrations and restarts — it will not reset the
 # database or change your passwords.
-set -euo pipefail
+set -Eeuo pipefail
 
 REPO="https://github.com/Higreenpanda1/web.git"
 BRANCH="${BRANCH:-claude/practical-newton-m55sbw}"
@@ -29,6 +29,18 @@ step() { printf '\n%s==> %s%s\n' "$c_step" "$1" "$c_off"; }
 ok()   { printf '%s  ok%s %s\n' "$c_ok" "$c_off" "$1"; }
 warn() { printf '%s  !!%s %s\n' "$c_warn" "$c_off" "$1"; }
 die()  { printf '\n%serror%s %s\n\n' "$c_err" "$c_off" "$1" >&2; exit 1; }
+
+# `set -e` exits silently, which on a 300-line script means the run simply
+# stops at a prompt with no clue which command gave up. Every unhandled
+# failure now names itself and the line it was on.
+on_err() {
+  local code=$? line=$1 cmd=$2
+  printf '\n%s==> STOPPED%s\n' "$c_err" "$c_off" >&2
+  printf '    line %s exited %s:\n      %s\n' "$line" "$code" "$cmd" >&2
+  printf '\n    Send this message, and the ten lines above it, for help.\n\n' >&2
+  exit "$code"
+}
+trap 'on_err "$LINENO" "$BASH_COMMAND"' ERR
 
 # ── talking to the human ─────────────────────────────────────────────────────
 # This script is meant to be piped straight from curl into bash, which means
@@ -199,13 +211,36 @@ step "Starting the database"
 $COMPOSE up -d --build db
 ok "database running"
 
+# Payload's CLI has been known to finish its work and still exit non-zero on
+# the way out — the migration lands, the script dies. So these two are checked
+# by hand: the exit code is reported, and migrate specifically is re-tested by
+# asking the database whether the tables are actually there before deciding.
 step "Creating the database tables (this can take a minute)"
-$COMPOSE run --rm -T tools npm run migrate
-ok "tables created"
+migrate_code=0
+$COMPOSE run --rm -T tools npm run migrate || migrate_code=$?
+if [ "$migrate_code" -ne 0 ]; then
+  warn "migrate exited $migrate_code — checking whether the tables landed anyway"
+  if $COMPOSE exec -T db psql -U "${POSTGRES_USER:-higreenpanda}" \
+       -d "${POSTGRES_DB:-higreenpanda}" -tAc \
+       "select to_regclass('public.payload_migrations') is not null" 2>/dev/null | grep -q '^t$'; then
+    ok "the schema is present; carrying on"
+  else
+    die "The database tables were not created, and migrate exited $migrate_code.
+Send the output above for help."
+  fi
+else
+  ok "tables created"
+fi
 
 step "Loading the services, articles and settings"
-$COMPOSE run --rm -T tools npm run seed
-ok "content loaded"
+seed_code=0
+$COMPOSE run --rm -T tools npm run seed || seed_code=$?
+if [ "$seed_code" -ne 0 ]; then
+  warn "seed exited $seed_code. The site will still start; if it comes up empty,
+       re-run this script and it will try again."
+else
+  ok "content loaded"
+fi
 
 step "Building and starting the website (the slow part — several minutes)"
 $COMPOSE up -d --build
