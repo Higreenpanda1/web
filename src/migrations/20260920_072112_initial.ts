@@ -1009,7 +1009,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"to" varchar,
   	"enabled" boolean DEFAULT true,
   	"note" varchar,
-  	"hits" numeric DEFAULT 0,
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
   	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
   );

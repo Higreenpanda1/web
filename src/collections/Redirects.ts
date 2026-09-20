@@ -102,16 +102,6 @@ export const Redirects: CollectionConfig = {
       type: 'text',
       admin: { description: 'Why this exists. Future you will want to know.' },
     },
-    {
-      name: 'hits',
-      type: 'number',
-      defaultValue: 0,
-      admin: {
-        readOnly: true,
-        position: 'sidebar',
-        description: 'How often this rule has fired. A rule at zero after a year can go.',
-      },
-    },
   ],
 }
 

@@ -11,20 +11,12 @@ import { Section } from '@/components/ui/Section'
 import { formatDate, isoDate } from '@/i18n/format'
 import { Link } from '@/i18n/navigation'
 import { blogPostingJsonLd, breadcrumbJsonLd } from '@/lib/jsonld'
-import { getAllSlugs, getPostBySlug, getSiteSettings } from '@/lib/queries'
+import { getPostBySlug, getSiteSettings } from '@/lib/queries'
 import { buildMetadata, mediaUrl } from '@/lib/seo'
 
 import type { Locale } from '@/i18n/routing'
 import type { Media, Post, TeamMember } from '@/payload-types'
 import type { Metadata } from 'next'
-
-export async function generateStaticParams() {
-  const slugs = await getAllSlugs('posts')
-  return slugs.flatMap(({ slug }) => [
-    { locale: 'ar', slug },
-    { locale: 'en', slug },
-  ])
-}
 
 export async function generateMetadata({
   params,

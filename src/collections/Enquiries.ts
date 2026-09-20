@@ -92,9 +92,19 @@ export const Enquiries: CollectionConfig = {
       type: 'relationship',
       relationTo: 'services',
       maxDepth: 1,
-      admin: { description: 'Empty when the visitor chose “something else”.' },
+      admin: {
+        description: 'Empty when the visitor chose “something else”, or skipped the question.',
+      },
     },
-    { name: 'serviceOther', type: 'text', admin: { readOnly: true } },
+    {
+      name: 'serviceOther',
+      type: 'text',
+      admin: {
+        readOnly: true,
+        description:
+          'Set when the visitor chose “something else”. Blank means they skipped the question.',
+      },
+    },
     { name: 'message', type: 'textarea', required: true },
 
     {

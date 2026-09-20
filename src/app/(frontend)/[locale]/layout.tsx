@@ -38,6 +38,18 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }))
 }
 
+/**
+ * Explicitly dynamic, because reading the CSP nonce from `headers()` below
+ * already makes it so.
+ *
+ * Saying it out loud matters: while this was only implicit, adding
+ * `generateStaticParams` to a detail route looked harmless and instead asked
+ * Next to prerender a page whose layout cannot be prerendered. The blog posts
+ * built without complaint and then returned 500 (DYNAMIC_SERVER_USAGE) to
+ * every visitor. With this, such a route is dynamic like everything else.
+ */
+export const dynamic = 'force-dynamic'
+
 export const viewport: Viewport = {
   /**
    * One theme colour, not a light/dark pair.

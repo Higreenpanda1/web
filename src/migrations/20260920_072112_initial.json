@@ -11741,13 +11741,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "hits": {
-          "name": "hits",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false,
-          "default": 0
-        },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamp(3) with time zone",
@@ -14325,6 +14318,6 @@
     "tables": {},
     "columns": {}
   },
-  "id": "1d247f04-a855-42e5-a2bb-5091c3af1df3",
+  "id": "1ea40d9e-8a18-4482-8ab7-9b6011730949",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }

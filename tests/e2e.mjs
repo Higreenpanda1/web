@@ -46,6 +46,49 @@ context.on('page', (page) => {
 
 const page = await context.newPage()
 
+// ── Every route answers ──────────────────────────────────────────────────────
+// Cheap, and it catches the failure mode that hurts most: a page that builds
+// cleanly and then 500s in production only. The blog posts did exactly that
+// once, because a detail route asked to be prerendered inside a layout that
+// cannot be.
+console.log('Routes')
+const ROUTES = [
+  ['/', 200],
+  ['/en', 200],
+  ['/services', 200],
+  ['/services/full-import-management', 200],
+  ['/en/services/product-sourcing', 200],
+  ['/blog', 200],
+  ['/en/blog', 200],
+  ['/blog/how-to-inspect-a-factory-before-you-pay', 200],
+  ['/about', 200],
+  ['/en/about', 200],
+  ['/contact', 200],
+  ['/privacy', 200],
+  ['/terms', 200],
+  ['/sitemap.xml', 200],
+  ['/robots.txt', 200],
+  ['/manifest.webmanifest', 200],
+  ['/api/health', 200],
+  // Migration and clean-up behaviour, not just availability.
+  ['/en/home/', 200], // 301 to /en, followed
+  ['/about-us/', 200], // 301 to /about, followed
+  ['/slot-gacor', 410],
+  ['/wp-admin/', 410],
+  ['/admin', 404],
+  ['/this-page-does-not-exist', 404],
+]
+
+for (const [path, expected] of ROUTES) {
+  const response = await page.goto(`${BASE}${path}`, { waitUntil: 'domcontentloaded' })
+  const status = response?.status()
+  if (status !== expected) {
+    fail(`${path} returned ${status}, expected ${expected}`)
+    note(`${path} → ${status}  ✗ expected ${expected}`)
+  }
+}
+note(`${ROUTES.length} routes checked`)
+
 // ── Arabic is the site, not a translation ────────────────────────────────────
 console.log('\nArabic homepage')
 await page.goto(`${BASE}/`, { waitUntil: 'networkidle' })

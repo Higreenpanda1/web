@@ -96,7 +96,9 @@ export async function submitEnquiry(
         whatsapp: toE164(input.whatsapp),
         email: input.email || undefined,
         service: serviceId,
-        serviceOther: serviceId ? undefined : 'other',
+        // Only set when the visitor explicitly picked "something else"; a blank
+        // select means they skipped the question, which is not the same thing.
+        serviceOther: input.service === 'other' ? 'other' : undefined,
         message: input.message,
         meta: {
           locale,

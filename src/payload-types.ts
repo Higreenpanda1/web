@@ -704,9 +704,12 @@ export interface Enquiry {
   whatsapp: string;
   email?: string | null;
   /**
-   * Empty when the visitor chose “something else”.
+   * Empty when the visitor chose “something else”, or skipped the question.
    */
   service?: (number | null) | Service;
+  /**
+   * Set when the visitor chose “something else”. Blank means they skipped the question.
+   */
   serviceOther?: string | null;
   message: string;
   /**
@@ -837,10 +840,6 @@ export interface Redirect {
    * Why this exists. Future you will want to know.
    */
   note?: string | null;
-  /**
-   * How often this rule has fired. A rule at zero after a year can go.
-   */
-  hits?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1373,7 +1372,6 @@ export interface RedirectsSelect<T extends boolean = true> {
   to?: T;
   enabled?: T;
   note?: T;
-  hits?: T;
   updatedAt?: T;
   createdAt?: T;
 }

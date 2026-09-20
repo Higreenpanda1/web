@@ -44,7 +44,9 @@ npm run test:e2e      # Chromium: RTL, type scale, the form, CSP, keyboard, 410
 ```
 
 `npm run test:e2e` needs a server already running. It drives a real browser at
-phone width and asserts the things that only break in one.
+phone width: 23 routes for the status they should return, then the Arabic type
+scale, RTL layout, the language switcher, an enquiry reaching the database, the
+keyboard entry point, dark mode, and whether the strict CSP blocks anything.
 
 ---
 
@@ -166,9 +168,10 @@ Lighthouse, simulated mobile, production build:
 | `/services` | 98 | 100 | 100 | 100 |
 | `/services/full-import-management` | 99 | 100 | 100 | 100 |
 | `/blog` | 98 | 100 | 100 | 100 |
+| `/blog/how-to-inspect-a-factory-before-you-pay` | 99 | 100 | 100 | 100 |
 | `/about` | 98 | 100 | 100 | 100 |
 
-LCP 2.0–2.5 s, TBT 40–70 ms, CLS 0–0.003.
+LCP 2.0–2.5 s, TBT 40–70 ms, CLS 0–0.007.
 
 Run it yourself against a production build:
 

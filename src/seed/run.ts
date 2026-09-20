@@ -3,7 +3,7 @@ import 'dotenv/config'
 import { getPayload } from 'payload'
 
 import config from '../payload.config'
-import { FOUNDER, REDIRECTS, SERVICES } from './content'
+import { CATEGORIES, FOUNDER, POSTS, REDIRECTS, SERVICES } from './content'
 
 /**
  * Seeds a fresh database with the content from WEBSITE-BRIEF.md.
@@ -129,6 +129,53 @@ async function main() {
     console.log(`  ${service.slug} → ${id}`)
   }
 
+  console.log('→ Categories')
+  const categoryIds = new Map<string, number>()
+  for (const category of CATEGORIES) {
+    const id = await upsert(
+      payload,
+      'categories',
+      { slug: { equals: category.slug } },
+      {
+        ar: { slug: category.slug, title: category.ar },
+        en: { title: category.en },
+      },
+    )
+    categoryIds.set(category.slug, id)
+  }
+  console.log(`  ${CATEGORIES.length} categories`)
+
+  console.log('→ Blog')
+  for (const post of POSTS) {
+    const id = await upsert(
+      payload,
+      'posts',
+      { slug: { equals: post.slug } },
+      {
+        ar: {
+          slug: post.slug,
+          title: post.ar.title,
+          excerpt: post.ar.excerpt,
+          body: richText(post.ar.body),
+          publishedAt: post.publishedAt,
+          author: founderId,
+          categories: post.categories.flatMap((slug) => {
+            const id = categoryIds.get(slug)
+            return id ? [id] : []
+          }),
+          _status: 'published',
+        },
+        en: {
+          title: post.en.title,
+          excerpt: post.en.excerpt,
+          body: richText(post.en.body),
+          _status: 'published',
+        },
+      },
+    )
+    console.log(`  ${post.slug} → ${id}`)
+  }
+
   console.log('→ Redirects')
   for (const redirect of REDIRECTS) {
     await upsert(
@@ -162,7 +209,7 @@ async function main() {
  */
 async function upsert(
   payload: Awaited<ReturnType<typeof getPayload>>,
-  collection: 'services' | 'team-members' | 'redirects' | 'pages' | 'posts',
+  collection: 'services' | 'team-members' | 'redirects' | 'pages' | 'posts' | 'categories',
   where: Record<string, unknown>,
   data: { ar: Record<string, unknown>; en?: Record<string, unknown> },
 ): Promise<number> {

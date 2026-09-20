@@ -11,20 +11,12 @@ import { Container } from '@/components/ui/Container'
 import { Section } from '@/components/ui/Section'
 import { Link } from '@/i18n/navigation'
 import { breadcrumbJsonLd, faqJsonLd, serviceJsonLd } from '@/lib/jsonld'
-import { getAllSlugs, getServiceBySlug, getSiteSettings } from '@/lib/queries'
+import { getServiceBySlug, getSiteSettings } from '@/lib/queries'
 import { buildMetadata, mediaUrl } from '@/lib/seo'
 
 import type { Locale } from '@/i18n/routing'
 import type { Media } from '@/payload-types'
 import type { Metadata } from 'next'
-
-export async function generateStaticParams() {
-  const slugs = await getAllSlugs('services')
-  return slugs.flatMap(({ slug }) => [
-    { locale: 'ar', slug },
-    { locale: 'en', slug },
-  ])
-}
 
 export async function generateMetadata({
   params,
