@@ -12,7 +12,7 @@
 #
 # THE ONE THING THIS PROTECTS YOU FROM: it disables SSH password login. If no
 # SSH key is installed, that locks you out of your own server. The script
-# refuses to touch the SSH config unless it can see a usable key first, and it
+# skips that one step entirely unless it can see a usable key first, and it
 # validates the config before restarting the daemon. Hostinger's browser
 # terminal in hPanel is the way back in if something still goes wrong — find
 # it before you need it.
@@ -117,17 +117,26 @@ if [ -s "$root_keys" ]; then
   key_count=${key_count:-0}
 fi
 
+SKIP_SSH_HARDENING=0
 if [ "$key_count" -eq 0 ]; then
-  die "No SSH key in $root_keys.
+  SKIP_SSH_HARDENING=1
+  warn "No SSH key in $root_keys."
+  cat <<EOF
 
-This script disables SSH password login. Without a key you would be locked out
-of the server the moment it restarts sshd.
+       Disabling password login now would lock you out of your own server the
+       moment sshd restarts, so that one step is being SKIPPED. Everything
+       else — Docker, the firewall, automatic updates, fail2ban — still runs,
+       and the deployment in §2 does not need SSH at all.
 
-Add your public key first — in hPanel under the VPS's SSH keys section, or by
-appending it to $root_keys — then run this again. Verify from your own machine
-that 'ssh root@<vps-ip>' works using the key BEFORE re-running."
+       The server is left reachable by SSH password, which is weaker than
+       key-only but is how it already is. To close that off later: add your
+       public key in hPanel under the VPS's SSH keys section, confirm
+       'ssh root@<vps-ip>' works with the key, then run this script again.
+
+EOF
+else
+  ok "$key_count key(s) found — safe to harden SSH"
 fi
-ok "$key_count key(s) found — safe to proceed"
 
 # ── deploy user ──────────────────────────────────────────────────────────────
 step "Creating the '$DEPLOY_USER' user"
@@ -145,8 +154,12 @@ run usermod -aG sudo "$DEPLOY_USER"
 deploy_home=$(getent passwd "$DEPLOY_USER" | cut -d: -f6) || true
 deploy_home="${deploy_home:-/home/$DEPLOY_USER}"
 run install -d -m 700 -o "$DEPLOY_USER" -g "$DEPLOY_USER" "$deploy_home/.ssh"
-run install -m 600 -o "$DEPLOY_USER" -g "$DEPLOY_USER" "$root_keys" "$deploy_home/.ssh/authorized_keys"
-ok "copied $key_count key(s) to $DEPLOY_USER"
+if [ "$key_count" -gt 0 ]; then
+  run install -m 600 -o "$DEPLOY_USER" -g "$DEPLOY_USER" "$root_keys" "$deploy_home/.ssh/authorized_keys"
+  ok "copied $key_count key(s) to $DEPLOY_USER"
+else
+  ok "no keys to copy; reach this account with 'su - $DEPLOY_USER' as root"
+fi
 
 # Passwordless sudo: this account is key-only and has no password to type.
 write_file /etc/sudoers.d/90-"$DEPLOY_USER" <<EOF
@@ -160,6 +173,10 @@ ok "passwordless sudo configured"
 
 # ── ssh ──────────────────────────────────────────────────────────────────────
 step "Hardening SSH"
+
+if [ "$SKIP_SSH_HARDENING" -eq 1 ]; then
+  warn "skipped — no SSH key, see above. Nothing about SSH has been changed."
+else
 
 # A drop-in rather than editing sshd_config: Ubuntu includes this directory at
 # the top of the main file, and SSH takes the first value it sees, so these win
@@ -191,6 +208,8 @@ fi
 warn "Before closing this session, open a SECOND terminal and confirm:"
 printf '         ssh %s@%s\n' "$DEPLOY_USER" "$(hostname -I 2>/dev/null | awk '{print $1}')"
 warn "If that fails, you still have this session open to fix it."
+
+fi
 
 # ── firewall ─────────────────────────────────────────────────────────────────
 step "Firewall"
