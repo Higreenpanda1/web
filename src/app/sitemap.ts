@@ -8,7 +8,20 @@ import type { MetadataRoute } from 'next'
  * the canonical URL and x-default because it is the primary site, not a
  * fallback.
  */
-export const revalidate = 3600
+/**
+ * Rendered per request, not prerendered at build time.
+ *
+ * `docker build` has no route to the database container, so a production image
+ * is *always* built with Postgres unreachable. Prerendering this baked an empty
+ * or stale sitemap into the image, and with a one-hour revalidate it stayed
+ * wrong for an hour after every deploy — a crawler arriving in that window gets
+ * a sitemap listing nothing.
+ *
+ * Per-request costs almost nothing: the slug queries go through
+ * `unstable_cache` (src/lib/queries.ts), tag-invalidated on publish, and a
+ * sitemap is fetched by crawlers, not by visitors.
+ */
+export const dynamic = 'force-dynamic'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [services, posts, pages] = await Promise.all([

@@ -28,6 +28,10 @@ ENV PAYLOAD_SECRET=$PAYLOAD_SECRET NEXT_PUBLIC_SERVER_URL=$NEXT_PUBLIC_SERVER_UR
 RUN npm run build
 
 # --- runtime -----------------------------------------------------------------
+# Deliberately minimal: Next's standalone output only. That means no CLIs in
+# node_modules/.bin and no src/, so migrations, seeding and TOTP enrolment
+# cannot run here — they run in the `tools` service, which is built from the
+# `build` stage above. See docker-compose.prod.yml.
 FROM node:22.20.0-bookworm-slim AS runtime
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000 HOSTNAME=0.0.0.0
 WORKDIR /app

@@ -77,11 +77,49 @@ At minimum set `NEXT_PUBLIC_SERVER_URL=https://higreenpanda.com`,
 `SITE_DOMAIN=higreenpanda.com`, `PAYLOAD_SECRET`, `POSTGRES_*`,
 `ADMIN_REQUIRE_2FA=true`, `RESEND_API_KEY` and `ENQUIRY_NOTIFY_TO`.
 
+### Database first, then the app
+
+The order matters, and not only for tidiness. Migrations and seeding run in
+the `tools` service, not in `app`:
+
 ```bash
+# 1. Database only.
+docker compose -f docker-compose.prod.yml up -d --build db
+
+# 2. Schema, then content. Both exit when done; neither stays running.
+docker compose -f docker-compose.prod.yml run --rm tools npm run migrate
+docker compose -f docker-compose.prod.yml run --rm tools npm run seed
+
+# 3. Now bring up the site, the proxy and the backup job.
 docker compose -f docker-compose.prod.yml up -d --build
-docker compose -f docker-compose.prod.yml exec app npm run migrate
-docker compose -f docker-compose.prod.yml exec app npm run seed
 ```
+
+Two things about that sequence.
+
+**Migrations and seeding cannot run in `app`.** The runtime image carries only
+Next's standalone output: an empty `node_modules/.bin`, no `src/migrations`,
+no `src/seed`. `docker compose exec app npm run migrate` fails with
+`cross-env: not found`. It looks like it should work — the standalone output
+copies `package.json`, so the scripts are listed — which is the trap. The
+`tools` service is built from the same Dockerfile's `build` stage, which still
+has the source and the dev dependencies. It sits behind a compose profile, so
+`up -d` never starts it.
+
+**Seeding before `app` starts is what avoids a stale cache.** Page data is
+cached for an hour and invalidated by tag. An edit in the admin panel drops
+exactly the tag it touched; a script running in its own process cannot reach
+the running server to do that. Seed first and `app` starts cold, with nothing
+to invalidate. Seed against a already-running site and it serves pre-seed
+content for up to an hour — the seed prints a restart command when it
+finishes, for exactly that case.
+
+`seed` creates the eight services, the three articles, the founder record, the
+redirects and the first admin user from `SEED_ADMIN_EMAIL` /
+`SEED_ADMIN_PASSWORD`. It is idempotent — re-running it updates rather than
+duplicates, and it never deletes anything an editor has created.
+
+Then **clear `SEED_ADMIN_EMAIL` and `SEED_ADMIN_PASSWORD` from `.env`**; they
+are only needed once.
 
 ### Confirm every service is healthy before going further
 
@@ -105,32 +143,21 @@ without needing a certificate:
 curl -sI -H 'Host: higreenpanda.com' http://127.0.0.1/            # 200
 curl -sI -H 'Host: higreenpanda.com' http://127.0.0.1/en          # 200
 curl -sI -H 'Host: higreenpanda.com' http://127.0.0.1/slot-gacor  # 410
+
+# The old URLs — these read the redirect table out of the database, so they
+# also prove the app can see Postgres on its very first request.
+curl -sI -H 'Host: higreenpanda.com' http://127.0.0.1/en/home/    # 301 → /en
+curl -sI -H 'Host: higreenpanda.com' http://127.0.0.1/about-us/   # 301 → /about
 ```
 
 Do not continue until all of that is right.
 
-`seed` creates the eight services, the three articles, the founder record, the
-redirects and the first admin user from `SEED_ADMIN_EMAIL` /
-`SEED_ADMIN_PASSWORD`. It is idempotent — re-running it updates rather than
-duplicates, and it never deletes anything an editor has created.
-
-```bash
-docker compose -f docker-compose.prod.yml restart app
-```
-
-That restart is not optional. The seed runs in its own process, so it cannot
-drop the running server's cache the way an edit in the admin panel does — page
-data is cached for an hour, and without the restart the site can serve
-pre-seed content for that long. Editing through the admin needs no restart:
-publishing drops exactly the cache tag it touched.
-
-Then **clear `SEED_ADMIN_EMAIL` and `SEED_ADMIN_PASSWORD` from `.env`**; they
-are only needed once.
-
 ### Enrol the second factor
 
+Also in `tools`, and interactive — `run` gives it a terminal:
+
 ```bash
-docker compose -f docker-compose.prod.yml exec app npm run totp:enrol -- admin@higreenpanda.com
+docker compose -f docker-compose.prod.yml run --rm tools npm run totp:enrol -- admin@higreenpanda.com
 ```
 
 Scan the QR code, type the six digits to confirm, and **write down the ten
@@ -178,7 +205,7 @@ fix the cause rather than restarting repeatedly.
 
 ---
 
-## 4. Email — the one change it needs
+## 4. Email — what it needs, and what it must not have done to it
 
 **Mail is working. Do not modify the MX, SPF policy, DKIM or DMARC policy
 records.** As published, the domain has:
@@ -188,45 +215,96 @@ records.** As published, the domain has:
 | MX | `1 smtp.google.com` | Correct — Google Workspace's current single-record format, which replaced the old five-record `ASPMX.L.GOOGLE.COM` set |
 | SPF | `v=spf1 include:_spf.google.com ~all` | Correct for Google-sent mail |
 | DKIM | `google._domainkey`, 2048-bit | Correct |
-| DMARC | `v=DMARC1; p=quarantine; adkim=r; aspf=r` | Policy correct |
+| DMARC | `v=DMARC1; p=quarantine; adkim=r; aspf=r` | Policy correct; `rua` is not — see below |
 
 The mailbox was created on 19 September, which is why nothing in it predates
 that date. Anything sent before the mailbox existed bounced at the sender and
 no DNS change brings it back.
 
-### Two changes, both before any HubSpot campaign sends
+---
 
-HubSpot was connected to `contact@higreenpanda.com` on 19 September. With
-`p=quarantine` in force and HubSpot not authorised for the domain, marketing
-mail sent as `contact@higreenpanda.com` will be quarantined by receivers.
+### 4a. Point the DMARC reports somewhere they are read — do this now
 
-**1. Authorise HubSpot to send as the domain.**
+Not blocked on anything. The `rua` is currently GoDaddy's default,
+`dmarc_rua@onsecureserver.net`, which nobody at HiGreenPanda can open. With
+`p=quarantine` in force that means mail can be quarantined with no visibility
+into what or why. Change **only** the `rua` tag; leave the policy alone:
 
-Get the exact records from HubSpot — Settings → Content → Domains & URLs →
-*Connect a domain* → **Email Sending**. It generates values specific to the
-portal, so do not copy them from anywhere else.
+```
+v=DMARC1; p=quarantine; adkim=r; aspf=r; rua=mailto:contact@higreenpanda.com
+```
 
-Add HubSpot to SPF, keeping Google first and the `~all` as it is:
+The reports are daily XML aggregates and are unreadable by hand — feed the
+address to a DMARC report reader, or expect to ignore them. An address nobody
+reads is still better than one nobody can.
+
+---
+
+### 4b. Authorise HubSpot — blocked until someone completes the portal setup
+
+HubSpot was connected to `contact@higreenpanda.com` on 19 September, but **the
+portal has not finished onboarding and the email sending domain is not
+connected.** That matters for sequencing: HubSpot only generates the DKIM
+records once the Email Sending Domain setup is started, so **there is nothing
+to publish yet.** Anyone who goes looking for those records in DNS today, or
+in HubSpot's docs, will not find them — they do not exist until step 1 below.
+
+With `p=quarantine` in force and HubSpot unauthorised, any marketing mail sent
+as `contact@higreenpanda.com` will be quarantined by receivers. So all five
+steps have to be finished before the first campaign, in this order.
+
+> **Step 1 is a prerequisite for steps 2–5 and cannot be done from this
+> repository, the DNS panel, or the server.** It needs someone signed in to
+> the HubSpot portal with the `sale@higreenpanda.com` login. Until they have
+> done it, steps 2–5 have no inputs. Do not start at step 3 because the SPF
+> include looks like the easy one — on its own it does not work (see 4c).
+
+**1. Connect the email sending domain in HubSpot.** *(portal — blocked on the
+`sale@higreenpanda.com` login)*
+
+In HubSpot: **Settings → Content → Domains & URLs → Connect a domain →
+Email Sending**, and follow it through for `higreenpanda.com`. Completing it
+produces the DNS records for steps 2 and 3, specific to this portal. Do not
+copy those values from another account, another domain, or this document —
+HubSpot generates them per portal and a borrowed value silently fails.
+
+Leave the page open; it is also where HubSpot verifies the records once they
+are published.
+
+**2. Publish the DKIM `CNAME` records HubSpot generated.** *(DNS, after step 1)*
+
+Two records, in the shape `hs1-<id>._domainkey` and `hs2-<id>._domainkey`,
+each pointing at a HubSpot hostname. Take the exact names and values from the
+screen in step 1.
+
+This is the step that actually stops the quarantine — see 4c.
+
+**3. Add HubSpot to SPF.** *(DNS, after step 1)*
+
+One record, edited not replaced. Keep Google first and keep `~all` exactly as
+it is:
 
 ```
 v=spf1 include:_spf.google.com include:<portal-id>.spf<nn>.hubspotemail.net ~all
 ```
 
-Then publish the DKIM `CNAME` records HubSpot gives you (they look like
-`hs1-<id>._domainkey` and `hs2-<id>._domainkey`).
+`<portal-id>` and `<nn>` come from step 1. A domain may publish only one SPF
+record, so this must be an edit to the existing one — a second `v=spf1` record
+invalidates both.
 
-> **Publish the DKIM records, not just the SPF include.** DMARC passes when
-> *either* SPF or DKIM aligns with the visible From domain, and SPF alignment
-> is judged against the return-path, not the From address. HubSpot's default
-> return-path is a HubSpot-owned domain, so SPF will not align to
-> higreenpanda.com however the include is written — even under the relaxed
-> `aspf=r` already in the record. HubSpot's DKIM signs as
-> `d=higreenpanda.com`, which does align. The SPF include is still worth
-> adding, because plenty of receivers check SPF on its own, but DKIM is what
-> actually stops the quarantine.
+**4. Optionally, set a custom return-path.** *(HubSpot + DNS, after step 1)*
 
-Verify before sending to a real list — send one campaign to a personal Gmail
-address and read the raw headers:
+Only needed if you want SPF to align as well as DKIM. HubSpot's own
+documentation is explicit that a sending domain uses the HubSpot default
+return-path until a custom one is set, and that setting one is what allows for
+SPF alignment. DKIM alone is sufficient for DMARC to pass, so this is a
+belt-and-braces step rather than a requirement — but it is cheap, and two
+aligned signals survive one of them breaking.
+
+**5. Verify on a real send, before any list.** *(after 1–4)*
+
+Send one campaign to a personal Gmail address, open it, and use *Show
+original* to read the raw headers:
 
 ```
 Authentication-Results: mx.google.com;
@@ -235,22 +313,30 @@ Authentication-Results: mx.google.com;
   dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=higreenpanda.com
 ```
 
-`dmarc=pass` with `header.from=higreenpanda.com` is the line that matters.
+`dmarc=pass` with `header.from=higreenpanda.com` is the line that matters. If
+it says `dmarc=fail`, stop and fix it — do not send to a list, because
+quarantined mail from a new sending domain damages the domain's reputation
+for months.
 
-**2. Point the DMARC reports somewhere they are read.**
+---
 
-The `rua` is currently GoDaddy's default, `dmarc_rua@onsecureserver.net`,
-which nobody at HiGreenPanda can open. With `p=quarantine` that means mail is
-being quarantined with no visibility into what or why. Change only the `rua`
-tag and leave the policy alone:
+### 4c. Why the SPF include alone is not enough
 
-```
-v=DMARC1; p=quarantine; adkim=r; aspf=r; rua=mailto:contact@higreenpanda.com
-```
+Worth keeping in mind at step 3, because it is the step that looks sufficient
+and is not.
 
-The reports are daily XML aggregates and are unreadable by hand; feed the
-address to a DMARC report reader, or expect to ignore them. An address nobody
-reads is still better than one nobody can.
+DMARC passes when *either* SPF or DKIM aligns with the visible From domain.
+SPF alignment is judged against the return-path — the envelope sender — not
+the From address a reader sees. HubSpot's default return-path is a
+HubSpot-owned domain, so SPF cannot align to `higreenpanda.com` however the
+include is written, even under the relaxed `aspf=r` already in the record.
+That is exactly what step 4 changes, and why it is the one marked optional
+rather than the one marked essential.
+
+HubSpot's DKIM, by contrast, signs as `d=higreenpanda.com`, which does align.
+So DKIM is what makes DMARC pass. The SPF include is still worth publishing —
+plenty of receivers check SPF on its own, outside DMARC — but publishing it
+without the DKIM records leaves the quarantine exactly where it was.
 
 ---
 
@@ -280,13 +366,17 @@ Everything else gets a 404 from Caddy, before the request reaches the app.
 ```bash
 cd ~/higreenpanda
 git pull
+docker compose -f docker-compose.prod.yml run --rm tools npm run migrate
 docker compose -f docker-compose.prod.yml up -d --build
-docker compose -f docker-compose.prod.yml exec app npm run migrate
 ```
 
-If a deploy also re-runs `npm run seed`, restart the app afterwards for the
-reason in §2. A plain deploy needs no restart — `up -d --build` already
-replaces the container, and the runtime image carries no warm cache.
+Migrate before replacing the app, so the new container never meets an old
+schema. Migrations here are additive by construction — see the rollback note
+below for the exception.
+
+No restart step: `up -d --build` replaces the container, and the runtime image
+carries no warm cache. If a deploy also re-runs the seed, run it through
+`tools` *before* `up -d --build` for the reason in §2.
 
 Removing a seeded item is a CMS action, not a code one: deleting it from
 `src/seed/content.ts` stops it being recreated, but does not remove a copy the
@@ -313,7 +403,7 @@ docker compose -f docker-compose.prod.yml up -d --build
 If the bad deploy included a migration, roll that back first:
 
 ```bash
-docker compose -f docker-compose.prod.yml exec app npx payload migrate:down
+docker compose -f docker-compose.prod.yml run --rm tools npx payload migrate:down
 ```
 
 ---
@@ -370,7 +460,7 @@ Then drop the scratch database.
 ### Rebuilding from nothing
 
 The brief's real test: **repository plus a database dump, back up in under an
-hour.** Steps 1, 2 and 3 above, then restore into the live database instead of
+hour.** Sections 1 to 3 above, then restore into the live database instead of
 a scratch one, then restore the media archive into the `media` volume:
 
 ```bash

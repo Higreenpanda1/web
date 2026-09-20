@@ -12,7 +12,19 @@ import { getPayloadClient } from '@/lib/payload'
  * definition — so it needs no auth, and the response is cached for a minute so
  * even a direct hammering costs nothing.
  */
-export const revalidate = 60
+/**
+ * Rendered per request, not prerendered at build time.
+ *
+ * Same reason as the sitemap: `docker build` cannot reach the database, so
+ * prerendering this shipped `{"rules":[]}` inside the image and every deploy
+ * served no redirects at all until the first revalidation. The old site's URLs
+ * are the entire point of this table, so a window where none of them work is
+ * not acceptable — and it is exactly the window a redeploy creates.
+ *
+ * Middleware caches the result in memory for a minute, so this is hit about
+ * once a minute per instance, not once per visitor.
+ */
+export const dynamic = 'force-dynamic'
 
 export async function GET() {
   try {

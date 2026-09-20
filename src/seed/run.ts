@@ -14,8 +14,10 @@ import { CATEGORIES, FOUNDER, POSTS, REDIRECTS, SERVICES } from './content'
  * also means removing an entry from src/seed/content.ts does not remove it from
  * a database that already has it. Delete it in the admin panel.
  *
- * Because it runs in its own process it cannot invalidate a running server's
- * cache; restart the app afterwards. See the note it prints when it finishes.
+ * It runs in its own process, so it cannot invalidate a running server's cache
+ * the way an edit in the admin panel does. DEPLOY.md avoids the problem by
+ * seeding before the app container starts; if you seed against a site that is
+ * already up, restart it — the note printed at the end says so.
  *
  *   npm run seed
  */
@@ -205,11 +207,13 @@ async function main() {
 
   console.log('\nDone. Sign in at /hgp-studio-gate')
   console.log(
-    '\nIf the site is already running, restart it now:\n' +
+    '\nIf the site was ALREADY RUNNING when this ran, restart it now:\n' +
       '  docker compose -f docker-compose.prod.yml restart app\n' +
       'This script runs in its own process, so it cannot drop the running\n' +
-      "server's cache the way an edit in the admin panel does. Without a\n" +
-      'restart the site can serve pre-seed content for up to an hour.',
+      "server's cache the way an edit in the admin panel does, and the site\n" +
+      'would serve pre-seed content for up to an hour.\n' +
+      'On a first deploy the app has not started yet, so there is nothing to\n' +
+      'restart — that is why DEPLOY.md seeds before bringing the app up.',
   )
   process.exit(0)
 }

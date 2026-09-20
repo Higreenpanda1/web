@@ -70,7 +70,9 @@ const ROUTES = [
   ['/robots.txt', 200],
   ['/manifest.webmanifest', 200],
   ['/api/health', 200],
-  // Migration and clean-up behaviour, not just availability.
+  // Migration and clean-up behaviour, not just availability. These two read the
+  // redirect table from the database on the first request after a cold start,
+  // which is how a build-time-prerendered empty table was caught.
   ['/en/home/', 200], // 301 to /en, followed
   ['/about-us/', 200], // 301 to /about, followed
   ['/slot-gacor', 410],

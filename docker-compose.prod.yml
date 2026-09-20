@@ -54,6 +54,34 @@ services:
       retries: 3
       start_period: 40s
 
+  # One-off tooling: migrations, seeding, TOTP enrolment.
+  #
+  # Built from the `build` stage, not the runtime one. The runtime image
+  # carries only Next's standalone output — an empty node_modules/.bin, no
+  # src/migrations, no src/seed — so `npm run migrate` inside it fails with
+  # "cross-env: not found". The standalone output does copy package.json, so
+  # the scripts are listed there and look runnable, which is the trap.
+  #
+  # `profiles` keeps this out of `up -d`; it only ever runs via
+  # `docker compose run --rm tools …` and exits. It shares the internal
+  # network and the media volume, and it is never exposed.
+  tools:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build
+    profiles: ['tools']
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      DATABASE_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    volumes:
+      - media:/app/media
+    networks: [internal]
+
   caddy:
     image: caddy:2.10-alpine
     restart: unless-stopped
