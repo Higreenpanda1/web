@@ -42,6 +42,24 @@ on_err() {
 }
 trap 'on_err "$LINENO" "$BASH_COMMAND"' ERR
 
+# ── run from a file, never from the pipe ─────────────────────────────────────
+# This script is pasted as `curl ... | bash`, which means bash is reading its
+# own source from standard input, a line at a time. Anything further down that
+# also reads standard input — `docker compose run` does, with or without -T —
+# consumes the rest of the script. Bash then reaches end of input and exits 0,
+# having silently skipped every remaining step. That is not theoretical: it
+# swallowed everything after the migration on the first real deployment, and
+# it did it without a single error message.
+#
+# So the very first thing we do is write ourselves to a real file and start
+# again from there, leaving standard input free.
+if [ "${HGP_REEXEC:-0}" != "1" ] && { [ -z "${BASH_SOURCE[0]:-}" ] || [ ! -f "${BASH_SOURCE[0]}" ]; }; then
+  self=$(mktemp /tmp/hgp-deploy.XXXXXXXX.sh)
+  curl -fsSL "${RAW}/ops/deploy.sh" -o "$self"
+  export HGP_REEXEC=1
+  exec bash "$self" "$@"
+fi
+
 # ── talking to the human ─────────────────────────────────────────────────────
 # This script is meant to be piped straight from curl into bash, which means
 # stdin is the script itself, not the keyboard. Every prompt therefore reads
@@ -72,7 +90,7 @@ if [ "$(id -u)" -ne 0 ]; then
   command -v sudo >/dev/null 2>&1 || die "This needs to run as root, and sudo is not installed.
 Log in as root and paste the command again."
   warn "not root — re-running through sudo"
-  exec sudo -E bash -c "$(curl -fsSL "${RAW}/ops/deploy.sh")"
+  exec sudo -E env HGP_REEXEC=1 bash "${BASH_SOURCE[0]}" "$@"
 fi
 ok "running as root on $(. /etc/os-release 2>/dev/null && echo "${PRETTY_NAME:-this machine}")"
 
@@ -208,7 +226,7 @@ ADMIN_EMAIL=$(grep '^SEED_ADMIN_EMAIL=' .env | cut -d= -f2-)
 # the content has to exist before the app starts — otherwise the app caches an
 # empty sitemap and an empty redirect table for an hour.
 step "Starting the database"
-$COMPOSE up -d --build db
+$COMPOSE up -d --build db </dev/null
 ok "database running"
 
 # Payload's CLI has been known to finish its work and still exit non-zero on
@@ -217,7 +235,7 @@ ok "database running"
 # asking the database whether the tables are actually there before deciding.
 step "Creating the database tables (this can take a minute)"
 migrate_code=0
-$COMPOSE run --rm -T tools npm run migrate || migrate_code=$?
+$COMPOSE run --rm -T tools npm run migrate </dev/null || migrate_code=$?
 if [ "$migrate_code" -ne 0 ]; then
   warn "migrate exited $migrate_code — checking whether the tables landed anyway"
   if $COMPOSE exec -T db psql -U "${POSTGRES_USER:-higreenpanda}" \
@@ -234,7 +252,7 @@ fi
 
 step "Loading the services, articles and settings"
 seed_code=0
-$COMPOSE run --rm -T tools npm run seed || seed_code=$?
+$COMPOSE run --rm -T tools npm run seed </dev/null || seed_code=$?
 if [ "$seed_code" -ne 0 ]; then
   warn "seed exited $seed_code. The site will still start; if it comes up empty,
        re-run this script and it will try again."
@@ -243,7 +261,7 @@ else
 fi
 
 step "Building and starting the website (the slow part — several minutes)"
-$COMPOSE up -d --build
+$COMPOSE up -d --build </dev/null
 ok "all services started"
 
 # ── health ───────────────────────────────────────────────────────────────────
