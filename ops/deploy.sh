@@ -117,6 +117,14 @@ if ! command -v git >/dev/null 2>&1; then
   ok "installed git"
 fi
 
+# The previous run handed this tree to the deploy user, and git refuses to
+# operate on a repository owned by somebody else — a sensible default that
+# turns this script's own tidying-up into a hard stop on the second run.
+# Declaring it safe is the documented answer; we own both accounts.
+if ! git config --global --get-all safe.directory 2>/dev/null | grep -qxF "$APP_DIR"; then
+  git config --global --add safe.directory "$APP_DIR"
+fi
+
 if [ -d "$APP_DIR/.git" ]; then
   git -C "$APP_DIR" fetch origin "$BRANCH" --quiet
   git -C "$APP_DIR" checkout "$BRANCH" --quiet
