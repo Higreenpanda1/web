@@ -17,7 +17,7 @@ export function BlockActions({
   if (!actions || actions.length === 0) return null
 
   return (
-    <div className="mt-7 flex flex-wrap gap-3">
+    <div className="mt-8 flex flex-wrap gap-3">
       {actions.map((action, index) => (
         <ButtonLink
           key={action.id ?? `${action.href}-${index}`}

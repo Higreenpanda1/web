@@ -2,20 +2,22 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 
+import { ContactPanel } from '@/components/home/ContactPanel'
 import { JsonLd } from '@/components/JsonLd'
+import { PlayMark } from '@/components/layout/Logo'
 import { PostCard } from '@/components/PostCard'
 import { RichText } from '@/components/RichText'
-import { ButtonLink } from '@/components/ui/Button'
+import { Breadcrumb } from '@/components/ui/Breadcrumb'
 import { Container } from '@/components/ui/Container'
-import { Section } from '@/components/ui/Section'
+import { Eyebrow } from '@/components/ui/Eyebrow'
+import { Section, SectionHeading } from '@/components/ui/Section'
 import { formatDate, isoDate } from '@/i18n/format'
-import { Link } from '@/i18n/navigation'
 import { blogPostingJsonLd, breadcrumbJsonLd } from '@/lib/jsonld'
 import { getPostBySlug, getSiteSettings } from '@/lib/queries'
 import { buildMetadata, mediaUrl } from '@/lib/seo'
 
 import type { Locale } from '@/i18n/routing'
-import type { Media, Post, TeamMember } from '@/payload-types'
+import type { Category, Media, Post, TeamMember } from '@/payload-types'
 import type { Metadata } from 'next'
 
 export async function generateMetadata({
@@ -58,6 +60,9 @@ export default async function PostPage({
   const cover = typeof post.coverImage === 'object' ? (post.coverImage as Media) : null
   const coverSrc = mediaUrl(cover, 'feature')
   const author = typeof post.author === 'object' && post.author ? (post.author as TeamMember) : null
+  const category = (post.categories ?? []).find(
+    (entry): entry is Category => typeof entry === 'object' && entry !== null,
+  )
   const related = (post.relatedPosts ?? []).filter(
     (entry): entry is Post => typeof entry === 'object' && entry !== null,
   )
@@ -74,30 +79,49 @@ export default async function PostPage({
       />
 
       <article>
-        <Container as="header" className="py-12 md:py-16">
-          <nav aria-label={t('a11y.breadcrumb')} className="mb-5 text-caption">
-            <Link href="/blog" className="no-underline hover:underline">
-              {t('blog.backToBlog')}
-            </Link>
-          </nav>
+        <header className="relative isolate overflow-hidden bg-surface bg-gradient-hero">
+          <div className="absolute inset-0 -z-10 bg-dots opacity-70" aria-hidden="true" />
+          <Container className="py-12 md:py-16">
+            <Breadcrumb
+              label={t('a11y.breadcrumb')}
+              className="mb-8"
+              items={[
+                { name: t('nav.home'), href: '/' },
+                { name: t('blog.title'), href: '/blog' },
+                { name: post.title },
+              ]}
+            />
+            <div className="mx-auto max-w-[var(--measure)]">
+              {category ? <Eyebrow className="mb-4">{category.title}</Eyebrow> : null}
+              <h1 className="text-display">{post.title}</h1>
+              <p className="mt-6 text-body-lg text-text-muted">{post.excerpt}</p>
+              <p className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 text-caption text-text-muted">
+                {author ? (
+                  <span className="inline-flex items-center gap-2 font-semibold text-text">
+                    <span
+                      aria-hidden="true"
+                      className="inline-flex size-8 items-center justify-center rounded-full bg-surface-tint text-caption font-bold text-brand-800"
+                    >
+                      {author.name.slice(0, 1)}
+                    </span>
+                    {t('blog.by', { author: author.name })}
+                  </span>
+                ) : null}
+                <bdi>
+                  <time dateTime={isoDate(post.publishedAt)}>
+                    {t('blog.publishedOn', { date: formatDate(post.publishedAt, locale) })}
+                  </time>
+                </bdi>
+                {post.readingMinutes ? (
+                  <bdi>{t('blog.readingTime', { minutes: post.readingMinutes })}</bdi>
+                ) : null}
+              </p>
+            </div>
+          </Container>
+        </header>
 
-          <div className="max-w-[var(--measure)]">
-            <h1 className="text-h1">{post.title}</h1>
-            <p className="ltr-nums mt-4 text-caption text-[var(--text-muted)]">
-              <time dateTime={isoDate(post.publishedAt)}>
-                {t('blog.publishedOn', { date: formatDate(post.publishedAt, locale) })}
-              </time>
-              {post.readingMinutes ? (
-                <> · {t('blog.readingTime', { minutes: post.readingMinutes })}</>
-              ) : null}
-              {author ? <> · {t('blog.by', { author: author.name })}</> : null}
-            </p>
-            <p className="mt-5 text-body-lg text-[var(--text-muted)]">{post.excerpt}</p>
-          </div>
-        </Container>
-
-        {coverSrc ? (
-          <Container>
+        <Container>
+          {coverSrc ? (
             <Image
               src={coverSrc}
               alt={cover?.alt ?? ''}
@@ -105,31 +129,29 @@ export default async function PostPage({
               height={720}
               priority
               sizes="(min-width: 1200px) 1200px, 100vw"
-              className="aspect-[16/9] w-full rounded-[var(--radius-lg)] object-cover"
+              className="aspect-[16/9] w-full rounded-xl object-cover shadow-card"
             />
-          </Container>
-        ) : null}
+          ) : null}
+        </Container>
 
-        <Container className="py-12">
-          <RichText data={post.body} />
+        <Container className="py-12 md:py-16">
+          <div className="mx-auto max-w-[var(--measure)]">
+            <RichText data={post.body} className="text-body-lg" />
+            <p className="mt-12 flex items-center gap-3 border-t border-border-soft pt-8 text-caption text-text-muted">
+              <PlayMark size={28} />
+              {settings.organisationName}
+            </p>
+          </div>
         </Container>
       </article>
 
-      <Section tone="inverse">
-        <div className="max-w-[var(--measure)]">
-          <h2 className="text-white">{t('home.contactTitle')}</h2>
-          <p className="mt-4 text-body-lg text-[var(--brand-100)]">{t('home.contactLead')}</p>
-          <ButtonLink href="/contact" size="lg" variant="inverse" className="mt-7">
-            {t('cta.enquire')}
-          </ButtonLink>
-        </div>
-      </Section>
-
       {related.length > 0 ? (
         <Section tone="sunken" labelledBy="related-heading">
-          <h2 id="related-heading" className="mb-8">
-            {t('blog.relatedTitle')}
-          </h2>
+          <SectionHeading
+            id="related-heading"
+            eyebrow={t('blog.eyebrow')}
+            title={t('blog.relatedTitle')}
+          />
           <ul className="grid list-none gap-5 p-0 sm:grid-cols-2 lg:grid-cols-3">
             {related.map((item) => (
               <PostCard key={item.id} post={item} locale={locale} />
@@ -137,6 +159,17 @@ export default async function PostPage({
           </ul>
         </Section>
       ) : null}
+
+      <Section className="pt-0 md:pt-0">
+        <ContactPanel
+          locale={locale}
+          settings={settings}
+          eyebrow={t('home.contactEyebrow')}
+          heading={t('home.contactTitle')}
+          lead={t('home.contactLead')}
+          showForm={false}
+        />
+      </Section>
     </>
   )
 }

@@ -1,9 +1,9 @@
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 
-import { Link } from '@/i18n/navigation'
 import { ServiceIcon } from '@/components/ServiceIcon'
 import { Card } from '@/components/ui/Card'
+import { Link } from '@/i18n/navigation'
 import { cn } from '@/lib/cn'
 
 import type { Locale } from '@/i18n/routing'
@@ -26,46 +26,61 @@ export async function ServiceCard({
   return (
     <Card
       as="li"
+      interactive
       className={cn(
-        'group flex flex-col hover:shadow-lg',
-        featured && 'border-[var(--brand-300)] bg-[var(--surface-tint)] md:col-span-2',
+        'group relative flex flex-col',
+        featured &&
+          'border-transparent bg-gradient-brand text-white hover:border-transparent sm:col-span-2 lg:col-span-2',
       )}
     >
-      <span
-        className={cn(
-          'mb-4 inline-flex size-12 items-center justify-center rounded-[var(--radius)]',
-          featured
-            ? 'bg-[var(--brand-700)] text-white'
-            : 'bg-[var(--brand-100)] text-[var(--brand-700)]',
-        )}
-      >
-        <ServiceIcon name={service.icon} />
-      </span>
+      <div className="flex items-start justify-between gap-4">
+        <span
+          className={cn(
+            'inline-flex size-14 items-center justify-center rounded-lg transition-colors duration-300',
+            featured
+              ? 'bg-white/15 text-white'
+              : 'bg-surface-tint text-brand-700 group-hover:bg-brand-700 group-hover:text-white',
+          )}
+        >
+          <ServiceIcon name={service.icon} />
+        </span>
+        {featured ? (
+          <span className="rounded-full bg-white/15 px-3 py-1 text-eyebrow font-bold tracking-[0.1em] text-white uppercase">
+            {t('services.featured')}
+          </span>
+        ) : null}
+      </div>
 
-      {featured ? (
-        <p className="mb-1 text-caption font-semibold text-[var(--accent-text)]">
-          {t('services.featured')}
-        </p>
-      ) : null}
-
-      <h3 className="text-h3">
+      <h3 className={cn('mt-6', featured && 'text-h2 text-white')}>
         <Link
           href={`/services/${service.slug}`}
-          className="text-[var(--heading)] no-underline after:absolute after:inset-0 after:content-['']"
+          className="text-inherit no-underline after:absolute after:inset-0 after:content-['']"
         >
           {service.title}
         </Link>
       </h3>
 
-      <p className="mt-2 flex-1 text-[var(--text-muted)]">{service.summary}</p>
+      <p
+        className={cn(
+          'mt-3 flex-1',
+          featured ? 'max-w-[40rem] text-body-lg text-brand-100' : 'text-text-muted',
+        )}
+      >
+        {service.summary}
+      </p>
 
-      <span className="mt-4 inline-flex items-center gap-1.5 font-semibold text-[var(--text-brand)]">
+      <span
+        className={cn(
+          'mt-6 inline-flex items-center gap-1.5 font-semibold',
+          featured ? 'text-white' : 'text-text-brand',
+        )}
+      >
         {t('cta.learnMore')}
         <Arrow
           size={18}
-          strokeWidth={1.5}
+          strokeWidth={2}
           aria-hidden="true"
-          className="transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5"
+          className="transition-transform duration-300 group-hover:translate-x-1 rtl:group-hover:-translate-x-1"
         />
       </span>
     </Card>

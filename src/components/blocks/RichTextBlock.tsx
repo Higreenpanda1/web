@@ -8,8 +8,10 @@ type Block = Extract<NonNullable<Page['layout']>[number], { blockType: 'richText
 export function RichTextBlock({ block }: { block: Block }) {
   return (
     <Section>
-      {block.heading ? <h2 className="mb-6">{block.heading}</h2> : null}
-      <RichText data={block.content} />
+      <div className="mx-auto max-w-[var(--measure)]">
+        {block.heading ? <h2 className="mb-6">{block.heading}</h2> : null}
+        <RichText data={block.content} className="text-body-lg" />
+      </div>
     </Section>
   )
 }

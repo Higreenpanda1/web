@@ -1,5 +1,6 @@
 import { getTranslations } from 'next-intl/server'
 
+import { PlayMark } from '@/components/layout/Logo'
 import { ButtonLink } from '@/components/ui/Button'
 import { Container } from '@/components/ui/Container'
 
@@ -10,15 +11,19 @@ export default async function NotFound() {
   const t = await getTranslations()
 
   return (
-    <Container className="py-24 text-center">
-      <p className="ltr-nums text-h1 font-bold text-[var(--brand-400)]">404</p>
-      <h1 className="mt-3 text-h1">{t('error.notFoundTitle')}</h1>
-      <p className="mx-auto mt-4 max-w-[var(--measure)] text-body-lg text-[var(--text-muted)]">
-        {t('error.notFoundBody')}
-      </p>
-      <ButtonLink href="/" size="lg" className="mt-8">
-        {t('error.backHome')}
-      </ButtonLink>
-    </Container>
+    <section className="relative isolate overflow-hidden bg-surface bg-gradient-hero">
+      <div className="absolute inset-0 -z-10 bg-dots opacity-70" aria-hidden="true" />
+      <Container className="py-24 text-center md:py-32">
+        <PlayMark size={72} className="mx-auto" />
+        <p className="ltr-nums mt-8 text-eyebrow font-bold tracking-[0.2em] text-text-brand">404</p>
+        <h1 className="mt-3 text-display">{t('error.notFoundTitle')}</h1>
+        <p className="mx-auto mt-5 max-w-[var(--measure)] text-body-lg text-text-muted">
+          {t('error.notFoundBody')}
+        </p>
+        <ButtonLink href="/" size="lg" className="mt-9">
+          {t('error.backHome')}
+        </ButtonLink>
+      </Container>
+    </section>
   )
 }

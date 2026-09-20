@@ -232,9 +232,9 @@ Using the knockout on a green background makes the triangle vanish. This is the 
 
 | Variant | File | Use |
 |---------|------|-----|
-| Wordmark, full colour | `web/logo-wordmark@2x.png` | Site header, documents, letterhead |
-| Wordmark, white | `web/logo-wordmark-mono-white@2x.png` | Dark footers, over photography, green panels |
-| Wordmark, black | `web/logo-wordmark-mono-black@2x.png` | Single-colour print, faxes, stamps |
+| Wordmark, full colour | `vector/logo-wordmark.svg` (PNG: `web/logo-wordmark@2x.png`) | Site header, documents, letterhead |
+| Wordmark, white | `vector/logo-wordmark-white.svg` (PNG: `web/logo-wordmark-white@2x.png`) | Dark footers, over photography, green panels — green disc kept, triangle painted white |
+| Wordmark, mono | `vector/logo-wordmark-mono-black.svg`, `-mono-white.svg` | Single-colour print, faxes, stamps |
 | Icon, knockout | `vector/icon-play.svg` | Light backgrounds |
 | Icon, solid white triangle | `vector/icon-play-white.svg` | Dark or green backgrounds |
 | Icon, mono | `vector/icon-mono-black.svg`, `-white.svg` | One-colour applications |
@@ -245,9 +245,16 @@ Using the knockout on a green background makes the triangle vanish. This is the 
 - **Minimum size:** wordmark no smaller than 100px wide on screen, 22mm in print. Below that, use the icon alone — it is designed for it.
 - **Never:** stretch or squash, re-colour, add shadows or outlines, rotate, put the knockout version on a busy photo, or rebuild the letterforms in another typeface.
 
-### One gap to close
+### Vector masters — gap closed 20 September 2026
 
-You sent raster files (JPG and PNG). The icon has been rebuilt as clean vector, but **the HiGP wordmark exists only as pixels.** Ask whoever designed it for the original `.ai`, `.svg`, or `.eps`. Until then the supplied PNGs go up to 2379px wide, which covers every web use and most print, but a true vector wordmark should be obtained for large-format printing and banners.
+The wordmark now exists as true vector: `vector/logo-wordmark.svg`, traced
+from the 2379px master at high resolution. The letterforms are deliberately
+hand-cut in the original — the P stem is very slightly slanted, the "i" stem is
+hand-drawn — and the trace preserves that exactly rather than "correcting" it.
+The disc and the play triangle are exact geometry. White, mono-black and
+mono-white wordmarks are derived from the same file, and the site header
+renders the same geometry inline. Large-format print and banners can use the
+SVG directly.
 
 ---
 
@@ -349,7 +356,7 @@ All 37 files are in `brand-assets/`, produced from your artwork.
 
 ### `vector/` — scalable masters
 
-`icon-play.svg` (knockout) · `icon-play-white.svg` (solid) · `icon-mono-black.svg` · `icon-mono-white.svg`
+`logo-wordmark.svg` · `logo-wordmark-white.svg` · `logo-wordmark-mono-black.svg` · `logo-wordmark-mono-white.svg` · `icon-play.svg` (knockout) · `icon-play-white.svg` (solid) · `icon-mono-black.svg` · `icon-mono-white.svg`
 
 ### `web/` — site assets
 
@@ -371,7 +378,7 @@ All 37 files are in `brand-assets/`, produced from your artwork.
 
 | File | Size | Where |
 |------|------|-------|
-| `og-image.png`, `-en`, `-ar` | 1200 × 630 | Link previews on WhatsApp, Facebook, LinkedIn |
+| `og-image.png`, `-en`, `-ar` | 1200 × 630 | Link previews on WhatsApp, Facebook, LinkedIn — wordmark plus the tagline in that language, set in the site's own Plex fonts |
 | `avatar.png` | 400 × 400 | Instagram, Facebook, YouTube — full-bleed, survives circular cropping |
 | `avatar-800.png` | 800 × 800 | High-DPI profiles |
 | `whatsapp-profile.png` | 640 × 640 | WhatsApp Business |
@@ -384,10 +391,11 @@ All 37 files are in `brand-assets/`, produced from your artwork.
 
 ### Regenerating
 
-`generate-logo-assets.sh` rebuilds the whole set from a single master file. When you get the vector wordmark from your designer, run:
+`scripts/brand/build.mjs` rebuilds the whole set from the vector masters and
+needs nothing beyond the project's own dependencies:
 
 ```bash
-./generate-logo-assets.sh logo-wordmark.svg brand-assets
+node scripts/brand/build.mjs
 ```
 
 ---

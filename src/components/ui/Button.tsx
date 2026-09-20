@@ -3,39 +3,37 @@ import { cn } from '@/lib/cn'
 
 import type { ComponentProps, ReactNode } from 'react'
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'inverse' | 'outline-inverse'
-type Size = 'md' | 'lg'
+type Variant = 'primary' | 'secondary' | 'ghost' | 'inverse' | 'outline-inverse' | 'soft'
+type Size = 'sm' | 'md' | 'lg'
 
 /**
  * WCAG note (brief section 12): white text on --brand-600 is 4.16:1, which
  * fails AA at normal size. The primary button therefore uses --brand-700
- * (6.48:1) for its fill, not the logo green. The two greens are close enough
- * that nothing is lost visually, and the labels stay readable on a phone in
- * direct sunlight.
+ * (6.48:1) for its fill, not the logo green.
+ *
+ * Buttons are pills: the rounded "i" stem in the wordmark is the one soft
+ * shape in an otherwise hard-edged mark, and the controls echo it.
  */
 const VARIANT_CLASS: Record<Variant, string> = {
   primary:
-    'bg-[var(--brand-700)] text-white hover:bg-[var(--brand-800)] active:bg-[var(--brand-900)]',
+    'bg-brand-700 text-white shadow-[0_1px_2px_rgb(18_52_27/0.2),0_10px_24px_-12px_rgb(39_107_52/0.8)] hover:bg-brand-800 active:bg-brand-900',
   secondary:
-    'bg-transparent text-[var(--text-brand)] border border-[var(--brand-700)] hover:bg-[var(--brand-100)]',
-  ghost: 'bg-transparent text-[var(--text-brand)] hover:bg-[var(--brand-100)]',
-  inverse: 'bg-white text-[var(--brand-800)] hover:bg-[var(--brand-100)]',
-  // For a dark or photographic background. A real variant rather than adding
-  // `text-…` on top of `secondary`: both would set the same property, Tailwind's
-  // emission order would decide the winner, and the losing case here was
-  // --brand-700 green on --brand-900 green, which Lighthouse correctly failed
-  // for contrast.
-  'outline-inverse':
-    'bg-transparent text-white border border-[var(--brand-400)] hover:bg-[var(--brand-800)]',
+    'bg-surface text-heading border border-border-strong hover:border-brand-400 hover:bg-surface-tint-soft',
+  soft: 'bg-surface-tint text-brand-900 hover:bg-brand-200',
+  ghost: 'bg-transparent text-text-brand hover:bg-surface-tint-soft',
+  inverse: 'bg-white text-brand-900 shadow-[0_10px_24px_-12px_rgb(0_0_0/0.5)] hover:bg-brand-50',
+  // For a dark or photographic background.
+  'outline-inverse': 'bg-white/0 text-white border border-white/35 hover:bg-white/10',
 }
 
 const SIZE_CLASS: Record<Size, string> = {
-  md: 'px-5 py-2.5 text-body',
-  lg: 'px-7 py-3.5 text-body-lg',
+  sm: 'min-h-10 px-4 py-2 text-caption',
+  md: 'min-h-11 px-5 py-2.5 text-body',
+  lg: 'min-h-13 px-7 py-3.5 text-body-lg',
 }
 
 const BASE =
-  'inline-flex items-center justify-center gap-2 rounded-[var(--radius)] font-semibold no-underline transition-colors duration-150 min-h-11'
+  'inline-flex items-center justify-center gap-2 rounded-full font-semibold no-underline transition-[background-color,border-color,color,box-shadow,transform] duration-200 active:scale-[0.98]'
 
 type CommonProps = {
   variant?: Variant
@@ -96,7 +94,7 @@ export function Button({
         BASE,
         VARIANT_CLASS[variant],
         SIZE_CLASS[size],
-        'disabled:opacity-60 disabled:cursor-not-allowed',
+        'disabled:cursor-not-allowed disabled:opacity-60',
         className,
       )}
       {...rest}

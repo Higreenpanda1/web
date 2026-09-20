@@ -65,7 +65,21 @@
     "blogLead": "Practical articles about importing from China, written in Arabic.",
     "testimonialsTitle": "What our clients say",
     "contactTitle": "Tell us what you need",
-    "contactLead": "Fill in the form or message us directly on WhatsApp. We reply within one working day."
+    "contactLead": "Fill in the form or message us directly on WhatsApp. We reply within one working day.",
+    "heroChipReply": "We reply within one working day",
+    "heroChipCities": "235+ Chinese cities",
+    "journeyTitle": "Your import journey",
+    "journeyStatus": "One partner, start to finish",
+    "journeyDone": "Done",
+    "journeyNow": "In progress",
+    "journeyNext": "Next",
+    "servicesEyebrow": "Our services",
+    "processEyebrow": "How it works",
+    "founderEyebrow": "The founder",
+    "blogEyebrow": "From the blog",
+    "contactEyebrow": "Get started",
+    "contactOr": "or tell us here and we will get back to you",
+    "statsEyebrow": "Numbers, not promises"
   },
   "services": {
     "title": "Our services",
@@ -73,7 +87,11 @@
     "featured": "Flagship service",
     "otherServices": "Other services",
     "enquireAbout": "Ask about {service}",
-    "empty": "No services have been published yet."
+    "empty": "No services have been published yet.",
+    "eyebrow": "Services",
+    "detailEyebrow": "Service",
+    "highlightsTitle": "What you get",
+    "faqTitle": "Common questions"
   },
   "about": {
     "title": "About us",
@@ -84,7 +102,9 @@
     "storyTitle": "Our story",
     "valuesTitle": "How we work",
     "teamTitle": "The team",
-    "contactTitle": "Talk to us directly"
+    "contactTitle": "Talk to us directly",
+    "eyebrow": "About HiGreenPanda",
+    "valuesLead": "On the ground, plain-spoken, and transparent about cost and process."
   },
   "blog": {
     "title": "Blog",
@@ -103,7 +123,9 @@
       "next": "Next",
       "page": "Page {current} of {total}",
       "label": "Article pagination"
-    }
+    },
+    "eyebrow": "Blog",
+    "noCover": "Article"
   },
   "contact": {
     "title": "Contact",
@@ -150,7 +172,9 @@
         "tooFast": "We could not verify the form. Please try again.",
         "generic": "Could not send your enquiry. Please try again."
       }
-    }
+    },
+    "eyebrow": "Contact",
+    "formLead": "Two minutes. We reply on WhatsApp within one working day."
   },
   "footer": {
     "aboutBlurb": "A trade services company in China, serving Arabic-speaking traders and entrepreneurs.",
@@ -161,7 +185,8 @@
     "rights": "All rights reserved.",
     "privacy": "Privacy policy",
     "terms": "Terms and conditions",
-    "builtNote": "Built securely and backed up daily."
+    "builtNote": "Built securely and backed up daily.",
+    "tagline": "Your partner on the ground in China"
   },
   "legal": {
     "privacyTitle": "Privacy policy",

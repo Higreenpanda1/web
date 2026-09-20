@@ -1,10 +1,13 @@
 import { getTranslations } from 'next-intl/server'
 
-import { Link } from '@/i18n/navigation'
+import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon'
 import { ButtonLink } from '@/components/ui/Button'
-import { Logo } from './Logo'
+import { Link } from '@/i18n/navigation'
+import { whatsappLink } from '@/lib/url'
 import { LocaleSwitcher } from './LocaleSwitcher'
+import { Wordmark } from './Logo'
 import { MobileNav } from './MobileNav'
+import { NavLink } from './NavLink'
 
 import type { Locale } from '@/i18n/routing'
 import type { SiteSetting } from '@/payload-types'
@@ -24,23 +27,21 @@ export async function Header({ locale, settings }: { locale: Locale; settings: S
           { label: t('nav.contact'), href: '/contact' },
         ]
 
+  const whatsapp = whatsappLink(settings.whatsappNumber, settings.whatsappPrefill ?? undefined)
+
   return (
-    <header className="relative sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--surface)]/95 backdrop-blur supports-[backdrop-filter]:bg-[var(--surface)]/80">
-      <div className="container-page flex h-[var(--header-height)] items-center justify-between gap-2 md:gap-4">
-        <Link href="/" className="no-underline" aria-label={t('site.name')}>
-          <Logo label={t('site.name')} />
+    <header className="sticky top-0 z-40 border-b border-border-soft bg-surface/85 backdrop-blur-md">
+      <div className="container-page flex h-[var(--header-height)] items-center justify-between gap-3">
+        <Link href="/" className="shrink-0 rounded-sm no-underline" aria-label={t('site.name')}>
+          <Wordmark height={48} className="h-10 w-auto md:h-12" />
+          <span className="sr-only">{t('site.name')}</span>
         </Link>
 
-        <nav aria-label={t('nav.primary')} className="hidden md:block">
+        <nav aria-label={t('nav.primary')} className="hidden lg:block">
           <ul className="flex items-center gap-1">
             {items.map((item) => (
               <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className="inline-flex min-h-11 items-center rounded-[var(--radius)] px-3 py-2 font-semibold text-[var(--text)] no-underline transition-colors hover:bg-[var(--surface-tint)] hover:text-[var(--text-brand)]"
-                >
-                  {item.label}
-                </Link>
+                <NavLink href={item.href} label={item.label} />
               </li>
             ))}
           </ul>
@@ -51,13 +52,21 @@ export async function Header({ locale, settings }: { locale: Locale; settings: S
             locale={locale}
             label={t('locale.label')}
             switchTo={t('locale.switchTo')}
+            className="hidden sm:inline-flex"
           />
+          <a
+            href={whatsapp}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={t('cta.whatsapp')}
+            title={t('cta.whatsapp')}
+            className="hidden size-11 items-center justify-center rounded-full border border-border bg-surface text-text-brand transition-colors hover:border-brand-300 hover:bg-surface-tint-soft md:inline-flex"
+          >
+            <WhatsAppIcon size={20} />
+          </a>
           {/* The wrapper, rather than `hidden sm:inline-flex` on the button
-              itself: `hidden` and the button's own `inline-flex` both set
-              `display`, and which one wins is decided by the order Tailwind
-              emits them, not by the order they are written. On a 390px phone
-              the button stayed visible, pushed the header 96px past the
-              viewport, and put the language switcher off-screen entirely. */}
+              itself: both would set `display` and Tailwind's emission order
+              would decide the winner. */}
           <span className="hidden sm:block">
             <ButtonLink href="/contact">{t('cta.enquire')}</ButtonLink>
           </span>
@@ -66,7 +75,18 @@ export async function Header({ locale, settings }: { locale: Locale; settings: S
             openLabel={t('nav.openMenu')}
             closeLabel={t('nav.closeMenu')}
             navLabel={t('nav.primary')}
-          />
+            ctaLabel={t('cta.enquire')}
+            ctaHref="/contact"
+            whatsappLabel={t('cta.whatsapp')}
+            whatsappHref={whatsapp}
+          >
+            <LocaleSwitcher
+              locale={locale}
+              label={t('locale.label')}
+              switchTo={t('locale.switchTo')}
+              className="sm:hidden"
+            />
+          </MobileNav>
         </div>
       </div>
     </header>

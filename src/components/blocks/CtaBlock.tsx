@@ -1,5 +1,6 @@
-import { EnquiryFormSection } from '@/components/forms/EnquiryFormSection'
+import { ContactPanel } from '@/components/home/ContactPanel'
 import { Section } from '@/components/ui/Section'
+import { getSiteSettings } from '@/lib/queries'
 import { BlockActions } from './BlockActions'
 
 import type { Locale } from '@/i18n/routing'
@@ -7,37 +8,24 @@ import type { Page } from '@/payload-types'
 
 type Block = Extract<NonNullable<Page['layout']>[number], { blockType: 'cta' }>
 
-export function CtaBlock({ block, locale }: { block: Block; locale: Locale }) {
-  if (block.showEnquiryForm) {
-    return (
-      <Section tone="sunken" id="enquire">
-        <div className="grid gap-10 lg:grid-cols-2">
-          <div>
-            <h2>{block.heading}</h2>
-            {block.body ? (
-              <p className="mt-4 max-w-[var(--measure)] text-body-lg text-[var(--text-muted)]">
-                {block.body}
-              </p>
-            ) : null}
-            <BlockActions actions={block.actions} />
-          </div>
-          <div className="rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)] p-6 md:p-8">
-            <EnquiryFormSection locale={locale} compact />
-          </div>
-        </div>
-      </Section>
-    )
-  }
+export async function CtaBlock({ block, locale }: { block: Block; locale: Locale }) {
+  const settings = await getSiteSettings(locale)
 
   return (
-    <Section tone="inverse" id="enquire">
-      <div className="max-w-[var(--measure)]">
-        <h2 className="text-white">{block.heading}</h2>
-        {block.body ? (
-          <p className="mt-4 text-body-lg text-[var(--brand-100)]">{block.body}</p>
-        ) : null}
-        <BlockActions actions={block.actions} inverse />
-      </div>
+    <Section className="py-10 md:py-14">
+      <ContactPanel
+        id="enquire"
+        locale={locale}
+        settings={settings}
+        heading={block.heading}
+        lead={block.body}
+        showForm={Boolean(block.showEnquiryForm)}
+        actions={
+          block.actions && block.actions.length > 0 ? (
+            <BlockActions actions={block.actions} inverse />
+          ) : undefined
+        }
+      />
     </Section>
   )
 }

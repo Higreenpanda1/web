@@ -11,8 +11,7 @@ import localFont from 'next/font/local'
  *
  * Splitting Arabic and Latin into two font objects with explicit unicode ranges
  * means an English page never downloads the 43 KB Arabic face, and Latin
- * numerals inside Arabic text still render from the Latin file. `size-adjust`
- * fallbacks come from next/font, which is what keeps CLS at zero.
+ * numerals inside Arabic text still render from the Latin file.
  *
  * Two weights, not three. The brief's type scale asks for 600 on H2 and H3, but
  * it also says two weights per language is enough — and the 600 files cost
@@ -29,6 +28,17 @@ import localFont from 'next/font/local'
  *
  * Google Fonts is deliberately not used: a third-party request, a privacy
  * exposure, and a render delay (brief section 13).
+ *
+ * WHY THERE ARE NO `fallback` LISTS HERE. next/font appends the fallback
+ * fonts to the CSS variable it exports, so `var(--font-plex-latin)` used to
+ * expand to `plexLatin, "plexLatin Fallback", ui-sans-serif, system-ui,
+ * sans-serif`. Put that first in a font stack and `sans-serif` — which can
+ * draw Arabic — sits ahead of plexArabic, so the Arabic face was never
+ * requested and the entire Arabic site rendered in a system font. The generic
+ * fallbacks now live once, at the end of `--font-sans` in globals.css, after
+ * both real faces. The Latin face also drops its metric-adjusted fallback:
+ * that face is `local(Arial)` with no unicode-range, and Arial has Arabic
+ * glyphs too, so it would have caught the Arabic text just the same.
  */
 
 // The unicode ranges are written inline below rather than hoisted into
@@ -43,6 +53,8 @@ export const plexLatin = localFont({
   variable: '--font-plex-latin',
   display: 'swap',
   preload: false,
+  fallback: [],
+  adjustFontFallback: false,
   declarations: [
     {
       prop: 'unicode-range',
@@ -50,7 +62,6 @@ export const plexLatin = localFont({
         'U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD',
     },
   ],
-  fallback: ['ui-sans-serif', 'system-ui', 'Segoe UI', 'sans-serif'],
 })
 
 export const plexArabic = localFont({
@@ -61,11 +72,11 @@ export const plexArabic = localFont({
   variable: '--font-plex-arabic',
   display: 'swap',
   preload: false,
+  fallback: [],
   declarations: [
     {
       prop: 'unicode-range',
       value: 'U+0600-06FF,U+0750-077F,U+0870-088E,U+08A0-08FF,U+FB50-FDFF,U+FE70-FEFF',
     },
   ],
-  fallback: ['Segoe UI', 'Tahoma', 'sans-serif'],
 })

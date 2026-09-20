@@ -7,6 +7,7 @@
    Arabic type step happen in CSS rather than in React.
    --------------------------------------------------------------------------- */
 @theme inline {
+  --color-brand-950: var(--brand-950);
   --color-brand-900: var(--brand-900);
   --color-brand-800: var(--brand-800);
   --color-brand-700: var(--brand-700);
@@ -14,6 +15,7 @@
   --color-brand-500: var(--brand-500);
   --color-brand-400: var(--brand-400);
   --color-brand-300: var(--brand-300);
+  --color-brand-200: var(--brand-200);
   --color-brand-100: var(--brand-100);
   --color-brand-50: var(--brand-50);
 
@@ -25,6 +27,8 @@
 
   --color-accent: var(--accent);
   --color-accent-text: var(--accent-text);
+  --color-whatsapp: var(--whatsapp);
+  --color-whatsapp-deep: var(--whatsapp-deep);
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-error: var(--error);
@@ -33,6 +37,7 @@
   --color-surface: var(--surface);
   --color-surface-sunken: var(--surface-sunken);
   --color-surface-tint: var(--surface-tint);
+  --color-surface-tint-soft: var(--surface-tint-soft);
   --color-surface-inverse: var(--surface-inverse);
   --color-text: var(--text);
   --color-text-muted: var(--text-muted);
@@ -40,6 +45,7 @@
   --color-text-brand: var(--text-brand);
   --color-heading: var(--heading);
   --color-border: var(--border);
+  --color-border-soft: var(--border-soft);
   --color-border-strong: var(--border-strong);
 
   --text-display: var(--text-display);
@@ -49,18 +55,70 @@
   --text-body-lg: var(--text-body-lg);
   --text-body: var(--text-body);
   --text-caption: var(--text-caption);
+  --text-eyebrow: var(--text-eyebrow);
 
   --radius-sm: var(--radius-sm);
   --radius-DEFAULT: var(--radius);
   --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
 
+  /* Latin face, Arabic face, then — and only then — the generic fallbacks.
+     See src/lib/fonts.ts for why the order is load-bearing. */
   --font-sans:
-    var(--font-plex-latin), var(--font-plex-arabic), ui-sans-serif, system-ui, 'Segoe UI',
+    var(--font-plex-latin), var(--font-plex-arabic), ui-sans-serif, system-ui, 'Segoe UI', Tahoma,
     sans-serif;
 
   --shadow-sm: var(--shadow-sm);
   --shadow-DEFAULT: var(--shadow);
   --shadow-lg: var(--shadow-lg);
+  --shadow-card: var(--shadow-card);
+  --shadow-float: var(--shadow-float);
+  --shadow-glow: var(--shadow-glow);
+
+  --animate-fade-up: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-fade-in: fade-in 0.8s ease-out both;
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-pulse-ring: pulse-ring 2.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+  @keyframes pulse-ring {
+    0% {
+      transform: scale(1);
+      opacity: 0.55;
+    }
+    70%,
+    100% {
+      transform: scale(1.6);
+      opacity: 0;
+    }
+  }
 }
 
 /* ---------------------------------------------------------------------------
@@ -112,8 +170,16 @@
     color: var(--heading);
     line-height: var(--leading-heading);
     font-weight: 700;
+    letter-spacing: -0.01em;
     text-wrap: balance;
     margin-block: 0;
+  }
+
+  :root:lang(ar) h1,
+  :root:lang(ar) h2,
+  :root:lang(ar) h3,
+  :root:lang(ar) h4 {
+    letter-spacing: 0;
   }
 
   h1 {
@@ -121,11 +187,9 @@
   }
   h2 {
     font-size: var(--text-h2);
-    font-weight: 600;
   }
   h3 {
     font-size: var(--text-h3);
-    font-weight: 600;
   }
 
   p {
@@ -142,12 +206,10 @@
   :focus-visible {
     outline: 3px solid var(--focus-ring);
     outline-offset: 2px;
-    border-radius: 2px;
+    border-radius: 4px;
   }
 
-  /* Western Arabic numerals in both locales (build prompt §1). Arabic-Indic
-     digits are switched off explicitly so a font default cannot reintroduce
-     them. If the client ever asks for ١٢٣٤, change it here and nowhere else. */
+  /* Western Arabic numerals in both locales (build prompt §1). */
   :root:lang(ar) {
     font-variant-numeric: lining-nums;
     -moz-font-feature-settings: 'anum' 0;
@@ -172,6 +234,13 @@
     background: var(--brand-100);
     color: var(--brand-900);
   }
+
+  input,
+  select,
+  textarea,
+  button {
+    font: inherit;
+  }
 }
 
 /* ---------------------------------------------------------------------------
@@ -181,7 +250,7 @@
 @layer components {
   .container-page {
     inline-size: 100%;
-    max-inline-size: 76rem;
+    max-inline-size: 78rem;
     margin-inline: auto;
     padding-inline: 1.25rem;
   }
@@ -218,15 +287,20 @@
     margin-block-start: 0.4em;
   }
 
+  .prose-hgp li::marker {
+    color: var(--brand-600);
+  }
+
   .prose-hgp a {
     text-decoration: underline;
   }
 
   .prose-hgp blockquote {
     margin-inline: 0;
-    padding-inline-start: 1em;
-    border-inline-start: 3px solid var(--brand-300);
+    padding-inline-start: 1.25em;
+    border-inline-start: 3px solid var(--brand-400);
     color: var(--text-muted);
+    font-size: var(--text-body-lg);
   }
 
   /* The skip link is the first thing in the tab order on every page. */
@@ -245,6 +319,18 @@
   .skip-link:focus {
     transform: translateY(0);
   }
+
+  /* Native <details> as an accordion: the chevron turns, nothing else moves. */
+  .accordion summary {
+    list-style: none;
+    cursor: pointer;
+  }
+  .accordion summary::-webkit-details-marker {
+    display: none;
+  }
+  .accordion[open] .accordion-chevron {
+    transform: rotate(180deg);
+  }
 }
 
 @layer utilities {
@@ -258,6 +344,64 @@
 
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Brand surfaces. Fixed greens so they are identical in both colour schemes. */
+  .bg-gradient-brand {
+    background-image: var(--gradient-brand);
+  }
+  .bg-gradient-deep {
+    background-image: var(--gradient-deep);
+  }
+  .bg-gradient-hero {
+    background-image: var(--gradient-hero);
+  }
+
+  /* A faint dot grid: structure without decoration. Fades out towards the
+     bottom so it never fights the content below it. */
+  .bg-dots {
+    background-image: radial-gradient(
+      color-mix(in srgb, var(--brand-700) 14%, transparent) 1px,
+      transparent 1px
+    );
+    background-size: 22px 22px;
+    -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 30%, transparent 100%);
+  }
+  .bg-dots-inverse {
+    background-image: radial-gradient(rgb(255 255 255 / 0.11) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+
+  /* Card lift on hover. Transform-only, so it costs nothing on a phone. */
+  .lift {
+    transition:
+      transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 0.25s ease;
+  }
+  @media (hover: hover) {
+    .lift:hover {
+      transform: translateY(-3px);
+    }
+  }
+
+  /* Staggered entrance for the hero. `both` fill means reduced-motion users
+     simply see the final state. */
+  .reveal {
+    animation: var(--animate-fade-up);
+  }
+  .reveal-1 {
+    animation-delay: 80ms;
+  }
+  .reveal-2 {
+    animation-delay: 160ms;
+  }
+  .reveal-3 {
+    animation-delay: 240ms;
+  }
+  .reveal-4 {
+    animation-delay: 340ms;
   }
 
   /* Visible to assistive technology, not on screen. */

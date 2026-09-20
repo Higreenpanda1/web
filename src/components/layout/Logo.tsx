@@ -1,4 +1,12 @@
+import { useId } from 'react'
+
 import { cn } from '@/lib/cn'
+import {
+  WORDMARK_DISC,
+  WORDMARK_PATH,
+  WORDMARK_TRIANGLE,
+  WORDMARK_VIEWBOX,
+} from './wordmark-geometry'
 
 /**
  * THE KNOCKOUT RULE (brief section 11) — the one thing to get wrong.
@@ -8,15 +16,14 @@ import { cn } from '@/lib/cn'
  * or dark background it vanishes, so the solid variant, with the triangle
  * actually painted white, must be used instead.
  *
- * That is why `onDark` is a required decision at every call site rather than
- * something a component guesses. The two files are:
- *   knockout → /brand/vector/icon-play.svg       (light backgrounds)
- *   solid    → /brand/vector/icon-play-white.svg (green, photography, dark UI)
- *
- * The mark is inlined rather than loaded as an <img> because it appears in the
- * header on every page: inlining costs about 400 bytes and removes a request
- * from the critical path on a slow connection.
+ * That is why `onDark` is a decision at every call site rather than something
+ * a component guesses. The mask id comes from `useId` so two marks on one page
+ * (header and footer) never share a mask.
  */
+function useMaskId(prefix: string): string {
+  return `${prefix}-${useId().replace(/[^a-zA-Z0-9]/g, '')}`
+}
+
 export function PlayMark({
   onDark = false,
   size = 40,
@@ -28,7 +35,7 @@ export function PlayMark({
   className?: string
   title?: string
 }) {
-  const id = onDark ? undefined : 'hgp-play-knockout'
+  const id = useMaskId('hgp-play')
 
   return (
     <svg
@@ -77,32 +84,92 @@ export function PlayMark({
 }
 
 /**
- * Wordmark plus mark. The wordmark exists only as pixels — brief section 11
- * flags getting the vector original from the designer as an open item — so the
- * lockup here is the vector mark beside live text rather than the raster
- * wordmark, which keeps the header sharp at any zoom and saves ~15 KB.
- * Swap in the vector wordmark when it arrives.
+ * The HiGP wordmark, as vector. The letterforms are `currentColor` so the
+ * parent decides: ink on a light surface, white on a dark one — and in dark
+ * mode the ink token is already light, so nothing here branches on theme.
+ *
+ * Inlined rather than loaded as an <img>: it is on every page, it is 4 KB, and
+ * inlining removes a request from the critical path on a slow connection.
  */
+export function Wordmark({
+  onDark = false,
+  height = 44,
+  className,
+  title,
+}: {
+  onDark?: boolean
+  height?: number
+  className?: string
+  title?: string
+}) {
+  const id = useMaskId('hgp-wm')
+  const { width: vw, height: vh } = WORDMARK_VIEWBOX
+  const { cx, cy, r } = WORDMARK_DISC
+  const width = Math.round((height * vw) / vh)
+
+  return (
+    <svg
+      viewBox={`0 0 ${vw} ${vh}`}
+      width={width}
+      height={height}
+      className={cn('shrink-0', onDark ? 'text-white' : 'text-ink', className)}
+      role={title ? 'img' : 'presentation'}
+      aria-label={title}
+      aria-hidden={title ? undefined : true}
+      focusable="false"
+    >
+      {title ? <title>{title}</title> : null}
+      {onDark ? null : (
+        <defs>
+          <mask id={id}>
+            <rect width={vw} height={vh} fill="#fff" />
+            <polygon
+              points={WORDMARK_TRIANGLE.points}
+              fill="none"
+              stroke="#000"
+              strokeWidth={WORDMARK_TRIANGLE.strokeWidth}
+              strokeLinejoin="round"
+              strokeLinecap="round"
+            />
+          </mask>
+        </defs>
+      )}
+      <path d={WORDMARK_PATH} fill="currentColor" />
+      {onDark ? (
+        <>
+          <circle cx={cx} cy={cy} r={r} fill="var(--brand-600)" />
+          <polygon
+            points={WORDMARK_TRIANGLE.points}
+            fill="none"
+            stroke="#FFFFFF"
+            strokeWidth={WORDMARK_TRIANGLE.strokeWidth}
+            strokeLinejoin="round"
+            strokeLinecap="round"
+          />
+        </>
+      ) : (
+        <circle cx={cx} cy={cy} r={r} fill="var(--brand-600)" mask={`url(#${id})`} />
+      )}
+    </svg>
+  )
+}
+
+/** The wordmark with an accessible name. `label` is the site name in the current language. */
 export function Logo({
   onDark = false,
   className,
   label,
+  height = 44,
 }: {
   onDark?: boolean
   className?: string
   label: string
+  height?: number
 }) {
   return (
-    <span className={cn('inline-flex items-center gap-2.5', className)}>
-      <PlayMark onDark={onDark} size={36} />
-      <span
-        className={cn(
-          'text-h3 font-bold tracking-tight whitespace-nowrap',
-          onDark ? 'text-white' : 'text-[var(--ink)]',
-        )}
-      >
-        {label}
-      </span>
+    <span className={cn('inline-flex items-center', className)}>
+      <Wordmark onDark={onDark} height={height} />
+      <span className="sr-only">{label}</span>
     </span>
   )
 }

@@ -22,22 +22,25 @@ export default function ErrorBoundary({
   }, [error])
 
   return (
-    <Container className="py-24 text-center">
-      <h1 className="text-h1">{t('genericTitle')}</h1>
-      <p className="mx-auto mt-4 max-w-[var(--measure)] text-body-lg text-[var(--text-muted)]">
-        {t('genericBody')}
-      </p>
-      <div className="mt-8 flex justify-center gap-3">
-        <Button type="button" size="lg" onClick={reset}>
-          {t('retry')}
-        </Button>
-        <ButtonLink href="/" size="lg" variant="secondary">
-          {t('backHome')}
-        </ButtonLink>
-      </div>
-      {error.digest ? (
-        <p className="ltr-nums mt-6 text-caption text-[var(--text-muted)]">{error.digest}</p>
-      ) : null}
-    </Container>
+    <section className="relative isolate overflow-hidden bg-surface bg-gradient-hero">
+      <div className="absolute inset-0 -z-10 bg-dots opacity-70" aria-hidden="true" />
+      <Container className="py-24 text-center md:py-32">
+        <h1 className="text-display">{t('genericTitle')}</h1>
+        <p className="mx-auto mt-5 max-w-[var(--measure)] text-body-lg text-text-muted">
+          {t('genericBody')}
+        </p>
+        <div className="mt-9 flex justify-center gap-3">
+          <Button type="button" size="lg" onClick={reset}>
+            {t('retry')}
+          </Button>
+          <ButtonLink href="/" size="lg" variant="secondary">
+            {t('backHome')}
+          </ButtonLink>
+        </div>
+        {error.digest ? (
+          <p className="ltr-nums mt-8 text-caption text-text-muted">{error.digest}</p>
+        ) : null}
+      </Container>
+    </section>
   )
 }

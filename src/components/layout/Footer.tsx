@@ -1,9 +1,10 @@
-import { Instagram, Linkedin, Mail, MessageCircle, Youtube } from 'lucide-react'
+import { Instagram, Linkedin, Mail, MapPin, Youtube } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 
+import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon'
 import { Link } from '@/i18n/navigation'
-import { PlayMark } from './Logo'
 import { whatsappLink } from '@/lib/url'
+import { Wordmark } from './Logo'
 
 import type { Locale } from '@/i18n/routing'
 import type { SiteSetting } from '@/payload-types'
@@ -30,6 +31,7 @@ export async function Footer({ locale, settings }: { locale: Locale; settings: S
             links: [
               { id: 'c1', label: t('nav.about'), href: '/about' },
               { id: 'c2', label: t('nav.blog'), href: '/blog' },
+              { id: 'c3', label: t('nav.contact'), href: '/contact' },
             ],
           },
         ]
@@ -42,94 +44,96 @@ export async function Footer({ locale, settings }: { locale: Locale; settings: S
     Boolean(entry.href),
   )
 
+  const offices = (settings.offices ?? []).map((office) => office.city).filter(Boolean)
+
   return (
-    <footer className="bg-[var(--brand-900)] text-[var(--brand-100)]">
-      <div className="container-page py-14">
-        <div className="grid gap-10 md:grid-cols-4">
-          <div className="md:col-span-1">
+    <footer className="relative isolate overflow-hidden bg-gradient-deep text-brand-100">
+      <div className="absolute inset-0 -z-10 bg-dots-inverse opacity-60" aria-hidden="true" />
+      <div className="container-page pt-16 pb-10">
+        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-12">
+          <div className="lg:col-span-5">
             {/* Dark surface: the SOLID mark, never the knockout — see Logo.tsx. */}
-            <div className="mb-4 flex items-center gap-2.5">
-              <PlayMark onDark size={34} />
-              <span className="text-h3 font-bold text-white">{t('site.name')}</span>
-            </div>
-            <p className="text-caption leading-relaxed text-[var(--brand-300)]">
+            <Wordmark onDark height={56} title={t('site.name')} />
+            <p className="mt-5 max-w-[26rem] text-body-lg leading-relaxed text-brand-100">
               {t('footer.aboutBlurb')}
             </p>
-          </div>
-
-          {columns.map((column) => (
-            <nav key={column.id ?? column.title} aria-label={column.title}>
-              <h2 className="mb-3 text-caption font-bold tracking-wide text-white uppercase">
-                {column.title}
-              </h2>
-              <ul className="space-y-2">
-                {(column.links ?? []).map((link) => (
-                  <li key={link.id ?? link.href}>
-                    <Link
-                      href={link.href}
-                      className="text-[var(--brand-100)] no-underline hover:text-white hover:underline"
+            {offices.length > 0 ? (
+              <p className="mt-4 inline-flex items-center gap-2 text-caption text-brand-300">
+                <MapPin size={16} strokeWidth={1.75} aria-hidden="true" />
+                {offices.join(' · ')}
+              </p>
+            ) : null}
+            {socials.length > 0 ? (
+              <ul className="mt-6 flex gap-2">
+                {socials.map(({ href, Icon, name }) => (
+                  <li key={name}>
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={name}
+                      className="inline-flex size-11 items-center justify-center rounded-full border border-white/15 bg-white/5 text-brand-100 transition-colors hover:border-white/30 hover:bg-white/10 hover:text-white"
                     >
-                      {link.label}
-                    </Link>
+                      <Icon size={20} strokeWidth={1.75} aria-hidden="true" />
+                    </a>
                   </li>
                 ))}
               </ul>
-            </nav>
-          ))}
+            ) : null}
+          </div>
 
-          <div>
-            <h2 className="mb-3 text-caption font-bold tracking-wide text-white uppercase">
-              {t('footer.contactTitle')}
-            </h2>
-            <ul className="space-y-3">
-              <li>
-                <a
-                  href={whatsappLink(settings.whatsappNumber)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-[var(--brand-100)] no-underline hover:text-white hover:underline"
-                >
-                  <MessageCircle size={18} strokeWidth={1.5} aria-hidden="true" />
-                  <span className="ltr-nums">{settings.whatsappNumber}</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href={`mailto:${settings.email}`}
-                  className="inline-flex items-center gap-2 text-[var(--brand-100)] no-underline hover:text-white hover:underline"
-                >
-                  <Mail size={18} strokeWidth={1.5} aria-hidden="true" />
-                  <span className="ltr-nums">{settings.email}</span>
-                </a>
-              </li>
-            </ul>
-
-            {socials.length > 0 ? (
-              <>
-                <h2 className="mt-6 mb-3 text-caption font-bold tracking-wide text-white uppercase">
-                  {t('footer.followTitle')}
+          <div className="grid grid-cols-2 gap-8 lg:col-span-4">
+            {columns.map((column) => (
+              <nav key={column.id ?? column.title} aria-label={column.title}>
+                <h2 className="mb-4 text-eyebrow font-bold tracking-[0.14em] text-white uppercase">
+                  {column.title}
                 </h2>
-                <ul className="flex gap-2">
-                  {socials.map(({ href, Icon, name }) => (
-                    <li key={name}>
-                      <a
-                        href={href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={name}
-                        className="inline-flex size-11 items-center justify-center rounded-[var(--radius)] border border-[var(--brand-700)] text-[var(--brand-100)] transition-colors hover:bg-[var(--brand-800)] hover:text-white"
+                <ul className="space-y-2.5">
+                  {(column.links ?? []).map((link) => (
+                    <li key={link.id ?? link.href}>
+                      <Link
+                        href={link.href}
+                        className="text-brand-100 no-underline transition-colors hover:text-white hover:underline"
                       >
-                        <Icon size={20} strokeWidth={1.5} aria-hidden="true" />
-                      </a>
+                        {link.label}
+                      </Link>
                     </li>
                   ))}
                 </ul>
-              </>
+              </nav>
+            ))}
+          </div>
+
+          <div className="lg:col-span-3">
+            <h2 className="mb-4 text-eyebrow font-bold tracking-[0.14em] text-white uppercase">
+              {t('footer.contactTitle')}
+            </h2>
+            <a
+              href={whatsappLink(settings.whatsappNumber, settings.whatsappPrefill ?? undefined)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-12 w-full items-center justify-center gap-2.5 rounded-full bg-white px-5 font-semibold text-brand-900 no-underline transition-colors hover:bg-brand-50"
+            >
+              <WhatsAppIcon size={20} className="text-brand-700" />
+              {t('cta.whatsapp')}
+            </a>
+            <p className="mt-3 text-center text-caption text-brand-300">
+              <span className="ltr-nums">{settings.whatsappNumber}</span>
+            </p>
+            <a
+              href={`mailto:${settings.email}`}
+              className="mt-5 inline-flex items-center gap-2 text-brand-100 no-underline hover:text-white hover:underline"
+            >
+              <Mail size={18} strokeWidth={1.75} aria-hidden="true" />
+              <span className="ltr-nums">{settings.email}</span>
+            </a>
+            {settings.workingHours ? (
+              <p className="mt-3 text-caption text-brand-300">{settings.workingHours}</p>
             ) : null}
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col gap-3 border-t border-[var(--brand-800)] pt-6 text-caption text-[var(--brand-300)] md:flex-row md:items-center md:justify-between">
+        <div className="mt-14 flex flex-col gap-3 border-t border-white/10 pt-6 text-caption text-brand-300 md:flex-row md:items-center md:justify-between">
           <p>
             <span className="ltr-nums">© {year}</span> {settings.organisationName}.{' '}
             {t('footer.rights')}
@@ -137,11 +141,11 @@ export async function Footer({ locale, settings }: { locale: Locale; settings: S
               <span className="ltr-nums"> · {settings.companyRegistration}</span>
             ) : null}
           </p>
-          <ul className="flex gap-4">
+          <ul className="flex gap-5">
             <li>
               <Link
                 href="/privacy"
-                className="text-[var(--brand-300)] no-underline hover:text-white hover:underline"
+                className="text-brand-300 no-underline hover:text-white hover:underline"
               >
                 {t('footer.privacy')}
               </Link>
@@ -149,7 +153,7 @@ export async function Footer({ locale, settings }: { locale: Locale; settings: S
             <li>
               <Link
                 href="/terms"
-                className="text-[var(--brand-300)] no-underline hover:text-white hover:underline"
+                className="text-brand-300 no-underline hover:text-white hover:underline"
               >
                 {t('footer.terms')}
               </Link>

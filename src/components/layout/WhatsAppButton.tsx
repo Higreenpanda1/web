@@ -1,5 +1,4 @@
-import { MessageCircle } from 'lucide-react'
-
+import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon'
 import { whatsappLink } from '@/lib/url'
 
 /**
@@ -11,15 +10,10 @@ import { whatsappLink } from '@/lib/url'
  * and `end-5` is inset-inline-end, so it lands bottom-left in Arabic and
  * bottom-right in English without an RTL override.
  *
- * That position is a class and not a `style` attribute for a reason: under the
- * production CSP an inline style attribute is refused, and when this was
- * written as one the button silently reverted to the right-hand side on the
- * Arabic site — blocked styles fail quietly, unlike blocked scripts.
- *
  * The white ring is not decoration: the button's green is from the same family
  * as the footer's, and without it the button vanishes the moment a visitor
- * scrolls to the bottom of a page — which is exactly where someone who has
- * read everything and wants to make contact ends up.
+ * scrolls to the bottom of a page. The slow pulse behind it is the one piece
+ * of motion on the page that runs unprompted; it stops for reduced-motion.
  */
 export function WhatsAppButton({
   number,
@@ -38,9 +32,15 @@ export function WhatsAppButton({
       target="_blank"
       rel="noopener noreferrer"
       aria-label={ariaLabel}
-      className="fixed bottom-5 end-5 z-40 inline-flex min-h-14 items-center gap-2 rounded-[var(--radius-full)] bg-[var(--brand-700)] px-4 py-3 font-semibold text-white no-underline shadow-lg ring-2 ring-white/85 transition-colors hover:bg-[var(--brand-800)] md:px-5"
+      className="group fixed bottom-5 end-5 z-40 inline-flex min-h-14 items-center gap-2.5 rounded-full bg-brand-700 px-4 py-3 font-semibold text-white no-underline shadow-float ring-2 ring-white/90 transition-colors hover:bg-brand-800 md:px-5"
     >
-      <MessageCircle size={22} strokeWidth={1.5} aria-hidden="true" />
+      <span className="relative inline-flex size-6 items-center justify-center">
+        <span
+          aria-hidden="true"
+          className="absolute inset-0 rounded-full bg-brand-400/70 motion-safe:animate-pulse-ring"
+        />
+        <WhatsAppIcon size={24} className="relative" />
+      </span>
       <span className="hidden text-body sm:inline">{label}</span>
     </a>
   )

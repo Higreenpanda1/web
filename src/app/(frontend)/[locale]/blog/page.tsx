@@ -1,8 +1,12 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 
+import { JsonLd } from '@/components/JsonLd'
 import { PostCard } from '@/components/PostCard'
+import { Breadcrumb } from '@/components/ui/Breadcrumb'
+import { PageHero } from '@/components/ui/PageHero'
 import { Pagination } from '@/components/ui/Pagination'
-import { Section, SectionHeading } from '@/components/ui/Section'
+import { Section } from '@/components/ui/Section'
+import { breadcrumbJsonLd } from '@/lib/jsonld'
 import { getPosts } from '@/lib/queries'
 import { buildMetadata } from '@/lib/seo'
 
@@ -43,31 +47,52 @@ export default async function BlogIndex({
   ])
 
   return (
-    <Section labelledBy="blog-heading">
-      <SectionHeading id="blog-heading" title={t('blog.title')} lead={t('blog.lead')} />
-
-      {result.docs.length === 0 ? (
-        <p className="text-[var(--text-muted)]">{t('blog.empty')}</p>
-      ) : (
-        <>
-          <ul className="grid list-none gap-5 p-0 sm:grid-cols-2 lg:grid-cols-3">
-            {result.docs.map((post) => (
-              <PostCard key={post.id} post={post} locale={locale} />
-            ))}
-          </ul>
-          <Pagination
-            current={result.page}
-            total={result.totalPages}
-            basePath="/blog"
-            labels={{
-              previous: t('blog.pagination.previous'),
-              next: t('blog.pagination.next'),
-              nav: t('blog.pagination.label'),
-              page: t('blog.pagination.page', { current: result.page, total: result.totalPages }),
-            }}
+    <>
+      <JsonLd
+        data={breadcrumbJsonLd(locale, [
+          { name: t('nav.home'), path: '/' },
+          { name: t('blog.title'), path: '/blog' },
+        ])}
+      />
+      <PageHero
+        eyebrow={t('blog.eyebrow')}
+        title={t('blog.title')}
+        lead={t('blog.lead')}
+        breadcrumb={
+          <Breadcrumb
+            label={t('a11y.breadcrumb')}
+            items={[{ name: t('nav.home'), href: '/' }, { name: t('blog.title') }]}
           />
-        </>
-      )}
-    </Section>
+        }
+      />
+
+      <Section tone="sunken" labelledBy="blog-heading" className="pt-10 md:pt-14">
+        <h2 id="blog-heading" className="sr-only">
+          {t('blog.title')}
+        </h2>
+        {result.docs.length === 0 ? (
+          <p className="text-text-muted">{t('blog.empty')}</p>
+        ) : (
+          <>
+            <ul className="grid list-none gap-5 p-0 sm:grid-cols-2 lg:grid-cols-3">
+              {result.docs.map((post) => (
+                <PostCard key={post.id} post={post} locale={locale} />
+              ))}
+            </ul>
+            <Pagination
+              current={result.page}
+              total={result.totalPages}
+              basePath="/blog"
+              labels={{
+                previous: t('blog.pagination.previous'),
+                next: t('blog.pagination.next'),
+                nav: t('blog.pagination.label'),
+                page: t('blog.pagination.page', { current: result.page, total: result.totalPages }),
+              }}
+            />
+          </>
+        )}
+      </Section>
+    </>
   )
 }

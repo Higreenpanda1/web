@@ -1,8 +1,8 @@
 # Handover — HiGreenPanda website
 
-Written 20 September 2026, at the end of the session that deployed the site.
-Everything below is verified state, not intention. Where something is
-unfinished it says so.
+Written 20 September 2026, at the end of the session that deployed the site,
+and updated the same day after the front-end redesign. Everything below is
+verified state, not intention. Where something is unfinished it says so.
 
 ---
 
@@ -15,6 +15,42 @@ nothing customer-facing has changed.
 - **Live preview:** https://srv1994320.hstgr.cloud
 - **CMS:** https://srv1994320.hstgr.cloud/hgp-studio-gate
 - **Repository:** `Higreenpanda1/web`, branch `claude/practical-newton-m55sbw`
+
+## The redesign (20 September 2026, second session)
+
+The owner's verdict on the first build was that it looked like "90s HTML
+blocks" with no logo. The second session replaced the front end; the CMS,
+data model, migrations, security headers, i18n and routing are untouched, so
+nothing about deployment changes.
+
+- **The logo is now real and vector.** `src/components/layout/Logo.tsx`
+  renders the HiGP wordmark inline from traced geometry; the same data
+  produces `brand-assets/vector/logo-wordmark*.svg` and every PNG, favicon,
+  app icon and social card via `node scripts/brand/build.mjs` (see README).
+  The letterforms are intentionally hand-cut and were not "corrected".
+- **A design system**, not a theme: `src/styles/tokens.css` (elevation,
+  gradients, radii, the dot-grid motif) and `src/components/ui/` (Button,
+  Card, Section/SectionHeading, Eyebrow, Breadcrumb, PageHero, Accordion).
+  The homepage sections live in `src/components/home/` and the CMS blocks in
+  `src/components/blocks/` render through those same components, so a page
+  built in the CMS looks like the default homepage.
+- **The Arabic font was never loading.** next/font appended its generic
+  fallbacks to the Latin font variable, so `sans-serif` sat ahead of the
+  Arabic face in the stack and the Arabic site rendered in a system font.
+  Fixed in `src/lib/fonts.ts`; the comment there explains why the font stack
+  order is load-bearing. Do not add `fallback` lists back.
+- Reference points the owner asked for: Deloitte (black / white / one green,
+  and the green dot as a device — the play disc is used the same way),
+  BCG (green brand, service grids, dark statement bands), McKinsey and Bain
+  (editorial type and whitespace).
+
+Still open from this session, in order:
+
+1. **A real photograph of the founder.** The founder card shows the brand
+   mark until a photo is uploaded to the team member in the CMS. Brief §15:
+   photos of Sami on the ground are the proof the whole site rests on.
+2. Cover images for the three seeded posts (same: a placeholder shows
+   until Media is uploaded and attached).
 
 ## The person you are working with
 
@@ -146,6 +182,12 @@ Done in the sandbox before deployment: Lighthouse 97–99 / 100 / 100 / 100
 across seven pages; 25 unit tests; 23 route status checks; a backup and
 restore round trip against a live database; single-use backup codes; a
 password-only REST login correctly refused with 403.
+
+After the redesign, on a local database seeded from `src/seed/content.ts`:
+`tsc`, `eslint` and `prettier` clean; 25 unit tests; every route 200 in both
+languages; the Playwright e2e file (`npm run test:e2e`) against a production
+build; full-page screenshots of every page at 1440px and 390px in both
+languages, reviewed by eye.
 
 Not yet verified on the real server: nothing beyond the health check and route
 spot-checks that `ops/deploy.sh` runs. The site has not been looked at by
