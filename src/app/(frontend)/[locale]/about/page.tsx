@@ -13,7 +13,7 @@ import { PageHero } from '@/components/ui/PageHero'
 import { Section, SectionHeading } from '@/components/ui/Section'
 import { breadcrumbJsonLd, organisationJsonLd } from '@/lib/jsonld'
 import { getSiteSettings, getTeam } from '@/lib/queries'
-import { buildMetadata, mediaUrl } from '@/lib/seo'
+import { buildMetadata, mediaSrc } from '@/lib/seo'
 
 import type { Locale } from '@/i18n/routing'
 import type { Media } from '@/payload-types'
@@ -141,7 +141,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
           <ul className="grid list-none gap-5 p-0 sm:grid-cols-2 lg:grid-cols-3">
             {others.map((member) => {
               const photo = typeof member.photo === 'object' ? (member.photo as Media) : null
-              const src = mediaUrl(photo, 'thumbnail')
+              const src = mediaSrc(photo, 'thumbnail')
               return (
                 <Card as="li" key={member.id}>
                   {src ? (

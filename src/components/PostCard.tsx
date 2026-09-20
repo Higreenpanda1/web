@@ -6,7 +6,7 @@ import { PlayMark } from '@/components/layout/Logo'
 import { Card } from '@/components/ui/Card'
 import { formatDate, isoDate } from '@/i18n/format'
 import { Link } from '@/i18n/navigation'
-import { mediaUrl } from '@/lib/seo'
+import { mediaSrc } from '@/lib/seo'
 
 import type { Locale } from '@/i18n/routing'
 import type { Category, Media, Post } from '@/payload-types'
@@ -14,7 +14,7 @@ import type { Category, Media, Post } from '@/payload-types'
 export async function PostCard({ post, locale }: { post: Post; locale: Locale }) {
   const t = await getTranslations({ locale })
   const cover = typeof post.coverImage === 'object' ? (post.coverImage as Media) : null
-  const src = mediaUrl(cover, 'card')
+  const src = mediaSrc(cover, 'card')
   const category = (post.categories ?? []).find(
     (entry): entry is Category => typeof entry === 'object' && entry !== null,
   )

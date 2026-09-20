@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { PlayMark } from '@/components/layout/Logo'
 import { Container } from '@/components/ui/Container'
 import { Eyebrow } from '@/components/ui/Eyebrow'
-import { mediaUrl } from '@/lib/seo'
+import { mediaSrc } from '@/lib/seo'
 import { BlockActions } from './BlockActions'
 
 import type { Media, Page } from '@/payload-types'
@@ -18,7 +18,7 @@ type Block = Extract<NonNullable<Page['layout']>[number], { blockType: 'hero' }>
  */
 export function HeroBlock({ block, priority }: { block: Block; priority?: boolean }) {
   const image = typeof block.image === 'object' ? (block.image as Media) : null
-  const src = mediaUrl(image, 'hero')
+  const src = mediaSrc(image, 'hero')
 
   if (!src) {
     return (

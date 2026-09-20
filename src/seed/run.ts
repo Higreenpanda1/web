@@ -1,5 +1,8 @@
 import 'dotenv/config'
 
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
 import { getPayload } from 'payload'
 
 import config from '../payload.config'
@@ -41,9 +44,12 @@ async function main() {
         { city: 'شنجن', address: 'مقرنا الرئيسي' },
         { city: 'شنغهاي', address: 'مكتبنا الثاني' },
       ],
+      // The four networks connected in Metricool, 20 September 2026.
       social: {
         instagram: 'https://instagram.com/higreenpanda',
         youtube: 'https://youtube.com/@Higreenpanda',
+        facebook: 'https://www.facebook.com/100765135463061',
+        tiktok: 'https://www.tiktok.com/@higreenpanda',
       },
       primaryNav: [
         { label: 'الخدمات', href: '/services' },
@@ -76,6 +82,15 @@ async function main() {
     },
   })
 
+  console.log('→ Founder photo')
+  const founderPhotoId = await upsertMedia(payload, {
+    filePath: path.join(path.dirname(fileURLToPath(import.meta.url)), 'assets', 'founder-sami.jpg'),
+    alt: {
+      ar: 'سامي الحجري، مؤسس هاي جرين باندا',
+      en: 'Sami Al-Hajri, founder of HiGreenPanda',
+    },
+  })
+
   console.log('→ Founder')
   const founderId = await upsert(
     payload,
@@ -90,6 +105,7 @@ async function main() {
         credentials: FOUNDER.ar.credentials.map((text) => ({ text })),
         isFounder: true,
         order: 1,
+        photo: founderPhotoId,
         links: {
           instagram: 'https://instagram.com/higreenpanda',
           youtube: 'https://youtube.com/@Higreenpanda',
@@ -267,6 +283,50 @@ async function upsert(
   }
 
   return id as number
+}
+
+/**
+ * Upload a file from the seed's own assets folder, once. Matched by its Arabic
+ * alt text, so re-running the seed reuses the existing Media document instead
+ * of uploading a second copy — and an editor who replaces the photo in the
+ * CMS keeps their replacement, because the alt text is what is looked up.
+ */
+async function upsertMedia(
+  payload: Awaited<ReturnType<typeof getPayload>>,
+  { filePath, alt }: { filePath: string; alt: { ar: string; en: string } },
+): Promise<number | null> {
+  const existing = await payload.find({
+    collection: 'media',
+    where: { alt: { equals: alt.ar } },
+    limit: 1,
+    depth: 0,
+  })
+  const found = existing.docs[0]
+  if (found) {
+    console.log(`  reusing media ${found.id}`)
+    return found.id
+  }
+
+  try {
+    const created = await payload.create({
+      collection: 'media',
+      locale: 'ar',
+      data: { alt: alt.ar },
+      filePath,
+    })
+    await payload.update({
+      collection: 'media',
+      id: created.id,
+      locale: 'en',
+      data: { alt: alt.en },
+    })
+    console.log(`  uploaded ${path.basename(filePath)} as media ${created.id}`)
+    return created.id
+  } catch (error) {
+    // A missing or unreadable file must not stop the rest of the seed.
+    console.warn(`  could not upload ${filePath}: ${(error as Error).message}`)
+    return null
+  }
 }
 
 /** Minimal Lexical document from plain paragraphs. */

@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { Card } from '@/components/ui/Card'
 import { Section, SectionHeading } from '@/components/ui/Section'
 import { getTestimonials } from '@/lib/queries'
-import { mediaUrl } from '@/lib/seo'
+import { mediaSrc } from '@/lib/seo'
 
 import type { Locale } from '@/i18n/routing'
 import type { Media, Page, Testimonial } from '@/payload-types'
@@ -21,7 +21,7 @@ export async function TestimonialsBlock({ block, locale }: { block: Block; local
       <ul className="grid list-none gap-5 p-0 md:grid-cols-2 lg:grid-cols-3">
         {items.map((item) => {
           const avatar = typeof item.avatar === 'object' ? (item.avatar as Media) : null
-          const src = mediaUrl(avatar, 'thumbnail')
+          const src = mediaSrc(avatar, 'thumbnail')
           return (
             <Card as="li" key={item.id}>
               <figure className="flex h-full flex-col">

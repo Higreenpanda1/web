@@ -14,7 +14,7 @@ import { Section, SectionHeading } from '@/components/ui/Section'
 import { formatDate, isoDate } from '@/i18n/format'
 import { blogPostingJsonLd, breadcrumbJsonLd } from '@/lib/jsonld'
 import { getPostBySlug, getSiteSettings } from '@/lib/queries'
-import { buildMetadata, mediaUrl } from '@/lib/seo'
+import { buildMetadata, mediaSrc } from '@/lib/seo'
 
 import type { Locale } from '@/i18n/routing'
 import type { Category, Media, Post, TeamMember } from '@/payload-types'
@@ -58,7 +58,7 @@ export default async function PostPage({
   const [t, settings] = await Promise.all([getTranslations({ locale }), getSiteSettings(locale)])
 
   const cover = typeof post.coverImage === 'object' ? (post.coverImage as Media) : null
-  const coverSrc = mediaUrl(cover, 'feature')
+  const coverSrc = mediaSrc(cover, 'feature')
   const author = typeof post.author === 'object' && post.author ? (post.author as TeamMember) : null
   const category = (post.categories ?? []).find(
     (entry): entry is Category => typeof entry === 'object' && entry !== null,

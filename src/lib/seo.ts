@@ -36,6 +36,22 @@ export function fallbackOgImage(locale: Locale): string {
   return `${serverURL}/brand/social/og-image-${locale}.png`
 }
 
+/**
+ * The `src` for a next/image of an upload: a same-origin path, never an
+ * absolute URL. `remotePatterns` is empty by design (next.config.ts), so the
+ * optimiser refuses `https://<host>/api/media/...` with "url parameter is not
+ * allowed" — every uploaded photo on the site rendered as a broken image until
+ * this existed. Use `mediaUrl` only where an absolute URL is genuinely needed:
+ * Open Graph tags and structured data.
+ */
+export function mediaSrc(
+  media: Media | number | null | undefined,
+  size?: keyof NonNullable<Media['sizes']>,
+): string | null {
+  const url = mediaUrl(media, size)
+  return url ? url.replace(serverURL, '') || '/' : null
+}
+
 export function mediaUrl(
   media: Media | number | null | undefined,
   size?: keyof NonNullable<Media['sizes']>,

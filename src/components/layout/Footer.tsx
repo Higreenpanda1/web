@@ -1,6 +1,7 @@
-import { Instagram, Linkedin, Mail, MapPin, Youtube } from 'lucide-react'
+import { Facebook, Instagram, Linkedin, Mail, MapPin, Youtube } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 
+import { TikTokIcon } from '@/components/icons/TikTokIcon'
 import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon'
 import { Link } from '@/i18n/navigation'
 import { whatsappLink } from '@/lib/url'
@@ -8,6 +9,10 @@ import { Wordmark } from './Logo'
 
 import type { Locale } from '@/i18n/routing'
 import type { SiteSetting } from '@/payload-types'
+import type { ComponentType } from 'react'
+
+type SocialIcon = ComponentType<{ size?: number; className?: string; strokeWidth?: number }>
+type SocialLink = { href: string; Icon: SocialIcon; name: string }
 
 export async function Footer({ locale, settings }: { locale: Locale; settings: SiteSetting }) {
   const t = await getTranslations({ locale })
@@ -36,13 +41,14 @@ export async function Footer({ locale, settings }: { locale: Locale; settings: S
           },
         ]
 
-  const socials = [
+  const candidates: Array<{ href?: string | null; Icon: SocialIcon; name: string }> = [
     { href: settings.social?.instagram, Icon: Instagram, name: 'Instagram' },
     { href: settings.social?.youtube, Icon: Youtube, name: 'YouTube' },
+    { href: settings.social?.tiktok, Icon: TikTokIcon, name: 'TikTok' },
+    { href: settings.social?.facebook, Icon: Facebook, name: 'Facebook' },
     { href: settings.social?.linkedin, Icon: Linkedin, name: 'LinkedIn' },
-  ].filter((entry): entry is { href: string; Icon: typeof Instagram; name: string } =>
-    Boolean(entry.href),
-  )
+  ]
+  const socials = candidates.filter((entry): entry is SocialLink => Boolean(entry.href))
 
   const offices = (settings.offices ?? []).map((office) => office.city).filter(Boolean)
 

@@ -3,7 +3,7 @@ import Image from 'next/image'
 
 import { PlayMark } from '@/components/layout/Logo'
 import { Eyebrow } from '@/components/ui/Eyebrow'
-import { mediaUrl } from '@/lib/seo'
+import { mediaSrc } from '@/lib/seo'
 
 import type { Media, TeamMember } from '@/payload-types'
 import type { ReactNode } from 'react'
@@ -25,7 +25,7 @@ export function FounderCard({
   actions?: ReactNode
 }) {
   const photo = typeof member.photo === 'object' ? (member.photo as Media) : null
-  const src = mediaUrl(photo, 'card')
+  const src = mediaSrc(photo, 'card')
 
   return (
     <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,22rem)_1fr] lg:gap-16">
@@ -41,7 +41,7 @@ export function FounderCard({
             width={768}
             height={960}
             sizes="(min-width: 1024px) 22rem, 100vw"
-            className="aspect-[4/5] w-full rounded-xl object-cover shadow-float"
+            className="aspect-[4/5] w-full rounded-xl object-cover object-[50%_20%] shadow-float"
           />
         ) : (
           <div

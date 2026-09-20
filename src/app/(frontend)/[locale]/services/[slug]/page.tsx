@@ -16,7 +16,7 @@ import { PageHero } from '@/components/ui/PageHero'
 import { Link } from '@/i18n/navigation'
 import { breadcrumbJsonLd, faqJsonLd, serviceJsonLd } from '@/lib/jsonld'
 import { getServiceBySlug, getServices, getSiteSettings } from '@/lib/queries'
-import { buildMetadata, mediaUrl } from '@/lib/seo'
+import { buildMetadata, mediaSrc } from '@/lib/seo'
 import { whatsappLink } from '@/lib/url'
 
 import type { Locale } from '@/i18n/routing'
@@ -59,7 +59,7 @@ export default async function ServicePage({
   ])
 
   const image = typeof service.image === 'object' ? (service.image as Media) : null
-  const featureSrc = mediaUrl(image, 'feature')
+  const featureSrc = mediaSrc(image, 'feature')
   const faqs = (service.faqs ?? []).map((item) => ({
     question: item.question,
     answer: item.answer,

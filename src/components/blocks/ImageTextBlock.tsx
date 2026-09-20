@@ -2,7 +2,7 @@ import Image from 'next/image'
 
 import { Section } from '@/components/ui/Section'
 import { cn } from '@/lib/cn'
-import { mediaUrl } from '@/lib/seo'
+import { mediaSrc } from '@/lib/seo'
 import { BlockActions } from './BlockActions'
 
 import type { Media, Page } from '@/payload-types'
@@ -11,7 +11,7 @@ type Block = Extract<NonNullable<Page['layout']>[number], { blockType: 'imageTex
 
 export function ImageTextBlock({ block, priority }: { block: Block; priority?: boolean }) {
   const image = typeof block.image === 'object' ? (block.image as Media) : null
-  const src = mediaUrl(image, 'feature')
+  const src = mediaSrc(image, 'feature')
 
   return (
     <Section>

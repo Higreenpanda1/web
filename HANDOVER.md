@@ -44,13 +44,21 @@ nothing about deployment changes.
   BCG (green brand, service grids, dark statement bands), McKinsey and Bain
   (editorial type and whitespace).
 
-Still open from this session, in order:
+Also fixed the same day: **uploaded images never rendered.** `next.config.ts`
+keeps `images.remotePatterns` empty on purpose, but every `<Image>` was
+given the absolute media URL, which the optimiser refuses ("url parameter is
+not allowed"). Components now use `mediaSrc()` (same-origin path);
+`mediaUrl()` stays for Open Graph and structured data only.
 
-1. **A real photograph of the founder.** The founder card shows the brand
-   mark until a photo is uploaded to the team member in the CMS. Brief §15:
-   photos of Sami on the ground are the proof the whole site rests on.
-2. Cover images for the three seeded posts (same: a placeholder shows
-   until Media is uploaded and attached).
+The founder's portrait is seeded from `src/seed/assets/founder-sami.jpg`
+(uploaded once, matched by its alt text on re-runs, and replaceable in the
+CMS). The four social networks connected in Metricool — Instagram, YouTube,
+TikTok, Facebook — are seeded into Site settings and shown in the footer.
+
+Still open from this session:
+
+1. Cover images for the three seeded posts (a placeholder shows until Media
+   is uploaded and attached in the CMS).
 
 ## The person you are working with
 
