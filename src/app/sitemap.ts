@@ -17,7 +17,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getAllSlugs('pages'),
   ])
 
-  const staticRoutes: Array<{ path: string; priority: number; changeFrequency: 'daily' | 'weekly' | 'monthly' | 'yearly' }> = [
+  const staticRoutes: Array<{
+    path: string
+    priority: number
+    changeFrequency: 'daily' | 'weekly' | 'monthly' | 'yearly'
+  }> = [
     { path: '/', priority: 1, changeFrequency: 'weekly' },
     { path: '/services', priority: 0.9, changeFrequency: 'monthly' },
     { path: '/about', priority: 0.7, changeFrequency: 'monthly' },

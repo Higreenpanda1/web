@@ -3,7 +3,15 @@ import { unstable_cache } from 'next/cache'
 import { getPayloadClient } from './payload'
 
 import type { Locale } from '@/i18n/routing'
-import type { Category, Page, Post, Service, SiteSetting, TeamMember, Testimonial } from '@/payload-types'
+import type {
+  Category,
+  Page,
+  Post,
+  Service,
+  SiteSetting,
+  TeamMember,
+  Testimonial,
+} from '@/payload-types'
 
 /**
  * Every read the public site performs, in one place.
@@ -55,7 +63,10 @@ export const getPageBySlug = (slug: string, locale: Locale) =>
     { tags: [CACHE_TAGS.pages], revalidate: ONE_HOUR },
   )()
 
-export const getServices = (locale: Locale, options: { featuredOnly?: boolean; limit?: number } = {}) =>
+export const getServices = (
+  locale: Locale,
+  options: { featuredOnly?: boolean; limit?: number } = {},
+) =>
   unstable_cache(
     async (): Promise<Service[]> => {
       const payload = await getPayloadClient()
@@ -127,7 +138,13 @@ export const getPosts = (
         totalDocs: result.totalDocs,
       }
     },
-    ['posts', locale, String(options.page ?? 1), String(options.limit ?? 9), options.category ?? 'all'],
+    [
+      'posts',
+      locale,
+      String(options.page ?? 1),
+      String(options.limit ?? 9),
+      options.category ?? 'all',
+    ],
     { tags: [CACHE_TAGS.posts], revalidate: ONE_HOUR },
   )()
 

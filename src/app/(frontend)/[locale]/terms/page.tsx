@@ -39,8 +39,8 @@ export default async function TermsPage({ params }: { params: Promise<{ locale: 
           <>
             <h2>من نحن</h2>
             <p>
-              {settings.organisationName} شركة خدمات تجارية مقرها الصين، تقدّم خدمات التوريد والتصنيع
-              والفحص والشحن وتأسيس الشركات للتجار الناطقين بالعربية.
+              {settings.organisationName} شركة خدمات تجارية مقرها الصين، تقدّم خدمات التوريد
+              والتصنيع والفحص والشحن وتأسيس الشركات للتجار الناطقين بالعربية.
             </p>
             <h2>ما تقدّمه هذه الصفحات</h2>
             <p>
@@ -49,8 +49,8 @@ export default async function TermsPage({ params }: { params: Promise<{ locale: 
             </p>
             <h2>الأسعار والدفع</h2>
             <p>
-              نذكر التكلفة الكاملة قبل البدء، ونخبرك بما يتغيّر ولماذا قبل أن يتغيّر. لا نُحمّلك رسومًا
-              لم نتفق عليها مسبقًا.
+              نذكر التكلفة الكاملة قبل البدء، ونخبرك بما يتغيّر ولماذا قبل أن يتغيّر. لا نُحمّلك
+              رسومًا لم نتفق عليها مسبقًا.
             </p>
             <h2>حدود مسؤوليتنا</h2>
             <p>
@@ -58,13 +58,10 @@ export default async function TermsPage({ params }: { params: Promise<{ locale: 
               ثالث خارج ما ينص عليه عقدك معنا. تفاصيل كل حالة تُحدَّد في عرض السعر المتفق عليه.
             </p>
             <h2>الملكية الفكرية</h2>
-            <p>
-              الشعار والنصوص والصور في هذا الموقع مملوكة لنا. لا تُستخدم دون إذن كتابي.
-            </p>
+            <p>الشعار والنصوص والصور في هذا الموقع مملوكة لنا. لا تُستخدم دون إذن كتابي.</p>
             <h2>الاتصال</h2>
             <p>
-              لأي سؤال عن هذه الشروط راسلنا على{' '}
-              <span className="ltr-nums">{settings.email}</span>.
+              لأي سؤال عن هذه الشروط راسلنا على <span className="ltr-nums">{settings.email}</span>.
             </p>
           </>
         ) : (
@@ -72,8 +69,8 @@ export default async function TermsPage({ params }: { params: Promise<{ locale: 
             <h2>Who we are</h2>
             <p>
               {settings.organisationName} is a China-based trade services company providing
-              sourcing, manufacturing, inspection, shipping and company formation for Arabic-speaking
-              traders.
+              sourcing, manufacturing, inspection, shipping and company formation for
+              Arabic-speaking traders.
             </p>
             <h2>What these pages are</h2>
             <p>

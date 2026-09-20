@@ -1,0 +1,139 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+# A second push to the same branch cancels the first; nobody needs the results
+# of a commit that has already been replaced.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Lint, types, tests, build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:16.10-alpine
+        env:
+          POSTGRES_USER: higreenpanda
+          POSTGRES_PASSWORD: ci-not-a-real-secret
+          POSTGRES_DB: higreenpanda_ci
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U higreenpanda"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URI: postgres://higreenpanda:ci-not-a-real-secret@localhost:5432/higreenpanda_ci
+      PAYLOAD_SECRET: ci-only-secret-never-used-in-production
+      NEXT_PUBLIC_SERVER_URL: http://localhost:3000
+      ADMIN_REQUIRE_2FA: 'true'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Apply migrations
+        run: npm run migrate
+
+      - name: Build
+        run: npm run build
+
+  browser:
+    name: Browser checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    needs: check
+
+    services:
+      postgres:
+        image: postgres:16.10-alpine
+        env:
+          POSTGRES_USER: higreenpanda
+          POSTGRES_PASSWORD: ci-not-a-real-secret
+          POSTGRES_DB: higreenpanda_ci
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U higreenpanda"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URI: postgres://higreenpanda:ci-not-a-real-secret@localhost:5432/higreenpanda_ci
+      PAYLOAD_SECRET: ci-only-secret-never-used-in-production
+      NEXT_PUBLIC_SERVER_URL: http://127.0.0.1:3000
+      # The gate is exercised separately; these checks are about the public site.
+      ADMIN_REQUIRE_2FA: 'false'
+      SEED_ADMIN_EMAIL: ci@example.invalid
+      SEED_ADMIN_PASSWORD: ci-only-password
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+
+      - name: Migrate and seed
+        run: |
+          npm run migrate
+          npm run seed
+
+      - name: Build
+        run: npm run build
+
+      - name: Start and wait for health
+        run: |
+          npm start &
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:3000/api/health > /dev/null; then
+              echo "ready after ${i}s"; exit 0
+            fi
+            sleep 1
+          done
+          echo "server did not become healthy"; exit 1
+
+      - name: Browser checks
+        run: BASE=http://127.0.0.1:3000 npm run test:e2e
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-failure-screenshots
+          path: tests/screenshots/
+          if-no-files-found: ignore

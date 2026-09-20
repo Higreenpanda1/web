@@ -2,24 +2,37 @@
  * Security headers, applied in middleware so they cover every response
  * including redirects and the 410s — not just rendered pages.
  *
- * The CSP is nonce-based rather than `unsafe-inline`. Next.js reads the nonce
- * out of the CSP header we set on the *request* and stamps it onto its own
+ * `script-src` is nonce-based rather than `unsafe-inline`. Next.js reads the
+ * nonce out of the CSP header set on the *request* and stamps it onto its own
  * bootstrap scripts, which is what makes a strict policy workable with the App
  * Router at all.
+ *
+ * One policy covers the public site and the admin panel. They had separate
+ * policies while the site's was stricter about styles; now that `style-src`
+ * has to allow inline everywhere (see below), the two were identical, and an
+ * unused distinction in a security header is just somewhere for them to drift
+ * apart.
  */
 
-export type CspTarget = 'site' | 'admin'
-
-export function buildCsp(nonce: string, target: CspTarget, isProduction: boolean): string {
+export function buildCsp(nonce: string, isProduction: boolean): string {
   const scriptSrc = ["'self'", `'nonce-${nonce}'`, "'strict-dynamic'"]
 
-  // The admin panel is Payload's own bundle: it injects styles at runtime and
-  // uses blob workers for uploads, so it needs a slightly wider policy than the
-  // public site. It is behind authentication and a second factor, and the two
-  // policies are kept apart precisely so the public site is not loosened to
-  // suit it.
-  const styleSrc =
-    target === 'admin' ? ["'self'", "'unsafe-inline'"] : ["'self'", `'nonce-${nonce}'`]
+  /**
+   * Scripts are nonce-based and strict. Styles cannot be, and pretending
+   * otherwise produces a policy that silently breaks the page.
+   *
+   * A CSP nonce does not cover `style="..."` attributes at all — only <style>
+   * elements — and React, next/font and Payload's admin all emit inline style
+   * attributes. Worse, a blocked style fails silently: when this was strict,
+   * the floating WhatsApp button lost its inline position and quietly moved to
+   * the wrong side of the Arabic site, with nothing visible but a console line.
+   *
+   * So `style-src` allows inline. The exposure is bounded: an injected style
+   * cannot execute code, and the directive that actually stops cross-site
+   * scripting — `script-src` with a nonce and 'strict-dynamic' — stays strict,
+   * as do object-src, base-uri, form-action and frame-ancestors.
+   */
+  const styleSrc = ["'self'", "'unsafe-inline'"]
 
   const directives: Record<string, string[]> = {
     'default-src': ["'self'"],
@@ -47,7 +60,6 @@ export function buildCsp(nonce: string, target: CspTarget, isProduction: boolean
     // Next's dev overlay and fast refresh need eval and a websocket.
     directives['script-src'] = [...scriptSrc, "'unsafe-eval'"]
     directives['connect-src'] = ["'self'", 'ws:', 'wss:']
-    directives['style-src'] = ["'self'", "'unsafe-inline'"]
   }
 
   return Object.entries(directives)

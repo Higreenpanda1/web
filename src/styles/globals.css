@@ -54,8 +54,9 @@
   --radius-DEFAULT: var(--radius);
   --radius-lg: var(--radius-lg);
 
-  --font-sans: var(--font-plex-latin), var(--font-plex-arabic), ui-sans-serif, system-ui,
-    'Segoe UI', sans-serif;
+  --font-sans:
+    var(--font-plex-latin), var(--font-plex-arabic), ui-sans-serif, system-ui, 'Segoe UI',
+    sans-serif;
 
   --shadow-sm: var(--shadow-sm);
   --shadow-DEFAULT: var(--shadow);

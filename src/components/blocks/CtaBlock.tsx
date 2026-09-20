@@ -33,7 +33,9 @@ export function CtaBlock({ block, locale }: { block: Block; locale: Locale }) {
     <Section tone="inverse" id="enquire">
       <div className="max-w-[var(--measure)]">
         <h2 className="text-white">{block.heading}</h2>
-        {block.body ? <p className="mt-4 text-body-lg text-[var(--brand-100)]">{block.body}</p> : null}
+        {block.body ? (
+          <p className="mt-4 text-body-lg text-[var(--brand-100)]">{block.body}</p>
+        ) : null}
         <BlockActions actions={block.actions} inverse />
       </div>
     </Section>

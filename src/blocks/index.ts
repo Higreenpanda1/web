@@ -52,10 +52,7 @@ export const HeroBlock: Block = {
 export const RichTextBlock: Block = {
   slug: 'richText',
   labels: { singular: 'Text', plural: 'Text sections' },
-  fields: [
-    { name: 'heading', type: 'text', localized: true },
-    bodyField({ name: 'content' }),
-  ],
+  fields: [{ name: 'heading', type: 'text', localized: true }, bodyField({ name: 'content' })],
 }
 
 export const ServicesGridBlock: Block = {

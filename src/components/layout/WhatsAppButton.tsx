@@ -8,8 +8,13 @@ import { whatsappLink } from '@/lib/url'
  * This audience contacts businesses through WhatsApp, not email forms (brief
  * section 9), so this is arguably the most important control on the site. It is
  * a plain anchor — no JavaScript, works before hydration, works with JS off —
- * and it uses inset-inline-end so it lands bottom-left in Arabic and
+ * and `end-5` is inset-inline-end, so it lands bottom-left in Arabic and
  * bottom-right in English without an RTL override.
+ *
+ * That position is a class and not a `style` attribute for a reason: under the
+ * production CSP an inline style attribute is refused, and when this was
+ * written as one the button silently reverted to the right-hand side on the
+ * Arabic site — blocked styles fail quietly, unlike blocked scripts.
  *
  * The white ring is not decoration: the button's green is from the same family
  * as the footer's, and without it the button vanishes the moment a visitor
@@ -33,8 +38,7 @@ export function WhatsAppButton({
       target="_blank"
       rel="noopener noreferrer"
       aria-label={ariaLabel}
-      className="fixed bottom-5 z-40 inline-flex min-h-14 items-center gap-2 rounded-[var(--radius-full)] bg-[var(--brand-700)] px-4 py-3 font-semibold text-white no-underline shadow-lg ring-2 ring-white/85 transition-colors hover:bg-[var(--brand-800)] md:px-5"
-      style={{ insetInlineEnd: '1.25rem' }}
+      className="fixed bottom-5 end-5 z-40 inline-flex min-h-14 items-center gap-2 rounded-[var(--radius-full)] bg-[var(--brand-700)] px-4 py-3 font-semibold text-white no-underline shadow-lg ring-2 ring-white/85 transition-colors hover:bg-[var(--brand-800)] md:px-5"
     >
       <MessageCircle size={22} strokeWidth={1.5} aria-hidden="true" />
       <span className="hidden text-body sm:inline">{label}</span>

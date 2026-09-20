@@ -55,10 +55,7 @@ export default async function ServicePage({
   const service = await getServiceBySlug(slug, locale)
   if (!service) notFound()
 
-  const [t, settings] = await Promise.all([
-    getTranslations({ locale }),
-    getSiteSettings(locale),
-  ])
+  const [t, settings] = await Promise.all([getTranslations({ locale }), getSiteSettings(locale)])
 
   const image = typeof service.image === 'object' ? (service.image as Media) : null
   const heroSrc = mediaUrl(image, 'hero')
@@ -70,7 +67,8 @@ export default async function ServicePage({
   return (
     <>
       <JsonLd data={serviceJsonLd(service, locale, settings)} />
-      <JsonLd data={breadcrumbJsonLd(locale, [
+      <JsonLd
+        data={breadcrumbJsonLd(locale, [
           { name: t('nav.home'), path: '/' },
           { name: t('services.title'), path: '/services' },
           { name: service.title, path: `/services/${slug}` },
@@ -89,11 +87,7 @@ export default async function ServicePage({
               sizes="100vw"
               className="-z-20 object-cover"
             />
-            <div
-              className="absolute inset-0 -z-10"
-              style={{ background: 'var(--overlay-photo)' }}
-              aria-hidden="true"
-            />
+            <div className="absolute inset-0 -z-10 bg-[var(--overlay-photo)]" aria-hidden="true" />
           </>
         ) : null}
         <Container>

@@ -97,8 +97,7 @@ export default async function PrivacyPage({ params }: { params: Promise<{ locale
             <h2>How long we keep it</h2>
             <p>
               We keep enquiries for three years and then delete them. You can ask us to delete your
-              data at any time by writing to{' '}
-              <span className="ltr-nums">{settings.email}</span>.
+              data at any time by writing to <span className="ltr-nums">{settings.email}</span>.
             </p>
             <h2>Your rights</h2>
             <p>

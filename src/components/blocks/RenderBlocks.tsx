@@ -20,13 +20,7 @@ type Block = NonNullable<Page['layout']>[number]
  * has exactly one case here; an unrecognised block renders nothing rather than
  * throwing, so a half-deployed block type can never take the page down.
  */
-export async function RenderBlocks({
-  blocks,
-  locale,
-}: {
-  blocks: Page['layout']
-  locale: Locale
-}) {
+export async function RenderBlocks({ blocks, locale }: { blocks: Page['layout']; locale: Locale }) {
   if (!blocks || blocks.length === 0) return null
 
   return (

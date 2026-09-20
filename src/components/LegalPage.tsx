@@ -41,15 +41,13 @@ export async function LegalPage({
           </p>
         ) : null}
 
-        {page?.layout && page.layout.length > 0 ? (
-          page.layout.map((block, index) =>
-            block.blockType === 'richText' ? (
-              <RichText key={block.id ?? index} data={block.content} className="max-w-none" />
-            ) : null,
-          )
-        ) : (
-          fallback
-        )}
+        {page?.layout && page.layout.length > 0
+          ? page.layout.map((block, index) =>
+              block.blockType === 'richText' ? (
+                <RichText key={block.id ?? index} data={block.content} className="max-w-none" />
+              ) : null,
+            )
+          : fallback}
       </div>
     </Container>
   )

@@ -139,12 +139,18 @@ export async function Footer({ locale, settings }: { locale: Locale; settings: S
           </p>
           <ul className="flex gap-4">
             <li>
-              <Link href="/privacy" className="text-[var(--brand-300)] no-underline hover:text-white hover:underline">
+              <Link
+                href="/privacy"
+                className="text-[var(--brand-300)] no-underline hover:text-white hover:underline"
+              >
                 {t('footer.privacy')}
               </Link>
             </li>
             <li>
-              <Link href="/terms" className="text-[var(--brand-300)] no-underline hover:text-white hover:underline">
+              <Link
+                href="/terms"
+                className="text-[var(--brand-300)] no-underline hover:text-white hover:underline"
+              >
                 {t('footer.terms')}
               </Link>
             </li>

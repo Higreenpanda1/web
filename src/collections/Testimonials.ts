@@ -31,7 +31,12 @@ export const Testimonials: CollectionConfig = {
       maxLength: 400,
     },
     { name: 'author', type: 'text', required: true },
-    { name: 'role', type: 'text', localized: true, admin: { description: 'e.g. importer, Riyadh' } },
+    {
+      name: 'role',
+      type: 'text',
+      localized: true,
+      admin: { description: 'e.g. importer, Riyadh' },
+    },
     { name: 'country', type: 'text', admin: { description: 'ISO 3166-1 alpha-2, e.g. SA.' } },
     { name: 'avatar', type: 'upload', relationTo: 'media' },
     {

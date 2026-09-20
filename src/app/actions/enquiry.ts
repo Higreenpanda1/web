@@ -41,10 +41,7 @@ export async function submitEnquiry(
   const locale = (formData.get('locale') === 'en' ? 'en' : 'ar') as Locale
 
   // --- Bot defences (honeypot + signed timing token) ------------------------
-  const guard = verifyFormToken(
-    formData.get(TIMESTAMP_FIELD),
-    formData.get(HONEYPOT_FIELD),
-  )
+  const guard = verifyFormToken(formData.get(TIMESTAMP_FIELD), formData.get(HONEYPOT_FIELD))
   if (!guard.ok) {
     if (guard.reason === 'honeypot') {
       // Do not tell a bot it was caught. Report success and store nothing.
@@ -54,9 +51,7 @@ export async function submitEnquiry(
   }
 
   // --- Rate limit, keyed by network prefix rather than exact address --------
-  const prefix = networkPrefix(
-    headerList.get('x-real-ip') ?? headerList.get('x-forwarded-for'),
-  )
+  const prefix = networkPrefix(headerList.get('x-real-ip') ?? headerList.get('x-forwarded-for'))
   const limit = consume(`enquiry:${prefix}`, RATE_LIMIT, RATE_WINDOW_MS)
   if (!limit.allowed) {
     return { status: 'error', errorKey: 'rateLimited' }

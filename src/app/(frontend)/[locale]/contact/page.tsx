@@ -31,14 +31,12 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
   const { locale } = await params
   setRequestLocale(locale)
 
-  const [t, settings] = await Promise.all([
-    getTranslations({ locale }),
-    getSiteSettings(locale),
-  ])
+  const [t, settings] = await Promise.all([getTranslations({ locale }), getSiteSettings(locale)])
 
   return (
     <>
-      <JsonLd data={breadcrumbJsonLd(locale, [
+      <JsonLd
+        data={breadcrumbJsonLd(locale, [
           { name: t('nav.home'), path: '/' },
           { name: t('contact.title'), path: '/contact' },
         ])}
@@ -69,7 +67,10 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
                   <dt className="font-semibold">{t('contact.phoneLabel')}</dt>
                   <dd>
                     <a
-                      href={whatsappLink(settings.whatsappNumber, settings.whatsappPrefill ?? undefined)}
+                      href={whatsappLink(
+                        settings.whatsappNumber,
+                        settings.whatsappPrefill ?? undefined,
+                      )}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="ltr-nums"

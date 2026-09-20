@@ -1,0 +1,57 @@
+# Dependency updates. Brief section 9: "Dependencies updated on a schedule,
+# with automated security alerts." Security updates arrive as soon as they
+# exist; routine updates are batched weekly so the repository does not become
+# a stream of single-package pull requests nobody reviews.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '02:00'
+      timezone: Asia/Shanghai
+    open-pull-requests-limit: 5
+    groups:
+      payload:
+        # Payload's packages are version-locked to each other; bumping one at
+        # a time produces a peer-dependency conflict every single week.
+        patterns:
+          - '@payloadcms/*'
+          - 'payload'
+      next:
+        patterns:
+          - 'next'
+          - 'react'
+          - 'react-dom'
+          - '@types/react'
+          - '@types/react-dom'
+          - 'eslint-config-next'
+      dev-dependencies:
+        dependency-type: development
+    commit-message:
+      prefix: 'deps'
+      prefix-development: 'deps(dev)'
+    labels:
+      - dependencies
+
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+    labels:
+      - dependencies
+
+  - package-ecosystem: docker
+    directory: /ops/backup
+    schedule:
+      interval: weekly
+    labels:
+      - dependencies
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    labels:
+      - dependencies

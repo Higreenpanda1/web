@@ -48,13 +48,15 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
 
   const founder = team.find((member) => member.isFounder) ?? team[0] ?? null
   const others = team.filter((member) => member.id !== founder?.id)
-  const founderPhoto = founder && typeof founder.photo === 'object' ? (founder.photo as Media) : null
+  const founderPhoto =
+    founder && typeof founder.photo === 'object' ? (founder.photo as Media) : null
   const founderSrc = mediaUrl(founderPhoto, 'card')
 
   return (
     <>
       <JsonLd data={organisationJsonLd(settings, locale)} />
-      <JsonLd data={breadcrumbJsonLd(locale, [
+      <JsonLd
+        data={breadcrumbJsonLd(locale, [
           { name: t('nav.home'), path: '/' },
           { name: t('about.title'), path: '/about' },
         ])}

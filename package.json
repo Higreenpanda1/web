@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "node .next/standalone/server.js",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write \"src/**/*.{ts,tsx,css,md}\"",
@@ -23,7 +23,8 @@
     "seed": "cross-env NODE_OPTIONS=--no-deprecation tsx src/seed/run.ts",
     "totp:enrol": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/enrol-totp.ts",
     "test": "node --test --experimental-strip-types \"src/**/*.test.ts\"",
-    "test:e2e": "node tests/e2e.mjs"
+    "test:e2e": "node tests/e2e.mjs",
+    "prestart": "mkdir -p .next/standalone/public .next/standalone/.next && cp -r public/. .next/standalone/public/ && cp -r .next/static .next/standalone/.next/"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.90.1",
@@ -33,11 +34,10 @@
     "@payloadcms/richtext-lexical": "3.90.1",
     "@payloadcms/translations": "3.90.1",
     "@payloadcms/ui": "3.90.1",
-    "dotenv": "^16.6.1",
     "graphql": "16.14.2",
     "lucide-react": "0.469.0",
     "next": "15.4.11",
-    "next-intl": "4.3.12",
+    "next-intl": "4.14.5",
     "payload": "3.90.1",
     "qrcode": "1.5.4",
     "react": "19.2.0",
@@ -46,7 +46,7 @@
     "zod": "3.25.76"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/eslintrc": "3.3.1",
     "@tailwindcss/postcss": "4.1.14",
     "@types/node": "22.18.8",
     "@types/qrcode": "1.5.5",
@@ -55,11 +55,12 @@
     "cross-env": "7.0.3",
     "eslint": "9.39.5",
     "eslint-config-next": "15.4.11",
-    "playwright": "^1.56.1",
+    "playwright": "1.56.1",
     "prettier": "3.6.2",
     "tailwindcss": "4.1.14",
     "tsx": "4.20.6",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "dotenv": "16.6.1"
   },
   "overrides": {
     "graphql": "16.14.2"

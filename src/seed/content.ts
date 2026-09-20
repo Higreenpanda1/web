@@ -79,7 +79,8 @@ export const SERVICES: SeedService[] = [
     },
     en: {
       title: 'Product sourcing',
-      summary: 'We find your next product in China and the right factory to make it, at the right price.',
+      summary:
+        'We find your next product in China and the right factory to make it, at the right price.',
       body: 'Tell us the product, the quantity, the budget and the destination country, and we start looking. We compare factories on the ground rather than only through platforms, and negotiate price, payment terms and lead time in Chinese.\n\nYou get a shortlist with the real cost of each option, photographs of the factory, and a sample if you want one — before you commit to anything.',
       highlights: [
         'Factories compared on the ground, not only on platforms',
@@ -107,7 +108,8 @@ export const SERVICES: SeedService[] = [
     },
     en: {
       title: 'Manufacturing',
-      summary: 'Your product made in China to your specification and under your brand, with production followed through.',
+      summary:
+        'Your product made in China to your specification and under your brand, with production followed through.',
       body: 'If you have a product of your own — a design, a modification of something existing, or a brand you want to launch — we find the factory that can build it and translate your specification into language the factory understands.\n\nWe follow production in stages: first sample, production sample, then the full run, with photographs and reports at each point so nothing surprises you on arrival.',
       highlights: [
         'Your specification translated into the factory’s language',
@@ -135,7 +137,8 @@ export const SERVICES: SeedService[] = [
     },
     en: {
       title: 'Quality inspection',
-      summary: 'The factory and the goods inspected on the ground before you pay or ship, with a photographed report.',
+      summary:
+        'The factory and the goods inspected on the ground before you pay or ship, with a photographed report.',
       body: 'Inspection is the difference between a good deal and a container you cannot sell. We visit the factory ourselves, verify that it is a real factory and not a middleman, and check the goods before shipping: dimensions, quantity, packaging and defects.\n\nYou get a photographed report before you release the final payment, so the decision is yours and not the factory’s.',
       highlights: [
         'A site visit to verify the factory is real',
@@ -163,7 +166,8 @@ export const SERVICES: SeedService[] = [
     },
     en: {
       title: 'Shipping and freight',
-      summary: 'Your goods shipped from China to your country, by sea or air, with customs clearance and delivery.',
+      summary:
+        'Your goods shipped from China to your country, by sea or air, with customs clearance and delivery.',
       body: 'We arrange the freight that suits your volume and your budget: a full container, a part load, or air freight when time matters more than cost.\n\nWe prepare the documents, follow customs clearance in your country, and stay with the shipment until you have the goods — not until it leaves the port.',
       highlights: [
         'Full container, part load or air freight',
@@ -240,8 +244,7 @@ export const SERVICES: SeedService[] = [
     icon: 'lightbulb',
     ar: {
       title: 'الاستشارات التجارية',
-      summary:
-        'دعم واستشارات تساعدك على الاستفادة من الفرص المتاحة في الأسواق الصينية والآسيوية.',
+      summary: 'دعم واستشارات تساعدك على الاستفادة من الفرص المتاحة في الأسواق الصينية والآسيوية.',
       body: 'أحيانًا لا تحتاج إلى خدمة كاملة بل إلى رأي صادق: هل هذا المنتج يستحق؟ هل هذا السعر منطقي؟ هل هذا المصنع حقيقي؟ ما التكلفة الكاملة حتى باب مستودعك؟\n\nنجلس معك ونجيب بالأرقام، معتمدين على وجودنا الفعلي في السوق الصيني.',
       highlights: [
         'رأي صادق مبني على وجود فعلي في السوق',
@@ -334,8 +337,18 @@ export const REDIRECTS: Array<{
   type: '301' | '410'
   note: string
 }> = [
-  { from: '/en/home', to: '/en', type: '301', note: 'Old English homepage — the path the brief calls out by name.' },
-  { from: '/en/home/', to: '/en', type: '301', note: 'Trailing-slash variant of the old English homepage.' },
+  {
+    from: '/en/home',
+    to: '/en',
+    type: '301',
+    note: 'Old English homepage — the path the brief calls out by name.',
+  },
+  {
+    from: '/en/home/',
+    to: '/en',
+    type: '301',
+    note: 'Trailing-slash variant of the old English homepage.',
+  },
   { from: '/home', to: '/', type: '301', note: 'Old Arabic homepage path.' },
   { from: '/en/about-us', to: '/en/about', type: '301', note: 'Old English about page.' },
   { from: '/about-us', to: '/about', type: '301', note: 'Old Arabic about page.' },

@@ -61,10 +61,7 @@ export default async function PostPage({
   const post = await getPostBySlug(slug, locale)
   if (!post) notFound()
 
-  const [t, settings] = await Promise.all([
-    getTranslations({ locale }),
-    getSiteSettings(locale),
-  ])
+  const [t, settings] = await Promise.all([getTranslations({ locale }), getSiteSettings(locale)])
 
   const cover = typeof post.coverImage === 'object' ? (post.coverImage as Media) : null
   const coverSrc = mediaUrl(cover, 'feature')
@@ -76,7 +73,8 @@ export default async function PostPage({
   return (
     <>
       <JsonLd data={blogPostingJsonLd(post, locale, settings)} />
-      <JsonLd data={breadcrumbJsonLd(locale, [
+      <JsonLd
+        data={breadcrumbJsonLd(locale, [
           { name: t('nav.home'), path: '/' },
           { name: t('blog.title'), path: '/blog' },
           { name: post.title, path: `/blog/${slug}` },

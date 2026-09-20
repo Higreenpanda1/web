@@ -16,7 +16,8 @@ export function slugField(sourceField = 'title'): Field {
     localized: false,
     admin: {
       position: 'sidebar',
-      description: 'Lowercase Latin letters, numbers and hyphens. Used in the URL for both languages.',
+      description:
+        'Lowercase Latin letters, numbers and hyphens. Used in the URL for both languages.',
     },
     validate: (value: unknown) => {
       if (typeof value !== 'string' || value.length === 0) return 'A slug is required.'

@@ -70,66 +70,81 @@ async function main() {
   })
 
   console.log('→ Founder')
-  const founderId = await upsert(payload, 'team-members', { slug: { equals: FOUNDER.slug } }, {
-    ar: {
-      slug: FOUNDER.slug,
-      name: FOUNDER.ar.name,
-      role: FOUNDER.ar.role,
-      bio: FOUNDER.ar.bio,
-      credentials: FOUNDER.ar.credentials.map((text) => ({ text })),
-      isFounder: true,
-      order: 1,
-      links: {
-        instagram: 'https://instagram.com/higreenpanda',
-        youtube: 'https://youtube.com/@Higreenpanda',
-        email: 'Sam@higreenpanda.com',
+  const founderId = await upsert(
+    payload,
+    'team-members',
+    { slug: { equals: FOUNDER.slug } },
+    {
+      ar: {
+        slug: FOUNDER.slug,
+        name: FOUNDER.ar.name,
+        role: FOUNDER.ar.role,
+        bio: FOUNDER.ar.bio,
+        credentials: FOUNDER.ar.credentials.map((text) => ({ text })),
+        isFounder: true,
+        order: 1,
+        links: {
+          instagram: 'https://instagram.com/higreenpanda',
+          youtube: 'https://youtube.com/@Higreenpanda',
+          email: 'Sam@higreenpanda.com',
+        },
+      },
+      en: {
+        name: FOUNDER.en.name,
+        role: FOUNDER.en.role,
+        bio: FOUNDER.en.bio,
+        credentials: FOUNDER.en.credentials.map((text) => ({ text })),
       },
     },
-    en: {
-      name: FOUNDER.en.name,
-      role: FOUNDER.en.role,
-      bio: FOUNDER.en.bio,
-      credentials: FOUNDER.en.credentials.map((text) => ({ text })),
-    },
-  })
+  )
   console.log(`  founder id ${founderId}`)
 
   console.log('→ Services')
   for (const service of SERVICES) {
-    const id = await upsert(payload, 'services', { slug: { equals: service.slug } }, {
-      ar: {
-        slug: service.slug,
-        title: service.ar.title,
-        summary: service.ar.summary,
-        body: richText(service.ar.body),
-        highlights: service.ar.highlights.map((text) => ({ text })),
-        icon: service.icon,
-        featured: service.featured,
-        order: service.order,
-        _status: 'published',
+    const id = await upsert(
+      payload,
+      'services',
+      { slug: { equals: service.slug } },
+      {
+        ar: {
+          slug: service.slug,
+          title: service.ar.title,
+          summary: service.ar.summary,
+          body: richText(service.ar.body),
+          highlights: service.ar.highlights.map((text) => ({ text })),
+          icon: service.icon,
+          featured: service.featured,
+          order: service.order,
+          _status: 'published',
+        },
+        en: {
+          title: service.en.title,
+          summary: service.en.summary,
+          body: richText(service.en.body),
+          highlights: service.en.highlights.map((text) => ({ text })),
+          _status: 'published',
+        },
       },
-      en: {
-        title: service.en.title,
-        summary: service.en.summary,
-        body: richText(service.en.body),
-        highlights: service.en.highlights.map((text) => ({ text })),
-        _status: 'published',
-      },
-    })
+    )
     console.log(`  ${service.slug} → ${id}`)
   }
 
   console.log('→ Redirects')
   for (const redirect of REDIRECTS) {
-    await upsert(payload, 'redirects', { from: { equals: redirect.from } }, {
-      ar: {
-        from: redirect.from,
-        to: redirect.to ?? undefined,
-        type: redirect.type,
-        enabled: true,
-        note: redirect.note,
+    await upsert(
+      payload,
+      'redirects',
+      { from: { equals: redirect.from } },
+      {
+        ar: {
+          from: redirect.from,
+          to: redirect.to ?? undefined,
+          type: redirect.type,
+          enabled: true,
+          note: redirect.note,
+        },
       },
-    })
+    )
   }
   console.log(`  ${REDIRECTS.length} rules`)
 

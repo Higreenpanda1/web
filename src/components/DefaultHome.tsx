@@ -116,7 +116,9 @@ export async function DefaultHome({ locale }: { locale: Locale }) {
               >
                 {index + 1}
               </span>
-              <h3 className="text-h3">{t(`home.process.step${step}Title` as 'home.process.step1Title')}</h3>
+              <h3 className="text-h3">
+                {t(`home.process.step${step}Title` as 'home.process.step1Title')}
+              </h3>
               <p className="mt-2 text-[var(--text-muted)]">
                 {t(`home.process.step${step}Body` as 'home.process.step1Body')}
               </p>

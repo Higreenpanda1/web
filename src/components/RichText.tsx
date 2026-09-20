@@ -9,13 +9,7 @@ import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical
  * measure, the vertical rhythm and the logical-property list indents, so the
  * Arabic and English renderings share one stylesheet and no RTL override.
  */
-export function RichText({
-  data,
-  className,
-}: {
-  data: unknown
-  className?: string
-}) {
+export function RichText({ data, className }: { data: unknown; className?: string }) {
   if (!data) return null
 
   return (

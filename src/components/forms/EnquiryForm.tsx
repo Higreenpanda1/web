@@ -62,9 +62,7 @@ export function EnquiryForm({
           className="mb-3 text-[var(--brand-700)]"
         />
         <h3 className="text-h3 text-[var(--brand-900)]">{t('successTitle')}</h3>
-        <p className="mt-2">
-          {t('successBody', { reference: state.reference })}
-        </p>
+        <p className="mt-2">{t('successBody', { reference: state.reference })}</p>
         <Button
           type="button"
           variant="secondary"
@@ -101,7 +99,12 @@ export function EnquiryForm({
       <div aria-live="polite">
         {state.status === 'error' && !state.fieldErrors ? (
           <p className="flex items-start gap-2 rounded-[var(--radius)] border border-[var(--error)] bg-[var(--error)]/10 p-3 text-[var(--error)]">
-            <AlertCircle size={20} strokeWidth={1.5} aria-hidden="true" className="mt-0.5 shrink-0" />
+            <AlertCircle
+              size={20}
+              strokeWidth={1.5}
+              aria-hidden="true"
+              className="mt-0.5 shrink-0"
+            />
             <span>{t(`errors.${state.errorKey}` as 'errors.generic')}</span>
           </p>
         ) : null}
@@ -250,7 +253,9 @@ function Field({
         id={id}
         name={name}
         required={required}
-        aria-describedby={[hint ? hintId : null, error ? errorId : null].filter(Boolean).join(' ') || undefined}
+        aria-describedby={
+          [hint ? hintId : null, error ? errorId : null].filter(Boolean).join(' ') || undefined
+        }
         aria-invalid={error ? true : undefined}
         className={inputClass(Boolean(error))}
         {...rest}
@@ -286,7 +291,11 @@ function FieldError({ id, messageKey }: { id: string; messageKey?: string }) {
   const t = useTranslations('contact.form.errors')
   if (!messageKey) return null
   return (
-    <p id={id} role="alert" className="mt-1.5 flex items-center gap-1.5 text-caption text-[var(--error)]">
+    <p
+      id={id}
+      role="alert"
+      className="mt-1.5 flex items-center gap-1.5 text-caption text-[var(--error)]"
+    >
       <AlertCircle size={16} strokeWidth={1.5} aria-hidden="true" />
       {t(messageKey as 'generic')}
     </p>

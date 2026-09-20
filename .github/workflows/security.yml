@@ -1,0 +1,36 @@
+name: Security
+
+on:
+  schedule:
+    # Weekly, Monday morning China time. The previous site was taken over
+    # through an unmaintained dependency; this is the cheap half of not
+    # repeating that.
+    - cron: '0 1 * * 1'
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - package.json
+      - package-lock.json
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: npm audit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # High and critical fail the job. Moderate and low are reported but do
+      # not block: a blocked pipeline that everyone learns to ignore protects
+      # nothing.
+      - run: npm audit --audit-level=high
+      - name: Full report
+        if: always()
+        run: npm audit || true

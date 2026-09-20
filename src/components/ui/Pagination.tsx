@@ -34,7 +34,12 @@ export function Pagination({
           rel="prev"
           className="inline-flex min-h-11 items-center gap-1.5 font-semibold text-[var(--text-brand)] no-underline"
         >
-          <ChevronLeft size={20} strokeWidth={1.5} aria-hidden="true" className="rtl:-scale-x-100" />
+          <ChevronLeft
+            size={20}
+            strokeWidth={1.5}
+            aria-hidden="true"
+            className="rtl:-scale-x-100"
+          />
           {labels.previous}
         </Link>
       ) : (
@@ -50,7 +55,12 @@ export function Pagination({
           className="inline-flex min-h-11 items-center gap-1.5 font-semibold text-[var(--text-brand)] no-underline"
         >
           {labels.next}
-          <ChevronRight size={20} strokeWidth={1.5} aria-hidden="true" className="rtl:-scale-x-100" />
+          <ChevronRight
+            size={20}
+            strokeWidth={1.5}
+            aria-hidden="true"
+            className="rtl:-scale-x-100"
+          />
         </Link>
       ) : (
         <span />

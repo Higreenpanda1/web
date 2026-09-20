@@ -12,9 +12,10 @@ function required(name: string, fallback?: string): string {
 }
 
 /** Public origin, no trailing slash. */
-export const serverURL = (
-  process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:3000'
-).replace(/\/+$/, '')
+export const serverURL = (process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:3000').replace(
+  /\/+$/,
+  '',
+)
 
 export const isProduction = process.env.NODE_ENV === 'production'
 

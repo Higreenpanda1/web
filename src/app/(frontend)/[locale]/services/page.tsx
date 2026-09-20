@@ -36,13 +36,18 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
 
   return (
     <>
-      <JsonLd data={breadcrumbJsonLd(locale, [
+      <JsonLd
+        data={breadcrumbJsonLd(locale, [
           { name: t('nav.home'), path: '/' },
           { name: t('services.title'), path: '/services' },
         ])}
       />
       <Section labelledBy="services-heading">
-        <SectionHeading id="services-heading" title={t('services.title')} lead={t('services.lead')} />
+        <SectionHeading
+          id="services-heading"
+          title={t('services.title')}
+          lead={t('services.lead')}
+        />
         {services.length === 0 ? (
           <p className="text-[var(--text-muted)]">{t('services.empty')}</p>
         ) : (

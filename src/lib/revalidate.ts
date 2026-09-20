@@ -2,7 +2,11 @@ import { revalidateTag } from 'next/cache'
 
 import { CACHE_TAGS } from './queries'
 
-import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, GlobalAfterChangeHook } from 'payload'
+import type {
+  CollectionAfterChangeHook,
+  CollectionAfterDeleteHook,
+  GlobalAfterChangeHook,
+} from 'payload'
 
 /**
  * Publishing in the CMS has to show up on the site immediately — the build

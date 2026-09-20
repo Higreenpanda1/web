@@ -13,11 +13,7 @@ import { z } from 'zod'
 const E164 = /^\+?[1-9]\d{6,15}$/
 
 export const enquirySchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(2, 'nameRequired')
-    .max(120, 'nameTooLong'),
+  name: z.string().trim().min(2, 'nameRequired').max(120, 'nameTooLong'),
   country: z.string().trim().min(2, 'countryRequired').max(60, 'countryRequired'),
   whatsapp: z
     .string()
@@ -27,11 +23,7 @@ export const enquirySchema = z.object({
     .refine((value) => E164.test(value), 'whatsappInvalid'),
   email: z.string().trim().email().optional().or(z.literal('')),
   service: z.string().trim().optional().or(z.literal('')),
-  message: z
-    .string()
-    .trim()
-    .min(10, 'messageTooShort')
-    .max(4000, 'messageTooLong'),
+  message: z.string().trim().min(10, 'messageTooShort').max(4000, 'messageTooLong'),
 })
 
 export type EnquiryInput = z.infer<typeof enquirySchema>

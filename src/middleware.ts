@@ -62,7 +62,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith(`${ADMIN_PATH}/`) ||
     pathname === ADMIN_GATE_PATH ||
     pathname.startsWith(`${ADMIN_GATE_PATH}/`)
-  const csp = buildCsp(nonce, isAdminSurface ? 'admin' : 'site', isProduction)
+  const csp = buildCsp(nonce, isProduction)
 
   // --- 1. Injected spam: gone, permanently ---------------------------------
   // Before trailing-slash canonicalisation, so /slot-gacor/ is answered in one
@@ -82,7 +82,7 @@ export async function middleware(request: NextRequest) {
     if (rule.to) {
       const destination = rule.to.startsWith('http')
         ? new URL(rule.to)
-        : new URL(rule.to, request.nextUrl.origin)
+        : publicUrl(rule.to, request)
       // Last line of defence against a loop. The Redirects collection refuses
       // a rule that points at its own source, but a rule written before that
       // validation existed — or one that becomes self-referential through a
@@ -105,10 +105,7 @@ export async function middleware(request: NextRequest) {
     // Built from the origin rather than cloning nextUrl: the clone carries
     // Next's own routing state and re-asserts the original pathname, which
     // produced a redirect to the very URL being redirected from.
-    const canonical = new URL(
-      `${trimmedPath || '/'}${request.nextUrl.search}`,
-      request.nextUrl.origin,
-    )
+    const canonical = publicUrl(`${trimmedPath || '/'}${request.nextUrl.search}`, request)
     return decorate(NextResponse.redirect(canonical, 308), { csp, isProduction, pathname })
   }
 
@@ -162,11 +159,13 @@ function routeLocale(request: NextRequest, nonce: string, csp: string): NextResp
   const requestHeaders = withRequestHeaders(request, nonce, csp)
 
   const location = intlResponse.headers.get('location')
-  if (location) return intlResponse
+  if (location) {
+    return NextResponse.redirect(publicUrl(location, request), intlResponse.status)
+  }
 
   const rewrite = intlResponse.headers.get('x-middleware-rewrite')
   const rebuilt = rewrite
-    ? NextResponse.rewrite(new URL(rewrite, request.nextUrl.origin), {
+    ? NextResponse.rewrite(internalUrl(rewrite, request), {
         request: { headers: requestHeaders },
       })
     : NextResponse.next({ request: { headers: requestHeaders } })
@@ -220,6 +219,40 @@ function enforceRateLimit(
 }
 
 /**
+ * URL building for rewrites and redirects.
+ *
+ * Both are built on `request.url` — the exact URL Next is serving — rather
+ * than on `request.nextUrl.origin`, which in a production build reports
+ * `localhost:3000` whatever host the request arrived on.
+ *
+ * That difference is not cosmetic. Next decides whether a rewrite is internal
+ * by comparing its origin with the incoming request's. next-intl builds its
+ * rewrite from `nextUrl`, so in production the rewrite of `/services` to
+ * `/ar/services` came back on a foreign origin, Next proxied it to itself as a
+ * fresh request, middleware ran again, next-intl stripped the default-locale
+ * prefix back to `/services`, and the browser gave up with
+ * ERR_TOO_MANY_REDIRECTS. Every page except /en was unreachable — in the
+ * production build only, which is the one that matters. Behind Caddy the same
+ * mismatch would have done it on the real domain.
+ */
+function internalUrl(target: string, request: NextRequest): URL {
+  const parsed = new URL(target, request.url)
+  return new URL(`${parsed.pathname}${parsed.search}`, request.url)
+}
+
+/**
+ * A URL a browser will be sent to. Same origin as the request, but honouring
+ * `x-forwarded-proto` so a request Caddy terminated as HTTPS and forwarded over
+ * plain HTTP still redirects to an https:// address.
+ */
+function publicUrl(target: string, request: NextRequest): URL {
+  const url = internalUrl(target, request)
+  const forwardedProto = request.headers.get('x-forwarded-proto')
+  if (forwardedProto) url.protocol = `${forwardedProto.split(',')[0]?.trim()}:`
+  return url
+}
+
+/**
  * Two-factor gate. Payload's own login form is refused by the beforeLogin hook
  * on the Users collection, so this only has to stop an authenticated-but-
  * unverified session reaching the panel, and send everyone else to the gate.
@@ -233,7 +266,7 @@ function guardAdmin(request: NextRequest): NextResponse | null {
   // Signing out must always work, verified or not.
   if (pathname.startsWith(`${ADMIN_PATH}/logout`)) return null
 
-  const gate = new URL(ADMIN_GATE_PATH, request.nextUrl.origin)
+  const gate = publicUrl(ADMIN_GATE_PATH, request)
   if (pathname !== ADMIN_PATH) gate.searchParams.set('next', pathname)
   return NextResponse.redirect(gate, 302)
 }
@@ -246,7 +279,7 @@ function guardAdmin(request: NextRequest): NextResponse | null {
  * version builds without complaint and then 404s at runtime.
  */
 function goneResponse(request: NextRequest): NextResponse {
-  const url = new URL('/gone', request.nextUrl.origin)
+  const url = internalUrl('/gone', request)
   url.searchParams.set('locale', request.nextUrl.pathname.startsWith('/en') ? 'en' : 'ar')
   return NextResponse.rewrite(url)
 }

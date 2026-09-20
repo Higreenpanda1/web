@@ -132,8 +132,16 @@ export const SiteSettings: GlobalConfig = {
               name: 'social',
               type: 'group',
               fields: [
-                { name: 'instagram', type: 'text', defaultValue: 'https://instagram.com/higreenpanda' },
-                { name: 'youtube', type: 'text', defaultValue: 'https://youtube.com/@Higreenpanda' },
+                {
+                  name: 'instagram',
+                  type: 'text',
+                  defaultValue: 'https://instagram.com/higreenpanda',
+                },
+                {
+                  name: 'youtube',
+                  type: 'text',
+                  defaultValue: 'https://youtube.com/@Higreenpanda',
+                },
                 { name: 'facebook', type: 'text' },
                 { name: 'tiktok', type: 'text' },
                 { name: 'linkedin', type: 'text' },

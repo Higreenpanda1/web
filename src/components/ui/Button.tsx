@@ -51,7 +51,12 @@ export function ButtonLink({
   >) {
   const classes = cn(BASE, VARIANT_CLASS[variant], SIZE_CLASS[size], className)
 
-  if (external || href.startsWith('http') || href.startsWith('tel:') || href.startsWith('mailto:')) {
+  if (
+    external ||
+    href.startsWith('http') ||
+    href.startsWith('tel:') ||
+    href.startsWith('mailto:')
+  ) {
     return (
       <a
         href={href}

@@ -131,7 +131,10 @@ export const Enquiries: CollectionConfig = {
           // submissions from one network, not enough to track an individual.
           name: 'ipPrefix',
           type: 'text',
-          admin: { readOnly: true, description: 'Network prefix only; the full address is never stored.' },
+          admin: {
+            readOnly: true,
+            description: 'Network prefix only; the full address is never stored.',
+          },
         },
         {
           name: 'submittedAt',
@@ -146,7 +149,8 @@ export const Enquiries: CollectionConfig = {
       admin: {
         readOnly: true,
         position: 'sidebar',
-        description: 'When the notification email was accepted by the provider. Empty means it failed — the enquiry is still safe here.',
+        description:
+          'When the notification email was accepted by the provider. Empty means it failed — the enquiry is still safe here.',
       },
     },
   ],

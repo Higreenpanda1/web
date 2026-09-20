@@ -1,11 +1,19 @@
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 
 import { anyone, isStaff } from '@/access'
 
 import type { CollectionConfig } from 'payload'
 
-const dirname = path.dirname(fileURLToPath(import.meta.url))
+/**
+ * Where uploads live on disk.
+ *
+ * Resolved from the working directory rather than from this module's own path:
+ * once the app is bundled for production the module no longer sits two levels
+ * below the project root, and a relative path computed from `import.meta.url`
+ * quietly points somewhere else. In Docker this is /app/media, which is a
+ * mounted volume so a redeploy never loses it.
+ */
+const MEDIA_DIR = process.env.MEDIA_DIR ?? path.resolve(process.cwd(), 'media')
 
 /**
  * Uploads are validated by type and by size, and written outside the web root
@@ -38,7 +46,7 @@ export const Media: CollectionConfig = {
     delete: isStaff,
   },
   upload: {
-    staticDir: path.resolve(dirname, '../../media'),
+    staticDir: MEDIA_DIR,
     // SVG is excluded on purpose: it is an executable document, and an upload
     // form that accepts it is a stored-XSS hole. Brand SVGs ship in /public.
     mimeTypes: [...ALLOWED_MIME_TYPES],

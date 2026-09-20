@@ -33,11 +33,7 @@ export function HeroBlock({ block, priority }: { block: Block; priority?: boolea
         className="-z-20 object-cover"
       />
       {/* Brief section 15: brand-900 at 55%, not black. */}
-      <div
-        className="absolute inset-0 -z-10"
-        style={{ background: 'var(--overlay-photo)' }}
-        aria-hidden="true"
-      />
+      <div className="absolute inset-0 -z-10 bg-[var(--overlay-photo)]" aria-hidden="true" />
       <Container>
         <HeroCopy block={block} inverse />
       </Container>

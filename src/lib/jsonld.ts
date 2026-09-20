@@ -129,10 +129,7 @@ export function blogPostingJsonLd(post: Post, locale: Locale, settings: SiteSett
   }
 }
 
-export function breadcrumbJsonLd(
-  locale: Locale,
-  trail: Array<{ name: string; path: string }>,
-) {
+export function breadcrumbJsonLd(locale: Locale, trail: Array<{ name: string; path: string }>) {
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',

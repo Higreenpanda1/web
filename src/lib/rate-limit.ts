@@ -28,7 +28,12 @@ export type RateLimitResult = {
   retryAfterSeconds: number
 }
 
-export function consume(key: string, limit: number, windowMs: number, now = Date.now()): RateLimitResult {
+export function consume(
+  key: string,
+  limit: number,
+  windowMs: number,
+  now = Date.now(),
+): RateLimitResult {
   pruneExpired(now)
 
   const existing = buckets.get(key)

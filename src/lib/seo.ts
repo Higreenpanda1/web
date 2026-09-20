@@ -36,7 +36,10 @@ export function fallbackOgImage(locale: Locale): string {
   return `${serverURL}/brand/social/og-image-${locale}.png`
 }
 
-export function mediaUrl(media: Media | number | null | undefined, size?: keyof NonNullable<Media['sizes']>): string | null {
+export function mediaUrl(
+  media: Media | number | null | undefined,
+  size?: keyof NonNullable<Media['sizes']>,
+): string | null {
   if (!media || typeof media === 'number') return null
   if (size && media.sizes) {
     const variant = media.sizes[size]
@@ -83,9 +86,7 @@ export function buildMetadata({
       locale: locale === 'ar' ? 'ar_AR' : 'en_GB',
       alternateLocale: locale === 'ar' ? ['en_GB'] : ['ar_AR'],
       images: [{ url: ogImage, width: 1200, height: 630, alt: finalTitle }],
-      ...(type === 'article'
-        ? { publishedTime, modifiedTime, authors }
-        : {}),
+      ...(type === 'article' ? { publishedTime, modifiedTime, authors } : {}),
     },
     twitter: {
       card: 'summary_large_image',
