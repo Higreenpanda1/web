@@ -9,8 +9,8 @@ replace a WordPress site that was taken over and injected with spam.
 - **Content and brand:** [`WEBSITE-BRIEF.md`](./WEBSITE-BRIEF.md) — positioning,
   the eight services, the founder, the colour and type systems. Authoritative.
 - **Original instructions:** [`BUILD-PROMPT.md`](./BUILD-PROMPT.md)
-- **Deployment:** [`DEPLOY.md`](./DEPLOY.md) — provisioning, DNS (including the
-  MX records that need restoring), backups and the restore drill.
+- **Deployment:** [`DEPLOY.md`](./DEPLOY.md) — provisioning, bringing the stack
+  up, DNS, backups and the restore drill.
 
 ---
 
@@ -116,8 +116,8 @@ blocking first paint; text now renders immediately in a metric-adjusted
 fallback and swaps. First load carries 38 KiB of fonts.
 
 **The enquiry form stores first and emails second.** An email failure never
-fails the request — when the MX records were wiped a day of enquiries was lost
-with nobody knowing how many. Three server-side guards instead of a CAPTCHA:
+fails the request: a provider outage or an expired API key should cost a
+notification, never a lead. Three server-side guards instead of a CAPTCHA:
 a honeypot, an HMAC-signed timing token, and a per-network rate limit. A
 CAPTCHA would cost this audience half a megabyte over 4G and lock out anyone
 using a screen reader.
@@ -148,7 +148,7 @@ render against warm data, not a round trip. `script-src` keeps its nonce and
 
 **Phase 2 is unblocked, not built.** `Customers` is a separate auth collection
 with a `role`, and `Enquiries` already carries `status`, `assignedTo` and a
-`customer` relation. See DEPLOY.md §9.
+`customer` relation. See DEPLOY.md §10.
 
 ### Where this differs from the brief
 
@@ -159,8 +159,12 @@ with a `role`, and `Enquiries` already carries `status`, `assignedTo` and a
   on this audience's connection that is worse than a heading one step heavier.
 - **Headings are fluid rather than fixed.** The brief's sizes are a desktop
   scale and are reached exactly at 1280px.
-- **Trade-fair accompaniment is a ninth service**, which the brief flags as
-  worth adding and the founder's 100+ fairs make credible.
+
+Brief §4 also suggests a ninth service, trade-fair accompaniment, and marks it
+[confirm]. It was seeded and has since been removed: nobody has confirmed the
+business sells it, and a published service the client does not offer turns
+into an enquiry they have to decline. The `tent` icon is still in the picker,
+so adding it is one document in the admin panel if it turns out they do.
 
 ---
 

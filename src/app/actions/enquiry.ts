@@ -21,8 +21,8 @@ import type { Locale } from '@/i18n/routing'
  *
  * Order of operations matters. The enquiry is written to Postgres first and
  * emailed second, and an email failure does not fail the request: the visitor
- * is told we have their enquiry because we do. That is the direct lesson of
- * losing a day of enquiries when the MX records were wiped (brief section 6).
+ * is told we have their enquiry because we do. A provider outage, an expired
+ * API key or a DNS change should cost a notification, never a lead.
  */
 
 export type EnquiryState =

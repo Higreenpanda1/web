@@ -6,6 +6,8 @@
 
 > **How this was assembled.** The old site went offline on 19 September 2026 and its host is unknown, so nothing could be read from the live site. Everything below was recovered from search-engine records of higreenpanda.com and its mirror higreenpanda.net, plus the brand's public social profiles. Sections marked **[confirm]** are my reading and should be checked by you before anyone builds from them.
 
+> **Corrections applied.** Where a reconstructed claim has since been checked against a primary source and found wrong, it is struck through and annotated in place rather than deleted, so the provenance stays visible. So far: **§6 (email)** — mail was never broken; and **§4 (trade-fair accompaniment)** — not confirmed as a service, so not published.
+
 ---
 
 ## 1. What the business is
@@ -106,7 +108,13 @@ The old site had roughly this shape:
 - **Phone / WhatsApp:** +86 130 2344 0305
 - **PayPal:** paypal.me/samihgp
 
-⚠️ **The email is currently broken.** When the DNS was wiped on 19 September, the mail records went with it. Email on @higreenpanda.com will not work again until the MX records are restored. Fix this first — it's more urgent than the website, because enquiries are being lost right now.
+> ~~⚠️ **The email is currently broken.** When the DNS was wiped on 19 September, the mail records went with it. Email on @higreenpanda.com will not work again until the MX records are restored. Fix this first — it's more urgent than the website, because enquiries are being lost right now.~~
+>
+> **CORRECTED — 20 September 2026.** This was wrong, and it was reconstruction rather than observation. Live DNS was checked against the registry: `MX 1 smtp.google.com` (Google Workspace's current single-record format, which replaced the old five-record `ASPMX.L.GOOGLE.COM` set), `SPF v=spf1 include:_spf.google.com ~all`, a 2048-bit `google._domainkey` DKIM record, and a `p=quarantine` DMARC record. All correct. **Mail is not being dropped and contact@higreenpanda.com receives normally.**
+>
+> The mailbox was *created* on 19 September — Google's "Welcome to your inbox" arrived at 08:27 and "Welcome to Google Workspace" at 11:00. That is why the inbox holds nothing earlier, and it is what this section mistook for an outage. Anything sent before the mailbox existed bounced at the sender; no DNS change recovers it.
+>
+> **Do not modify the MX, DKIM or DMARC policy records.** The one change the domain does need — authorising HubSpot to send as it, and redirecting the DMARC reports away from GoDaddy's default address — is in `DEPLOY.md` §4.
 
 ---
 
@@ -409,7 +417,7 @@ All 37 files are in `brand-assets/`, produced from your artwork.
 
 ## 17. Immediate next steps
 
-1. **Restore email.** Add the MX records back at GoDaddy so contact@higreenpanda.com works again.
+1. ~~**Restore email.**~~ **Not needed — see the correction in §6.** Mail works. Instead: authorise HubSpot in SPF and publish its DKIM records before any campaign sends, and move the DMARC `rua` off GoDaddy's default address. Both are in `DEPLOY.md` §4.
 2. **Secure the GoDaddy account.** New password, two-step verification, check who else has access, confirm the domain isn't listed for sale.
 3. **Send the logo.** Attach the original artwork in the best quality you have — `.ai`, `.svg`, `.eps`, `.pdf`, or a large `.png`. Everything in §14 is generated from it automatically.
 4. **Ask the former developer** for the hosting login and any backup of the old site. Even a database dump would save weeks of content rewriting.

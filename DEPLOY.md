@@ -3,42 +3,16 @@
 Everything needed to put this site on a Hetzner VPS, and to rebuild it from
 nothing if the server disappears.
 
-Two things from `WEBSITE-BRIEF.md` govern this document. The old site was taken
+One thing from `WEBSITE-BRIEF.md` governs this document: the old site was taken
 over through an unmaintained WordPress install, and one person held all the
 access — so **every account below must be in the client's own name**: domain,
-hosting, object storage, email, repository. And there was no backup anyone
-controlled, so §6 here is not optional.
+hosting, object storage, repository. There was no backup anyone controlled
+either, so the backup section is not optional.
 
----
-
-## 0. Before the website: fix email
-
-This is more urgent than the site. When the DNS was wiped on 19 September the
-MX records went with it, and `contact@higreenpanda.com` has been silently
-dropping enquiries ever since.
-
-At GoDaddy → **DNS → Records**, restore the MX records for whichever mailbox
-provider the client uses. For Microsoft 365 they look like this; for Google
-Workspace or another provider, use that provider's published values.
-
-| Type | Name | Value | Priority | TTL |
-|------|------|-------|----------|-----|
-| MX | @ | `higreenpanda-com.mail.protection.outlook.com` | 0 | 1 hour |
-| TXT | @ | `v=spf1 include:spf.protection.outlook.com -all` | — | 1 hour |
-| CNAME | autodiscover | `autodiscover.outlook.com` | — | 1 hour |
-
-Then add the two records that stop anyone spoofing the domain:
-
-| Type | Name | Value |
-|------|------|-------|
-| TXT | `_dmarc` | `v=DMARC1; p=quarantine; rua=mailto:contact@higreenpanda.com; adkim=s; aspf=s` |
-| TXT | `<selector>._domainkey` | the DKIM value from the mailbox provider |
-
-Verify with `dig MX higreenpanda.com +short` and by sending a message from an
-outside address. **Do not move on until a test email arrives.**
-
-While in the GoDaddy account: new password, two-step verification on, check who
-else has access, and confirm the domain is locked and not listed for sale.
+> **Mail is already working and this runbook does not touch it.** An earlier
+> draft opened with a section on restoring MX records, taken from brief §6.
+> That section was wrong and has been removed — see §4, which covers the one
+> DNS change the domain actually needs and lists what must not be altered.
 
 ---
 
@@ -77,31 +51,13 @@ survives a mistake in `ufw`.
 
 ---
 
-## 2. DNS
+## 2. Deploy the stack
 
-Point the domain at the server. Keep the MX records from §0 untouched.
-
-| Type | Name | Value | TTL |
-|------|------|-------|-----|
-| A | @ | `<server IPv4>` | 1 hour |
-| AAAA | @ | `<server IPv6>` | 1 hour |
-| A | www | `<server IPv4>` | 1 hour |
-| AAAA | www | `<server IPv6>` | 1 hour |
-| CAA | @ | `0 issue "letsencrypt.org"` | 1 hour |
-
-The `CAA` record means no certificate authority other than Let's Encrypt can
-issue a certificate for this domain — cheap insurance against a mis-issued
-certificate.
-
-The `.net` mirror can point at the same server; the Caddyfile already redirects
-it to the apex.
-
-Wait for propagation (`dig higreenpanda.com +short`) **before** starting the
-stack, or Caddy's first certificate request will fail and back off.
-
----
-
-## 3. First deploy
+Do this **before** pointing DNS at the box. The images are built here, on the
+server — the container images cannot be built in a sandbox whose egress policy
+blocks Docker Hub's layer CDN, and that build has therefore never been
+exercised. Expect to debug it here, with no traffic arriving, rather than
+after the domain is live.
 
 ```bash
 sudo -iu deploy
@@ -127,11 +83,49 @@ docker compose -f docker-compose.prod.yml exec app npm run migrate
 docker compose -f docker-compose.prod.yml exec app npm run seed
 ```
 
-`seed` creates the eight services, the founder record, the redirects and the
-first admin user from `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`. It is
-idempotent — re-running it updates rather than duplicates.
+### Confirm every service is healthy before going further
 
-Then **clear those two variables from `.env`**; they are only needed once.
+Caddy cannot get a real certificate until DNS resolves, so check the app
+directly on the box:
+
+```bash
+docker compose -f docker-compose.prod.yml ps        # all four: running / healthy
+docker compose -f docker-compose.prod.yml exec app \
+  node -e "fetch('http://127.0.0.1:3000/api/health').then(r=>r.json()).then(console.log)"
+# → { status: 'ok' }   (a real database query, not just a liveness ping)
+
+docker compose -f docker-compose.prod.yml logs backup | tail -5
+docker compose -f docker-compose.prod.yml logs app | tail -20
+```
+
+Then walk the site over the server's IP with a Host header, so Caddy routes it
+without needing a certificate:
+
+```bash
+curl -sI -H 'Host: higreenpanda.com' http://127.0.0.1/            # 200
+curl -sI -H 'Host: higreenpanda.com' http://127.0.0.1/en          # 200
+curl -sI -H 'Host: higreenpanda.com' http://127.0.0.1/slot-gacor  # 410
+```
+
+Do not continue until all of that is right.
+
+`seed` creates the eight services, the three articles, the founder record, the
+redirects and the first admin user from `SEED_ADMIN_EMAIL` /
+`SEED_ADMIN_PASSWORD`. It is idempotent — re-running it updates rather than
+duplicates, and it never deletes anything an editor has created.
+
+```bash
+docker compose -f docker-compose.prod.yml restart app
+```
+
+That restart is not optional. The seed runs in its own process, so it cannot
+drop the running server's cache the way an edit in the admin panel does — page
+data is cached for an hour, and without the restart the site can serve
+pre-seed content for that long. Editing through the admin needs no restart:
+publishing drops exactly the cache tag it touched.
+
+Then **clear `SEED_ADMIN_EMAIL` and `SEED_ADMIN_PASSWORD` from `.env`**; they
+are only needed once.
 
 ### Enrol the second factor
 
@@ -147,7 +141,120 @@ Sign in at `https://higreenpanda.com/hgp-studio-gate`.
 
 ---
 
-## 4. The admin path
+## 3. DNS — only once the stack is healthy
+
+Now, and not before: with the stack already proven on the box, pointing DNS is
+what triggers Caddy to request a certificate, and a broken app behind it just
+burns Let's Encrypt rate limits.
+
+**Add or change only the records in this table.** Do not touch MX, SPF, DKIM
+or DMARC here — mail is working and §4 covers the only change it needs.
+
+| Type | Name | Value | TTL |
+|------|------|-------|-----|
+| A | @ | `<server IPv4>` | 1 hour |
+| AAAA | @ | `<server IPv6>` | 1 hour |
+| A | www | `<server IPv4>` | 1 hour |
+| AAAA | www | `<server IPv6>` | 1 hour |
+| CAA | @ | `0 issue "letsencrypt.org"` | 1 hour |
+
+The `CAA` record means no certificate authority other than Let's Encrypt can
+issue a certificate for this domain — cheap insurance against a mis-issued
+certificate.
+
+The `.net` mirror can point at the same server; the Caddyfile already redirects
+it to the apex.
+
+Then wait for propagation and watch Caddy issue the certificate:
+
+```bash
+dig higreenpanda.com +short
+docker compose -f docker-compose.prod.yml logs -f caddy | grep -i certificate
+curl -sI https://higreenpanda.com/ | head -3
+```
+
+If the certificate request fails, Caddy backs off with increasing delays, so
+fix the cause rather than restarting repeatedly.
+
+---
+
+## 4. Email — the one change it needs
+
+**Mail is working. Do not modify the MX, SPF policy, DKIM or DMARC policy
+records.** As published, the domain has:
+
+| Record | Value | State |
+|--------|-------|-------|
+| MX | `1 smtp.google.com` | Correct — Google Workspace's current single-record format, which replaced the old five-record `ASPMX.L.GOOGLE.COM` set |
+| SPF | `v=spf1 include:_spf.google.com ~all` | Correct for Google-sent mail |
+| DKIM | `google._domainkey`, 2048-bit | Correct |
+| DMARC | `v=DMARC1; p=quarantine; adkim=r; aspf=r` | Policy correct |
+
+The mailbox was created on 19 September, which is why nothing in it predates
+that date. Anything sent before the mailbox existed bounced at the sender and
+no DNS change brings it back.
+
+### Two changes, both before any HubSpot campaign sends
+
+HubSpot was connected to `contact@higreenpanda.com` on 19 September. With
+`p=quarantine` in force and HubSpot not authorised for the domain, marketing
+mail sent as `contact@higreenpanda.com` will be quarantined by receivers.
+
+**1. Authorise HubSpot to send as the domain.**
+
+Get the exact records from HubSpot — Settings → Content → Domains & URLs →
+*Connect a domain* → **Email Sending**. It generates values specific to the
+portal, so do not copy them from anywhere else.
+
+Add HubSpot to SPF, keeping Google first and the `~all` as it is:
+
+```
+v=spf1 include:_spf.google.com include:<portal-id>.spf<nn>.hubspotemail.net ~all
+```
+
+Then publish the DKIM `CNAME` records HubSpot gives you (they look like
+`hs1-<id>._domainkey` and `hs2-<id>._domainkey`).
+
+> **Publish the DKIM records, not just the SPF include.** DMARC passes when
+> *either* SPF or DKIM aligns with the visible From domain, and SPF alignment
+> is judged against the return-path, not the From address. HubSpot's default
+> return-path is a HubSpot-owned domain, so SPF will not align to
+> higreenpanda.com however the include is written — even under the relaxed
+> `aspf=r` already in the record. HubSpot's DKIM signs as
+> `d=higreenpanda.com`, which does align. The SPF include is still worth
+> adding, because plenty of receivers check SPF on its own, but DKIM is what
+> actually stops the quarantine.
+
+Verify before sending to a real list — send one campaign to a personal Gmail
+address and read the raw headers:
+
+```
+Authentication-Results: mx.google.com;
+  dkim=pass header.i=@higreenpanda.com;
+  spf=pass ...;
+  dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=higreenpanda.com
+```
+
+`dmarc=pass` with `header.from=higreenpanda.com` is the line that matters.
+
+**2. Point the DMARC reports somewhere they are read.**
+
+The `rua` is currently GoDaddy's default, `dmarc_rua@onsecureserver.net`,
+which nobody at HiGreenPanda can open. With `p=quarantine` that means mail is
+being quarantined with no visibility into what or why. Change only the `rua`
+tag and leave the policy alone:
+
+```
+v=DMARC1; p=quarantine; adkim=r; aspf=r; rua=mailto:contact@higreenpanda.com
+```
+
+The reports are daily XML aggregates and are unreadable by hand; feed the
+address to a DMARC report reader, or expect to ignore them. An address nobody
+reads is still better than one nobody can.
+
+---
+
+## 5. The admin path
 
 The admin panel is at **`/hgp-studio`**, not `/admin`. `/admin` returns 404 so a
 scanner learns nothing.
@@ -168,7 +275,7 @@ Everything else gets a 404 from Caddy, before the request reaches the app.
 
 ---
 
-## 5. Routine deploys
+## 6. Routine deploys
 
 ```bash
 cd ~/higreenpanda
@@ -176,6 +283,14 @@ git pull
 docker compose -f docker-compose.prod.yml up -d --build
 docker compose -f docker-compose.prod.yml exec app npm run migrate
 ```
+
+If a deploy also re-runs `npm run seed`, restart the app afterwards for the
+reason in §2. A plain deploy needs no restart — `up -d --build` already
+replaces the container, and the runtime image carries no warm cache.
+
+Removing a seeded item is a CMS action, not a code one: deleting it from
+`src/seed/content.ts` stops it being recreated, but does not remove a copy the
+database already holds. Delete it in the admin panel.
 
 Migrations are checked into `src/migrations/` and applied explicitly. The app
 never alters its own schema in production — `push` is off outside development,
@@ -203,7 +318,7 @@ docker compose -f docker-compose.prod.yml exec app npx payload migrate:down
 
 ---
 
-## 6. Backups, and the restore you must rehearse
+## 7. Backups, and the restore you must rehearse
 
 The `backup` service in `docker-compose.prod.yml` runs nightly at 03:15 China
 time. Each run takes a custom-format `pg_dump` and a tar of the media volume,
@@ -265,7 +380,7 @@ docker compose -f docker-compose.prod.yml exec backup \
 
 ---
 
-## 7. Search Console, after go-live
+## 8. Search Console, after go-live
 
 1. Verify `https://higreenpanda.com` in Google Search Console (a DNS TXT record
    is easiest and survives a hosting change).
@@ -282,14 +397,14 @@ docker compose -f docker-compose.prod.yml exec backup \
 
 ---
 
-## 8. What to watch
+## 9. What to watch
 
 | Thing | How | How often |
 |-------|-----|-----------|
 | Site is up | `curl -sS https://higreenpanda.com/api/health` | Uptime monitor, 1 min |
 | Certificate renewal | `docker compose -f docker-compose.prod.yml logs caddy \| grep -i certificate` | Monthly |
 | Backups ran | `aws s3 ls s3://higreenpanda-backups/db/` | Weekly |
-| Restore works | §6 drill | Twice a year |
+| Restore works | §7 drill | Twice a year |
 | Dependency alerts | GitHub → Security → Dependabot | As they arrive |
 | Disk space | `df -h` and `docker system df` | Monthly |
 | New enquiries | `/hgp-studio` → Enquiries | Daily |
@@ -302,7 +417,7 @@ reported as down instead of looking healthy.
 
 ---
 
-## 9. Phase 2 — what is already in place
+## 10. Phase 2 — what is already in place
 
 The client portal and subscriptions are not built, but nothing blocks them:
 

@@ -7,10 +7,11 @@ import type { Enquiry } from '@/payload-types'
  * Enquiry notifications.
  *
  * The enquiry is written to Postgres first and emailed second, and a failure
- * here is logged rather than thrown. That ordering is the whole point: when the
- * DNS was wiped on 19 September the MX records went with it and every enquiry
- * sent that day was simply lost (brief section 6). Storage is the record of
- * truth; email is a notification about it.
+ * here is logged rather than thrown. Storage is the record of truth; email is
+ * a notification about it. A transactional provider, a mailbox provider and a
+ * DNS record are three things that can each be down or misconfigured on a day
+ * a lead arrives, and none of them should be able to lose one. The site owns
+ * the enquiry the moment it is submitted.
  */
 
 export async function sendEnquiryNotification(enquiry: Enquiry, serviceTitle: string | null) {

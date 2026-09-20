@@ -117,10 +117,11 @@ export default buildConfig({
   }),
 
   /**
-   * Transactional email. Form notifications must not depend on the domain's own
-   * mail server — the last DNS wipe took the MX records with it and enquiries
-   * were lost (brief section 6). Without a key the adapter is omitted entirely
-   * and enquiries are still stored; see src/lib/email.ts.
+   * Transactional email, deliberately separate from the mailbox that receives
+   * it. A notification the site sends to itself should not depend on the same
+   * provider, credentials or DNS records as the inbox it lands in. Without a
+   * key the adapter is omitted entirely and enquiries are still stored; see
+   * src/lib/email.ts.
    */
   email: process.env.RESEND_API_KEY
     ? resendAdapter({

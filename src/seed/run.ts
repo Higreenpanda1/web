@@ -10,7 +10,12 @@ import { CATEGORIES, FOUNDER, POSTS, REDIRECTS, SERVICES } from './content'
  *
  * Idempotent: every record is matched by slug (or `from`, for redirects) and
  * updated rather than duplicated, so this is safe to re-run after editing
- * src/seed/content.ts. It never deletes anything an editor has created.
+ * src/seed/content.ts. It never deletes anything an editor has created — which
+ * also means removing an entry from src/seed/content.ts does not remove it from
+ * a database that already has it. Delete it in the admin panel.
+ *
+ * Because it runs in its own process it cannot invalidate a running server's
+ * cache; restart the app afterwards. See the note it prints when it finishes.
  *
  *   npm run seed
  */
@@ -199,6 +204,13 @@ async function main() {
   await seedAdmin(payload)
 
   console.log('\nDone. Sign in at /hgp-studio-gate')
+  console.log(
+    '\nIf the site is already running, restart it now:\n' +
+      '  docker compose -f docker-compose.prod.yml restart app\n' +
+      'This script runs in its own process, so it cannot drop the running\n' +
+      "server's cache the way an edit in the admin panel does. Without a\n" +
+      'restart the site can serve pre-seed content for up to an hour.',
+  )
   process.exit(0)
 }
 

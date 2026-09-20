@@ -7,8 +7,8 @@
 # database are on an internal network with no published ports, so the only
 # thing reachable from the internet is Caddy on 80/443.
 #
-# See DEPLOY.md for provisioning, DNS (including the MX records that need
-# restoring), backups and the restore test.
+# See DEPLOY.md for provisioning, bringing this stack up before DNS is pointed
+# at it, backups and the restore test.
 # ─────────────────────────────────────────────────────────────────────────────
 name: higreenpanda
 

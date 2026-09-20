@@ -1,6 +1,13 @@
 /**
- * Seed content — the eight services from brief section 4, plus the trade-fair
- * service it flags as worth adding, and the homepage copy.
+ * Seed content — the eight services from brief section 4, and the homepage copy.
+ *
+ * Eight, not nine. Brief section 4 suggests adding trade-fair and exhibition
+ * accompaniment and marks it [confirm]; the client has not confirmed that
+ * HiGreenPanda sells it. Publishing a service the business may not offer is
+ * worse than omitting one it does — somebody enquires about Canton Fair
+ * accompaniment and the answer is "we don't do that". If it turns out they do,
+ * it is a new Service in the CMS and no deploy: the `tent` icon is already in
+ * the icon list for it.
  *
  * Arabic is written first and English second throughout, because the brief is
  * explicit that translated-feeling Arabic is the fastest way to lose this
@@ -263,36 +270,6 @@ export const SERVICES: SeedService[] = [
         'Full landed cost worked out to your warehouse door',
         'Product, factory and price assessed',
         'Advice before you commit any money',
-      ],
-    },
-  },
-  {
-    slug: 'trade-fair-support',
-    order: 90,
-    featured: false,
-    icon: 'tent',
-    ar: {
-      title: 'مرافقة المعارض التجارية',
-      summary:
-        'مرافقتك في معرض كانتون وغيره: الترجمة، تحديد المواعيد، التفاوض، ومتابعة ما بعد المعرض.',
-      body: 'حضرنا أكثر من مئة معرض تجاري في قطاعات مختلفة، ونعرف كيف يُستغل المعرض فعلًا بدل أن يُقضى في المشي.\n\nنحدّد المواعيد قبل وصولك، ونرافقك للترجمة والتفاوض، ونجمع العروض ونقارنها بعد المعرض — لأن أغلب الصفقات تُحسم بعد أن تعود إلى بلدك لا داخل القاعة.',
-      highlights: [
-        'مواعيد محدّدة مع موردين قبل وصولك',
-        'ترجمة ومرافقة داخل المعرض',
-        'جمع العروض ومقارنتها بعد المعرض',
-        'متابعة الموردين بعد عودتك',
-      ],
-    },
-    en: {
-      title: 'Trade fair accompaniment',
-      summary:
-        'With you at the Canton Fair and others: translation, appointments, negotiation, and the follow-up afterwards.',
-      body: 'We have attended more than a hundred trade fairs across many sectors, and we know how to actually use one rather than spend it walking.\n\nWe set appointments before you land, come with you to translate and negotiate, and collect and compare the quotations afterwards — because most deals are settled after you fly home, not in the hall.',
-      highlights: [
-        'Appointments with suppliers set before you land',
-        'Translation and negotiation alongside you',
-        'Quotations collected and compared afterwards',
-        'Suppliers followed up once you are home',
       ],
     },
   },

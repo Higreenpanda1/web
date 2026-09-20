@@ -3,9 +3,9 @@ import { isAdmin, isStaff, noone } from '@/access'
 import type { CollectionConfig } from 'payload'
 
 /**
- * Lead capture. Stored in Postgres AND emailed — never email-only, because the
- * last time the mail records went down (brief section 6) enquiries were simply
- * lost, and nobody knew how many.
+ * Lead capture. Stored in Postgres AND emailed — never email-only. An enquiry
+ * that exists solely as a message in an inbox can be lost to a filter, a
+ * deletion or a provider problem, and nobody would know how many.
  *
  * Shaped for the phase-2 quotation flow from the start: `status` moves an
  * enquiry from new → contacted → quoted → won/lost, `assignedTo` gives it an
