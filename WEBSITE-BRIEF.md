@@ -6,7 +6,7 @@
 
 > **How this was assembled.** The old site went offline on 19 September 2026 and its host is unknown, so nothing could be read from the live site. Everything below was recovered from search-engine records of higreenpanda.com and its mirror higreenpanda.net, plus the brand's public social profiles. Sections marked **[confirm]** are my reading and should be checked by you before anyone builds from them.
 
-> **Corrections applied.** Where a reconstructed claim has since been checked against a primary source and found wrong, it is struck through and annotated in place rather than deleted, so the provenance stays visible. So far: **§6 (email)** — mail was never broken; and **§4 (trade-fair accompaniment)** — not confirmed as a service, so not published.
+> **Corrections applied.** Where a reconstructed claim has since been checked against a primary source and found wrong, it is struck through and annotated in place rather than deleted, so the provenance stays visible. So far: **§6 (email)** — mail was never broken. Separately, the `[confirm]` item in **§4 (trade-fair accompaniment)** was confirmed on 20 September 2026: HiGreenPanda does offer it, and it is published as the ninth service.
 
 ---
 
@@ -73,6 +73,8 @@ These are the services the old site described. They are the core of the new site
 | 8 | **Business consulting** | Support and consultations to help clients take advantage of available business opportunities in Chinese and Asian markets |
 
 **Worth adding on the new site [confirm]:** trade-fair and exhibition accompaniment (Canton Fair and similar). The founder's 100+ fairs make this credible, and it's a service Arabic-speaking buyers actively search for — but it wasn't clearly a listed service before.
+
+> **CONFIRMED — 20 September 2026.** The client confirms HiGreenPanda offers this. It is live as the ninth service at `/services/trade-fair-support`, ordered last, using the `tent` icon.
 
 ---
 

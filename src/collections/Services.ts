@@ -7,15 +7,13 @@ import { slugField } from '@/fields/slug'
 import type { CollectionConfig } from 'payload'
 
 /**
- * The eight services from brief section 4. Each is one document with both
- * locales on it — Payload's own localisation, not two parallel trees — so an
- * editor translates in place and the slug stays shared between /services/x and
- * /en/services/x.
+ * Nine services: the eight from brief section 4, plus trade-fair accompaniment,
+ * which section 4 proposes and marks [confirm] and the client confirmed on
+ * 20 September 2026.
  *
- * The icon list below includes `tent` for trade-fair accompaniment, which the
- * brief suggests and marks [confirm]. It is not seeded, because nobody has
- * confirmed the business sells it. Adding it later is a new document in the
- * admin panel — no deploy, no migration.
+ * Each is one document with both locales on it — Payload's own localisation,
+ * not two parallel trees — so an editor translates in place and the slug stays
+ * shared between /services/x and /en/services/x.
  */
 export const Services: CollectionConfig = {
   slug: 'services',

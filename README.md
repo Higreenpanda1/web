@@ -159,12 +159,10 @@ with a `role`, and `Enquiries` already carries `status`, `assignedTo` and a
   on this audience's connection that is worse than a heading one step heavier.
 - **Headings are fluid rather than fixed.** The brief's sizes are a desktop
   scale and are reached exactly at 1280px.
-
-Brief §4 also suggests a ninth service, trade-fair accompaniment, and marks it
-[confirm]. It was seeded and has since been removed: nobody has confirmed the
-business sells it, and a published service the client does not offer turns
-into an enquiry they have to decline. The `tent` icon is still in the picker,
-so adding it is one document in the admin panel if it turns out they do.
+- **Trade-fair accompaniment is a ninth service.** Brief §4 proposes it and
+  marks it `[confirm]`; the client confirmed on 20 September 2026 that they
+  offer it. The founder's 100+ fairs make it credible and Arabic-speaking
+  buyers search for it, but it was never a listed service before.
 
 ---
 
