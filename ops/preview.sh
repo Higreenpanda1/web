@@ -23,6 +23,25 @@ warn() { printf '%s  !!%s %s\n' "$c_warn" "$c_off" "$1"; }
 die()  { printf '\n%serror%s %s\n\n' "$c_err" "$c_off" "$1" >&2; exit 1; }
 trap 'printf "\n%s==> STOPPED%s at line %s: %s\n\n" "$c_err" "$c_off" "$LINENO" "$BASH_COMMAND" >&2' ERR
 
+# Does <hostname> actually point at <ip>, as the rest of the world sees it?
+#
+# Not a question the local resolver can answer. Cloud images put a line like
+# "127.0.1.1 srv1994320.hstgr.cloud" in /etc/hosts, and NSS stops at the first
+# source that has the name — so getent returns loopback and never asks DNS.
+# That made this check reject a hostname whose A record was correct all along.
+# Ask a public resolver over HTTPS instead, and fall back to getent only for
+# non-loopback answers.
+resolves_to() { # resolves_to <hostname> <ip>
+  local host="$1" ip="$2" answers=""
+  answers=$(curl -fsS --max-time 10 -H 'accept: application/dns-json' \
+              "https://dns.google/resolve?name=${host}&type=A" 2>/dev/null \
+            | tr ',' '\n' | sed -n 's/.*"data":"\([0-9.]*\)".*/\1/p') || true
+  if [ -z "$answers" ]; then
+    answers=$(getent ahostsv4 "$host" 2>/dev/null | awk '$1 !~ /^127\./ {print $1}' | sort -u)
+  fi
+  [ -n "$answers" ] && printf '%s\n' "$answers" | grep -qxF "$ip"
+}
+
 [ -d "$APP_DIR" ] || die "$APP_DIR does not exist. Run ops/deploy.sh first."
 cd "$APP_DIR"
 
@@ -57,9 +76,9 @@ Point DNS at it (DEPLOY.md §3) to see the site." ;;
   # challenges, so confirm the name really points back here before using it.
   public_ip=$(curl -fsS --max-time 10 https://api.ipify.org 2>/dev/null || true)
   [ -n "$public_ip" ] || die "Could not determine this server's public address."
-  if ! getent ahostsv4 "$HOST" 2>/dev/null | grep -q "^$public_ip\b"; then
-    die "$HOST does not resolve to $public_ip, so a certificate for it cannot be
-issued. Nothing has been changed."
+  if ! resolves_to "$HOST" "$public_ip"; then
+    die "$HOST does not resolve to $public_ip in public DNS, so a certificate
+for it cannot be issued. Nothing has been changed."
   fi
   ok "$HOST resolves to $public_ip"
 fi

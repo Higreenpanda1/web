@@ -88,6 +88,25 @@ pause() { # pause "press enter text"
   IFS= read -r _ <"$TTY" || true
 }
 
+# Does <hostname> actually point at <ip>, as the rest of the world sees it?
+#
+# Not a question the local resolver can answer. Cloud images put a line like
+# "127.0.1.1 srv1994320.hstgr.cloud" in /etc/hosts, and NSS stops at the first
+# source that has the name — so getent returns loopback and never asks DNS.
+# That made this check reject a hostname whose A record was correct all along.
+# Ask a public resolver over HTTPS instead, and fall back to getent only for
+# non-loopback answers.
+resolves_to() { # resolves_to <hostname> <ip>
+  local host="$1" ip="$2" answers=""
+  answers=$(curl -fsS --max-time 10 -H 'accept: application/dns-json' \
+              "https://dns.google/resolve?name=${host}&type=A" 2>/dev/null \
+            | tr ',' '\n' | sed -n 's/.*"data":"\([0-9.]*\)".*/\1/p') || true
+  if [ -z "$answers" ]; then
+    answers=$(getent ahostsv4 "$host" 2>/dev/null | awk '$1 !~ /^127\./ {print $1}' | sort -u)
+  fi
+  [ -n "$answers" ] && printf '%s\n' "$answers" | grep -qxF "$ip"
+}
+
 # ── who is running this ──────────────────────────────────────────────────────
 step "Checking where we are"
 
@@ -253,7 +272,7 @@ if [ -z "${PREVIEW_HOSTNAME:-}" ]; then
       ;;
     *.*.*)
       public_ip=$(curl -fsS --max-time 10 https://api.ipify.org 2>/dev/null || true)
-      if [ -n "$public_ip" ] && getent ahostsv4 "$candidate" 2>/dev/null | grep -q "^$public_ip\b"; then
+      if [ -n "$public_ip" ] && resolves_to "$candidate" "$public_ip"; then
         PREVIEW_HOSTNAME="$candidate"
         if grep -q '^PREVIEW_HOSTNAME=' .env; then
           sed -i "s|^PREVIEW_HOSTNAME=.*|PREVIEW_HOSTNAME=${PREVIEW_HOSTNAME}|" .env
