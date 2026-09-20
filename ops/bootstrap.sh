@@ -39,6 +39,37 @@ run() {
   fi
 }
 
+# A fresh Ubuntu box runs apt on its own: apt-daily fires shortly after boot,
+# and installing unattended-upgrades below starts it immediately. Either will
+# be holding the dpkg lock when the next install starts, and apt-get's default
+# behaviour is to give up at once rather than wait. So: say what is happening,
+# wait for the lock to clear, and hand apt a timeout of its own as a backstop.
+wait_for_apt() {
+  # fuser lives in psmisc, which is not guaranteed on a minimal image. Without
+  # it we still have apt's own Lock::Timeout below, so this is a nicer message
+  # rather than the mechanism.
+  command -v fuser >/dev/null 2>&1 || return 0
+  local waited=0
+  while fuser /var/lib/dpkg/lock-frontend /var/lib/dpkg/lock \
+              /var/lib/apt/lists/lock >/dev/null 2>&1; do
+    if [ "$waited" -eq 0 ]; then
+      warn "another apt process is running (usually the automatic security"
+      printf '       updates that start on a new server). Waiting for it.\n'
+    fi
+    [ "$waited" -ge 600 ] && die "apt has been locked for ten minutes.
+Something is stuck. Reboot the server from hPanel and run this again."
+    sleep 5
+    waited=$(( waited + 5 ))
+  done
+  [ "$waited" -gt 0 ] && ok "apt is free again after ${waited}s"
+  return 0
+}
+
+apt_get() {
+  wait_for_apt
+  DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=600 "$@"
+}
+
 write_file() { # write_file <path> <<<content on stdin
   local path="$1"
   if [ "$DRY_RUN" -eq 1 ]; then
@@ -164,8 +195,8 @@ warn "If that fails, you still have this session open to fix it."
 # ── firewall ─────────────────────────────────────────────────────────────────
 step "Firewall"
 
-run apt-get update -qq
-run apt-get install -y -qq ufw
+run apt_get update -qq
+run apt_get install -y -qq ufw
 # Allow before enabling. The other order drops your own connection.
 run ufw --force reset
 run ufw default deny incoming
@@ -179,7 +210,7 @@ ok "ufw: 22, 80, 443 in; everything else denied. Postgres is never exposed."
 # ── patching and brute-force protection ──────────────────────────────────────
 step "Unattended upgrades and fail2ban"
 
-run apt-get install -y -qq unattended-upgrades fail2ban
+run apt_get install -y -qq unattended-upgrades fail2ban
 write_file /etc/apt/apt.conf.d/20auto-upgrades <<'EOF'
 APT::Periodic::Update-Package-Lists "1";
 APT::Periodic::Unattended-Upgrade "1";
@@ -205,7 +236,7 @@ if command -v docker >/dev/null 2>&1; then
   ok "docker already installed: $(docker --version 2>/dev/null || echo unknown)"
 else
   # From Docker's own repository: the distribution package lags badly.
-  run apt-get install -y -qq ca-certificates curl gnupg
+  run apt_get install -y -qq ca-certificates curl gnupg
   run install -m 0755 -d /etc/apt/keyrings
   if [ "$DRY_RUN" -eq 0 ]; then
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
@@ -217,8 +248,8 @@ else
   else
     printf '       would add download.docker.com gpg key and apt source\n'
   fi
-  run apt-get update -qq
-  run apt-get install -y -qq docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+  run apt_get update -qq
+  run apt_get install -y -qq docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
   ok "docker installed"
 fi
 
