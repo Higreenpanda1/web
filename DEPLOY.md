@@ -1,7 +1,12 @@
 # Deploying HiGreenPanda
 
-Everything needed to put this site on a Hetzner VPS, and to rebuild it from
-nothing if the server disappears.
+Everything needed to put this site on its VPS, and to rebuild it from nothing
+if the server disappears.
+
+The server is a **Hostinger KVM 2** (2 vCPU, 8 GB RAM, 100 GB NVMe), bought
+20 September 2026. Nothing in the stack is tied to that provider — it needs
+root, Docker and a public IP — so the few places where Hostinger specifically
+matters are called out by name and everything else says "the VPS".
 
 One thing from `WEBSITE-BRIEF.md` governs this document: the old site was taken
 over through an unmaintained WordPress install, and one person held all the
@@ -18,9 +23,23 @@ either, so the backup section is not optional.
 
 ## 1. Provision the server
 
-A Hetzner **CX22** (2 vCPU, 4 GB, 40 GB) is enough for this site with room to
-spare. Choose a location close to the audience — Falkenstein or Nuremberg are
-fine for the Gulf; Singapore is closer but costs more.
+**Hostinger KVM 2** — 2 vCPU, 8 GB RAM, 100 GB NVMe. The 8 GB matters: §2
+builds the Docker image on the box, and a Next build spikes memory while
+Postgres is running alongside it. On 4 GB that is tight; on 8 GB it is
+comfortable.
+
+When creating the VPS in hPanel:
+
+- **OS: Ubuntu 24.04.** If a Docker-ready template is offered, it saves a step,
+  but a plain Ubuntu image is fine — Docker is installed below either way.
+- **Location: a European datacentre** (Netherlands or Lithuania). Europe is
+  better connected to the Gulf and Yemen than the Asian regions.
+- **Add your SSH public key** during creation rather than using a root
+  password. If you did not, add it now before locking down SSH below, or the
+  next step will shut you out.
+
+hPanel has a browser-based terminal for the VPS. It is worth knowing where it
+is *before* you need it — it is the way back in if SSH ever breaks.
 
 ```bash
 # As root, immediately after first boot
@@ -46,8 +65,16 @@ systemctl enable --now fail2ban
 Install Docker from Docker's own repository (the distribution package lags):
 <https://docs.docker.com/engine/install/ubuntu/>.
 
-Also set up Hetzner's own firewall in the cloud console, as a second layer that
-survives a mistake in `ufw`.
+Then set up **Hostinger's own firewall in hPanel** as a second layer, allowing
+only 22, 80 and 443 inbound. It sits outside the operating system, so it
+survives a mistake in `ufw` — and `ufw` survives a mistake in it.
+
+> **Take a Hostinger snapshot once §2 reports every service healthy, before the
+> DNS cutover in §3.** It is a one-click whole-machine rollback for the riskiest
+> hour of this deployment, and the plan includes it.
+>
+> It is *not* the backup plan. Snapshots live with the provider and with the
+> server; §7 is the backup that does not. Both, not either.
 
 ---
 
@@ -199,13 +226,13 @@ cutover time anyway, in case they have moved since.
 
 ### The cutover
 
-**Replace the two root `A` records with the Hetzner IPv4 address. Change
-nothing else.**
+**Replace the two root `A` records with the VPS IPv4 address. Change nothing
+else.**
 
 | Type | Name | Action |
 |------|------|--------|
-| A | @ | Replace `15.197.148.33` → `<Hetzner IPv4>` |
-| A | @ | Delete the second record, or replace it with the same Hetzner IPv4 |
+| A | @ | Replace `15.197.148.33` → `<VPS IPv4>` |
+| A | @ | Delete the second record, or replace it with the same VPS IPv4 |
 | CNAME | www | **Leave alone.** It points at the root, so it follows automatically — and a name holding a CNAME may not hold anything else, so adding an `A` for `www` would break it |
 
 TTL is 600, so the cutover takes effect in about ten minutes — and so does the
@@ -237,7 +264,7 @@ CAA  @  0 issue "letsencrypt.org"
 ### Verify against DNS, then watch the certificate
 
 ```bash
-dig +short A higreenpanda.com        # the Hetzner IPv4, nothing else
+dig +short A higreenpanda.com        # the VPS IPv4, nothing else
 dig +short A www.higreenpanda.com    # same address, via the CNAME
 dig +short MX higreenpanda.com       # unchanged: 1 smtp.google.com
 
@@ -254,7 +281,7 @@ rather than restarting repeatedly — restarts do not reset the rate limit.
 Both of these are separate changes, each made only once the site is confirmed
 working, and each independently reversible:
 
-- **IPv6.** Add `AAAA @ <Hetzner IPv6>`. Worth having; roll back by deleting
+- **IPv6.** Add `AAAA @ <VPS IPv6>`. Worth having; roll back by deleting
   it. Do not add it during the cutover — it is one more thing to be wrong
   while you are trying to tell whether the site works.
 - **The `.net` mirror.** If `higreenpanda.net` is under the same control,
@@ -541,8 +568,14 @@ time. Each run takes a custom-format `pg_dump` and a tar of the media volume,
 **verifies the dump is readable by `pg_restore` before uploading it**, and
 pushes both to S3-compatible object storage.
 
-Set these in `.env` — Hetzner Object Storage, Cloudflare R2 and Backblaze B2 all
-work:
+Set these in `.env`. **Hostinger does not sell S3-compatible object storage, so
+this must be another provider** — Cloudflare R2 and Backblaze B2 both work and
+both have usable free tiers at this size.
+
+That is an improvement rather than a workaround. Backups belonging to a
+different company from the server is stronger isolation than both sitting with
+one provider: a billing dispute, a suspended account or a compromised hPanel
+login takes out the server without touching the backups.
 
 ```
 S3_BUCKET=higreenpanda-backups

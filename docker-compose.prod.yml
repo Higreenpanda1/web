@@ -1,5 +1,6 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# HiGreenPanda — production stack (Hetzner CX22 or larger)
+# HiGreenPanda — production stack (Hostinger KVM 2, or any VPS with root,
+# Docker and 2 vCPU / 8 GB)
 #
 #   docker compose -f docker-compose.prod.yml up -d --build
 #

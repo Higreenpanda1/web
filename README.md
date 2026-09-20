@@ -66,7 +66,7 @@ password, so it is run by hand rather than in CI; see the header of
 | CMS | Payload 3, installed into the same app |
 | Database | PostgreSQL 16, migrations checked in |
 | Styling | Tailwind CSS 4 reading brand tokens from CSS custom properties |
-| Hosting | Hetzner VPS, Docker Compose, Caddy for TLS |
+| Hosting | Hostinger KVM 2 VPS, Docker Compose, Caddy for TLS |
 | Email | Resend — form notifications must not depend on the domain's own mail |
 | Analytics | Plausible or Umami, self-hosted, no cookies |
 

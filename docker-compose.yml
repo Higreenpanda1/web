@@ -5,7 +5,7 @@
 #   docker compose up -d db
 #   npm run dev
 #
-# For the Hetzner deployment use docker-compose.prod.yml, which adds Caddy and
+# For the server deployment use docker-compose.prod.yml, which adds Caddy and
 # runs the app from the built image instead of the host's `npm run dev`.
 # ─────────────────────────────────────────────────────────────────────────────
 name: higreenpanda
