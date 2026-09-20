@@ -1,6 +1,5 @@
 import { Clock, Mail, MapPin, MessageCircle } from 'lucide-react'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
-import { headers } from 'next/headers'
 
 import { JsonLd } from '@/components/JsonLd'
 import { EnquiryFormSection } from '@/components/forms/EnquiryFormSection'
@@ -32,18 +31,14 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
   const { locale } = await params
   setRequestLocale(locale)
 
-  const [t, settings, headerList] = await Promise.all([
+  const [t, settings] = await Promise.all([
     getTranslations({ locale }),
     getSiteSettings(locale),
-    headers(),
   ])
-  const nonce = headerList.get('x-nonce') ?? undefined
 
   return (
     <>
-      <JsonLd
-        nonce={nonce}
-        data={breadcrumbJsonLd(locale, [
+      <JsonLd data={breadcrumbJsonLd(locale, [
           { name: t('nav.home'), path: '/' },
           { name: t('contact.title'), path: '/contact' },
         ])}

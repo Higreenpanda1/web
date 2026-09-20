@@ -1145,42 +1145,27 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TABLE "site_settings_primary_nav" (
   	"_order" integer NOT NULL,
   	"_parent_id" integer NOT NULL,
-  	"id" varchar PRIMARY KEY NOT NULL,
-  	"href" varchar NOT NULL
-  );
-  
-  CREATE TABLE "site_settings_primary_nav_locales" (
-  	"label" varchar NOT NULL,
-  	"id" serial PRIMARY KEY NOT NULL,
   	"_locale" "_locales" NOT NULL,
-  	"_parent_id" varchar NOT NULL
+  	"id" varchar PRIMARY KEY NOT NULL,
+  	"label" varchar NOT NULL,
+  	"href" varchar NOT NULL
   );
   
   CREATE TABLE "site_settings_footer_columns_links" (
   	"_order" integer NOT NULL,
   	"_parent_id" varchar NOT NULL,
-  	"id" varchar PRIMARY KEY NOT NULL,
-  	"href" varchar NOT NULL
-  );
-  
-  CREATE TABLE "site_settings_footer_columns_links_locales" (
-  	"label" varchar NOT NULL,
-  	"id" serial PRIMARY KEY NOT NULL,
   	"_locale" "_locales" NOT NULL,
-  	"_parent_id" varchar NOT NULL
+  	"id" varchar PRIMARY KEY NOT NULL,
+  	"label" varchar NOT NULL,
+  	"href" varchar NOT NULL
   );
   
   CREATE TABLE "site_settings_footer_columns" (
   	"_order" integer NOT NULL,
   	"_parent_id" integer NOT NULL,
-  	"id" varchar PRIMARY KEY NOT NULL
-  );
-  
-  CREATE TABLE "site_settings_footer_columns_locales" (
-  	"title" varchar NOT NULL,
-  	"id" serial PRIMARY KEY NOT NULL,
   	"_locale" "_locales" NOT NULL,
-  	"_parent_id" varchar NOT NULL
+  	"id" varchar PRIMARY KEY NOT NULL,
+  	"title" varchar NOT NULL
   );
   
   CREATE TABLE "site_settings" (
@@ -1359,11 +1344,8 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "payload_preferences_rels" ADD CONSTRAINT "payload_preferences_rels_customers_fk" FOREIGN KEY ("customers_id") REFERENCES "public"."customers"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "site_settings_offices" ADD CONSTRAINT "site_settings_offices_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."site_settings"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "site_settings_primary_nav" ADD CONSTRAINT "site_settings_primary_nav_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."site_settings"("id") ON DELETE cascade ON UPDATE no action;
-  ALTER TABLE "site_settings_primary_nav_locales" ADD CONSTRAINT "site_settings_primary_nav_locales_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."site_settings_primary_nav"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "site_settings_footer_columns_links" ADD CONSTRAINT "site_settings_footer_columns_links_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."site_settings_footer_columns"("id") ON DELETE cascade ON UPDATE no action;
-  ALTER TABLE "site_settings_footer_columns_links_locales" ADD CONSTRAINT "site_settings_footer_columns_links_locales_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."site_settings_footer_columns_links"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "site_settings_footer_columns" ADD CONSTRAINT "site_settings_footer_columns_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."site_settings"("id") ON DELETE cascade ON UPDATE no action;
-  ALTER TABLE "site_settings_footer_columns_locales" ADD CONSTRAINT "site_settings_footer_columns_locales_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."site_settings_footer_columns"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "site_settings" ADD CONSTRAINT "site_settings_default_og_image_id_media_id_fk" FOREIGN KEY ("default_og_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "site_settings_locales" ADD CONSTRAINT "site_settings_locales_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."site_settings"("id") ON DELETE cascade ON UPDATE no action;
   CREATE INDEX "pages_blocks_hero_actions_order_idx" ON "pages_blocks_hero_actions" USING btree ("_order");
@@ -1690,13 +1672,13 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "site_settings_offices_locale_idx" ON "site_settings_offices" USING btree ("_locale");
   CREATE INDEX "site_settings_primary_nav_order_idx" ON "site_settings_primary_nav" USING btree ("_order");
   CREATE INDEX "site_settings_primary_nav_parent_id_idx" ON "site_settings_primary_nav" USING btree ("_parent_id");
-  CREATE UNIQUE INDEX "site_settings_primary_nav_locales_locale_parent_id_unique" ON "site_settings_primary_nav_locales" USING btree ("_locale","_parent_id");
+  CREATE INDEX "site_settings_primary_nav_locale_idx" ON "site_settings_primary_nav" USING btree ("_locale");
   CREATE INDEX "site_settings_footer_columns_links_order_idx" ON "site_settings_footer_columns_links" USING btree ("_order");
   CREATE INDEX "site_settings_footer_columns_links_parent_id_idx" ON "site_settings_footer_columns_links" USING btree ("_parent_id");
-  CREATE UNIQUE INDEX "site_settings_footer_columns_links_locales_locale_parent_id_" ON "site_settings_footer_columns_links_locales" USING btree ("_locale","_parent_id");
+  CREATE INDEX "site_settings_footer_columns_links_locale_idx" ON "site_settings_footer_columns_links" USING btree ("_locale");
   CREATE INDEX "site_settings_footer_columns_order_idx" ON "site_settings_footer_columns" USING btree ("_order");
   CREATE INDEX "site_settings_footer_columns_parent_id_idx" ON "site_settings_footer_columns" USING btree ("_parent_id");
-  CREATE UNIQUE INDEX "site_settings_footer_columns_locales_locale_parent_id_unique" ON "site_settings_footer_columns_locales" USING btree ("_locale","_parent_id");
+  CREATE INDEX "site_settings_footer_columns_locale_idx" ON "site_settings_footer_columns" USING btree ("_locale");
   CREATE INDEX "site_settings_default_og_image_idx" ON "site_settings" USING btree ("default_og_image_id");
   CREATE UNIQUE INDEX "site_settings_locales_locale_parent_id_unique" ON "site_settings_locales" USING btree ("_locale","_parent_id");`)
 }
@@ -1819,11 +1801,8 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TABLE "payload_migrations" CASCADE;
   DROP TABLE "site_settings_offices" CASCADE;
   DROP TABLE "site_settings_primary_nav" CASCADE;
-  DROP TABLE "site_settings_primary_nav_locales" CASCADE;
   DROP TABLE "site_settings_footer_columns_links" CASCADE;
-  DROP TABLE "site_settings_footer_columns_links_locales" CASCADE;
   DROP TABLE "site_settings_footer_columns" CASCADE;
-  DROP TABLE "site_settings_footer_columns_locales" CASCADE;
   DROP TABLE "site_settings" CASCADE;
   DROP TABLE "site_settings_locales" CASCADE;
   DROP TYPE "public"."_locales";

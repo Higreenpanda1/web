@@ -1,5 +1,4 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server'
-import { headers } from 'next/headers'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 
@@ -62,12 +61,10 @@ export default async function PostPage({
   const post = await getPostBySlug(slug, locale)
   if (!post) notFound()
 
-  const [t, settings, headerList] = await Promise.all([
+  const [t, settings] = await Promise.all([
     getTranslations({ locale }),
     getSiteSettings(locale),
-    headers(),
   ])
-  const nonce = headerList.get('x-nonce') ?? undefined
 
   const cover = typeof post.coverImage === 'object' ? (post.coverImage as Media) : null
   const coverSrc = mediaUrl(cover, 'feature')
@@ -78,10 +75,8 @@ export default async function PostPage({
 
   return (
     <>
-      <JsonLd nonce={nonce} data={blogPostingJsonLd(post, locale, settings)} />
-      <JsonLd
-        nonce={nonce}
-        data={breadcrumbJsonLd(locale, [
+      <JsonLd data={blogPostingJsonLd(post, locale, settings)} />
+      <JsonLd data={breadcrumbJsonLd(locale, [
           { name: t('nav.home'), path: '/' },
           { name: t('blog.title'), path: '/blog' },
           { name: post.title, path: `/blog/${slug}` },

@@ -1,5 +1,4 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server'
-import { headers } from 'next/headers'
 
 import { JsonLd } from '@/components/JsonLd'
 import { ServiceCard } from '@/components/ServiceCard'
@@ -30,18 +29,14 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
   const { locale } = await params
   setRequestLocale(locale)
 
-  const [t, services, headerList] = await Promise.all([
+  const [t, services] = await Promise.all([
     getTranslations({ locale }),
     getServices(locale, { limit: 30 }),
-    headers(),
   ])
-  const nonce = headerList.get('x-nonce') ?? undefined
 
   return (
     <>
-      <JsonLd
-        nonce={nonce}
-        data={breadcrumbJsonLd(locale, [
+      <JsonLd data={breadcrumbJsonLd(locale, [
           { name: t('nav.home'), path: '/' },
           { name: t('services.title'), path: '/services' },
         ])}

@@ -40,6 +40,10 @@ export default buildConfig({
   admin: {
     user: Users.slug,
     importMap: { baseDir: path.resolve(dirname) },
+    // Not gravatar: Payload's default sends an MD5 of the signed-in user's
+    // email address to a third party on every admin page load, which is both a
+    // privacy leak and a request the site's own CSP correctly refuses.
+    avatar: 'default',
     meta: {
       titleSuffix: ' · HiGreenPanda',
       icons: [{ rel: 'icon', type: 'image/svg+xml', url: '/favicon.svg' }],

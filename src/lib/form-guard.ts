@@ -1,7 +1,5 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 
-import { HONEYPOT_FIELD, TIMESTAMP_FIELD } from './form-fields'
-
 /**
  * Bot defences for the enquiry form. No third-party CAPTCHA: this audience is
  * on mid-range Androids over slow 4G in the Gulf and Yemen, and a CAPTCHA costs
@@ -21,7 +19,9 @@ export const MIN_FILL_MS = 3_000
 /** After this the token is stale; the form re-renders with a fresh one. */
 export const MAX_FORM_AGE_MS = 2 * 60 * 60 * 1000
 
-export { HONEYPOT_FIELD, TIMESTAMP_FIELD }
+// The field names live in src/lib/form-fields.ts and are NOT re-exported here.
+// This module reaches for node:crypto, so anything that imports it drags that
+// into the bundle — which is exactly what the client form must not do.
 
 function secret(): string {
   const value = process.env.PAYLOAD_SECRET

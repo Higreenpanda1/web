@@ -26,7 +26,7 @@ export async function Header({ locale, settings }: { locale: Locale; settings: S
 
   return (
     <header className="relative sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--surface)]/95 backdrop-blur supports-[backdrop-filter]:bg-[var(--surface)]/80">
-      <div className="container-page flex h-[var(--header-height)] items-center justify-between gap-4">
+      <div className="container-page flex h-[var(--header-height)] items-center justify-between gap-2 md:gap-4">
         <Link href="/" className="no-underline" aria-label={t('site.name')}>
           <Logo label={t('site.name')} />
         </Link>
@@ -52,9 +52,15 @@ export async function Header({ locale, settings }: { locale: Locale; settings: S
             label={t('locale.label')}
             switchTo={t('locale.switchTo')}
           />
-          <ButtonLink href="/contact" className="hidden sm:inline-flex">
-            {t('cta.enquire')}
-          </ButtonLink>
+          {/* The wrapper, rather than `hidden sm:inline-flex` on the button
+              itself: `hidden` and the button's own `inline-flex` both set
+              `display`, and which one wins is decided by the order Tailwind
+              emits them, not by the order they are written. On a 390px phone
+              the button stayed visible, pushed the header 96px past the
+              viewport, and put the language switcher off-screen entirely. */}
+          <span className="hidden sm:block">
+            <ButtonLink href="/contact">{t('cta.enquire')}</ButtonLink>
+          </span>
           <MobileNav
             items={items}
             openLabel={t('nav.openMenu')}

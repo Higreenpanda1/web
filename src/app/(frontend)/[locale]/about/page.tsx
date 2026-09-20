@@ -1,6 +1,5 @@
 import { CheckCircle2 } from 'lucide-react'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
-import { headers } from 'next/headers'
 import Image from 'next/image'
 
 import { JsonLd } from '@/components/JsonLd'
@@ -41,13 +40,11 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
   const { locale } = await params
   setRequestLocale(locale)
 
-  const [t, team, settings, headerList] = await Promise.all([
+  const [t, team, settings] = await Promise.all([
     getTranslations({ locale }),
     getTeam(locale),
     getSiteSettings(locale),
-    headers(),
   ])
-  const nonce = headerList.get('x-nonce') ?? undefined
 
   const founder = team.find((member) => member.isFounder) ?? team[0] ?? null
   const others = team.filter((member) => member.id !== founder?.id)
@@ -56,10 +53,8 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
 
   return (
     <>
-      <JsonLd nonce={nonce} data={organisationJsonLd(settings, locale)} />
-      <JsonLd
-        nonce={nonce}
-        data={breadcrumbJsonLd(locale, [
+      <JsonLd data={organisationJsonLd(settings, locale)} />
+      <JsonLd data={breadcrumbJsonLd(locale, [
           { name: t('nav.home'), path: '/' },
           { name: t('about.title'), path: '/about' },
         ])}

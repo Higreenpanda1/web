@@ -56,14 +56,23 @@
   --focus-ring: var(--brand-700);
   --overlay-photo: color-mix(in srgb, var(--brand-900) 55%, transparent);
 
-  /* --- Type scale (brief §13). Latin values; Arabic overridden below. ----- */
+  /* ---------------------------------------------------------------------------
+     Type scale (brief §13). The brief's numbers are a desktop scale, and taken
+     literally a 56px display size fills an entire 390px phone screen with the
+     first heading — which is the opposite of what the same brief asks for in
+     §7, where the stated audience is a mid-range Android over slow 4G.
+     So each heading is fluid: it reaches the brief's size exactly at a 1280px
+     viewport and scales down below that. Body sizes are not scaled — 17px and
+     19px are already correct on a phone, and shrinking body text is how
+     bilingual sites become unreadable.
+     --------------------------------------------------------------------------- */
   --leading-body: 1.65;
   --leading-heading: 1.2;
 
-  --text-display: 3.5rem; /* 56px */
-  --text-h1: 2.5rem; /*   40px */
-  --text-h2: 1.875rem; /* 30px */
-  --text-h3: 1.375rem; /* 22px */
+  --text-display: clamp(2.125rem, 1.35rem + 3.1vw, 3.5rem); /* 34 → 56px */
+  --text-h1: clamp(1.875rem, 1.42rem + 1.82vw, 2.5rem); /*     30 → 40px */
+  --text-h2: clamp(1.5rem, 1.23rem + 1.09vw, 1.875rem); /*     24 → 30px */
+  --text-h3: clamp(1.25rem, 1.16rem + 0.36vw, 1.375rem); /*    20 → 22px */
   --text-body-lg: 1.1875rem; /* 19px */
   --text-body: 1.0625rem; /*  17px */
   --text-caption: 0.9375rem; /* 15px */
@@ -90,10 +99,11 @@
   --leading-body: 1.9;
   --leading-heading: 1.4;
 
-  --text-display: 3.75rem; /* 60px */
-  --text-h1: 2.75rem; /*   44px */
-  --text-h2: 2.0625rem; /* 33px */
-  --text-h3: 1.5rem; /*   24px */
+  /* One step up at every size, same fluid behaviour. */
+  --text-display: clamp(2.25rem, 1.41rem + 3.35vw, 3.75rem); /* 36 → 60px */
+  --text-h1: clamp(2rem, 1.5rem + 2vw, 2.75rem); /*             32 → 44px */
+  --text-h2: clamp(1.625rem, 1.32rem + 1.22vw, 2.0625rem); /*   26 → 33px */
+  --text-h3: clamp(1.375rem, 1.28rem + 0.36vw, 1.5rem); /*      22 → 24px */
   --text-body-lg: 1.3125rem; /* 21px */
   --text-body: 1.1875rem; /* 19px */
   --text-caption: 1rem; /*   16px */

@@ -68,7 +68,7 @@ export function MobileNav({
         id="mobile-nav-panel"
         ref={panelRef}
         hidden={!open}
-        className="absolute inset-inline-0 start-0 end-0 top-full border-b border-[var(--border)] bg-[var(--surface)] shadow-lg"
+        className="absolute start-0 end-0 top-full border-b border-[var(--border)] bg-[var(--surface)] shadow-lg"
       >
         <nav aria-label={navLabel} className="container-page py-3">
           <ul className="flex flex-col">

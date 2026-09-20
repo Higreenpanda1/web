@@ -1,3 +1,5 @@
+import { Forbidden } from 'payload'
+
 import { isAdmin, isAdminField, isAdminOrSelf } from '@/access'
 import { verifyBackupCode } from '@/lib/backup-codes'
 
@@ -105,9 +107,11 @@ export const Users: CollectionConfig = {
       ({ req }) => {
         if (process.env.ADMIN_REQUIRE_2FA !== 'true') return
         if (req.context?.twoFactorVerified === true) return
-        // Deliberately vague: an attacker learns nothing about whether the
-        // password was right, only that this route is not the way in.
-        throw new Error('Sign in through the two-factor gate.')
+        // Payload's Forbidden, not a bare Error: a bare one surfaces as a 500,
+        // which reads like a broken server rather than a refused request.
+        // Deliberately vague otherwise — an attacker learns nothing about
+        // whether the password was right, only that this is not the way in.
+        throw new Forbidden(req.t)
       },
     ],
   },

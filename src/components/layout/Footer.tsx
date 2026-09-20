@@ -20,7 +20,7 @@ export async function Footer({ locale, settings }: { locale: Locale; settings: S
             id: 'services',
             title: t('footer.servicesTitle'),
             links: [
-              { id: 's1', label: t('nav.services'), href: '/services' },
+              { id: 's1', label: t('cta.allServices'), href: '/services' },
               { id: 's2', label: t('cta.enquire'), href: '/contact' },
             ],
           },

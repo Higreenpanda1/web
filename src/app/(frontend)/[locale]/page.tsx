@@ -1,5 +1,4 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server'
-import { headers } from 'next/headers'
 
 import { JsonLd } from '@/components/JsonLd'
 import { RenderBlocks } from '@/components/blocks/RenderBlocks'
@@ -32,16 +31,14 @@ export default async function HomePage({ params }: { params: Promise<{ locale: L
   const { locale } = await params
   setRequestLocale(locale)
 
-  const [page, settings, headerList] = await Promise.all([
+  const [page, settings] = await Promise.all([
     getPageBySlug('home', locale),
     getSiteSettings(locale),
-    headers(),
   ])
-  const nonce = headerList.get('x-nonce') ?? undefined
 
   return (
     <>
-      <JsonLd data={organisationJsonLd(settings, locale)} nonce={nonce} />
+      <JsonLd data={organisationJsonLd(settings, locale)} />
       {page?.layout && page.layout.length > 0 ? (
         <RenderBlocks blocks={page.layout} locale={locale} />
       ) : (

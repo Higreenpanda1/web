@@ -1,6 +1,5 @@
 import { CheckCircle2 } from 'lucide-react'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
-import { headers } from 'next/headers'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 
@@ -56,12 +55,10 @@ export default async function ServicePage({
   const service = await getServiceBySlug(slug, locale)
   if (!service) notFound()
 
-  const [t, settings, headerList] = await Promise.all([
+  const [t, settings] = await Promise.all([
     getTranslations({ locale }),
     getSiteSettings(locale),
-    headers(),
   ])
-  const nonce = headerList.get('x-nonce') ?? undefined
 
   const image = typeof service.image === 'object' ? (service.image as Media) : null
   const heroSrc = mediaUrl(image, 'hero')
@@ -72,16 +69,14 @@ export default async function ServicePage({
 
   return (
     <>
-      <JsonLd nonce={nonce} data={serviceJsonLd(service, locale, settings)} />
-      <JsonLd
-        nonce={nonce}
-        data={breadcrumbJsonLd(locale, [
+      <JsonLd data={serviceJsonLd(service, locale, settings)} />
+      <JsonLd data={breadcrumbJsonLd(locale, [
           { name: t('nav.home'), path: '/' },
           { name: t('services.title'), path: '/services' },
           { name: service.title, path: `/services/${slug}` },
         ])}
       />
-      {faqs.length > 0 ? <JsonLd nonce={nonce} data={faqJsonLd(faqs)} /> : null}
+      {faqs.length > 0 ? <JsonLd data={faqJsonLd(faqs)} /> : null}
 
       <section className="relative isolate overflow-hidden bg-[var(--brand-900)] py-16 text-[var(--text-on-inverse)] md:py-20">
         {heroSrc ? (

@@ -85,27 +85,39 @@ export const SiteSettings: GlobalConfig = {
           label: 'Navigation',
           fields: [
             {
+              /**
+               * The array itself is localised, not just the labels inside it.
+               *
+               * With a non-localised array holding localised fields, Payload
+               * keys each translation to a row id — so writing the English
+               * version replaces the rows and the Arabic labels are orphaned,
+               * leaving a menu of blank links. Localising the array gives each
+               * language its own rows, which is also what an editor wants: the
+               * Arabic and English menus are allowed to differ.
+               */
               name: 'primaryNav',
               type: 'array',
+              localized: true,
               labels: { singular: 'Link', plural: 'Primary navigation' },
               maxRows: 7,
               fields: [
-                { name: 'label', type: 'text', required: true, localized: true },
+                { name: 'label', type: 'text', required: true },
                 { name: 'href', type: 'text', required: true },
               ],
             },
             {
               name: 'footerColumns',
               type: 'array',
+              localized: true,
               maxRows: 3,
               labels: { singular: 'Column', plural: 'Footer columns' },
               fields: [
-                { name: 'title', type: 'text', required: true, localized: true },
+                { name: 'title', type: 'text', required: true },
                 {
                   name: 'links',
                   type: 'array',
                   fields: [
-                    { name: 'label', type: 'text', required: true, localized: true },
+                    { name: 'label', type: 'text', required: true },
                     { name: 'href', type: 'text', required: true },
                   ],
                 },
