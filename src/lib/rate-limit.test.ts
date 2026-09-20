@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 
-import { __reset, consume, networkPrefix } from './rate-limit.ts'
+import { __reset, consume, networkPrefix, peek } from './rate-limit.ts'
 
 test('allows up to the limit then refuses', () => {
   __reset()
@@ -45,4 +45,27 @@ test('network prefix keeps a network and drops the host', () => {
   assert.equal(networkPrefix(null), 'unknown')
   assert.equal(networkPrefix(''), 'unknown')
   assert.equal(networkPrefix('not-an-address'), 'unknown')
+})
+
+test('peek reports the budget without spending it', () => {
+  __reset()
+  const now = 1_000_000
+  // Peeking a fresh key never records an attempt.
+  for (let i = 0; i < 10; i += 1) {
+    assert.equal(peek('p', 2, now).allowed, true, `peek ${i + 1}`)
+  }
+  assert.equal(consume('p', 2, 60_000, now).allowed, true)
+  assert.equal(peek('p', 2, now).allowed, true)
+  assert.equal(consume('p', 2, 60_000, now).allowed, true)
+  // The budget is now spent, and peek says so without spending more.
+  assert.equal(peek('p', 2, now).allowed, false)
+  assert.equal(peek('p', 2, now).retryAfterSeconds, 60)
+})
+
+test('peek sees a window that has expired as fresh', () => {
+  __reset()
+  const now = 1_000_000
+  consume('q', 1, 60_000, now)
+  assert.equal(peek('q', 1, now).allowed, false)
+  assert.equal(peek('q', 1, now + 60_001).allowed, true)
 })

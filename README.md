@@ -40,13 +40,21 @@ npm run lint          # ESLint
 npm run typecheck     # tsc --noEmit
 npm test              # 23 unit tests: TOTP, rate limiter, form guard, spam patterns
 npm run build && npm start
-npm run test:e2e      # Chromium: RTL, type scale, the form, CSP, keyboard, 410
+npm run test:e2e      # Chromium: routes, RTL, type scale, the form, CSP, keyboard
+npm run test:admin    # the 2FA gate — needs real credentials, see the file header
 ```
 
 `npm run test:e2e` needs a server already running. It drives a real browser at
 phone width: 23 routes for the status they should return, then the Arabic type
 scale, RTL layout, the language switcher, an enquiry reaching the database, the
 keyboard entry point, dark mode, and whether the strict CSP blocks anything.
+
+`npm run test:admin` checks that the admin panel is actually protected — that
+`/hgp-studio` redirects when signed out, `/admin` is not a route, a
+password-only REST login is refused, a wrong code is refused, a right one is
+not, and a backup code works exactly once. It needs a real enrolled secret and
+password, so it is run by hand rather than in CI; see the header of
+`tests/admin-gate.mjs`.
 
 ---
 
@@ -184,10 +192,16 @@ Scores vary a point or two between runs. These were taken on the production
 build with `NEXT_PUBLIC_SERVER_URL` matching the host being served, which
 matters: a canonical URL pointing at a different origin fails the SEO audit.
 
-Also verified in a browser: RTL layout with no horizontal overflow at 390px,
-the language switcher staying on the page, an enquiry reaching Postgres, the
-skip link first in the tab order, `410` on injected paths, dark mode, and zero
-CSP violations on both the public site and the admin panel.
+Also verified in a browser against the production build: RTL layout with no
+horizontal overflow at 390px, the language switcher staying on the page, an
+enquiry reaching Postgres, the skip link first in the tab order, `410` on
+injected paths, dark mode, and zero CSP violations on both the public site and
+the admin panel.
+
+And the brief's own definition of success: signing in through the two-factor
+gate, editing an Arabic service page in the CMS, publishing it, and seeing the
+change live on the public Arabic page — with the English translation
+untouched.
 
 ---
 

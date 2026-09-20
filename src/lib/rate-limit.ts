@@ -68,6 +68,28 @@ function pruneExpired(now: number): void {
   }
 }
 
+/**
+ * How many attempts are left without recording one.
+ *
+ * Used where only failures should count against the budget — signing in
+ * successfully is not evidence of an attack, and charging for it means an
+ * admin who signs in and out a few times locks themselves out of their own
+ * site.
+ */
+export function peek(key: string, limit: number, now = Date.now()): RateLimitResult {
+  const existing = buckets.get(key)
+  if (!existing || existing.resetAt <= now) {
+    return { allowed: true, remaining: limit, resetAt: now, retryAfterSeconds: 0 }
+  }
+  const allowed = existing.count < limit
+  return {
+    allowed,
+    remaining: Math.max(0, limit - existing.count),
+    resetAt: existing.resetAt,
+    retryAfterSeconds: allowed ? 0 : Math.ceil((existing.resetAt - now) / 1000),
+  }
+}
+
 /** Test seam. */
 export function __reset(): void {
   buckets.clear()

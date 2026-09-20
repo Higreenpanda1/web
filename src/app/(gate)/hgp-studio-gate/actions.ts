@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 
 import { findUnusedBackupCode } from '@/collections/Users'
 import { getPayloadClient } from '@/lib/payload'
-import { consume, networkPrefix } from '@/lib/rate-limit'
+import { consume, networkPrefix, peek } from '@/lib/rate-limit'
 import { verifyToken } from '@/lib/totp'
 
 /**
@@ -41,16 +41,26 @@ export async function signIn(_previous: GateState, formData: FormData): Promise<
 
   const headerList = await headers()
   const prefix = networkPrefix(headerList.get('x-real-ip') ?? headerList.get('x-forwarded-for'))
-  if (!consume(`gate:${prefix}`, GATE_ATTEMPTS, GATE_WINDOW_MS).allowed) {
+  const limitKey = `gate:${prefix}`
+
+  // Check the budget without spending it. Only a *failed* attempt is charged
+  // (see `refuse` below) — an administrator signing in successfully several
+  // times in an afternoon is not a brute-force attack, and charging for it
+  // would lock them out of their own site.
+  if (!peek(limitKey, GATE_ATTEMPTS).allowed) {
     return { error: 'Too many attempts. Wait fifteen minutes and try again.' }
+  }
+
+  /** Record a failure against the budget and return the same message always. */
+  const refuse = (): GateState => {
+    consume(limitKey, GATE_ATTEMPTS, GATE_WINDOW_MS)
+    // Telling an attacker which of the three factors was wrong is telling them
+    // which two were right.
+    return { error: 'Those details are not correct.' }
   }
 
   const payload = await getPayloadClient()
   const required = process.env.ADMIN_REQUIRE_2FA === 'true'
-
-  // Every failure below returns the same message. Telling an attacker which of
-  // the three factors was wrong is telling them which two were right.
-  const GENERIC = 'Those details are not correct.'
 
   let consumedBackupCodeIndex = -1
 
@@ -69,12 +79,12 @@ export async function signIn(_previous: GateState, formData: FormData): Promise<
     })
 
     const user = found.docs[0]
-    if (!user?.totpEnabled || !user.totpSecret) return { error: GENERIC }
+    if (!user?.totpEnabled || !user.totpSecret) return refuse()
 
     const totpValid = verifyToken(code, user.totpSecret)
     if (!totpValid) {
       consumedBackupCodeIndex = findUnusedBackupCode(code, user.backupCodes)
-      if (consumedBackupCodeIndex === -1) return { error: GENERIC }
+      if (consumedBackupCodeIndex === -1) return refuse()
     }
   }
 
@@ -89,10 +99,10 @@ export async function signIn(_previous: GateState, formData: FormData): Promise<
     })
     token = result.token
   } catch {
-    return { error: GENERIC }
+    return refuse()
   }
 
-  if (!token) return { error: GENERIC }
+  if (!token) return refuse()
 
   // Burn the backup code only once the password has also checked out, so a
   // wrong password cannot be used to exhaust someone's codes.
