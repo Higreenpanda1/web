@@ -1,4 +1,5 @@
 import { anyone, isAdmin, isStaff } from '@/access'
+import { revalidateCollection } from '@/lib/revalidate'
 import { slugField } from '@/fields/slug'
 
 import type { CollectionConfig } from 'payload'
@@ -11,6 +12,8 @@ import type { CollectionConfig } from 'payload'
  */
 export const TeamMembers: CollectionConfig = {
   slug: 'team-members',
+  // Publishing drops this collection's cache tag so the change is live at once.
+  hooks: revalidateCollection('team'),
   labels: { singular: 'Team member', plural: 'Team' },
   admin: {
     useAsTitle: 'name',

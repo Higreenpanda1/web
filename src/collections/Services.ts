@@ -1,4 +1,5 @@
-import { anyone, isAdmin, isStaff, isStaffOrPublished } from '@/access'
+import { isAdmin, isStaff, isStaffOrPublished } from '@/access'
+import { revalidateCollection } from '@/lib/revalidate'
 import { bodyField } from '@/fields/richText'
 import { seoField } from '@/fields/seo'
 import { slugField } from '@/fields/slug'
@@ -14,6 +15,8 @@ import type { CollectionConfig } from 'payload'
  */
 export const Services: CollectionConfig = {
   slug: 'services',
+  // Publishing drops this collection's cache tag so the change is live at once.
+  hooks: revalidateCollection('services'),
   labels: { singular: 'Service', plural: 'Services' },
   admin: {
     useAsTitle: 'title',

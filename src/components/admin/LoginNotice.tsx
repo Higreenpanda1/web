@@ -25,6 +25,10 @@ export function LoginNotice() {
         Two-factor authentication is required
       </strong>
       Sign in at{' '}
+      {/* A plain anchor on purpose: the gate is a different route group with its
+          own root layout, so it needs a full document load, not a client-side
+          navigation into the admin bundle. */}
+      {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
       <a href="/hgp-studio-gate" style={{ color: '#276b34', fontWeight: 600 }}>
         /hgp-studio-gate
       </a>

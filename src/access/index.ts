@@ -42,6 +42,10 @@ export const isAdmin: Access = ({ req }) => hasRole(req.user, 'admin')
 
 export const isAdminField: FieldAccess = ({ req }) => hasRole(req.user, 'admin')
 
+/** Field-level equivalent of isStaff. Field access has a different signature
+ *  from document access, so the two cannot share one function. */
+export const isStaffField: FieldAccess = ({ req }) => hasRole(req.user, 'admin', 'editor')
+
 /** Staff may read everything; the public may read only published documents. */
 export const isStaffOrPublished: Access = ({ req }) => {
   if (hasRole(req.user, 'admin', 'editor')) return true

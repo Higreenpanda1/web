@@ -1,4 +1,5 @@
 import { isAdmin, isStaff, isStaffOrPublished } from '@/access'
+import { revalidateCollection } from '@/lib/revalidate'
 import { bodyField } from '@/fields/richText'
 import { seoField } from '@/fields/seo'
 import { slugField } from '@/fields/slug'
@@ -106,6 +107,8 @@ export const Posts: CollectionConfig = {
         return data
       },
     ],
+    // Publishing drops this collection's cache tag so the change is live at once.
+    ...revalidateCollection('posts'),
   },
 }
 

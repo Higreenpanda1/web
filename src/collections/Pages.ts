@@ -1,4 +1,5 @@
 import { isAdmin, isStaff, isStaffOrPublished } from '@/access'
+import { revalidateCollection } from '@/lib/revalidate'
 import { layoutBlocks } from '@/blocks'
 import { seoField } from '@/fields/seo'
 import { slugField } from '@/fields/slug'
@@ -14,6 +15,8 @@ import type { CollectionConfig } from 'payload'
  */
 export const Pages: CollectionConfig = {
   slug: 'pages',
+  // Publishing drops this collection's cache tag so the change is live at once.
+  hooks: revalidateCollection('pages'),
   labels: { singular: 'Page', plural: 'Pages' },
   admin: {
     useAsTitle: 'title',

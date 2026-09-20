@@ -1,4 +1,5 @@
 import { anyone, isAdmin, isStaff } from '@/access'
+import { revalidateCollection } from '@/lib/revalidate'
 
 import type { CollectionConfig } from 'payload'
 
@@ -13,6 +14,8 @@ import type { CollectionConfig } from 'payload'
  */
 export const Redirects: CollectionConfig = {
   slug: 'redirects',
+  // Publishing drops this collection's cache tag so the change is live at once.
+  hooks: revalidateCollection('redirects'),
   labels: { singular: 'Redirect', plural: 'Redirects' },
   admin: {
     useAsTitle: 'from',
@@ -78,6 +81,12 @@ export const Redirects: CollectionConfig = {
         if (!value.startsWith('/') && !value.startsWith('https://')) {
           return 'Use a path starting with a slash, or a full https:// URL.'
         }
+        // A rule pointing at its own source is an infinite redirect loop, and
+        // the browser, not the CMS, is where it would be discovered.
+        const from = (siblingData as { from?: string } | undefined)?.from
+        if (from && normalisePath(from) === normalisePath(value)) {
+          return 'The destination is the same as the source — that is a redirect loop.'
+        }
         return true
       },
     },
@@ -104,4 +113,9 @@ export const Redirects: CollectionConfig = {
       },
     },
   ],
+}
+
+/** Trailing slashes are not a difference; /en/home and /en/home/ are one path. */
+function normalisePath(value: string): string {
+  return value.replace(/\/+$/, '') || '/'
 }

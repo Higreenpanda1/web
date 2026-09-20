@@ -1,9 +1,12 @@
 import { anyone, isAdmin, isStaff } from '@/access'
+import { revalidateCollection } from '@/lib/revalidate'
 
 import type { CollectionConfig } from 'payload'
 
 export const Testimonials: CollectionConfig = {
   slug: 'testimonials',
+  // Publishing drops this collection's cache tag so the change is live at once.
+  hooks: revalidateCollection('testimonials'),
   labels: { singular: 'Testimonial', plural: 'Testimonials' },
   admin: {
     useAsTitle: 'author',

@@ -140,13 +140,9 @@ export default buildConfig({
     disable: true,
   },
 
-  // Payload's own rate limiting, on top of the per-form limiter in
-  // src/lib/rate-limit.ts and Caddy's IP gate on the admin path.
-  rateLimit: {
-    trustProxy: true,
-    window: 60 * 1000,
-    max: 300,
-  },
+  // Payload 3 has no built-in rate limiter (v2's `rateLimit` option is gone),
+  // so it is applied in src/middleware.ts instead, where it also covers the
+  // sign-in gate and the REST API. Caddy adds an optional IP gate on top.
 
   cors: [serverURL],
   csrf: [serverURL],

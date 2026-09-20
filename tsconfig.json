@@ -10,6 +10,9 @@
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
+    // The node:test suites import with explicit .ts extensions so that
+    // `node --experimental-strip-types` can run them with no build step.
+    "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",

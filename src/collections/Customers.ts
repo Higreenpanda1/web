@@ -1,4 +1,4 @@
-import { isAdmin, isStaff } from '@/access'
+import { isAdmin, isStaff, isStaffField } from '@/access'
 
 import type { CollectionConfig } from 'payload'
 
@@ -70,7 +70,7 @@ export const Customers: CollectionConfig = {
     {
       name: 'notes',
       type: 'textarea',
-      access: { read: isStaff },
+      access: { read: isStaffField },
       admin: { description: 'Internal. Never shown to the customer.' },
     },
   ],

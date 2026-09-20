@@ -1,4 +1,5 @@
-import { anyone, isAdmin, isStaff } from '@/access'
+import { anyone, isStaff } from '@/access'
+import { revalidateGlobal } from '@/lib/revalidate'
 
 import type { GlobalConfig } from 'payload'
 
@@ -11,6 +12,7 @@ import type { GlobalConfig } from 'payload'
  */
 export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
+  hooks: revalidateGlobal('settings'),
   label: 'Site settings',
   admin: {
     group: 'Administration',

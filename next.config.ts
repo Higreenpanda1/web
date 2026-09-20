@@ -19,6 +19,16 @@ const nextConfig: NextConfig = {
   productionBrowserSourceMaps: false,
   output: 'standalone',
 
+  /**
+   * Next's own trailing-slash redirect runs before middleware, which turns
+   * /en/home/ into two hops: 308 to /en/home, then our 301 to /en. The old
+   * site's URLs are indexed *with* trailing slashes and the injected spam
+   * pages were too, so that extra hop is paid by exactly the requests that
+   * matter most. Middleware normalises the slash itself instead — see the
+   * canonicalisation step in src/middleware.ts.
+   */
+  skipTrailingSlashRedirect: true,
+
   images: {
     // AVIF first, WebP second — the audience is on mid-range Androids over 4G.
     formats: ['image/avif', 'image/webp'],
