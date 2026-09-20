@@ -55,7 +55,12 @@ trap 'on_err "$LINENO" "$BASH_COMMAND"' ERR
 # again from there, leaving standard input free.
 if [ "${HGP_REEXEC:-0}" != "1" ] && { [ -z "${BASH_SOURCE[0]:-}" ] || [ ! -f "${BASH_SOURCE[0]}" ]; }; then
   self=$(mktemp /tmp/hgp-deploy.XXXXXXXX.sh)
-  curl -fsSL "${RAW}/ops/deploy.sh" -o "$self"
+  # GitHub's raw CDN caches for several minutes, which on a script being
+  # fixed and re-run in the same sitting means the download can quietly be an
+  # older copy — the bug you just fixed appears to survive the fix. Ask for a
+  # fresh one explicitly.
+  curl -fsSL -H 'Cache-Control: no-cache' -H 'Pragma: no-cache' \
+       "${RAW}/ops/deploy.sh?v=$(date +%s)" -o "$self"
   export HGP_REEXEC=1
   exec bash "$self" "$@"
 fi
