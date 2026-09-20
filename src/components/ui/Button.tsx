@@ -3,7 +3,7 @@ import { cn } from '@/lib/cn'
 
 import type { ComponentProps, ReactNode } from 'react'
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'inverse'
+type Variant = 'primary' | 'secondary' | 'ghost' | 'inverse' | 'outline-inverse'
 type Size = 'md' | 'lg'
 
 /**
@@ -20,6 +20,13 @@ const VARIANT_CLASS: Record<Variant, string> = {
     'bg-transparent text-[var(--text-brand)] border border-[var(--brand-700)] hover:bg-[var(--brand-100)]',
   ghost: 'bg-transparent text-[var(--text-brand)] hover:bg-[var(--brand-100)]',
   inverse: 'bg-white text-[var(--brand-800)] hover:bg-[var(--brand-100)]',
+  // For a dark or photographic background. A real variant rather than adding
+  // `text-…` on top of `secondary`: both would set the same property, Tailwind's
+  // emission order would decide the winner, and the losing case here was
+  // --brand-700 green on --brand-900 green, which Lighthouse correctly failed
+  // for contrast.
+  'outline-inverse':
+    'bg-transparent text-white border border-[var(--brand-400)] hover:bg-[var(--brand-800)]',
 }
 
 const SIZE_CLASS: Record<Size, string> = {

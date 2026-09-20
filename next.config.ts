@@ -41,8 +41,24 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 60 * 60 * 24 * 30,
   },
 
+  /**
+   * Always render metadata into <head>, for every user agent.
+   *
+   * By default Next streams metadata into the body for anything it does not
+   * recognise as a "limited" bot, on the reasoning that Googlebot executes
+   * JavaScript. That leaves the description and OG tags outside <head> for
+   * every crawler and preview tool not on Next's list — and this site's job is
+   * converting social traffic (brief section 7), where a link preview that
+   * fails is a lost enquiry. Metadata here is built from cached queries, so
+   * blocking on it costs almost nothing.
+   */
+  htmlLimitedBots: /.*/,
+
   experimental: {
     optimizePackageImports: ['lucide-react'],
+    // The stylesheet is small and every page needs all of it, so a separate
+    // request just delays first paint on a slow connection.
+    inlineCss: true,
   },
 
   // Payload writes its own types; don't let a transient type error in the
@@ -55,4 +71,37 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default withPayload(withNextIntl(nextConfig), { devBundleServerPackages: false })
+const configured = withPayload(withNextIntl(nextConfig), { devBundleServerPackages: false })
+
+/**
+ * Scope Payload's colour-scheme client hint to the admin panel.
+ *
+ * `withPayload` appends `Accept-CH`, `Vary` and `Critical-CH` for
+ * Sec-CH-Prefers-Color-Scheme on `/:path*` — every route on the site. It does
+ * that so the admin panel can render in the user's preferred theme on the
+ * first paint, which is reasonable for the admin panel and expensive
+ * everywhere else: `Critical-CH` tells Chrome to discard the response and
+ * reissue the request with the hint attached, so every first-time visitor pays
+ * a full extra round trip before any HTML arrives. On the 4G connection this
+ * site is built for that is the single most expensive thing on the page, and
+ * it buys the public site nothing — its dark mode is pure CSS.
+ *
+ * So the rule is narrowed rather than removed. Everything else `withPayload`
+ * configures is left exactly as it was.
+ */
+const PAYLOAD_GLOBAL_HEADER_SOURCE = '/:path*'
+const ADMIN_HEADER_SOURCE = '/hgp-studio/:path*'
+
+const payloadHeaders = configured.headers
+
+configured.headers = async () => {
+  const rules = (await payloadHeaders?.()) ?? []
+  return rules.map((rule) =>
+    rule.source === PAYLOAD_GLOBAL_HEADER_SOURCE &&
+    rule.headers.some((header) => header.key === 'Accept-CH')
+      ? { ...rule, source: ADMIN_HEADER_SOURCE }
+      : rule,
+  )
+}
+
+export default configured

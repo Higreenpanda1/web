@@ -26,7 +26,7 @@ export function BlockActions({
           variant={
             action.style === 'secondary'
               ? inverse
-                ? 'inverse'
+                ? 'outline-inverse'
                 : 'secondary'
               : action.style === 'link'
                 ? 'ghost'

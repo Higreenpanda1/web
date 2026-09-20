@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "HiGreenPanda — Arabic-first bilingual marketing site for a China trade-services company. Next.js + Payload CMS + PostgreSQL.",
+  "description": "HiGreenPanda \u2014 Arabic-first bilingual marketing site for a China trade-services company. Next.js + Payload CMS + PostgreSQL.",
   "engines": {
     "node": ">=20.9.0"
   },
@@ -64,5 +64,15 @@
   },
   "overrides": {
     "graphql": "16.14.2"
-  }
+  },
+  "browserslist": [
+    "> 0.5% in AE",
+    "> 0.5% in SA",
+    "last 2 Chrome versions",
+    "last 2 Safari versions",
+    "last 2 Firefox versions",
+    "last 2 ChromeAndroid versions",
+    "last 2 iOS versions",
+    "not dead"
+  ]
 }

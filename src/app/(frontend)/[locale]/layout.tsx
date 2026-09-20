@@ -39,10 +39,17 @@ export function generateStaticParams() {
 }
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#378D42' },
-    { media: '(prefers-color-scheme: dark)', color: '#12341B' },
-  ],
+  /**
+   * One theme colour, not a light/dark pair.
+   *
+   * A media-query themeColor makes Next send `Accept-CH` and `Critical-CH` for
+   * Sec-CH-Prefers-Color-Scheme, which tells Chrome to throw away the response
+   * and restart the request with the hint attached. That is a whole extra round
+   * trip before the first byte of real HTML, on every first visit — paid by a
+   * mid-range Android on 4G, to tint the browser chrome. The page itself still
+   * honours dark mode through CSS.
+   */
+  themeColor: '#378D42',
   width: 'device-width',
   initialScale: 1,
   // Never block zoom: this audience reads on phones, often in bright sunlight,

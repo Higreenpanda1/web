@@ -391,6 +391,6 @@ export const config = {
      * routing, and keeping them out of middleware is most of the reason the
      * site stays fast on a slow connection.
      */
-    '/((?!_next/static|_next/image|fonts/|brand/|media/|favicon\\.ico|favicon\\.svg|apple-touch-icon\\.png|icon-\\d+\\.png|icon-maskable-512\\.png|robots\\.txt|sitemap\\.xml).*)',
+    '/((?!_next/static|_next/image|fonts/|brand/|media/|favicon\\.ico|favicon\\.svg|apple-touch-icon\\.png|icon-\\d+\\.png|icon-maskable-512\\.png|robots\\.txt|sitemap\\.xml|manifest\\.webmanifest).*)',
   ],
 }

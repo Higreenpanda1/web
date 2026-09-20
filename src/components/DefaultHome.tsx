@@ -45,12 +45,7 @@ export async function DefaultHome({ locale }: { locale: Locale }) {
               <ButtonLink href="/contact" size="lg" variant="inverse">
                 {t('cta.enquire')}
               </ButtonLink>
-              <ButtonLink
-                href="/services"
-                size="lg"
-                variant="secondary"
-                className="border-[var(--brand-400)] text-[var(--brand-100)] hover:bg-[var(--brand-800)]"
-              >
+              <ButtonLink href="/services" size="lg" variant="outline-inverse">
                 {t('cta.allServices')}
               </ButtonLink>
             </div>

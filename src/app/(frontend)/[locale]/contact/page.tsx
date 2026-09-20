@@ -56,80 +56,80 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
             <p className="mt-2 text-[var(--text-muted)]">{t('contact.whatsappNote')}</p>
 
             <dl className="mt-6 space-y-5">
-              <div className="flex items-start gap-3">
-                <MessageCircle
-                  size={22}
-                  strokeWidth={1.5}
-                  aria-hidden="true"
-                  className="mt-1 shrink-0 text-[var(--brand-700)]"
-                />
-                <div>
-                  <dt className="font-semibold">{t('contact.phoneLabel')}</dt>
-                  <dd>
-                    <a
-                      href={whatsappLink(
-                        settings.whatsappNumber,
-                        settings.whatsappPrefill ?? undefined,
-                      )}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="ltr-nums"
-                    >
-                      {settings.whatsappNumber}
-                    </a>
-                  </dd>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <Mail
-                  size={22}
-                  strokeWidth={1.5}
-                  aria-hidden="true"
-                  className="mt-1 shrink-0 text-[var(--brand-700)]"
-                />
-                <div>
-                  <dt className="font-semibold">{t('contact.emailLabel')}</dt>
-                  <dd>
-                    <a href={`mailto:${settings.email}`} className="ltr-nums">
-                      {settings.email}
-                    </a>
-                  </dd>
-                </div>
-              </div>
-
-              {settings.offices && settings.offices.length > 0 ? (
-                <div className="flex items-start gap-3">
-                  <MapPin
+              <div>
+                <dt className="flex items-center gap-2 font-semibold">
+                  <MessageCircle
                     size={22}
                     strokeWidth={1.5}
                     aria-hidden="true"
-                    className="mt-1 shrink-0 text-[var(--brand-700)]"
+                    className="shrink-0 text-[var(--brand-700)]"
                   />
-                  <div>
-                    <dt className="font-semibold">{t('contact.officesLabel')}</dt>
-                    {settings.offices.map((office, index) => (
-                      <dd key={office.id ?? index} className="text-[var(--text-muted)]">
-                        <span className="text-[var(--text)]">{office.city}</span>
-                        {office.address ? <> — {office.address}</> : null}
-                      </dd>
-                    ))}
-                  </div>
+                  {t('contact.phoneLabel')}
+                </dt>
+                <dd className="mt-1 ps-8">
+                  <a
+                    href={whatsappLink(
+                      settings.whatsappNumber,
+                      settings.whatsappPrefill ?? undefined,
+                    )}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ltr-nums"
+                  >
+                    {settings.whatsappNumber}
+                  </a>
+                </dd>
+              </div>
+
+              <div>
+                <dt className="flex items-center gap-2 font-semibold">
+                  <Mail
+                    size={22}
+                    strokeWidth={1.5}
+                    aria-hidden="true"
+                    className="shrink-0 text-[var(--brand-700)]"
+                  />
+                  {t('contact.emailLabel')}
+                </dt>
+                <dd className="mt-1 ps-8">
+                  <a href={`mailto:${settings.email}`} className="ltr-nums">
+                    {settings.email}
+                  </a>
+                </dd>
+              </div>
+
+              {settings.offices && settings.offices.length > 0 ? (
+                <div>
+                  <dt className="flex items-center gap-2 font-semibold">
+                    <MapPin
+                      size={22}
+                      strokeWidth={1.5}
+                      aria-hidden="true"
+                      className="shrink-0 text-[var(--brand-700)]"
+                    />
+                    {t('contact.officesLabel')}
+                  </dt>
+                  {settings.offices.map((office, index) => (
+                    <dd key={office.id ?? index} className="mt-1 ps-8 text-[var(--text-muted)]">
+                      <span className="text-[var(--text)]">{office.city}</span>
+                      {office.address ? <> — {office.address}</> : null}
+                    </dd>
+                  ))}
                 </div>
               ) : null}
 
               {settings.workingHours ? (
-                <div className="flex items-start gap-3">
-                  <Clock
-                    size={22}
-                    strokeWidth={1.5}
-                    aria-hidden="true"
-                    className="mt-1 shrink-0 text-[var(--brand-700)]"
-                  />
-                  <div>
-                    <dt className="font-semibold">{t('contact.hoursLabel')}</dt>
-                    <dd className="text-[var(--text-muted)]">{settings.workingHours}</dd>
-                  </div>
+                <div>
+                  <dt className="flex items-center gap-2 font-semibold">
+                    <Clock
+                      size={22}
+                      strokeWidth={1.5}
+                      aria-hidden="true"
+                      className="shrink-0 text-[var(--brand-700)]"
+                    />
+                    {t('contact.hoursLabel')}
+                  </dt>
+                  <dd className="mt-1 ps-8 text-[var(--text-muted)]">{settings.workingHours}</dd>
                 </div>
               ) : null}
             </dl>

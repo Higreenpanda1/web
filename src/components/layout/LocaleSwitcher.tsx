@@ -34,7 +34,6 @@ export function LocaleSwitcher({
       locale={target}
       hrefLang={target}
       lang={target}
-      aria-label={label}
       onNavigate={() => startTransition(() => {})}
       className={cn(
         'inline-flex min-h-11 items-center rounded-[var(--radius)] border border-[var(--border)] px-3 py-1.5 text-caption font-semibold text-[var(--text)] no-underline transition-colors hover:bg-[var(--surface-tint)]',
@@ -43,6 +42,11 @@ export function LocaleSwitcher({
       )}
     >
       {switchTo}
+      {/* WCAG 2.5.3 Label in Name: the accessible name has to contain the
+          visible text, so the purpose is appended rather than replacing it.
+          An aria-label of "تغيير اللغة" on a control reading "English" means
+          a speech-input user cannot say what they can see. */}
+      <span className="sr-only">&nbsp;{label}</span>
     </Link>
   )
 }
