@@ -333,17 +333,30 @@ if [ -z "$TTY" ]; then
 else
   cat <<'EOF'
 
-  You need an authenticator app on your phone. Google Authenticator, Microsoft
-  Authenticator and 1Password all work.
+  Signing in to the CMS needs two things: your password, and a six-digit code
+  from your phone. This step links the two.
 
-  A QR code will appear below. Open the app, choose "add account" or "+",
-  scan it, then type the six digits it shows.
+  You need an authenticator app: Google Authenticator, Microsoft Authenticator
+  and 1Password all work. A QR code appears, you scan it, you type the six
+  digits back.
+
+  Nothing breaks if you skip it. The site runs either way, and you cannot sign
+  in to the CMS until it is done — so do it before the DNS change in §3.
 
 EOF
-  pause "  Ready? Press Enter. "
-  $COMPOSE run --rm tools npm run totp:enrol -- "$ADMIN_EMAIL" <"$TTY" || \
-    warn "enrolment did not finish. Run it again with:
+  ask do_totp "  Set it up now? [Y/n]: " "y"
+  case "$do_totp" in
+    [Nn]*)
+      warn "skipped. When you are ready, paste this:"
+      printf '\n      cd %s && %s run --rm tools npm run totp:enrol -- %s\n\n' \
+             "$APP_DIR" "$COMPOSE" "$ADMIN_EMAIL"
+      ;;
+    *)
+      $COMPOSE run --rm tools npm run totp:enrol -- "$ADMIN_EMAIL" <"$TTY" || \
+        warn "enrolment did not finish. Run it again with:
       cd $APP_DIR && $COMPOSE run --rm tools npm run totp:enrol -- $ADMIN_EMAIL"
+      ;;
+  esac
 fi
 
 # ── done ─────────────────────────────────────────────────────────────────────
