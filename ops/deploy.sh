@@ -222,6 +222,10 @@ S3_SECRET_ACCESS_KEY=
 
 SEED_ADMIN_EMAIL=${ADMIN_EMAIL}
 SEED_ADMIN_PASSWORD=${ADMIN_PASSWORD}
+
+# Filled in below from this server's own hostname, so the site can be viewed
+# over HTTPS before DNS is pointed at the box.
+PREVIEW_HOSTNAME=
 EOF
   chmod 600 .env
   ok "wrote .env with freshly generated passwords"
@@ -233,6 +237,37 @@ fi
 
 SITE_DOMAIN=$(grep '^SITE_DOMAIN=' .env | cut -d= -f2-)
 ADMIN_EMAIL=$(grep '^SEED_ADMIN_EMAIL=' .env | cut -d= -f2-)
+
+# ── a way to see the site before DNS moves ───────────────────────────────────
+# Hostinger gives every VPS a real, already-resolving hostname. If this machine
+# has one, Caddy can get a genuine certificate for it, and the site is
+# viewable over HTTPS without touching higreenpanda.com at all. Only set it
+# when the name actually points back here — otherwise Caddy spends the next
+# hour failing certificate challenges for a host it cannot prove it owns.
+PREVIEW_HOSTNAME=$(grep '^PREVIEW_HOSTNAME=' .env | cut -d= -f2- || true)
+if [ -z "${PREVIEW_HOSTNAME:-}" ]; then
+  candidate=$(hostname -f 2>/dev/null || true)
+  case "$candidate" in
+    "$SITE_DOMAIN"|"www.$SITE_DOMAIN")
+      warn "this server's hostname is the site's own domain; no separate preview needed"
+      ;;
+    *.*.*)
+      public_ip=$(curl -fsS --max-time 10 https://api.ipify.org 2>/dev/null || true)
+      if [ -n "$public_ip" ] && getent ahostsv4 "$candidate" 2>/dev/null | grep -q "^$public_ip\b"; then
+        PREVIEW_HOSTNAME="$candidate"
+        if grep -q '^PREVIEW_HOSTNAME=' .env; then
+          sed -i "s|^PREVIEW_HOSTNAME=.*|PREVIEW_HOSTNAME=${PREVIEW_HOSTNAME}|" .env
+        else
+          printf 'PREVIEW_HOSTNAME=%s\n' "$PREVIEW_HOSTNAME" >> .env
+        fi
+        ok "preview address: https://${PREVIEW_HOSTNAME}"
+      else
+        warn "$candidate does not resolve to this server; no preview address"
+      fi
+      ;;
+    *) warn "this server has no public hostname; no preview address" ;;
+  esac
+fi
 
 # ── database, then content, then the site ────────────────────────────────────
 # Order matters. The schema has to exist before the seed can write to it, and
@@ -271,6 +306,25 @@ if [ "$seed_code" -ne 0 ]; then
        re-run this script and it will try again."
 else
   ok "content loaded"
+fi
+
+# A Caddyfile that does not parse means Caddy does not start, which means the
+# site is down — and `up -d` reports success either way. Check it first, in a
+# throwaway container, using the same image and the same variables.
+step "Checking the proxy configuration"
+if docker run --rm \
+     -e SITE_DOMAIN="$SITE_DOMAIN" \
+     -e ADMIN_IP_ALLOWLIST_CADDY="$(grep '^ADMIN_IP_ALLOWLIST_CADDY=' .env | cut -d= -f2-)" \
+     -e PREVIEW_HOSTNAME="${PREVIEW_HOSTNAME:-localhost}" \
+     -v "$APP_DIR/Caddyfile:/etc/caddy/Caddyfile:ro" \
+     caddy:2.10-alpine caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile \
+     >/dev/null 2>&1; then
+  ok "Caddyfile is valid"
+else
+  die "The Caddyfile does not parse. Nothing has been restarted, so the site is
+unchanged. Send this for help, along with the output of:
+  docker run --rm -e SITE_DOMAIN=$SITE_DOMAIN -v $APP_DIR/Caddyfile:/etc/caddy/Caddyfile:ro \\
+    caddy:2.10-alpine caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile"
 fi
 
 step "Building and starting the website (the slow part — several minutes)"
@@ -387,3 +441,16 @@ cat <<EOF
     https://${SITE_DOMAIN}/hgp-studio-gate
 
 EOF
+
+if [ -n "${PREVIEW_HOSTNAME:-}" ]; then
+  cat <<EOF
+  To look at the site right now, before any of that, open this in a browser:
+
+    https://${PREVIEW_HOSTNAME}
+
+  Give Caddy a minute on the first visit — it is fetching a certificate. The
+  pages will say higreenpanda.com in their links, which is correct; this
+  address is a preview and is marked noindex so search engines ignore it.
+
+EOF
+fi

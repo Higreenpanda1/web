@@ -24,6 +24,24 @@ higreenpanda.net, www.higreenpanda.net {
 	redir https://{$SITE_DOMAIN}{uri} permanent
 }
 
+# Optional preview host, for looking at the site before DNS is pointed at this
+# server. Hostinger gives every VPS a real hostname — srv1994320.hstgr.cloud —
+# which already resolves here, so Caddy can get a genuine certificate for it
+# and the site is reachable over HTTPS without touching higreenpanda.com.
+#
+# Set PREVIEW_HOSTNAME in .env to switch it on. The default of `localhost`
+# keeps this block syntactically valid and harmlessly unreachable when unset.
+# Canonical URLs, the sitemap and og:url still say higreenpanda.com here,
+# which is correct: this is a preview, not a second home for the site.
+{$PREVIEW_HOSTNAME:localhost} {
+	encode zstd gzip
+	reverse_proxy app:3000 {
+		header_up X-Real-IP {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+	}
+	header X-Robots-Tag "noindex, nofollow"
+}
+
 {$SITE_DOMAIN} {
 	encode zstd gzip
 

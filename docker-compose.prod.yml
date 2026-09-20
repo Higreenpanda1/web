@@ -94,6 +94,7 @@ services:
     environment:
       SITE_DOMAIN: ${SITE_DOMAIN:-higreenpanda.com}
       ADMIN_IP_ALLOWLIST_CADDY: ${ADMIN_IP_ALLOWLIST_CADDY:-0.0.0.0/0}
+      PREVIEW_HOSTNAME: ${PREVIEW_HOSTNAME:-localhost}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
