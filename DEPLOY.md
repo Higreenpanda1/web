@@ -41,6 +41,35 @@ When creating the VPS in hPanel:
 hPanel has a browser-based terminal for the VPS. **Find it before you need
 it** — it is the way back in if SSH ever breaks.
 
+### The short path: one command, no SSH client
+
+If you would rather not install an SSH client or work through the steps below
+by hand, `ops/deploy.sh` does the whole of §1 and §2 — Docker, the firewall,
+the code, the database, the content, the build, and the two-factor enrolment.
+
+Open **hPanel → VPS → Browser terminal**, which logs you in as `root` already,
+and paste exactly this, then press Enter:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Higreenpanda1/web/claude/practical-newton-m55sbw/ops/deploy.sh | bash
+```
+
+It asks four questions, each with a default you accept by pressing Enter, and
+prints the CMS password it generates. It is safe to run a second time: it
+keeps the existing `.env`, pulls the latest code, re-applies migrations and
+restarts, and it never resets the database.
+
+Two things it deliberately does *not* do. It does not change the DNS — that is
+§3, done by hand after the stack is proven. And it does not disable SSH
+password login unless a usable SSH key is already installed, because doing so
+from a password session would lock you out of the machine. If you skip the key
+step below, the server is otherwise hardened but stays password-reachable over
+SSH; add the key and re-run `ops/bootstrap.sh` when you are ready to close
+that off.
+
+Read the rest of §1 and §2 anyway. They explain what the script is doing and
+are what you will need the day something has to be fixed by hand.
+
 ### Add your SSH key first
 
 Everything below disables SSH password login. Without a key you lock yourself
@@ -104,6 +133,10 @@ server — the container images cannot be built in a sandbox whose egress policy
 blocks Docker Hub's layer CDN, and that build has therefore never been
 exercised. Expect to debug it here, with no traffic arriving, rather than
 after the domain is live.
+
+> `ops/deploy.sh` (§1, "The short path") performs everything in this section.
+> What follows is the same work spelled out — read it to understand what the
+> script did, or follow it if you would rather drive each step yourself.
 
 ```bash
 ssh deploy@187.77.153.108
