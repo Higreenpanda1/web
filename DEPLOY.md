@@ -174,48 +174,108 @@ Now, and not before: with the stack already proven on the box, pointing DNS is
 what triggers Caddy to request a certificate, and a broken app behind it just
 burns Let's Encrypt rate limits.
 
-**Add or change only the records in this table.** Do not touch MX, SPF, DKIM
-or DMARC here — mail is working and §4 covers the only change it needs.
+### Record the rollback values first
+
+Read them from DNS, not from the GoDaddy console — those two have disagreed in
+practice (see the warning in §4a). Do this **before** changing anything:
+
+```bash
+dig +short A higreenpanda.com          # note every address returned
+dig +short CNAME www.higreenpanda.com  # expected: higreenpanda.com.
+dig +short MX higreenpanda.com         # must not change today
+```
+
+As published on 20 September 2026, the zone is:
 
 | Type | Name | Value | TTL |
 |------|------|-------|-----|
-| A | @ | `<server IPv4>` | 1 hour |
-| AAAA | @ | `<server IPv6>` | 1 hour |
-| A | www | `<server IPv4>` | 1 hour |
-| AAAA | www | `<server IPv6>` | 1 hour |
-| CAA | @ | `0 issue "letsencrypt.org"` | 1 hour |
+| A | @ | `15.197.148.33` | 600 |
+| A | @ | `3.33.130.190` | 600 |
+| CNAME | www | `higreenpanda.com` | 600 |
 
-The `CAA` record means no certificate authority other than Let's Encrypt can
-issue a certificate for this domain — cheap insurance against a mis-issued
-certificate.
+**These two A records are the rollback.** If the cutover goes wrong, put them
+back exactly and the site returns to its previous state. Re-read them at
+cutover time anyway, in case they have moved since.
 
-The `.net` mirror can point at the same server; the Caddyfile already redirects
-it to the apex.
+### The cutover
 
-Then wait for propagation and watch Caddy issue the certificate:
+**Replace the two root `A` records with the Hetzner IPv4 address. Change
+nothing else.**
 
-```bash
-dig higreenpanda.com +short
-docker compose -f docker-compose.prod.yml logs -f caddy | grep -i certificate
-curl -sI https://higreenpanda.com/ | head -3
+| Type | Name | Action |
+|------|------|--------|
+| A | @ | Replace `15.197.148.33` → `<Hetzner IPv4>` |
+| A | @ | Delete the second record, or replace it with the same Hetzner IPv4 |
+| CNAME | www | **Leave alone.** It points at the root, so it follows automatically — and a name holding a CNAME may not hold anything else, so adding an `A` for `www` would break it |
+
+TTL is 600, so the cutover takes effect in about ten minutes — and so does the
+rollback. That is short enough to try the cutover during working hours and
+undo it if the site misbehaves.
+
+The Caddyfile already has a `www` site block that redirects to the apex, so
+`www` keeps working through the CNAME without a record of its own.
+
+### There is no CAA record, and that is fine
+
+`higreenpanda.com` publishes **no CAA record**, so no certificate authority is
+restricted and Let's Encrypt issuance is not blocked.
+
+**If Caddy fails to get a certificate, CAA is not the cause.** Do not go
+looking there. Check, in this order: does the A record actually resolve to the
+box (`dig +short A higreenpanda.com`), is port 80 reachable from outside
+(Let's Encrypt validates over HTTP), and what does Caddy say
+(`docker compose -f docker-compose.prod.yml logs caddy | grep -i -A5 error`).
+
+Adding a CAA record afterwards is worthwhile hardening — it stops any other CA
+issuing for the domain — but it is a separate change, made once the
+certificate exists and the site is up, never during the cutover:
+
+```
+CAA  @  0 issue "letsencrypt.org"
 ```
 
-If the certificate request fails, Caddy backs off with increasing delays, so
-fix the cause rather than restarting repeatedly.
+### Verify against DNS, then watch the certificate
+
+```bash
+dig +short A higreenpanda.com        # the Hetzner IPv4, nothing else
+dig +short A www.higreenpanda.com    # same address, via the CNAME
+dig +short MX higreenpanda.com       # unchanged: 1 smtp.google.com
+
+docker compose -f docker-compose.prod.yml logs -f caddy | grep -i certificate
+curl -sI https://higreenpanda.com/ | head -3
+curl -sI https://www.higreenpanda.com/ | head -3   # 301 to the apex
+```
+
+If issuance fails, Caddy backs off with increasing delays. Fix the cause
+rather than restarting repeatedly — restarts do not reset the rate limit.
+
+### Afterwards, optionally
+
+Both of these are separate changes, each made only once the site is confirmed
+working, and each independently reversible:
+
+- **IPv6.** Add `AAAA @ <Hetzner IPv6>`. Worth having; roll back by deleting
+  it. Do not add it during the cutover — it is one more thing to be wrong
+  while you are trying to tell whether the site works.
+- **The `.net` mirror.** If `higreenpanda.net` is under the same control,
+  point it at the same address; the Caddyfile already redirects it to the
+  apex.
 
 ---
 
 ## 4. Email — what it needs, and what it must not have done to it
 
 **Mail is working. Do not modify the MX, SPF policy, DKIM or DMARC policy
-records.** As published, the domain has:
+records.** The one change already made is the DMARC `rua` (§4a); the one still
+outstanding is authorising HubSpot (§4b), which is parked. As published, the
+domain has:
 
 | Record | Value | State |
 |--------|-------|-------|
 | MX | `1 smtp.google.com` | Correct — Google Workspace's current single-record format, which replaced the old five-record `ASPMX.L.GOOGLE.COM` set |
 | SPF | `v=spf1 include:_spf.google.com ~all` | Correct for Google-sent mail |
 | DKIM | `google._domainkey`, 2048-bit | Correct |
-| DMARC | `v=DMARC1; p=quarantine; adkim=r; aspf=r` | Policy correct; `rua` is not — see below |
+| DMARC | `v=DMARC1; p=quarantine; adkim=r; aspf=r; rua=mailto:dmarc@higreenpanda.com;` | Correct — `rua` fixed 20 Sep 2026, see §4a |
 
 The mailbox was created on 19 September, which is why nothing in it predates
 that date. Anything sent before the mailbox existed bounced at the sender and
@@ -223,41 +283,98 @@ no DNS change brings it back.
 
 ---
 
-### 4a. Point the DMARC reports somewhere they are read — do this now
+### 4a. DMARC reports — done, 20 September 2026
 
-Not blocked on anything. The `rua` is currently GoDaddy's default,
-`dmarc_rua@onsecureserver.net`, which nobody at HiGreenPanda can open. With
-`p=quarantine` in force that means mail can be quarantined with no visibility
-into what or why. Change **only** the `rua` tag; leave the policy alone:
+The `rua` was GoDaddy's default, `dmarc_rua@onsecureserver.net`, which nobody
+at HiGreenPanda could open: mail could be quarantined with no visibility into
+what or why. It now reads:
 
 ```
-v=DMARC1; p=quarantine; adkim=r; aspf=r; rua=mailto:contact@higreenpanda.com
+v=DMARC1; p=quarantine; adkim=r; aspf=r; rua=mailto:dmarc@higreenpanda.com;
 ```
 
-The reports are daily XML aggregates and are unreadable by hand — feed the
-address to a DMARC report reader, or expect to ignore them. An address nobody
+Policy untouched — only the `rua` tag changed.
+
+The reports are daily XML aggregates and are unreadable by hand. Feed the
+address to a DMARC report reader, or expect to ignore them; an address nobody
 reads is still better than one nobody can.
+
+> **At the time of writing, GoDaddy's nameservers were still serving the old
+> `rua`.** The console showed the new value. Give it time and re-check against
+> DNS, not the panel.
 
 ---
 
-### 4b. Authorise HubSpot — blocked until someone completes the portal setup
+> ### ⚠️ Two GoDaddy traps — read this before §4b touches the same zone
+>
+> Both were hit during the §4a change. §4b adds more records at the same
+> registrar, including one that must be unique, so they will be hit again.
+>
+> **1. Edit the existing row. Never use "Add new record" for a record that
+> must be unique.**
+>
+> Adding produced a *second* `_dmarc` TXT record alongside the first. Two
+> DMARC records is not "the newer one wins" — receivers treat a domain with
+> multiple DMARC records as having **no DMARC policy at all**. The change
+> left the domain worse off than before it was made, and the console gave no
+> indication.
+>
+> The same applies to **SPF in §4b step 3**: a domain may publish only one
+> `v=spf1` record. Adding a second invalidates both, and every HubSpot send
+> fails SPF. That step is an *edit* of the existing SPF row — keep
+> `include:_spf.google.com`, keep `~all`, insert the HubSpot include between
+> them.
+>
+> Records that must be unique here: **SPF** (one `v=spf1` TXT at the root),
+> **DMARC** (one TXT at `_dmarc`), **CNAME** (a name holding a CNAME may hold
+> nothing else). The HubSpot DKIM records in step 2 are *different names*, so
+> those are genuine additions.
+>
+> **2. The GoDaddy console is a statement of intent, not of state.**
+>
+> The console and the published zone disagreed three separate times during
+> this one change. A value showing in the panel does not mean the nameservers
+> are serving it. After every DNS change in this runbook, verify against DNS:
+>
+> ```bash
+> dig +short TXT _dmarc.higreenpanda.com     # exactly ONE string back
+> dig +short TXT higreenpanda.com | grep spf1 # exactly ONE v=spf1 string
+> dig +short A higreenpanda.com
+> ```
+>
+> More than one line back from either of the first two is the failure above.
+> Delete the extra row and re-check — do not assume the panel fixed it.
 
-HubSpot was connected to `contact@higreenpanda.com` on 19 September, but **the
-portal has not finished onboarding and the email sending domain is not
-connected.** That matters for sequencing: HubSpot only generates the DKIM
-records once the Email Sending Domain setup is started, so **there is nothing
-to publish yet.** Anyone who goes looking for those records in DNS today, or
-in HubSpot's docs, will not find them — they do not exist until step 1 below.
+---
+
+### 4b. Authorise HubSpot — PARKED, blocked on a portal step
+
+**Status as of 20 September 2026: not started, and not startable from here.**
+
+HubSpot was connected to `contact@higreenpanda.com` on 19 September, but the
+portal **has not completed onboarding** and the **email sending domain is not
+connected**.
+
+> ## Step 1 is a hard prerequisite. Steps 2–5 have no inputs until it is done.
+>
+> **HubSpot generates the DKIM records only once the Email Sending Domain
+> setup is started in the portal. Those records do not exist yet.** Anyone
+> who goes looking for them — in DNS, in HubSpot's documentation, or in this
+> runbook — will not find them, because they have not been created.
+>
+> Step 1 **cannot be done** from this repository, from the DNS panel, or from
+> the server. It needs a person signed in to the HubSpot portal with the
+> **`sale@higreenpanda.com`** login.
+>
+> Until that person has finished step 1, the correct state of steps 2–5 is
+> *not started*. Do not begin at step 3 because the SPF include looks like the
+> one you can do without waiting — on its own it does not work (see 4c), and
+> a lone SPF edit is the change most likely to be mistaken for "HubSpot is
+> authorised now".
 
 With `p=quarantine` in force and HubSpot unauthorised, any marketing mail sent
-as `contact@higreenpanda.com` will be quarantined by receivers. So all five
-steps have to be finished before the first campaign, in this order.
-
-> **Step 1 is a prerequisite for steps 2–5 and cannot be done from this
-> repository, the DNS panel, or the server.** It needs someone signed in to
-> the HubSpot portal with the `sale@higreenpanda.com` login. Until they have
-> done it, steps 2–5 have no inputs. Do not start at step 3 because the SPF
-> include looks like the easy one — on its own it does not work (see 4c).
+as `contact@higreenpanda.com` will be quarantined by receivers. All five steps
+have to be finished before the first campaign, in this order.
 
 **1. Connect the email sending domain in HubSpot.** *(portal — blocked on the
 `sale@higreenpanda.com` login)*
@@ -281,16 +398,25 @@ This is the step that actually stops the quarantine — see 4c.
 
 **3. Add HubSpot to SPF.** *(DNS, after step 1)*
 
-One record, edited not replaced. Keep Google first and keep `~all` exactly as
-it is:
+> **EDIT the existing SPF row. Do not use "Add new record".** See the GoDaddy
+> traps above §4b. A domain may publish only one `v=spf1` record; a second one
+> invalidates both, and every HubSpot send fails SPF. This is the same mistake
+> that produced a duplicate `_dmarc` record during §4a.
+
+Keep `include:_spf.google.com` first and keep `~all` exactly as it is; insert
+the HubSpot include between them:
 
 ```
 v=spf1 include:_spf.google.com include:<portal-id>.spf<nn>.hubspotemail.net ~all
 ```
 
-`<portal-id>` and `<nn>` come from step 1. A domain may publish only one SPF
-record, so this must be an edit to the existing one — a second `v=spf1` record
-invalidates both.
+`<portal-id>` and `<nn>` come from step 1.
+
+Verify against DNS, not the console — exactly one line must come back:
+
+```bash
+dig +short TXT higreenpanda.com | grep spf1
+```
 
 **4. Optionally, set a custom return-path.** *(HubSpot + DNS, after step 1)*
 
@@ -498,8 +624,15 @@ docker compose -f docker-compose.prod.yml exec backup \
 | Dependency alerts | GitHub → Security → Dependabot | As they arrive |
 | Disk space | `df -h` and `docker system df` | Monthly |
 | New enquiries | `/hgp-studio` → Enquiries | Daily |
+| Mail records unchanged | `dig +short MX higreenpanda.com` and one `v=spf1` / one `_dmarc` TXT | After any DNS change |
 
 Set `SENTRY_DSN` in `.env` to get errors reported rather than discovered.
+
+The mail row is there because a DNS panel and a published zone can disagree —
+they did, three times, during one change in §4a. Whenever anything in this
+zone is touched, re-check that MX is unchanged and that SPF and DMARC each
+return exactly one record. Two of either is the failure described in §4a, and
+nothing in the console will say so.
 
 An uptime monitor should check `/api/health`, not `/` — that endpoint makes a
 real database query, so a container that is up but cannot reach Postgres is
