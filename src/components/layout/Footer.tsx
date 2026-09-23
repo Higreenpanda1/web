@@ -4,6 +4,7 @@ import { getTranslations } from 'next-intl/server'
 import { TikTokIcon } from '@/components/icons/TikTokIcon'
 import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon'
 import { Link } from '@/i18n/navigation'
+import { SERVICE_CATEGORIES } from '@/lib/catalogue'
 import { whatsappLink } from '@/lib/url'
 import { Wordmark } from './Logo'
 
@@ -23,11 +24,24 @@ export async function Footer({ locale, settings }: { locale: Locale; settings: S
       ? settings.footerColumns
       : [
           {
+            // One link per area of the business, straight from the catalogue,
+            // so the footer grows with the services page and never lists a
+            // group that has nothing in it.
+            id: 'areas',
+            title: t('footer.areasTitle'),
+            links: SERVICE_CATEGORIES.map((category) => ({
+              id: `area-${category}`,
+              label: t(`services.categories.${category}.title`),
+              href: `/services#${category}`,
+            })),
+          },
+          {
             id: 'services',
             title: t('footer.servicesTitle'),
             links: [
               { id: 's1', label: t('cta.allServices'), href: '/services' },
-              { id: 's2', label: t('cta.enquire'), href: '/contact' },
+              { id: 's2', label: t('apply.types.consultation.cta'), href: '/apply/consultation' },
+              { id: 's3', label: t('cta.enquire'), href: '/contact' },
             ],
           },
           {

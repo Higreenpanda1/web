@@ -1,20 +1,72 @@
 # Handover — HiGreenPanda website
 
 Written 20 September 2026, at the end of the session that deployed the site,
-and updated the same day after the front-end redesign. Everything below is
-verified state, not intention. Where something is unfinished it says so.
+updated the same day after the front-end redesign, and again on 23 September
+2026 after go-live and the service catalogue. Everything below is verified
+state, not intention. Where something is unfinished it says so.
 
 ---
 
 ## Where things stand
 
-The site is **built, running and reachable** on its own server. The domain has
-**not** been moved yet, so `higreenpanda.com` still points at the old host and
-nothing customer-facing has changed.
+The site is **live on https://higreenpanda.com** since 21 September 2026. DNS
+was cut over at GoDaddy (root `A` → `187.77.153.108`; the rollback values are
+`15.197.148.33` and `3.33.130.190`, `www` is a CNAME). The preview hostname
+was switched off on 23 September, so `srv1994320.hstgr.cloud` no longer
+answers — which also closes the gap where the admin IP allowlist applied only
+on the real domain.
 
-- **Live preview:** https://srv1994320.hstgr.cloud
-- **CMS:** https://srv1994320.hstgr.cloud/hgp-studio-gate
+- **Site:** https://higreenpanda.com (Arabic) · https://higreenpanda.com/en
+- **CMS:** https://higreenpanda.com/hgp-studio-gate
 - **Repository:** `Higreenpanda1/web`, branch `claude/practical-newton-m55sbw`
+
+## The service catalogue (23 September 2026, third session)
+
+The owner supplied the old WordPress site's backup (`u530724501…tar.gz` and
+the `.sql.gz` dump) and the 2025 price list. Eleven services that existed on
+the old site but not the new one were added, and the request forms the old
+site ran through seventeen form plugins were rebuilt as one system.
+
+- **Twenty services in six categories.** `category` on the Services
+  collection groups the index page (`/services#visas` etc.), the footer and
+  the homepage tiles. The eleven new ones live in `src/seed/catalogue.ts`;
+  the nine originals stay in `src/seed/content.ts`. Categories, icons,
+  application types and price units are defined once in
+  `src/lib/catalogue.ts` and everything else derives from it.
+- **"From" prices.** `priceFrom` (whole yuan) and `priceUnit` on each
+  service, from the price list. Shown on cards, the page hero, the sidebar and
+  in the JSON-LD `offers`. Editors change them in the CMS; the quote confirms
+  the final figure. The owner chose to show starting prices, not a full table.
+- **Application forms** at `/apply/<type>` for nine request types —
+  consultation, company registration, M-visa invitation, visa, product
+  search, shipping quote, account opening, store setup, trademark. One
+  client component (`src/components/forms/ApplicationForm.tsx`) renders
+  whatever `src/forms/definitions.ts` describes: stepped once JavaScript
+  runs, all-at-once before it. Validation is derived from the same
+  definitions (`src/forms/schema.ts`), so the page and the server can never
+  disagree. Submissions go to the new **Applications** collection (Leads
+  group in the CMS) with the answers as JSON, and are emailed like enquiries.
+  References are `HGA-…`; enquiries stay `HGP-…`.
+- **No file uploads, by the owner's decision.** Passports and licences are
+  requested by email or WhatsApp after review. Do not add an upload field
+  without revisiting that decision — it puts identity documents on this
+  server.
+- A service with an `applicationType` leads with "Start your application";
+  one without keeps the general enquiry form, now pre-selected to the
+  service. `/contact?service=<slug>` pre-selects too.
+- `src/forms/definitions.test.ts` fails the build if any label, hint or
+  option a form uses is missing from either language, and if the two message
+  catalogues ever differ in keys. That test is the reason the Arabic can be
+  trusted.
+- Also this session: the dark-mode readability bug (seventeen places used
+  fixed light-mode greens on dark surfaces) was fixed, and `ops/preview.sh`
+  now restarts only Caddy (`--no-deps`), because app loads the whole `.env`
+  and used to be recreated too.
+
+Deploying this needs the migration and the seed:
+`20260923_073515_add_catalogue_and_applications` adds the columns, the enum
+values and the `applications` table; the seed writes the eleven services and
+the new fields on the nine. `ops/deploy.sh` does both.
 
 ## The redesign (20 September 2026, second session)
 
@@ -55,11 +107,6 @@ The founder's portrait is seeded from `src/seed/assets/founder-sami.jpg`
 CMS). The four social networks connected in Metricool — Instagram, YouTube,
 TikTok, Facebook — are seeded into Site settings and shown in the footer.
 
-Still open from this session:
-
-1. Cover images for the three seeded posts (a placeholder shows until Media
-   is uploaded and attached in the CMS).
-
 ## The person you are working with
 
 They do not use a terminal and should not be asked to. They reach the server
@@ -75,15 +122,15 @@ browser.
 
 ## The server
 
-| | |
-|---|---|
-| Host | Hostinger KVM 2 — 2 vCPU, 8 GB RAM, 100 GB NVMe |
-| Address | `187.77.153.108` |
-| Hostname | `srv1994320.hstgr.cloud` (real A and AAAA records, points here) |
-| OS | Ubuntu 26.04.1 LTS |
-| App directory | `/home/deploy/higreenpanda` |
-| Compose file | `docker-compose.prod.yml` |
-| Containers | `db`, `app`, `caddy` (plus `backup`, and `tools` under a profile) |
+|               |                                                                   |
+| ------------- | ----------------------------------------------------------------- |
+| Host          | Hostinger KVM 2 — 2 vCPU, 8 GB RAM, 100 GB NVMe                   |
+| Address       | `187.77.153.108`                                                  |
+| Hostname      | `srv1994320.hstgr.cloud` (real A and AAAA records, points here)   |
+| OS            | Ubuntu 26.04.1 LTS                                                |
+| App directory | `/home/deploy/higreenpanda`                                       |
+| Compose file  | `docker-compose.prod.yml`                                         |
+| Containers    | `db`, `app`, `caddy` (plus `backup`, and `tools` under a profile) |
 
 SSH password login is **still enabled** — no SSH key was installed, and
 `ops/bootstrap.sh` deliberately skips that hardening rather than locking
@@ -115,17 +162,17 @@ Secrets live in `/home/deploy/higreenpanda/.env`, mode 600. It is not in git.
 
 All three are idempotent and safe to re-run.
 
-| Script | What it does |
-|---|---|
+| Script             | What it does                                                                                                                 |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
 | `ops/bootstrap.sh` | Server hardening: Docker, ufw, unattended-upgrades, fail2ban, the `deploy` user. Skips SSH hardening when no key is present. |
-| `ops/deploy.sh` | The whole deployment: clone, `.env`, database, migrate, seed, build, health check, two-factor enrolment. |
-| `ops/preview.sh` | Turns the preview hostname on or off. Restarts only Caddy — no rebuild. `bash -s -- off` reverses it. |
+| `ops/deploy.sh`    | The whole deployment: clone, `.env`, database, migrate, seed, build, health check, two-factor enrolment.                     |
+| `ops/preview.sh`   | Turns the preview hostname on or off. Restarts only Caddy — no rebuild. `bash -s -- off` reverses it.                        |
 
 ### Run them with a commit-pinned URL
 
 `raw.githubusercontent.com` caches for several minutes, and a `?v=` query does
 not reliably beat it. During this session a fix was pushed and the next run
-executed the *previous* version twice, which is indistinguishable from the fix
+executed the _previous_ version twice, which is indistinguishable from the fix
 not working. Use the commit SHA in the path instead:
 
 ```
@@ -167,22 +214,23 @@ Two GoDaddy traps, learned the hard way:
 
 ## Still to do
 
-1. **hPanel snapshot** of the VPS. One-click undo for everything so far.
-   Should happen before the DNS change.
-2. **DNS cutover** — `DEPLOY.md` §3. The only step that touches anything live.
-   Rollback values, recorded before any change: root `A` → `15.197.148.33` and
-   `3.33.130.190`; `www` is a `CNAME`, not an A record; TTL 600; there is no
-   CAA record and that is fine.
-3. **Turn the preview off** once the real domain is live:
-   `ops/preview.sh` with `bash -s -- off`.
-4. **Resend API key** — until it is set, enquiries are stored but not emailed.
-5. **Off-server backups** — `S3_*` in `.env` are empty, so the nightly job
+1. **Cover images for the three blog posts.** Media has to be uploaded and
+   attached in the CMS; a placeholder shows until then.
+2. **Resend API key** — until it is set, enquiries and applications are
+   stored but not emailed. The owner creates the account and the key;
+   set it in `.env` with a command that reads it silently
+   (`read -rs`), never by pasting it into a chat.
+3. **Off-server backups** — `S3_*` in `.env` are empty, so the nightly job
    writes to `./.backups` on the same machine. That is not a backup. See
-   `DEPLOY.md` §7, including the restore drill.
-6. **HubSpot** — `DEPLOY.md` §4b, parked. The portal has not completed
+   `DEPLOY.md` §7, including the restore drill. Cloudflare R2 or Backblaze B2.
+4. **Optional CAA record** at GoDaddy: `0 issue "letsencrypt.org"` and
+   `0 issue "sectigo.com"` (Caddy falls back to ZeroSSL, which issues through
+   Sectigo). New records; they do not touch email DNS.
+5. **HubSpot** — `DEPLOY.md` §4b, parked. The portal has not completed
    onboarding, so the DKIM CNAMEs do not exist yet. That portal step is a hard
    prerequisite; do not add DNS records for it before then.
-7. **SSH key**, then re-run `ops/bootstrap.sh` to disable password login.
+6. **SSH key**, then re-run `ops/bootstrap.sh` to disable password login.
+7. **Photographs** for the new service pages — every `image` field is empty.
 
 ## Verified, so you do not have to re-check
 

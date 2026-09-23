@@ -58,6 +58,11 @@ const ROUTES = [
   ['/services', 200],
   ['/services/full-import-management', 200],
   ['/en/services/product-sourcing', 200],
+  ['/services/business-invitation-letter', 200],
+  ['/en/services/trademark-registration', 200],
+  ['/apply/company-registration', 200],
+  ['/en/apply/visa-invitation?service=business-invitation-letter', 200],
+  ['/apply/not-a-form', 404],
   ['/blog', 200],
   ['/en/blog', 200],
   ['/blog/how-to-inspect-a-factory-before-you-pay', 200],
@@ -120,7 +125,8 @@ if (Math.abs(arType.lineHeight / arType.fontSize - 1.9) > 0.02) {
 
 // Brief section 12: the contrast rule, asserted rather than trusted.
 note(`--brand-600=${arType.brand600} --text-brand=${arType.textBrand}`)
-if (arType.brand600 !== '#378d42') fail(`--brand-600 must be the logo green, got ${arType.brand600}`)
+if (arType.brand600 !== '#378d42')
+  fail(`--brand-600 must be the logo green, got ${arType.brand600}`)
 if (arType.textBrand !== '#276b34') {
   fail(`--text-brand must be --brand-700 (6.48:1), got ${arType.textBrand}`)
 }

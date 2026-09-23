@@ -2,6 +2,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 
 import { ServiceIcon } from '@/components/ServiceIcon'
+import { PriceTag } from '@/components/services/PriceTag'
 import { Card } from '@/components/ui/Card'
 import { Link } from '@/i18n/navigation'
 import { cn } from '@/lib/cn'
@@ -69,20 +70,25 @@ export async function ServiceCard({
         {service.summary}
       </p>
 
-      <span
-        className={cn(
-          'mt-6 inline-flex items-center gap-1.5 font-semibold',
-          featured ? 'text-white' : 'text-text-brand',
-        )}
-      >
-        {t('cta.learnMore')}
-        <Arrow
-          size={18}
-          strokeWidth={2}
-          aria-hidden="true"
-          className="transition-transform duration-300 group-hover:translate-x-1 rtl:group-hover:-translate-x-1"
-        />
-      </span>
+      <div className="mt-6 flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
+        <span
+          className={cn(
+            'inline-flex items-center gap-1.5 font-semibold',
+            featured ? 'text-white' : 'text-text-brand',
+          )}
+        >
+          {t('cta.learnMore')}
+          <Arrow
+            size={18}
+            strokeWidth={2}
+            aria-hidden="true"
+            className="transition-transform duration-300 group-hover:translate-x-1 rtl:group-hover:-translate-x-1"
+          />
+        </span>
+        {/* Starting price, when there is one. Sized to sit quietly beside the
+            link: a card is a menu, not a price list. */}
+        <PriceTag service={service} locale={locale} size="sm" inverse={featured} />
+      </div>
     </Card>
   )
 }

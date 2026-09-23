@@ -98,6 +98,21 @@ export function serviceJsonLd(service: Service, locale: Locale, settings: SiteSe
       { '@type': 'Country', name: 'United Arab Emirates' },
     ],
     ...(service.image ? { image: mediaUrl(service.image, 'feature') ?? undefined } : {}),
+    ...(typeof service.priceFrom === 'number' && service.priceFrom > 0
+      ? {
+          offers: {
+            '@type': 'Offer',
+            priceCurrency: 'CNY',
+            price: service.priceFrom,
+            priceSpecification: {
+              '@type': 'PriceSpecification',
+              priceCurrency: 'CNY',
+              minPrice: service.priceFrom,
+            },
+            availability: 'https://schema.org/InStock',
+          },
+        }
+      : {}),
   }
 }
 

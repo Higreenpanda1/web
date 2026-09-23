@@ -1,6 +1,8 @@
 import { getAllSlugs } from '@/lib/queries'
 import { absoluteUrl } from '@/lib/url'
 
+import { APPLICATION_TYPES } from '@/lib/catalogue'
+
 import type { MetadataRoute } from 'next'
 
 /**
@@ -40,6 +42,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: '/about', priority: 0.7, changeFrequency: 'monthly' },
     { path: '/blog', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/contact', priority: 0.8, changeFrequency: 'yearly' },
+    ...APPLICATION_TYPES.map((type) => ({
+      path: `/apply/${type}`,
+      priority: 0.6,
+      changeFrequency: 'yearly' as const,
+    })),
     { path: '/privacy', priority: 0.2, changeFrequency: 'yearly' },
     { path: '/terms', priority: 0.2, changeFrequency: 'yearly' },
   ]

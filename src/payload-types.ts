@@ -76,6 +76,7 @@ export interface Config {
     'team-members': TeamMember;
     media: Media;
     enquiries: Enquiry;
+    applications: Application;
     redirects: Redirect;
     users: User;
     customers: Customer;
@@ -94,6 +95,7 @@ export interface Config {
     'team-members': TeamMembersSelect<false> | TeamMembersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     enquiries: EnquiriesSelect<false> | EnquiriesSelect<true>;
+    applications: ApplicationsSelect<false> | ApplicationsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     customers: CustomersSelect<false> | CustomersSelect<true>;
@@ -458,6 +460,10 @@ export interface Service {
    */
   summary: string;
   /**
+   * Which group this service is listed under on the services page and in the footer.
+   */
+  category: 'import' | 'company' | 'banking' | 'ecommerce' | 'visas' | 'consulting';
+  /**
    * Single-weight line icon, from the Lucide set (brief section 15).
    */
   icon:
@@ -470,7 +476,42 @@ export interface Service {
     | 'shopping-cart'
     | 'lightbulb'
     | 'tent'
-    | 'package';
+    | 'package'
+    | 'plane'
+    | 'file-check'
+    | 'id-card'
+    | 'users'
+    | 'landmark'
+    | 'wallet'
+    | 'store'
+    | 'calculator'
+    | 'map-pin'
+    | 'badge-check'
+    | 'file-pen';
+  /**
+   * Starting price in Chinese yuan, whole numbers. Shown as “from ¥8,200”. Leave empty to show no price.
+   */
+  priceFrom?: number | null;
+  /**
+   * What the starting price is per.
+   */
+  priceUnit?: ('once' | 'year' | 'month' | 'class') | null;
+  /**
+   * A structured request form for this service. When set, the page leads with “Start your application” instead of the general enquiry form.
+   */
+  applicationType?:
+    | (
+        | 'consultation'
+        | 'company-registration'
+        | 'visa-invitation'
+        | 'visa'
+        | 'product-search'
+        | 'shipping-quote'
+        | 'account-opening'
+        | 'store-setup'
+        | 'trademark'
+      )
+    | null;
   /**
    * The flagship offering. Shown larger on the services index and the homepage.
    */
@@ -502,6 +543,15 @@ export interface Service {
    * Concrete, checkable points. Say what happens, in what order.
    */
   highlights?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Documents and information the client must have ready — a passport copy, three company names, a business licence. Shown as a checklist on the page and repeated on the application form.
+   */
+  requirements?:
     | {
         text: string;
         id?: string | null;
@@ -819,6 +869,79 @@ export interface Customer {
   collection: 'customers';
 }
 /**
+ * Structured requests from the application forms — company registration, visas, accounts, store setup, quotes. Nothing here is public.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "applications".
+ */
+export interface Application {
+  id: number;
+  reference: string;
+  type:
+    | 'consultation'
+    | 'company-registration'
+    | 'visa-invitation'
+    | 'visa'
+    | 'product-search'
+    | 'shipping-quote'
+    | 'account-opening'
+    | 'store-setup'
+    | 'trademark';
+  status: 'new' | 'contacted' | 'documents' | 'in-progress' | 'completed' | 'lost' | 'spam';
+  assignedTo?: (number | null) | User;
+  /**
+   * The service page the visitor started from, when there was one.
+   */
+  service?: (number | null) | Service;
+  name: string;
+  country: string;
+  /**
+   * E.164, e.g. +966501234567.
+   */
+  whatsapp: string;
+  email?: string | null;
+  /**
+   * One line summarising the request, built from the answers.
+   */
+  headline?: string | null;
+  /**
+   * The answers, exactly as validated. Field names match the form.
+   */
+  details:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Never leaves the CMS.
+   */
+  internalNotes?: string | null;
+  /**
+   * Captured automatically. Useful when judging whether a request is genuine.
+   */
+  meta?: {
+    locale?: ('ar' | 'en') | null;
+    sourcePath?: string | null;
+    referrer?: string | null;
+    userAgent?: string | null;
+    /**
+     * Network prefix only; the full address is never stored.
+     */
+    ipPrefix?: string | null;
+    submittedAt?: string | null;
+  };
+  /**
+   * When the notification email was accepted by the provider. Empty means it failed — the request is still safe here.
+   */
+  notifiedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Old URLs that should send visitors somewhere new, and injected spam URLs that should be told they are gone for good.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -898,6 +1021,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'enquiries';
         value: number | Enquiry;
+      } | null)
+    | ({
+        relationTo: 'applications';
+        value: number | Application;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1143,12 +1270,22 @@ export interface ServicesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   summary?: T;
+  category?: T;
   icon?: T;
+  priceFrom?: T;
+  priceUnit?: T;
+  applicationType?: T;
   featured?: T;
   order?: T;
   image?: T;
   body?: T;
   highlights?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  requirements?:
     | T
     | {
         text?: T;
@@ -1347,6 +1484,37 @@ export interface EnquiriesSelect<T extends boolean = true> {
   service?: T;
   serviceOther?: T;
   message?: T;
+  internalNotes?: T;
+  meta?:
+    | T
+    | {
+        locale?: T;
+        sourcePath?: T;
+        referrer?: T;
+        userAgent?: T;
+        ipPrefix?: T;
+        submittedAt?: T;
+      };
+  notifiedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "applications_select".
+ */
+export interface ApplicationsSelect<T extends boolean = true> {
+  reference?: T;
+  type?: T;
+  status?: T;
+  assignedTo?: T;
+  service?: T;
+  name?: T;
+  country?: T;
+  whatsapp?: T;
+  email?: T;
+  headline?: T;
+  details?: T;
   internalNotes?: T;
   meta?:
     | T

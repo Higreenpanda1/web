@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, CheckCircle2 } from 'lucide-react'
+import { ArrowLeft, ArrowRight, CheckCircle2, ClipboardList } from 'lucide-react'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
@@ -8,6 +8,7 @@ import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon'
 import { JsonLd } from '@/components/JsonLd'
 import { RichText } from '@/components/RichText'
 import { ServiceIcon } from '@/components/ServiceIcon'
+import { PriceTag } from '@/components/services/PriceTag'
 import { Accordion } from '@/components/ui/Accordion'
 import { Breadcrumb } from '@/components/ui/Breadcrumb'
 import { ButtonLink } from '@/components/ui/Button'
@@ -15,6 +16,7 @@ import { Container } from '@/components/ui/Container'
 import { PageHero } from '@/components/ui/PageHero'
 import { Link } from '@/i18n/navigation'
 import { breadcrumbJsonLd, faqJsonLd, serviceJsonLd } from '@/lib/jsonld'
+import { hasPrice } from '@/lib/price'
 import { getServiceBySlug, getServices, getSiteSettings } from '@/lib/queries'
 import { buildMetadata, mediaSrc } from '@/lib/seo'
 import { whatsappLink } from '@/lib/url'
@@ -41,6 +43,13 @@ export async function generateMetadata({
   })
 }
 
+/**
+ * A service page. The body sells; the sidebar converts. When the service has
+ * a structured application form the sidebar leads with it — a price, a
+ * "have these ready" list, and one button — and the general enquiry form
+ * drops below as the quieter option. Without one, the enquiry form stays in
+ * the sidebar, pre-selected to this service.
+ */
 export default async function ServicePage({
   params,
 }: {
@@ -55,7 +64,7 @@ export default async function ServicePage({
   const [t, settings, all] = await Promise.all([
     getTranslations({ locale }),
     getSiteSettings(locale),
-    getServices(locale, { limit: 30 }),
+    getServices(locale, { limit: 60 }),
   ])
 
   const image = typeof service.image === 'object' ? (service.image as Media) : null
@@ -64,7 +73,14 @@ export default async function ServicePage({
     question: item.question,
     answer: item.answer,
   }))
-  const others = all.filter((entry) => entry.id !== service.id).slice(0, 6)
+  const requirements = service.requirements ?? []
+  const applicationType = service.applicationType ?? null
+  const applyHref = applicationType ? `/apply/${applicationType}?service=${service.slug}` : null
+  // Siblings from the same area first; the rest of the catalogue after.
+  const others = [
+    ...all.filter((entry) => entry.id !== service.id && entry.category === service.category),
+    ...all.filter((entry) => entry.id !== service.id && entry.category !== service.category),
+  ].slice(0, 6)
   const Arrow = locale === 'ar' ? ArrowLeft : ArrowRight
   const whatsapp = whatsappLink(
     settings.whatsappNumber,
@@ -84,7 +100,7 @@ export default async function ServicePage({
       {faqs.length > 0 ? <JsonLd data={faqJsonLd(faqs)} /> : null}
 
       <PageHero
-        eyebrow={t('services.detailEyebrow')}
+        eyebrow={t(`services.categories.${service.category ?? 'import'}.title`)}
         title={service.title}
         lead={service.summary}
         icon={<ServiceIcon name={service.icon} size={30} />}
@@ -99,14 +115,17 @@ export default async function ServicePage({
           />
         }
       >
-        <div className="flex flex-wrap gap-3">
-          <ButtonLink href="#service-enquiry" size="lg">
-            {t('cta.enquire')}
-          </ButtonLink>
-          <ButtonLink href={whatsapp} size="lg" variant="secondary">
-            <WhatsAppIcon size={20} className="text-text-brand" />
-            {t('cta.whatsapp')}
-          </ButtonLink>
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
+          <div className="flex flex-wrap gap-3">
+            <ButtonLink href={applyHref ?? '#service-enquiry'} size="lg">
+              {applicationType ? t(`apply.types.${applicationType}.cta`) : t('cta.enquire')}
+            </ButtonLink>
+            <ButtonLink href={whatsapp} size="lg" variant="secondary">
+              <WhatsAppIcon size={20} className="text-text-brand" />
+              {t('cta.whatsapp')}
+            </ButtonLink>
+          </div>
+          <PriceTag service={service} locale={locale} />
         </div>
       </PageHero>
 
@@ -149,6 +168,32 @@ export default async function ServicePage({
               </div>
             ) : null}
 
+            {requirements.length > 0 ? (
+              <div className="mt-12 rounded-xl border border-border-soft bg-surface-sunken p-6 md:p-8">
+                <div className="flex items-start gap-4">
+                  <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg bg-surface-tint text-text-brand">
+                    <ClipboardList size={22} strokeWidth={1.5} aria-hidden="true" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <h2 className="text-h3">{t('services.requirementsTitle')}</h2>
+                    <ol className="mt-4 list-none space-y-2.5 p-0">
+                      {requirements.map((item, index) => (
+                        <li key={item.id ?? index} className="flex items-start gap-3">
+                          <span className="ltr-nums mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-surface-tint text-eyebrow font-bold text-text-brand">
+                            {index + 1}
+                          </span>
+                          <span>{item.text}</span>
+                        </li>
+                      ))}
+                    </ol>
+                    <p className="mt-4 text-caption text-text-muted">
+                      {t('services.documentsNote')}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+
             {faqs.length > 0 ? (
               <div className="mt-12">
                 <h2 className="text-h3">{t('services.faqTitle')}</h2>
@@ -158,6 +203,32 @@ export default async function ServicePage({
           </div>
 
           <aside className="space-y-6 lg:sticky lg:top-[calc(var(--header-height)+1.5rem)] lg:self-start">
+            {applyHref ? (
+              <div className="relative isolate overflow-hidden rounded-xl bg-gradient-brand p-6 text-white shadow-float">
+                <div
+                  className="absolute inset-0 -z-10 bg-dots-inverse opacity-30"
+                  aria-hidden="true"
+                />
+                {hasPrice(service) ? (
+                  <PriceTag service={service} locale={locale} size="lg" inverse />
+                ) : (
+                  <p className="text-h3 text-white">{t('services.noPrice')}</p>
+                )}
+                <p className="mt-2 text-caption text-brand-100">
+                  {hasPrice(service) ? t('services.priceNote') : t('services.applicationLead')}
+                </p>
+                <ButtonLink href={applyHref} variant="inverse" size="lg" className="mt-5 w-full">
+                  {t('services.startApplication')}
+                  <Arrow size={18} strokeWidth={2} aria-hidden="true" />
+                </ButtonLink>
+                {hasPrice(service) ? (
+                  <p className="mt-3 text-center text-caption text-brand-100">
+                    {t('services.applicationLead')}
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
+
             <div
               id="service-enquiry"
               aria-labelledby="service-enquiry-heading"
@@ -168,7 +239,7 @@ export default async function ServicePage({
               </h2>
               <p className="mt-2 text-caption text-text-muted">{t('contact.formLead')}</p>
               <div className="mt-5">
-                <EnquiryFormSection locale={locale} compact />
+                <EnquiryFormSection locale={locale} compact defaultService={service.id} />
               </div>
             </div>
 

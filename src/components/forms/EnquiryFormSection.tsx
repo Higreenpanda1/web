@@ -22,17 +22,24 @@ import type { Locale } from '@/i18n/routing'
 export async function EnquiryFormSection({
   locale,
   compact = false,
+  defaultService,
 }: {
   locale: Locale
   compact?: boolean
+  /** Pre-select this service — the page the form sits on, or `?service=slug`. */
+  defaultService?: string | number | null
 }) {
   await connection()
-  const services = await getServices(locale, { limit: 20 })
+  const services = await getServices(locale, { limit: 60 })
+  const preselected = services.find(
+    (service) => service.id === defaultService || service.slug === defaultService,
+  )
 
   return (
     <EnquiryForm
       locale={locale}
       compact={compact}
+      defaultService={preselected?.id}
       formToken={issueFormToken()}
       services={services.map((service) => ({ id: service.id, title: service.title }))}
     />

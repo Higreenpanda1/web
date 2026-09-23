@@ -59,7 +59,7 @@ prints the CMS password it generates. It is safe to run a second time: it
 keeps the existing `.env`, pulls the latest code, re-applies migrations and
 restarts, and it never resets the database.
 
-Two things it deliberately does *not* do. It does not change the DNS — that is
+Two things it deliberately does _not_ do. It does not change the DNS — that is
 §3, done by hand after the stack is proven. And it does not disable SSH
 password login unless a usable SSH key is already installed, because doing so
 from a password session would lock you out of the machine. If you skip the key
@@ -121,7 +121,7 @@ survives a mistake in `ufw` — and `ufw` survives a mistake in it.
 > DNS cutover in §3.** It is a one-click whole-machine rollback for the riskiest
 > hour of this deployment, and the plan includes it.
 >
-> It is *not* the backup plan. Snapshots live with the provider and with the
+> It is _not_ the backup plan. Snapshots live with the provider and with the
 > server; §7 is the backup that does not. Both, not either.
 
 ---
@@ -192,7 +192,7 @@ to invalidate. Seed against a already-running site and it serves pre-seed
 content for up to an hour — the seed prints a restart command when it
 finishes, for exactly that case.
 
-`seed` creates the eight services, the three articles, the founder record, the
+`seed` creates the twenty services, the three articles, the founder record, the
 redirects and the first admin user from `SEED_ADMIN_EMAIL` /
 `SEED_ADMIN_PASSWORD`. It is idempotent — re-running it updates rather than
 duplicates, and it never deletes anything an editor has created.
@@ -291,11 +291,11 @@ dig +short MX higreenpanda.com         # must not change today
 
 As published on 20 September 2026, the zone is:
 
-| Type | Name | Value | TTL |
-|------|------|-------|-----|
-| A | @ | `15.197.148.33` | 600 |
-| A | @ | `3.33.130.190` | 600 |
-| CNAME | www | `higreenpanda.com` | 600 |
+| Type  | Name | Value              | TTL |
+| ----- | ---- | ------------------ | --- |
+| A     | @    | `15.197.148.33`    | 600 |
+| A     | @    | `3.33.130.190`     | 600 |
+| CNAME | www  | `higreenpanda.com` | 600 |
 
 **These two A records are the rollback.** If the cutover goes wrong, put them
 back exactly and the site returns to its previous state. Re-read them at
@@ -306,11 +306,11 @@ cutover time anyway, in case they have moved since.
 **Replace the two root `A` records with the VPS IPv4 address. Change nothing
 else.**
 
-| Type | Name | Action |
-|------|------|--------|
-| A | @ | Replace `15.197.148.33` → `187.77.153.108` |
-| A | @ | Delete `3.33.130.190`, or replace it with `187.77.153.108` too |
-| CNAME | www | **Leave alone.** It points at the root, so it follows automatically — and a name holding a CNAME may not hold anything else, so adding an `A` for `www` would break it |
+| Type  | Name | Action                                                                                                                                                                 |
+| ----- | ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A     | @    | Replace `15.197.148.33` → `187.77.153.108`                                                                                                                             |
+| A     | @    | Delete `3.33.130.190`, or replace it with `187.77.153.108` too                                                                                                         |
+| CNAME | www  | **Leave alone.** It points at the root, so it follows automatically — and a name holding a CNAME may not hold anything else, so adding an `A` for `www` would break it |
 
 TTL is 600, so the cutover takes effect in about ten minutes — and so does the
 rollback. That is short enough to try the cutover during working hours and
@@ -374,12 +374,12 @@ records.** The one change already made is the DMARC `rua` (§4a); the one still
 outstanding is authorising HubSpot (§4b), which is parked. As published, the
 domain has:
 
-| Record | Value | State |
-|--------|-------|-------|
-| MX | `1 smtp.google.com` | Correct — Google Workspace's current single-record format, which replaced the old five-record `ASPMX.L.GOOGLE.COM` set |
-| SPF | `v=spf1 include:_spf.google.com ~all` | Correct for Google-sent mail |
-| DKIM | `google._domainkey`, 2048-bit | Correct |
-| DMARC | `v=DMARC1; p=quarantine; adkim=r; aspf=r; rua=mailto:dmarc@higreenpanda.com;` | Correct — `rua` fixed 20 Sep 2026, see §4a |
+| Record | Value                                                                         | State                                                                                                                  |
+| ------ | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| MX     | `1 smtp.google.com`                                                           | Correct — Google Workspace's current single-record format, which replaced the old five-record `ASPMX.L.GOOGLE.COM` set |
+| SPF    | `v=spf1 include:_spf.google.com ~all`                                         | Correct for Google-sent mail                                                                                           |
+| DKIM   | `google._domainkey`, 2048-bit                                                 | Correct                                                                                                                |
+| DMARC  | `v=DMARC1; p=quarantine; adkim=r; aspf=r; rua=mailto:dmarc@higreenpanda.com;` | Correct — `rua` fixed 20 Sep 2026, see §4a                                                                             |
 
 The mailbox was created on 19 September, which is why nothing in it predates
 that date. Anything sent before the mailbox existed bounced at the sender and
@@ -417,7 +417,7 @@ reads is still better than one nobody can.
 > **1. Edit the existing row. Never use "Add new record" for a record that
 > must be unique.**
 >
-> Adding produced a *second* `_dmarc` TXT record alongside the first. Two
+> Adding produced a _second_ `_dmarc` TXT record alongside the first. Two
 > DMARC records is not "the newer one wins" — receivers treat a domain with
 > multiple DMARC records as having **no DMARC policy at all**. The change
 > left the domain worse off than before it was made, and the console gave no
@@ -425,13 +425,13 @@ reads is still better than one nobody can.
 >
 > The same applies to **SPF in §4b step 3**: a domain may publish only one
 > `v=spf1` record. Adding a second invalidates both, and every HubSpot send
-> fails SPF. That step is an *edit* of the existing SPF row — keep
+> fails SPF. That step is an _edit_ of the existing SPF row — keep
 > `include:_spf.google.com`, keep `~all`, insert the HubSpot include between
 > them.
 >
 > Records that must be unique here: **SPF** (one `v=spf1` TXT at the root),
 > **DMARC** (one TXT at `_dmarc`), **CNAME** (a name holding a CNAME may hold
-> nothing else). The HubSpot DKIM records in step 2 are *different names*, so
+> nothing else). The HubSpot DKIM records in step 2 are _different names_, so
 > those are genuine additions.
 >
 > **2. The GoDaddy console is a statement of intent, not of state.**
@@ -471,7 +471,7 @@ connected**.
 > **`sale@higreenpanda.com`** login.
 >
 > Until that person has finished step 1, the correct state of steps 2–5 is
-> *not started*. Do not begin at step 3 because the SPF include looks like the
+> _not started_. Do not begin at step 3 because the SPF include looks like the
 > one you can do without waiting — on its own it does not work (see 4c), and
 > a lone SPF edit is the change most likely to be mistaken for "HubSpot is
 > authorised now".
@@ -480,8 +480,8 @@ With `p=quarantine` in force and HubSpot unauthorised, any marketing mail sent
 as `contact@higreenpanda.com` will be quarantined by receivers. All five steps
 have to be finished before the first campaign, in this order.
 
-**1. Connect the email sending domain in HubSpot.** *(portal — blocked on the
-`sale@higreenpanda.com` login)*
+**1. Connect the email sending domain in HubSpot.** _(portal — blocked on the
+`sale@higreenpanda.com` login)_
 
 In HubSpot: **Settings → Content → Domains & URLs → Connect a domain →
 Email Sending**, and follow it through for `higreenpanda.com`. Completing it
@@ -492,7 +492,7 @@ HubSpot generates them per portal and a borrowed value silently fails.
 Leave the page open; it is also where HubSpot verifies the records once they
 are published.
 
-**2. Publish the DKIM `CNAME` records HubSpot generated.** *(DNS, after step 1)*
+**2. Publish the DKIM `CNAME` records HubSpot generated.** _(DNS, after step 1)_
 
 Two records, in the shape `hs1-<id>._domainkey` and `hs2-<id>._domainkey`,
 each pointing at a HubSpot hostname. Take the exact names and values from the
@@ -500,7 +500,7 @@ screen in step 1.
 
 This is the step that actually stops the quarantine — see 4c.
 
-**3. Add HubSpot to SPF.** *(DNS, after step 1)*
+**3. Add HubSpot to SPF.** _(DNS, after step 1)_
 
 > **EDIT the existing SPF row. Do not use "Add new record".** See the GoDaddy
 > traps above §4b. A domain may publish only one `v=spf1` record; a second one
@@ -522,7 +522,7 @@ Verify against DNS, not the console — exactly one line must come back:
 dig +short TXT higreenpanda.com | grep spf1
 ```
 
-**4. Optionally, set a custom return-path.** *(HubSpot + DNS, after step 1)*
+**4. Optionally, set a custom return-path.** _(HubSpot + DNS, after step 1)_
 
 Only needed if you want SPF to align as well as DKIM. HubSpot's own
 documentation is explicit that a sending domain uses the HubSpot default
@@ -531,10 +531,10 @@ SPF alignment. DKIM alone is sufficient for DMARC to pass, so this is a
 belt-and-braces step rather than a requirement — but it is cheap, and two
 aligned signals survive one of them breaking.
 
-**5. Verify on a real send, before any list.** *(after 1–4)*
+**5. Verify on a real send, before any list.** _(after 1–4)_
 
-Send one campaign to a personal Gmail address, open it, and use *Show
-original* to read the raw headers:
+Send one campaign to a personal Gmail address, open it, and use _Show
+original_ to read the raw headers:
 
 ```
 Authentication-Results: mx.google.com;
@@ -555,7 +555,7 @@ for months.
 Worth keeping in mind at step 3, because it is the step that looks sufficient
 and is not.
 
-DMARC passes when *either* SPF or DKIM aligns with the visible From domain.
+DMARC passes when _either_ SPF or DKIM aligns with the visible From domain.
 SPF alignment is judged against the return-path — the envelope sender — not
 the From address a reader sees. HubSpot's default return-path is a
 HubSpot-owned domain, so SPF cannot align to `higreenpanda.com` however the
@@ -606,7 +606,7 @@ below for the exception.
 
 No restart step: `up -d --build` replaces the container, and the runtime image
 carries no warm cache. If a deploy also re-runs the seed, run it through
-`tools` *before* `up -d --build` for the reason in §2.
+`tools` _before_ `up -d --build` for the reason in §2.
 
 Removing a seeded item is a CMS action, not a code one: deleting it from
 `src/seed/content.ts` stops it being recreated, but does not remove a copy the
@@ -712,11 +712,11 @@ docker compose -f docker-compose.prod.yml exec backup \
    is easiest and survives a hosting change).
 2. Submit `https://higreenpanda.com/sitemap.xml`.
 3. **Remove the injected spam URLs.** They are still in the index from the July
-   compromise. Use *Removals → Temporary removals* for anything visible now, and
-   list the patterns under *Pages → Not indexed* to catch the rest. The site
+   compromise. Use _Removals → Temporary removals_ for anything visible now, and
+   list the patterns under _Pages → Not indexed_ to catch the rest. The site
    already answers `410 Gone` for them, which Google acts on far faster than a
    404, so the removals are a shortcut rather than the mechanism.
-4. Check *Pages* after a fortnight: the old URLs from §5 of the brief should be
+4. Check _Pages_ after a fortnight: the old URLs from §5 of the brief should be
    showing as redirected, not as errors.
 5. Add any spam URL Search Console reports that the site still answers with 404
    to the **Redirects** collection in the CMS as a `410` — no deploy needed.
@@ -725,16 +725,16 @@ docker compose -f docker-compose.prod.yml exec backup \
 
 ## 9. What to watch
 
-| Thing | How | How often |
-|-------|-----|-----------|
-| Site is up | `curl -sS https://higreenpanda.com/api/health` | Uptime monitor, 1 min |
-| Certificate renewal | `docker compose -f docker-compose.prod.yml logs caddy \| grep -i certificate` | Monthly |
-| Backups ran | `aws s3 ls s3://higreenpanda-backups/db/` | Weekly |
-| Restore works | §7 drill | Twice a year |
-| Dependency alerts | GitHub → Security → Dependabot | As they arrive |
-| Disk space | `df -h` and `docker system df` | Monthly |
-| New enquiries | `/hgp-studio` → Enquiries | Daily |
-| Mail records unchanged | `dig +short MX higreenpanda.com` and one `v=spf1` / one `_dmarc` TXT | After any DNS change |
+| Thing                  | How                                                                           | How often             |
+| ---------------------- | ----------------------------------------------------------------------------- | --------------------- |
+| Site is up             | `curl -sS https://higreenpanda.com/api/health`                                | Uptime monitor, 1 min |
+| Certificate renewal    | `docker compose -f docker-compose.prod.yml logs caddy \| grep -i certificate` | Monthly               |
+| Backups ran            | `aws s3 ls s3://higreenpanda-backups/db/`                                     | Weekly                |
+| Restore works          | §7 drill                                                                      | Twice a year          |
+| Dependency alerts      | GitHub → Security → Dependabot                                                | As they arrive        |
+| Disk space             | `df -h` and `docker system df`                                                | Monthly               |
+| New enquiries          | `/hgp-studio` → Enquiries                                                     | Daily                 |
+| Mail records unchanged | `dig +short MX higreenpanda.com` and one `v=spf1` / one `_dmarc` TXT          | After any DNS change  |
 
 Set `SENTRY_DSN` in `.env` to get errors reported rather than discovered.
 

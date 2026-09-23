@@ -31,8 +31,14 @@ export async function generateMetadata({
   })
 }
 
-export default async function ContactPage({ params }: { params: Promise<{ locale: Locale }> }) {
-  const { locale } = await params
+export default async function ContactPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: Locale }>
+  searchParams: Promise<{ service?: string }>
+}) {
+  const [{ locale }, { service }] = await Promise.all([params, searchParams])
   setRequestLocale(locale)
 
   const [t, settings] = await Promise.all([getTranslations({ locale }), getSiteSettings(locale)])
@@ -142,7 +148,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
             <h3>{t('contact.form.title')}</h3>
             <p className="mt-2 text-text-muted">{t('contact.formLead')}</p>
             <div className="mt-8">
-              <EnquiryFormSection locale={locale} />
+              <EnquiryFormSection locale={locale} defaultService={service} />
             </div>
           </div>
         </div>

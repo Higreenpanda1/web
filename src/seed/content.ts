@@ -1,5 +1,6 @@
 /**
- * Seed content — the nine services, and the homepage copy.
+ * Seed content — the nine original services and the homepage copy. The
+ * eleven services recovered from the old site are in ./catalogue.ts.
  *
  * Eight come from brief section 4. The ninth, trade-fair and exhibition
  * accompaniment, is the one section 4 proposes and marks [confirm]: the
@@ -13,30 +14,17 @@
  * records, they are used verbatim rather than rewritten.
  */
 
-export type SeedService = {
-  slug: string
-  order: number
-  featured: boolean
-  icon:
-    | 'search'
-    | 'factory'
-    | 'clipboard-check'
-    | 'ship'
-    | 'building'
-    | 'route'
-    | 'shopping-cart'
-    | 'lightbulb'
-    | 'tent'
-  ar: { title: string; summary: string; body: string; highlights: string[] }
-  en: { title: string; summary: string; body: string; highlights: string[] }
-}
+import { CATALOGUE_SERVICES, type SeedService } from './catalogue'
 
-export const SERVICES: SeedService[] = [
+export type { SeedService }
+
+const CORE_SERVICES: SeedService[] = [
   {
     slug: 'full-import-management',
     order: 10,
     featured: true,
     icon: 'route',
+    category: 'import',
     ar: {
       title: 'إدارة عملية الاستيراد كاملة',
       summary:
@@ -71,6 +59,8 @@ export const SERVICES: SeedService[] = [
     order: 20,
     featured: false,
     icon: 'search',
+    category: 'import',
+    applicationType: 'product-search',
     ar: {
       title: 'توريد المنتجات',
       summary: 'نبحث لك عن منتجك التالي في الصين ونجد المصنع المناسب بالسعر المناسب.',
@@ -100,6 +90,7 @@ export const SERVICES: SeedService[] = [
     order: 30,
     featured: false,
     icon: 'factory',
+    category: 'import',
     ar: {
       title: 'التصنيع',
       summary: 'تصنيع منتجك في الصين بمواصفاتك وعلامتك التجارية، ومتابعة الإنتاج حتى النهاية.',
@@ -129,6 +120,7 @@ export const SERVICES: SeedService[] = [
     order: 40,
     featured: false,
     icon: 'clipboard-check',
+    category: 'import',
     ar: {
       title: 'فحص الجودة',
       summary: 'فحص المصنع والبضاعة على الأرض قبل أن تدفع أو تشحن، مع تقرير مصوّر.',
@@ -158,6 +150,8 @@ export const SERVICES: SeedService[] = [
     order: 50,
     featured: false,
     icon: 'ship',
+    category: 'import',
+    applicationType: 'shipping-quote',
     ar: {
       title: 'الشحن والنقل',
       summary: 'شحن بضاعتك من الصين إلى بلدك، بحرًا أو جوًا، مع التخليص الجمركي والتسليم.',
@@ -187,6 +181,9 @@ export const SERVICES: SeedService[] = [
     order: 60,
     featured: false,
     icon: 'building',
+    category: 'company',
+    priceFrom: 7200,
+    applicationType: 'company-registration',
     ar: {
       title: 'تأسيس شركة في الصين',
       summary:
@@ -197,6 +194,12 @@ export const SERVICES: SeedService[] = [
         'الأوراق والتراخيص والتسجيل الضريبي',
         'فتح الحساب البنكي',
         'شرح التبعات قبل الاختيار لا بعده',
+      ],
+      requirements: [
+        'صورة واضحة لجواز سفر الممثل القانوني وكل شريك',
+        'ثلاثة أسماء مقترحة للشركة',
+        'نطاق النشاط ورأس المال المقترح',
+        'اختيار المدينة ونوع العنوان',
       ],
     },
     en: {
@@ -210,6 +213,12 @@ export const SERVICES: SeedService[] = [
         'Bank account opening',
         'Consequences explained before you choose',
       ],
+      requirements: [
+        'A clear passport copy of the legal representative and each partner',
+        'Three proposed company names',
+        'The scope of business and the proposed capital',
+        'Your choice of city and address type',
+      ],
     },
   },
   {
@@ -217,6 +226,7 @@ export const SERVICES: SeedService[] = [
     order: 70,
     featured: false,
     icon: 'shopping-cart',
+    category: 'ecommerce',
     ar: {
       title: 'إطلاق متجرك الإلكتروني',
       summary:
@@ -247,6 +257,8 @@ export const SERVICES: SeedService[] = [
     order: 80,
     featured: false,
     icon: 'lightbulb',
+    category: 'consulting',
+    applicationType: 'consultation',
     ar: {
       title: 'الاستشارات التجارية',
       summary: 'دعم واستشارات تساعدك على الاستفادة من الفرص المتاحة في الأسواق الصينية والآسيوية.',
@@ -276,6 +288,7 @@ export const SERVICES: SeedService[] = [
     order: 90,
     featured: false,
     icon: 'tent',
+    category: 'import',
     ar: {
       title: 'مرافقة المعارض التجارية',
       summary:
@@ -451,3 +464,5 @@ export const POSTS: SeedPost[] = [
     },
   },
 ]
+
+export const SERVICES: SeedService[] = [...CORE_SERVICES, ...CATALOGUE_SERVICES]

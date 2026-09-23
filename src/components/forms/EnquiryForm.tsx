@@ -1,12 +1,12 @@
 'use client'
 
-import { AlertCircle, CheckCircle2, Send } from 'lucide-react'
+import { CheckCircle2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useActionState, useId, useRef } from 'react'
-import { useFormStatus } from 'react-dom'
 
 import { submitEnquiry, type EnquiryState } from '@/app/actions/enquiry'
 import { Button } from '@/components/ui/Button'
+import { FieldError, FormAlert, Hint, inputClass, Label, SubmitButton } from './fields'
 import { HONEYPOT_FIELD, TIMESTAMP_FIELD } from '@/lib/form-fields'
 import { countryName, OTHER_COUNTRIES, PRIORITY_COUNTRIES } from '@/lib/countries'
 
@@ -33,11 +33,13 @@ export function EnquiryForm({
   services,
   formToken,
   compact = false,
+  defaultService,
 }: {
   locale: Locale
   services: ServiceOption[]
   formToken: string
   compact?: boolean
+  defaultService?: number
 }) {
   const t = useTranslations('contact.form')
   const [state, formAction] = useActionState(submitEnquiry, initialState)
@@ -48,6 +50,7 @@ export function EnquiryForm({
   const errorId = (name: string) => `${ids}-${name}-error`
   const fieldError = (name: string) =>
     state.status === 'error' ? state.fieldErrors?.[name] : undefined
+  const errorMessage = (key?: string) => (key ? t(`errors.${key}` as 'errors.generic') : undefined)
 
   if (state.status === 'success') {
     return (
@@ -98,15 +101,7 @@ export function EnquiryForm({
 
       <div aria-live="polite">
         {state.status === 'error' && !state.fieldErrors ? (
-          <p className="flex items-start gap-2 rounded-[var(--radius)] border border-[var(--error)] bg-[var(--error)]/10 p-3 text-[var(--error)]">
-            <AlertCircle
-              size={20}
-              strokeWidth={1.5}
-              aria-hidden="true"
-              className="mt-0.5 shrink-0"
-            />
-            <span>{t(`errors.${state.errorKey}` as 'errors.generic')}</span>
-          </p>
+          <FormAlert>{t(`errors.${state.errorKey}` as 'errors.generic')}</FormAlert>
         ) : null}
       </div>
 
@@ -118,7 +113,7 @@ export function EnquiryForm({
           placeholder={t('namePlaceholder')}
           autoComplete="name"
           required
-          error={fieldError('name')}
+          error={errorMessage(fieldError('name'))}
           errorId={errorId('name')}
         />
 
@@ -150,7 +145,7 @@ export function EnquiryForm({
               </option>
             ))}
           </select>
-          <FieldError id={errorId('country')} messageKey={fieldError('country')} />
+          <FieldError id={errorId('country')} message={errorMessage(fieldError('country'))} />
         </div>
       </div>
 
@@ -164,7 +159,7 @@ export function EnquiryForm({
         autoComplete="tel"
         dir="ltr"
         required
-        error={fieldError('whatsapp')}
+        error={errorMessage(fieldError('whatsapp'))}
         errorId={errorId('whatsapp')}
       />
 
@@ -173,7 +168,7 @@ export function EnquiryForm({
         <select
           id={fieldId('service')}
           name="service"
-          defaultValue=""
+          defaultValue={defaultService ? String(defaultService) : ''}
           className={inputClass(false)}
         >
           <option value="">{t('servicePlaceholder')}</option>
@@ -200,23 +195,13 @@ export function EnquiryForm({
           aria-invalid={fieldError('message') ? true : undefined}
           className={inputClass(Boolean(fieldError('message')))}
         />
-        <FieldError id={errorId('message')} messageKey={fieldError('message')} />
+        <FieldError id={errorId('message')} message={errorMessage(fieldError('message'))} />
       </div>
 
       <p className="text-caption text-[var(--text-muted)]">{t('consent')}</p>
 
       <SubmitButton idle={t('submit')} busy={t('submitting')} />
     </form>
-  )
-}
-
-function SubmitButton({ idle, busy }: { idle: string; busy: string }) {
-  const { pending } = useFormStatus()
-  return (
-    <Button type="submit" size="lg" disabled={pending}>
-      <Send size={20} strokeWidth={1.5} aria-hidden="true" className="rtl:-scale-x-100" />
-      {pending ? busy : idle}
-    </Button>
   )
 }
 
@@ -245,9 +230,9 @@ function Field({
         {label}
       </Label>
       {hint ? (
-        <p id={hintId} className="ltr-nums mb-1.5 text-caption text-[var(--text-muted)]">
-          {hint}
-        </p>
+        <Hint id={hintId}>
+          <span className="ltr-nums">{hint}</span>
+        </Hint>
       ) : null}
       <input
         id={id}
@@ -260,52 +245,7 @@ function Field({
         className={inputClass(Boolean(error))}
         {...rest}
       />
-      <FieldError id={errorId} messageKey={error} />
+      <FieldError id={errorId} message={error} />
     </div>
   )
-}
-
-function Label({
-  htmlFor,
-  children,
-  required,
-}: {
-  htmlFor: string
-  children: React.ReactNode
-  required?: boolean
-}) {
-  return (
-    <label htmlFor={htmlFor} className="mb-1.5 block font-semibold text-[var(--text)]">
-      {children}
-      {required ? (
-        <span className="text-[var(--error)]" aria-hidden="true">
-          {' '}
-          *
-        </span>
-      ) : null}
-    </label>
-  )
-}
-
-function FieldError({ id, messageKey }: { id: string; messageKey?: string }) {
-  const t = useTranslations('contact.form.errors')
-  if (!messageKey) return null
-  return (
-    <p
-      id={id}
-      role="alert"
-      className="mt-1.5 flex items-center gap-1.5 text-caption text-[var(--error)]"
-    >
-      <AlertCircle size={16} strokeWidth={1.5} aria-hidden="true" />
-      {t(messageKey as 'generic')}
-    </p>
-  )
-}
-
-function inputClass(hasError: boolean): string {
-  return [
-    'w-full rounded-[var(--radius)] border bg-[var(--surface)] px-3.5 py-3 text-body text-[var(--text)]',
-    'min-h-12 transition-colors placeholder:text-[var(--text-muted)]',
-    hasError ? 'border-[var(--error)]' : 'border-[var(--border-strong)]',
-  ].join(' ')
 }

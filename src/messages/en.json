@@ -46,7 +46,7 @@
       "subscribers": "YouTube subscribers"
     },
     "servicesTitle": "What we do for you",
-    "servicesLead": "Eight services covering the whole import journey. Take one, or hand us the entire process.",
+    "servicesLead": "Twenty services across importing, company setup, banking, e-commerce and visas. Take one, or hand us the whole journey.",
     "processTitle": "How it works",
     "processLead": "No surprises. At every stage you know where your goods are and what you have paid.",
     "process": {
@@ -79,7 +79,10 @@
     "blogEyebrow": "From the blog",
     "contactEyebrow": "Get started",
     "contactOr": "or tell us here and we will get back to you",
-    "statsEyebrow": "Numbers, not promises"
+    "statsEyebrow": "Numbers, not promises",
+    "categoriesEyebrow": "One partner",
+    "categoriesTitle": "Whatever you need in China, in one place",
+    "categoriesLead": "From the first product search to a registered company, a bank account and a work visa. Pick the area you need."
   },
   "services": {
     "title": "Our services",
@@ -91,7 +94,55 @@
     "eyebrow": "Services",
     "detailEyebrow": "Service",
     "highlightsTitle": "What you get",
-    "faqTitle": "Common questions"
+    "faqTitle": "Common questions",
+    "priceFrom": "from",
+    "priceUnit": {
+      "once": "",
+      "year": "/ year",
+      "month": "/ month",
+      "class": "/ class"
+    },
+    "priceNote": "Starting price. Your quote confirms the final figure before you pay anything.",
+    "pricingTitle": "Pricing",
+    "noPrice": "Quoted per case",
+    "categoriesTitle": "Browse by area",
+    "categoryCount": "{count, plural, one {# service} other {# services}}",
+    "categories": {
+      "import": {
+        "title": "Import & sourcing",
+        "short": "Import",
+        "lead": "Find the product, check the factory, ship it home — one accountable partner from idea to delivered goods."
+      },
+      "company": {
+        "title": "Company & compliance",
+        "short": "Company",
+        "lead": "Register your company in China, keep it compliant, and protect your brand."
+      },
+      "banking": {
+        "title": "Banking & payments",
+        "short": "Banking",
+        "lead": "Corporate bank accounts in mainland China and Hong Kong, and business Alipay and WeChat Pay."
+      },
+      "ecommerce": {
+        "title": "E-commerce",
+        "short": "E-commerce",
+        "lead": "Launch and run online stores on TEMU, Amazon, AliExpress and Alibaba through a Chinese company."
+      },
+      "visas": {
+        "title": "Visas & travel",
+        "short": "Visas",
+        "lead": "Business invitation letters, business and work visas, and family reunion visas."
+      },
+      "consulting": {
+        "title": "Consulting",
+        "short": "Consulting",
+        "lead": "A conversation with someone on the ground before you commit money to anything."
+      }
+    },
+    "requirementsTitle": "What you need to prepare",
+    "documentsNote": "We ask for documents by email or WhatsApp after reviewing your request. Nothing is uploaded on this site.",
+    "startApplication": "Start your application",
+    "applicationLead": "A short form, a few minutes. We reply on WhatsApp within one working day."
   },
   "about": {
     "title": "About us",
@@ -186,7 +237,8 @@
     "privacy": "Privacy policy",
     "terms": "Terms and conditions",
     "builtNote": "Built securely and backed up daily.",
-    "tagline": "Your partner on the ground in China"
+    "tagline": "Your partner on the ground in China",
+    "areasTitle": "What we do"
   },
   "legal": {
     "privacyTitle": "Privacy policy",
@@ -208,5 +260,406 @@
     "loading": "Loading",
     "externalLink": "Opens in a new window",
     "requiredField": "Required field"
+  },
+  "apply": {
+    "eyebrow": "Application",
+    "forService": "For: {service}",
+    "stepOf": "Step {current} of {total}",
+    "next": "Continue",
+    "back": "Back",
+    "submit": "Send application",
+    "submitting": "Sending…",
+    "optional": "optional",
+    "selectPlaceholder": "Select…",
+    "consent": "By sending this form you agree that we may contact you about your request. We never share your details.",
+    "documentsNote": "No documents are uploaded here. If your request needs a passport copy or a business licence, we will ask for it by email or WhatsApp once we have reviewed your answers.",
+    "successTitle": "We have your application",
+    "successBody": "Thank you. Your reference is {reference}. We will contact you on WhatsApp within one working day.",
+    "successAgain": "Send another application",
+    "backToServices": "Back to services",
+    "aside": {
+      "nextTitle": "What happens next",
+      "step1": "We review your answers within one working day.",
+      "step2": "We message you on WhatsApp with questions and a clear quote.",
+      "step3": "We ask for the documents we need by email or WhatsApp, and begin.",
+      "helpTitle": "Prefer to talk?",
+      "helpBody": "Message us on WhatsApp and we will fill the form with you.",
+      "requirementsTitle": "Have these ready"
+    },
+    "errors": {
+      "required": "This field is required.",
+      "invalid": "Choose one of the options.",
+      "tooLong": "This is too long.",
+      "number": "Enter a valid number.",
+      "date": "Enter a valid date.",
+      "whatsapp": "Enter a valid number with country code, e.g. +966501234567.",
+      "email": "Enter a valid email address.",
+      "url": "Enter a valid link.",
+      "stepIncomplete": "Please complete the highlighted fields before continuing.",
+      "rateLimited": "You have sent several requests in a short time. Please wait a moment and try again.",
+      "tooFast": "We could not verify the form. Please try again.",
+      "generic": "Could not send your application. Please try again, or message us on WhatsApp."
+    },
+    "types": {
+      "consultation": {
+        "title": "Request a consultation",
+        "lead": "Tell us what you are planning and when suits you. We confirm a time on WhatsApp.",
+        "cta": "Request a consultation"
+      },
+      "company-registration": {
+        "title": "Company registration application",
+        "lead": "The information we need to register your company in China. Ten minutes; you can leave anything you are unsure about and we will discuss it.",
+        "cta": "Start company registration"
+      },
+      "visa-invitation": {
+        "title": "Business invitation letter (M visa)",
+        "lead": "An official invitation for factory visits and trade fairs, issued for all nationalities. Enter the details exactly as they appear in the passport.",
+        "cta": "Request an invitation letter"
+      },
+      "visa": {
+        "title": "Visa application",
+        "lead": "Business, work or family reunion visa. Tell us your situation and we will confirm what is possible and what it costs.",
+        "cta": "Start your visa application"
+      },
+      "product-search": {
+        "title": "Find a product",
+        "lead": "Describe the product and the quantity. We come back with suppliers, prices and lead times.",
+        "cta": "Send a product request"
+      },
+      "shipping-quote": {
+        "title": "Shipping quote",
+        "lead": "Tell us what is being shipped, from where to where. We reply with a sea, air or express quote.",
+        "cta": "Request a shipping quote"
+      },
+      "account-opening": {
+        "title": "Open a bank or payment account",
+        "lead": "A corporate bank account in mainland China or Hong Kong, or a business Alipay or WeChat Pay account.",
+        "cta": "Start account opening"
+      },
+      "store-setup": {
+        "title": "Marketplace store setup",
+        "lead": "TEMU, Amazon, AliExpress or Alibaba. Tell us about the store you want and we will confirm the requirements.",
+        "cta": "Start store setup"
+      },
+      "trademark": {
+        "title": "Trademark registration",
+        "lead": "Protect your brand in China. Tell us about the trademark and the goods it covers.",
+        "cta": "Start trademark registration"
+      }
+    },
+    "steps": {
+      "contact": "Your contact details",
+      "topic": "What you need",
+      "schedule": "When suits you",
+      "legalRep": "The legal representative",
+      "company": "The company",
+      "shareholders": "Ownership",
+      "extras": "Additional services",
+      "applicant": "The applicant",
+      "trip": "The trip",
+      "visa": "The visa",
+      "background": "Your situation",
+      "product": "The product",
+      "cargo": "The cargo",
+      "service": "The service",
+      "account": "The account",
+      "store": "The store",
+      "brand": "The trademark"
+    },
+    "fields": {
+      "name": "Full name",
+      "country": "Country",
+      "whatsapp": "WhatsApp number",
+      "whatsappHint": "With country code, e.g. +966501234567",
+      "email": "Email",
+      "emailHint": "For documents and written confirmations",
+      "topic": "Topic",
+      "stage": "Where you are now",
+      "goals": "What would you like to achieve?",
+      "goalsHint": "Product, market, budget, timing — whatever you already know.",
+      "preferredDays": "Preferred days",
+      "preferredTime": "Preferred time",
+      "preferredTimeHint": "China time (GMT+8). Morning 9–12, afternoon 2–6, evening 7–10.",
+      "timezone": "Your time zone or city",
+      "timezoneHint": "So we can suggest a time that works for both of us.",
+      "channel": "How would you like to talk?",
+      "language": "Language",
+      "notes": "Anything else we should know",
+      "fullName": "Full name of the legal representative",
+      "fullNameHint": "Exactly as written in the passport.",
+      "gender": "Gender",
+      "dateOfBirth": "Date of birth",
+      "nationality": "Nationality",
+      "residenceCountry": "Country of residence",
+      "chinesePhone": "Do you have a Chinese phone number?",
+      "inChinaNow": "Are you in China now?",
+      "city": "City of registration",
+      "cityOther": "Which city?",
+      "companyNames": "Proposed company names",
+      "companyNamesHint": "Three options, in English and Chinese if you have them. Avoid names of countries, oceans or famous people.",
+      "businessScope": "Scope of business",
+      "businessScopeHint": "Be specific: “clothing — women’s and children’s wear”, not “trading”. Food and medical goods need extra licences.",
+      "registeredCapital": "Registered capital (USD)",
+      "registeredCapitalHint": "Not paid up front — it can be deposited within five years. Above 15,000 USD is recommended if you want a residence permit.",
+      "addressOption": "Registered address",
+      "addressOptionHint": "A physical office is required if you will live in China. Otherwise a virtual address with a formal lease works.",
+      "needResidence": "Do you want a work visa and residence permit?",
+      "needResidenceHint": "Affects the address type and the recommended capital.",
+      "ownership": "Ownership",
+      "shareholders": "Shareholders",
+      "shareholdersHint": "One per line: full name — nationality — percentage.",
+      "decisionMaker": "Who makes the major decisions?",
+      "decisionMakerHint": "The person with authority to sign for the company.",
+      "extras": "Would you also like us to arrange…",
+      "extrasHint": "Optional. Each is quoted separately.",
+      "familyName": "Family name",
+      "familyNameHint": "As shown in the passport.",
+      "givenNames": "Given names",
+      "passportNumber": "Passport number",
+      "passportNumberHint": "Letters and digits only, as printed.",
+      "passportExpiry": "Passport expiry date",
+      "passportExpiryHint": "Must be valid for at least six months after arrival.",
+      "applyCity": "Where will you apply for the visa?",
+      "applyCityHint": "City and country of the Chinese embassy or visa centre.",
+      "occupation": "Occupation",
+      "employer": "Employer or company",
+      "purpose": "Purpose of the trip",
+      "purposeHint": "Meetings, factory visits, exhibitions — a sentence or two.",
+      "speed": "Processing",
+      "speedHint": "Normal issue takes up to 29 working days.",
+      "arrivalDate": "Planned arrival",
+      "departureDate": "Planned departure",
+      "cities": "Cities you will visit",
+      "citiesHint": "Guangzhou, Yiwu, Shenzhen…",
+      "visitedChina": "Have you been to China before?",
+      "previousVisa": "Have you held a Chinese visa before?",
+      "visaType": "Visa type",
+      "stayLength": "Intended length of stay",
+      "plannedArrival": "Planned arrival",
+      "hasChineseCompany": "Do you have a company in China?",
+      "hasChineseCompanyHint": "A work visa needs an employer in China. If you have none, we can register one for you.",
+      "companyName": "Company name",
+      "education": "Highest qualification",
+      "educationHint": "The higher the qualification, the stronger the application.",
+      "experienceYears": "Years of work experience",
+      "experienceYearsHint": "Since graduation, in your field.",
+      "familyMember": "Family member in China",
+      "familyMemberHint": "Their relationship to you and their status in China (work permit, residence, citizen).",
+      "productName": "Product",
+      "productNameHint": "In English if possible, plus the Arabic name.",
+      "productLink": "Reference link",
+      "productLinkHint": "A listing on Alibaba, Amazon or anywhere else that shows what you mean.",
+      "specs": "Specifications",
+      "specsHint": "Colour, size, material, certification, packaging — everything the factory will ask.",
+      "quantity": "Quantity",
+      "targetPrice": "Target price per unit",
+      "targetPriceHint": "Optional, in any currency.",
+      "destinationCountry": "Destination country",
+      "timeline": "When do you need it?",
+      "productType": "Type of goods",
+      "originCity": "Pick-up city in China",
+      "originCityHint": "Where the supplier is.",
+      "destinationCity": "Destination city",
+      "cartons": "Number of cartons",
+      "weightKg": "Total weight (kg)",
+      "weightKgHint": "An estimate is fine.",
+      "volumeCbm": "Total volume (m³)",
+      "volumeCbmHint": "If you know it. Otherwise give carton dimensions in the notes.",
+      "packaging": "Packaging",
+      "readyDate": "Ready to ship from",
+      "readyDateHint": "When the goods will be ready at the supplier.",
+      "mode": "Shipping method",
+      "delivery": "Delivery",
+      "customs": "Customs clearance at destination",
+      "accountType": "Account type",
+      "legalRepInChina": "Can the legal representative travel to China?",
+      "legalRepInChinaHint": "Most banks require the legal representative in person. Some accept remote opening.",
+      "companyCity": "Company city",
+      "mainProducts": "Main products or services",
+      "tradingCountries": "Main trading countries",
+      "tradingCountriesHint": "Where you export to or import from.",
+      "monthlyVolume": "Expected monthly transactions (USD)",
+      "monthlyVolumeHint": "Banks ask. An estimate is enough.",
+      "platform": "Platform",
+      "hasAlipayBusiness": "Do you have a business Alipay account?",
+      "hasAlipayBusinessHint": "AliExpress requires one. We can open it for you.",
+      "category": "Product category",
+      "categoryHint": "Electronics, home goods, fashion…",
+      "targetMarkets": "Target markets",
+      "targetMarketsHint": "Gulf, Europe, USA…",
+      "firstProducts": "The first products you want to list",
+      "firstProductsHint": "Names and approximate prices.",
+      "brandName": "Trademark name",
+      "brandNameChinese": "Chinese name",
+      "brandNameChineseHint": "If you have one. Registering a Chinese version is strongly recommended.",
+      "hasLogo": "Is there a logo?",
+      "applicantType": "Applicant",
+      "applicantCountry": "Applicant’s country",
+      "classes": "Number of classes",
+      "classesHint": "Trademarks are registered per class of goods. Unsure? Leave it blank and we will advise.",
+      "products": "Goods or services covered",
+      "productsHint": "What the brand sells, e.g. “perfume and cosmetics”.",
+      "existingRegistration": "Is it registered anywhere else?",
+      "existingRegistrationHint": "In your own country or internationally."
+    },
+    "options": {
+      "common": {
+        "yes": "Yes",
+        "no": "No"
+      },
+      "topic": {
+        "import": "Importing and sourcing",
+        "company": "Company formation",
+        "ecommerce": "E-commerce",
+        "banking": "Bank and payment accounts",
+        "visas": "Visas",
+        "trademark": "Trademark",
+        "other": "Something else"
+      },
+      "stage": {
+        "idea": "Just an idea",
+        "planning": "Planning, not started",
+        "started": "Started, need help",
+        "operating": "Already operating"
+      },
+      "preferredDays": {
+        "sat": "Sat",
+        "sun": "Sun",
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri"
+      },
+      "preferredTime": {
+        "morning": "Morning",
+        "afternoon": "Afternoon",
+        "evening": "Evening"
+      },
+      "channel": {
+        "whatsapp": "WhatsApp call",
+        "video": "Video call",
+        "phone": "Phone call"
+      },
+      "language": {
+        "ar": "Arabic",
+        "en": "English"
+      },
+      "gender": {
+        "male": "Male",
+        "female": "Female"
+      },
+      "city": {
+        "shenzhen": "Shenzhen",
+        "guangzhou": "Guangzhou",
+        "shanghai": "Shanghai",
+        "yiwu": "Yiwu",
+        "hangzhou": "Hangzhou",
+        "nanjing": "Nanjing",
+        "other": "Another city"
+      },
+      "addressOption": {
+        "own-office": "I will rent a physical office",
+        "virtual-work-visa": "Virtual address that allows a work visa",
+        "virtual-basic": "Virtual address, no work visa needed",
+        "need-advice": "Not sure — advise me"
+      },
+      "ownership": {
+        "sole": "One owner (me)",
+        "partners": "Two or more partners"
+      },
+      "extras": {
+        "bank-account": "Corporate bank account",
+        "alipay-wechat": "Business Alipay and WeChat Pay",
+        "accounting": "Accounting and tax filing",
+        "financial-officer": "Appointed financial officer",
+        "trademark": "Trademark registration",
+        "work-visa": "Work visa and residence permit"
+      },
+      "purpose": {
+        "factory-visits": "Factory visits",
+        "trade-fair": "Trade fair",
+        "both": "Factories and a trade fair",
+        "other": "Other business"
+      },
+      "speed": {
+        "normal": "Normal",
+        "express": "Express"
+      },
+      "visaType": {
+        "business": "Business visa",
+        "work": "Work visa and residence permit",
+        "family": "Family reunion visa"
+      },
+      "stayLength": {
+        "under-1m": "Under a month",
+        "1-3m": "1–3 months",
+        "3-12m": "3–12 months",
+        "over-1y": "More than a year"
+      },
+      "hasChineseCompany": {
+        "yes": "Yes, in mainland China",
+        "hk-company": "Yes, in Hong Kong",
+        "no": "No"
+      },
+      "education": {
+        "high-school": "High school",
+        "diploma": "Diploma",
+        "bachelor": "Bachelor’s degree",
+        "master": "Master’s degree",
+        "phd": "Doctorate"
+      },
+      "timeline": {
+        "asap": "As soon as possible",
+        "1-3m": "Within 1–3 months",
+        "3-6m": "Within 3–6 months",
+        "exploring": "Just exploring"
+      },
+      "packaging": {
+        "cartons": "Cartons",
+        "pallets": "Pallets",
+        "bags": "Bags",
+        "other": "Other"
+      },
+      "mode": {
+        "sea": "Sea freight",
+        "air": "Air freight",
+        "express": "Express courier",
+        "unsure": "Not sure — recommend one"
+      },
+      "delivery": {
+        "door-to-door": "Door to door",
+        "port-to-port": "Port to port",
+        "door-to-port": "Door to port"
+      },
+      "customs": {
+        "include": "Please include it",
+        "own-agent": "I have my own agent",
+        "unsure": "Not sure"
+      },
+      "accountType": {
+        "china-bank": "Corporate bank account — mainland China",
+        "hk-bank": "Corporate bank account — Hong Kong",
+        "alipay": "Business Alipay",
+        "wechat-pay": "Business WeChat Pay"
+      },
+      "monthlyVolume": {
+        "under-10k": "Under 10,000",
+        "10k-50k": "10,000 – 50,000",
+        "50k-200k": "50,000 – 200,000",
+        "over-200k": "Over 200,000"
+      },
+      "platform": {
+        "temu": "TEMU",
+        "amazon": "Amazon",
+        "aliexpress": "AliExpress",
+        "alibaba": "Alibaba",
+        "other": "Another platform"
+      },
+      "applicantType": {
+        "individual": "An individual",
+        "company": "A company"
+      }
+    }
   }
 }

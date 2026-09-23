@@ -7,7 +7,7 @@ Arabic-first and bilingual, with a CMS the client edits themselves, built to
 replace a WordPress site that was taken over and injected with spam.
 
 - **Content and brand:** [`WEBSITE-BRIEF.md`](./WEBSITE-BRIEF.md) — positioning,
-  the eight services, the founder, the colour and type systems. Authoritative.
+  the services, the founder, the colour and type systems. Authoritative.
 - **Original instructions:** [`BUILD-PROMPT.md`](./BUILD-PROMPT.md)
 - **Deployment:** [`DEPLOY.md`](./DEPLOY.md) — provisioning, bringing the stack
   up, DNS, backups and the restore drill.
@@ -23,7 +23,7 @@ cp .env.example .env         # then fill in PAYLOAD_SECRET and POSTGRES_PASSWORD
 docker compose up -d db      # or point DATABASE_URI at your own Postgres
 npm install
 npm run migrate
-npm run seed                 # eight services, the founder, redirects, an admin user
+npm run seed                 # twenty services, the founder, redirects, an admin user
 npm run dev
 ```
 
@@ -60,15 +60,15 @@ password, so it is run by hand rather than in CI; see the header of
 
 ## How it is put together
 
-| Layer | Choice |
-|-------|--------|
-| Framework | Next.js 15 (App Router, TypeScript strict) |
-| CMS | Payload 3, installed into the same app |
-| Database | PostgreSQL 16, migrations checked in |
-| Styling | Tailwind CSS 4 reading brand tokens from CSS custom properties |
-| Hosting | Hostinger KVM 2 VPS, Docker Compose, Caddy for TLS |
-| Email | Resend — form notifications must not depend on the domain's own mail |
-| Analytics | Plausible or Umami, self-hosted, no cookies |
+| Layer     | Choice                                                               |
+| --------- | -------------------------------------------------------------------- |
+| Framework | Next.js 15 (App Router, TypeScript strict)                           |
+| CMS       | Payload 3, installed into the same app                               |
+| Database  | PostgreSQL 16, migrations checked in                                 |
+| Styling   | Tailwind CSS 4 reading brand tokens from CSS custom properties       |
+| Hosting   | Hostinger KVM 2 VPS, Docker Compose, Caddy for TLS                   |
+| Email     | Resend — form notifications must not depend on the domain's own mail |
+| Analytics | Plausible or Umami, self-hosted, no cookies                          |
 
 ```
 src/
@@ -170,16 +170,16 @@ with a `role`, and `Enquiries` already carries `status`, `assignedTo` and a
 
 Lighthouse, simulated mobile, production build:
 
-| Page | Performance | Accessibility | Best Practices | SEO |
-|------|------------:|--------------:|---------------:|----:|
-| `/` (Arabic home) | 98 | 100 | 100 | 100 |
-| `/en` (English home) | 97 | 100 | 100 | 100 |
-| `/contact` | 99 | 100 | 100 | 100 |
-| `/services` | 98 | 100 | 100 | 100 |
-| `/services/full-import-management` | 99 | 100 | 100 | 100 |
-| `/blog` | 98 | 100 | 100 | 100 |
-| `/blog/how-to-inspect-a-factory-before-you-pay` | 99 | 100 | 100 | 100 |
-| `/about` | 98 | 100 | 100 | 100 |
+| Page                                            | Performance | Accessibility | Best Practices | SEO |
+| ----------------------------------------------- | ----------: | ------------: | -------------: | --: |
+| `/` (Arabic home)                               |          98 |           100 |            100 | 100 |
+| `/en` (English home)                            |          97 |           100 |            100 | 100 |
+| `/contact`                                      |          99 |           100 |            100 | 100 |
+| `/services`                                     |          98 |           100 |            100 | 100 |
+| `/services/full-import-management`              |          99 |           100 |            100 | 100 |
+| `/blog`                                         |          98 |           100 |            100 | 100 |
+| `/blog/how-to-inspect-a-factory-before-you-pay` |          99 |           100 |            100 | 100 |
+| `/about`                                        |          98 |           100 |            100 | 100 |
 
 LCP 2.0–2.5 s, TBT 40–70 ms, CLS 0–0.007.
 

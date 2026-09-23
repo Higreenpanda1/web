@@ -8,10 +8,12 @@ import { ProcessSteps } from '@/components/home/ProcessSteps'
 import { StatsBand } from '@/components/home/StatsBand'
 import { PostCard } from '@/components/PostCard'
 import { ServiceCard } from '@/components/ServiceCard'
+import { CategoryTiles } from '@/components/services/CategoryTiles'
 import { ButtonLink } from '@/components/ui/Button'
 import { Container } from '@/components/ui/Container'
 import { Section, SectionHeading } from '@/components/ui/Section'
 import { getFounder, getPosts, getServices, getSiteSettings } from '@/lib/queries'
+import { groupServices } from '@/lib/services'
 
 import type { Locale } from '@/i18n/routing'
 
@@ -27,12 +29,20 @@ export async function DefaultHome({ locale }: { locale: Locale }) {
   const [t, settings, services, { docs: posts }, founder] = await Promise.all([
     getTranslations({ locale }),
     getSiteSettings(locale),
-    getServices(locale, { limit: 9 }),
+    getServices(locale, { limit: 60 }),
     getPosts(locale, { limit: 3 }),
     getFounder(locale),
   ])
 
   const Arrow = locale === 'ar' ? ArrowLeft : ArrowRight
+  const groups = groupServices(services)
+  // The flagship (which spans two columns) plus four more fills two rows of
+  // the three-column grid exactly. A taste, not the menu — the menu is the
+  // category tiles below.
+  const featured = [
+    ...services.filter((service) => service.featured),
+    ...services.filter((service) => !service.featured),
+  ].slice(0, 5)
   const steps = ([1, 2, 3, 4] as const).map((step) => ({
     title: t(`home.process.step${step}Title` as 'home.process.step1Title'),
     body: t(`home.process.step${step}Body` as 'home.process.step1Body'),
@@ -72,7 +82,7 @@ export async function DefaultHome({ locale }: { locale: Locale }) {
             }
           />
           <ul className="grid list-none gap-5 p-0 sm:grid-cols-2 lg:grid-cols-3">
-            {services.map((service) => (
+            {featured.map((service) => (
               <ServiceCard
                 key={service.id}
                 service={service}
@@ -84,7 +94,19 @@ export async function DefaultHome({ locale }: { locale: Locale }) {
         </Section>
       ) : null}
 
-      <Section labelledBy="home-process-heading">
+      {groups.length > 1 ? (
+        <Section labelledBy="home-categories-heading">
+          <SectionHeading
+            id="home-categories-heading"
+            eyebrow={t('home.categoriesEyebrow')}
+            title={t('home.categoriesTitle')}
+            lead={t('home.categoriesLead')}
+          />
+          <CategoryTiles groups={groups} locale={locale} />
+        </Section>
+      ) : null}
+
+      <Section tone="sunken" labelledBy="home-process-heading">
         <SectionHeading
           id="home-process-heading"
           eyebrow={t('home.processEyebrow')}
