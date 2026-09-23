@@ -20,7 +20,7 @@ export function NavLink({ href, label }: { href: string; label: string }) {
       className={cn(
         'relative inline-flex min-h-11 items-center rounded-full px-4 py-2 font-semibold no-underline transition-colors',
         active
-          ? 'bg-surface-tint text-brand-900'
+          ? 'bg-surface-tint text-heading'
           : 'text-text hover:bg-surface-tint-soft hover:text-text-brand',
       )}
     >

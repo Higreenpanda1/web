@@ -125,7 +125,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         <ul className="grid list-none gap-5 p-0 sm:grid-cols-2 lg:grid-cols-4">
           {values.map(({ Icon, title, body }) => (
             <Card as="li" key={title}>
-              <span className="inline-flex size-12 items-center justify-center rounded-lg bg-surface-tint text-brand-700">
+              <span className="inline-flex size-12 items-center justify-center rounded-lg bg-surface-tint text-text-brand">
                 <Icon size={24} strokeWidth={1.75} aria-hidden="true" />
               </span>
               <h3 className="mt-5">{title}</h3>

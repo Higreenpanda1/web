@@ -83,7 +83,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
 
             <dl className="divide-y divide-border-soft rounded-xl border border-border-soft bg-surface px-6">
               <div className="flex gap-4 py-5">
-                <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-sm bg-surface-tint text-brand-700">
+                <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-sm bg-surface-tint text-text-brand">
                   <Mail size={20} strokeWidth={1.75} aria-hidden="true" />
                 </span>
                 <div className="min-w-0">
@@ -103,7 +103,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
 
               {settings.offices && settings.offices.length > 0 ? (
                 <div className="flex gap-4 py-5">
-                  <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-sm bg-surface-tint text-brand-700">
+                  <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-sm bg-surface-tint text-text-brand">
                     <MapPin size={20} strokeWidth={1.75} aria-hidden="true" />
                   </span>
                   <div>
@@ -124,7 +124,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
 
               {settings.workingHours ? (
                 <div className="flex gap-4 py-5">
-                  <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-sm bg-surface-tint text-brand-700">
+                  <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-sm bg-surface-tint text-text-brand">
                     <Clock size={20} strokeWidth={1.75} aria-hidden="true" />
                   </span>
                   <div>

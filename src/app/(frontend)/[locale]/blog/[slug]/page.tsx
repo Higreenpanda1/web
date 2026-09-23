@@ -100,7 +100,7 @@ export default async function PostPage({
                   <span className="inline-flex items-center gap-2 font-semibold text-text">
                     <span
                       aria-hidden="true"
-                      className="inline-flex size-8 items-center justify-center rounded-full bg-surface-tint text-caption font-bold text-brand-800"
+                      className="inline-flex size-8 items-center justify-center rounded-full bg-surface-tint text-caption font-bold text-text-brand"
                     >
                       {author.name.slice(0, 1)}
                     </span>

@@ -104,7 +104,9 @@ the site is exactly as it was."
 ok "valid"
 
 step "Restarting the proxy"
-$COMPOSE up -d caddy </dev/null
+# --no-deps: app reads the whole .env (env_file), so without it compose
+# recreates app too whenever .env changed, and the site blips.
+$COMPOSE up -d --no-deps caddy </dev/null
 sleep 5
 $COMPOSE ps caddy
 

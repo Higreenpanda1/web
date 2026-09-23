@@ -19,7 +19,7 @@ const VARIANT_CLASS: Record<Variant, string> = {
     'bg-brand-700 text-white shadow-[0_1px_2px_rgb(18_52_27/0.2),0_10px_24px_-12px_rgb(39_107_52/0.8)] hover:bg-brand-800 active:bg-brand-900',
   secondary:
     'bg-surface text-heading border border-border-strong hover:border-brand-400 hover:bg-surface-tint-soft',
-  soft: 'bg-surface-tint text-brand-900 hover:bg-brand-200',
+  soft: 'bg-surface-tint text-heading hover:bg-brand-200 hover:text-brand-900',
   ghost: 'bg-transparent text-text-brand hover:bg-surface-tint-soft',
   inverse: 'bg-white text-brand-900 shadow-[0_10px_24px_-12px_rgb(0_0_0/0.5)] hover:bg-brand-50',
   // For a dark or photographic background.

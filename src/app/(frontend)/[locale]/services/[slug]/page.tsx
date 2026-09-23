@@ -104,7 +104,7 @@ export default async function ServicePage({
             {t('cta.enquire')}
           </ButtonLink>
           <ButtonLink href={whatsapp} size="lg" variant="secondary">
-            <WhatsAppIcon size={20} className="text-brand-700" />
+            <WhatsAppIcon size={20} className="text-text-brand" />
             {t('cta.whatsapp')}
           </ButtonLink>
         </div>
@@ -190,7 +190,7 @@ export default async function ServicePage({
                         href={`/services/${entry.slug}`}
                         className="group flex items-center gap-3 py-3 text-text no-underline hover:text-text-brand"
                       >
-                        <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-sm bg-surface-tint text-brand-700">
+                        <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-sm bg-surface-tint text-text-brand">
                           <ServiceIcon name={entry.icon} size={18} />
                         </span>
                         <span className="flex-1 font-medium">{entry.title}</span>

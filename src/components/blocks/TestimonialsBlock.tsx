@@ -44,7 +44,7 @@ export async function TestimonialsBlock({ block, locale }: { block: Block; local
                   ) : (
                     <span
                       aria-hidden="true"
-                      className="inline-flex size-11 items-center justify-center rounded-full bg-surface-tint font-bold text-brand-800"
+                      className="inline-flex size-11 items-center justify-center rounded-full bg-surface-tint font-bold text-text-brand"
                     >
                       {item.author.slice(0, 1)}
                     </span>

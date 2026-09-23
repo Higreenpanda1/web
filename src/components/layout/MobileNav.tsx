@@ -117,7 +117,7 @@ export function MobileNav({
               href={whatsappHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-brand-300 bg-surface-tint-soft px-6 text-body-lg font-semibold text-brand-900 no-underline"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-brand-300 bg-surface-tint-soft px-6 text-body-lg font-semibold text-heading no-underline"
             >
               <WhatsAppIcon size={20} />
               {whatsappLabel}

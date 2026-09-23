@@ -39,7 +39,7 @@ export async function ServiceCard({
             'inline-flex size-14 items-center justify-center rounded-lg transition-colors duration-300',
             featured
               ? 'bg-white/15 text-white'
-              : 'bg-surface-tint text-brand-700 group-hover:bg-brand-700 group-hover:text-white',
+              : 'bg-surface-tint text-text-brand group-hover:bg-brand-700 group-hover:text-white',
           )}
         >
           <ServiceIcon name={service.icon} />

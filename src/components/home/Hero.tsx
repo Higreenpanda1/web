@@ -45,7 +45,7 @@ export async function Hero({ locale, settings }: { locale: Locale; settings: Sit
 
       <Container className="grid items-center gap-14 py-14 md:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12 lg:py-28">
         <div className="max-w-[40rem]">
-          <p className="reveal inline-flex items-center gap-2 rounded-full border border-brand-200 bg-surface px-3.5 py-1.5 text-caption font-semibold text-brand-900 shadow-sm">
+          <p className="reveal inline-flex items-center gap-2 rounded-full border border-brand-200 bg-surface px-3.5 py-1.5 text-caption font-semibold text-heading shadow-sm">
             <MapPin size={16} strokeWidth={2} aria-hidden="true" className="text-brand-600" />
             {t('home.heroEyebrow')}
           </p>
@@ -59,7 +59,7 @@ export async function Hero({ locale, settings }: { locale: Locale; settings: Sit
 
           <p className="reveal reveal-2 mt-6 text-body-lg text-text-muted">{t('home.heroLead')}</p>
 
-          <p className="reveal reveal-2 mt-5 flex items-start gap-2.5 font-semibold text-brand-800">
+          <p className="reveal reveal-2 mt-5 flex items-start gap-2.5 font-semibold text-text-brand">
             <CheckCircle2
               size={22}
               strokeWidth={2}
@@ -74,7 +74,7 @@ export async function Hero({ locale, settings }: { locale: Locale; settings: Sit
               {t('cta.enquire')}
             </ButtonLink>
             <ButtonLink href={whatsapp} size="lg" variant="secondary">
-              <WhatsAppIcon size={20} className="text-brand-700" />
+              <WhatsAppIcon size={20} className="text-text-brand" />
               {t('cta.whatsapp')}
             </ButtonLink>
           </div>
@@ -88,7 +88,7 @@ export async function Hero({ locale, settings }: { locale: Locale; settings: Sit
               ] as const
             ).map(([value, label]) => (
               <div key={label}>
-                <dt className="ltr-nums text-h2 font-bold text-brand-800">{value}</dt>
+                <dt className="ltr-nums text-h2 font-bold text-text-brand">{value}</dt>
                 <dd className="mt-0.5 text-caption text-text-muted">{label}</dd>
               </div>
             ))}
@@ -131,7 +131,7 @@ export async function Hero({ locale, settings }: { locale: Locale; settings: Sit
                       className={cn(
                         'relative z-10 inline-flex size-10 shrink-0 items-center justify-center rounded-full',
                         state === 'done' && 'bg-brand-700 text-white',
-                        state === 'now' && 'bg-surface-tint text-brand-800 ring-2 ring-brand-500',
+                        state === 'now' && 'bg-surface-tint text-text-brand ring-2 ring-brand-500',
                         state === 'next' &&
                           'border border-border bg-surface-sunken text-text-muted',
                       )}
@@ -155,7 +155,7 @@ export async function Hero({ locale, settings }: { locale: Locale; settings: Sit
                         <span
                           className={cn(
                             'shrink-0 rounded-full px-2 py-0.5 text-eyebrow font-bold',
-                            state === 'done' && 'bg-surface-tint text-brand-800',
+                            state === 'done' && 'bg-surface-tint text-text-brand',
                             state === 'now' && 'bg-brand-700 text-white',
                             state === 'next' && 'bg-surface-sunken text-text-muted',
                           )}
@@ -184,7 +184,7 @@ export async function Hero({ locale, settings }: { locale: Locale; settings: Sit
             <span className="ltr-nums">{t('home.heroChipCities')}</span>
           </p>
           <p className="absolute -bottom-5 -start-3 hidden items-center gap-2 rounded-full border border-border-soft bg-surface px-4 py-2 text-caption font-semibold text-heading shadow-card motion-safe:animate-float sm:inline-flex">
-            <WhatsAppIcon size={17} className="text-brand-700" />
+            <WhatsAppIcon size={17} className="text-text-brand" />
             {t('home.heroChipReply')}
           </p>
         </div>
