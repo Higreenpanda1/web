@@ -83,20 +83,21 @@
 
   /* ---------------------------------------------------------------------------
      Type scale (brief §13). Fluid: each heading reaches the brief's size at a
-     1280px viewport and scales down below that. Body sizes are not scaled —
-     17px and 19px are already right on a phone.
+     1280px viewport and scales down below that. Body sizes are not scaled.
+     Reduced one step on 23 September 2026 at the owner's request ("fonts
+     large, not user friendly"): 16/17px body, 52/56px display at most.
      --------------------------------------------------------------------------- */
   --leading-body: 1.65;
   --leading-heading: 1.15;
 
-  --text-display: clamp(2.375rem, 1.3rem + 3.6vw, 3.875rem); /* 38 → 62px */
-  --text-h1: clamp(1.875rem, 1.42rem + 1.82vw, 2.5rem); /*     30 → 40px */
-  --text-h2: clamp(1.625rem, 1.3rem + 1.2vw, 2.125rem); /*     26 → 34px */
-  --text-h3: clamp(1.25rem, 1.16rem + 0.36vw, 1.375rem); /*    20 → 22px */
-  --text-body-lg: 1.1875rem; /* 19px */
-  --text-body: 1.0625rem; /*  17px */
-  --text-caption: 0.9375rem; /* 15px */
-  --text-eyebrow: 0.8125rem; /* 13px */
+  --text-display: clamp(2rem, 1.25rem + 2.5vw, 3.25rem); /* 32 → 52px */
+  --text-h1: clamp(1.75rem, 1.4rem + 1.2vw, 2.25rem); /*      28 → 36px */
+  --text-h2: clamp(1.5rem, 1.28rem + 0.75vw, 1.875rem); /*    24 → 30px */
+  --text-h3: clamp(1.125rem, 1.08rem + 0.2vw, 1.25rem); /*    18 → 20px */
+  --text-body-lg: 1.125rem; /* 18px */
+  --text-body: 1rem; /*       16px */
+  --text-caption: 0.875rem; /* 14px */
+  --text-eyebrow: 0.75rem; /*  12px */
 
   /* --- Layout ------------------------------------------------------------ */
   --measure: 68ch; /* brief §13: 65–75 characters */
@@ -126,14 +127,14 @@
   --leading-body: 1.9;
   --leading-heading: 1.35;
 
-  --text-display: clamp(2.5rem, 1.35rem + 3.9vw, 4.125rem); /* 40 → 66px */
-  --text-h1: clamp(2rem, 1.5rem + 2vw, 2.75rem); /*             32 → 44px */
-  --text-h2: clamp(1.75rem, 1.4rem + 1.3vw, 2.3125rem); /*      28 → 37px */
-  --text-h3: clamp(1.375rem, 1.28rem + 0.36vw, 1.5rem); /*      22 → 24px */
-  --text-body-lg: 1.3125rem; /* 21px */
-  --text-body: 1.1875rem; /* 19px */
-  --text-caption: 1rem; /*   16px */
-  --text-eyebrow: 0.875rem; /* 14px */
+  --text-display: clamp(2.125rem, 1.3rem + 2.7vw, 3.5rem); /* 34 → 56px */
+  --text-h1: clamp(1.875rem, 1.5rem + 1.3vw, 2.5rem); /*       30 → 40px */
+  --text-h2: clamp(1.625rem, 1.38rem + 0.8vw, 2.0625rem); /*   26 → 33px */
+  --text-h3: clamp(1.25rem, 1.2rem + 0.2vw, 1.375rem); /*      20 → 22px */
+  --text-body-lg: 1.1875rem; /* 19px */
+  --text-body: 1.0625rem; /* 17px */
+  --text-caption: 0.9375rem; /* 15px */
+  --text-eyebrow: 0.8125rem; /* 13px */
 
   --measure: 62ch;
 }

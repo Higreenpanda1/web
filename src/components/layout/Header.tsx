@@ -22,6 +22,7 @@ export async function Header({ locale, settings }: { locale: Locale; settings: S
       ? settings.primaryNav.map((item) => ({ label: item.label, href: item.href }))
       : [
           { label: t('nav.services'), href: '/services' },
+          { label: t('nav.consultation'), href: '/apply/consultation' },
           { label: t('nav.about'), href: '/about' },
           { label: t('nav.blog'), href: '/blog' },
           { label: t('nav.contact'), href: '/contact' },
@@ -68,15 +69,15 @@ export async function Header({ locale, settings }: { locale: Locale; settings: S
               itself: both would set `display` and Tailwind's emission order
               would decide the winner. */}
           <span className="hidden sm:block">
-            <ButtonLink href="/contact">{t('cta.enquire')}</ButtonLink>
+            <ButtonLink href="/apply/company-registration">{t('cta.startCompany')}</ButtonLink>
           </span>
           <MobileNav
             items={items}
             openLabel={t('nav.openMenu')}
             closeLabel={t('nav.closeMenu')}
             navLabel={t('nav.primary')}
-            ctaLabel={t('cta.enquire')}
-            ctaHref="/contact"
+            ctaLabel={t('cta.startCompany')}
+            ctaHref="/apply/company-registration"
             whatsappLabel={t('cta.whatsapp')}
             whatsappHref={whatsapp}
           >

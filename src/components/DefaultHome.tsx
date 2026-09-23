@@ -1,16 +1,14 @@
-import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Clock } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 
 import { ContactPanel } from '@/components/home/ContactPanel'
 import { FounderCard } from '@/components/home/FounderCard'
 import { Hero } from '@/components/home/Hero'
-import { ProcessSteps } from '@/components/home/ProcessSteps'
-import { StatsBand } from '@/components/home/StatsBand'
+import { Journey, type JourneyStep } from '@/components/home/Journey'
 import { PostCard } from '@/components/PostCard'
-import { ServiceCard } from '@/components/ServiceCard'
 import { CategoryTiles } from '@/components/services/CategoryTiles'
 import { ButtonLink } from '@/components/ui/Button'
-import { Container } from '@/components/ui/Container'
+import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { Section, SectionHeading } from '@/components/ui/Section'
 import { getFounder, getPosts, getServices, getSiteSettings } from '@/lib/queries'
 import { groupServices } from '@/lib/services'
@@ -18,12 +16,33 @@ import { groupServices } from '@/lib/services'
 import type { Locale } from '@/i18n/routing'
 
 /**
+ * Where each of the twelve steps sends the visitor. Services by slug; the
+ * two steps that are conversations rather than services go to the
+ * consultation form.
+ */
+const JOURNEY_LINKS = [
+  '/apply/consultation',
+  '/apply/consultation',
+  '/services/trademark-registration',
+  '/services/company-formation',
+  '/services/work-visa-and-residence',
+  '/services/accounting-and-tax',
+  '/services/product-sourcing',
+  '/services/quality-inspection',
+  '/services/shipping-and-freight',
+  '/services/shipping-and-freight',
+  '/services/shipping-and-freight',
+  '/services/full-import-management',
+] as const
+
+/**
  * The homepage as it renders before anyone has touched the CMS.
  *
- * Every word comes from the message catalogues, which were written Arabic-first
- * from the brief's own copy. Once an editor builds a `home` Page in the CMS,
- * that layout replaces this entirely — and the blocks it is made of share
- * these same section components, so the two never look different.
+ * Rebuilt on 23 September 2026 around the owner's structure document: a
+ * quieter hero, the twelve-step journey as the centrepiece, the consultation
+ * offer, then the service areas, the blog and the founder. One accent colour,
+ * white surfaces, and motion only on entrance. Every word comes from the
+ * message catalogues; a CMS `home` Page still replaces all of this.
  */
 export async function DefaultHome({ locale }: { locale: Locale }) {
   const [t, settings, services, { docs: posts }, founder] = await Promise.all([
@@ -36,39 +55,81 @@ export async function DefaultHome({ locale }: { locale: Locale }) {
 
   const Arrow = locale === 'ar' ? ArrowLeft : ArrowRight
   const groups = groupServices(services)
-  // The flagship (which spans two columns) plus four more fills two rows of
-  // the three-column grid exactly. A taste, not the menu — the menu is the
-  // category tiles below.
-  const featured = [
-    ...services.filter((service) => service.featured),
-    ...services.filter((service) => !service.featured),
-  ].slice(0, 5)
-  const steps = ([1, 2, 3, 4] as const).map((step) => ({
-    title: t(`home.process.step${step}Title` as 'home.process.step1Title'),
-    body: t(`home.process.step${step}Body` as 'home.process.step1Body'),
+  const steps: JourneyStep[] = JOURNEY_LINKS.map((href, index) => ({
+    href,
+    title: t(`home.journeySteps.${index + 1}.title` as 'home.journeySteps.1.title'),
+    body: t(`home.journeySteps.${index + 1}.body` as 'home.journeySteps.1.body'),
+    linkLabel: href.startsWith('/apply') ? t('cta.bookConsultation') : t('cta.seeService'),
   }))
 
   return (
     <>
+      <ScrollReveal />
       <Hero locale={locale} settings={settings} />
 
-      <div className="bg-surface pb-4">
-        <Container>
-          <StatsBand
-            eyebrow={t('home.statsEyebrow')}
-            heading={t('home.statsTitle')}
-            items={[
-              { value: '235+', label: t('home.stats.cities') },
-              { value: '100+', label: t('home.stats.fairs') },
-              { value: '46,000', label: t('home.stats.followers') },
-              { value: '29,000', label: t('home.stats.subscribers') },
-            ]}
-          />
-        </Container>
-      </div>
+      <Section id="journey" labelledBy="home-journey-heading" className="scroll-mt-20">
+        <SectionHeading
+          id="home-journey-heading"
+          eyebrow={t('home.journeyEyebrow')}
+          title={t('home.journeyTitle')}
+          lead={t('home.journeyLead')}
+          align="center"
+        />
+        <Journey steps={steps} locale={locale} stepLabel={t('home.journeyStep')} />
+      </Section>
 
-      {services.length > 0 ? (
-        <Section tone="sunken" labelledBy="home-services-heading">
+      <Section tone="sunken" labelledBy="home-consult-heading" className="py-12 md:py-16">
+        <div
+          data-reveal
+          className="grid items-center gap-8 rounded-2xl border border-border-soft bg-surface p-6 shadow-card md:p-10 lg:grid-cols-[1.2fr_1fr] lg:gap-14"
+        >
+          <div>
+            <SectionHeading
+              id="home-consult-heading"
+              eyebrow={t('home.consultEyebrow')}
+              title={t('home.consultTitle')}
+              lead={t('home.consultLead')}
+              className="mb-6 md:mb-6"
+            />
+            <div className="flex flex-wrap gap-3">
+              <ButtonLink href="/apply/consultation" size="lg">
+                {t('cta.bookConsultation')}
+                <Arrow size={18} strokeWidth={2} aria-hidden="true" />
+              </ButtonLink>
+            </div>
+          </div>
+          <ul className="grid list-none gap-3 p-0 sm:grid-cols-2 lg:grid-cols-1">
+            {(
+              [
+                ['consult30', 'consultPrice30'],
+                ['consult60', 'consultPrice60'],
+              ] as const
+            ).map(([len, price]) => (
+              <li
+                key={len}
+                className="flex items-center justify-between gap-4 rounded-lg border border-border-soft bg-surface-sunken px-5 py-4"
+              >
+                <span className="inline-flex items-center gap-2.5 font-semibold text-heading">
+                  <Clock
+                    size={18}
+                    strokeWidth={1.75}
+                    aria-hidden="true"
+                    className="text-text-brand"
+                  />
+                  {t(`home.${len}`)}
+                </span>
+                <span className="ltr-nums text-h3 font-bold text-heading">
+                  {t(`home.${price}`)}
+                </span>
+              </li>
+            ))}
+            <li className="px-1 text-caption text-text-muted">{t('home.consultNote')}</li>
+          </ul>
+        </div>
+      </Section>
+
+      {groups.length > 1 ? (
+        <Section labelledBy="home-services-heading">
           <SectionHeading
             id="home-services-heading"
             eyebrow={t('home.servicesEyebrow')}
@@ -81,57 +142,7 @@ export async function DefaultHome({ locale }: { locale: Locale }) {
               </ButtonLink>
             }
           />
-          <ul className="grid list-none gap-5 p-0 sm:grid-cols-2 lg:grid-cols-3">
-            {featured.map((service) => (
-              <ServiceCard
-                key={service.id}
-                service={service}
-                locale={locale}
-                featured={Boolean(service.featured)}
-              />
-            ))}
-          </ul>
-        </Section>
-      ) : null}
-
-      {groups.length > 1 ? (
-        <Section labelledBy="home-categories-heading">
-          <SectionHeading
-            id="home-categories-heading"
-            eyebrow={t('home.categoriesEyebrow')}
-            title={t('home.categoriesTitle')}
-            lead={t('home.categoriesLead')}
-          />
           <CategoryTiles groups={groups} locale={locale} />
-        </Section>
-      ) : null}
-
-      <Section tone="sunken" labelledBy="home-process-heading">
-        <SectionHeading
-          id="home-process-heading"
-          eyebrow={t('home.processEyebrow')}
-          title={t('home.processTitle')}
-          lead={t('home.processLead')}
-        />
-        <ProcessSteps steps={steps} />
-      </Section>
-
-      {founder ? (
-        <Section tone="tint" labelledBy="home-founder-heading">
-          <FounderCard
-            member={founder}
-            eyebrow={t('home.founderEyebrow')}
-            heading={t('home.founderTitle')}
-            actions={
-              <ButtonLink href="/about" variant="secondary">
-                {t('home.founderCta')}
-                <Arrow size={18} strokeWidth={2} aria-hidden="true" />
-              </ButtonLink>
-            }
-          />
-          <h2 id="home-founder-heading" className="sr-only">
-            {t('home.founderTitle')}
-          </h2>
         </Section>
       ) : null}
 
@@ -157,7 +168,28 @@ export async function DefaultHome({ locale }: { locale: Locale }) {
         </Section>
       ) : null}
 
-      <Section labelledBy="home-contact-heading" className="pt-4 md:pt-8">
+      {founder ? (
+        <Section labelledBy="home-founder-heading">
+          <div data-reveal>
+            <FounderCard
+              member={founder}
+              eyebrow={t('home.founderEyebrow')}
+              heading={t('home.founderTitle')}
+              actions={
+                <ButtonLink href="/about" variant="secondary">
+                  {t('home.founderCta')}
+                  <Arrow size={18} strokeWidth={2} aria-hidden="true" />
+                </ButtonLink>
+              }
+            />
+          </div>
+          <h2 id="home-founder-heading" className="sr-only">
+            {t('home.founderTitle')}
+          </h2>
+        </Section>
+      ) : null}
+
+      <Section tone="sunken" labelledBy="home-contact-heading" className="pt-4 md:pt-8">
         <ContactPanel
           id="enquire"
           locale={locale}

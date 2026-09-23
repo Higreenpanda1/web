@@ -105,6 +105,12 @@ export const FORMS: Record<ApplicationType, FormDef> = {
             width: 'half',
             options: ['idea', 'planning', 'started', 'operating'],
           },
+          {
+            name: 'duration',
+            kind: 'select',
+            required: true,
+            options: ['min30', 'min60'],
+          },
           { name: 'goals', kind: 'textarea', required: true, rows: 5, hint: true, max: 4000 },
         ],
       },

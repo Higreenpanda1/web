@@ -16,7 +16,8 @@
     "closeMenu": "Close menu",
     "skipToContent": "Skip to content",
     "primary": "Primary navigation",
-    "footer": "Footer links"
+    "footer": "Footer links",
+    "consultation": "Consultation"
   },
   "locale": {
     "switchTo": "العربية",
@@ -31,13 +32,17 @@
     "readMore": "Read more",
     "contactUs": "Contact us",
     "learnMore": "Details",
-    "startNow": "Get started"
+    "startNow": "Get started",
+    "startCompany": "Start a company",
+    "bookConsultation": "Book a consultation",
+    "exploreJourney": "Explore the journey",
+    "seeService": "See this service"
   },
   "home": {
-    "heroEyebrow": "Shenzhen · Shanghai",
-    "heroTitle": "Your first source for business services in China",
-    "heroLead": "Looking to source your next product from China, manufacture it, inspect it, or ship it? Looking for help setting up your own company in China? We're here for you.",
-    "heroPromise": "One accountable partner, from product idea to delivered goods.",
+    "heroEyebrow": "Shenzhen · Shanghai · Yiwu",
+    "heroTitle": "From idea to your warehouse",
+    "heroLead": "One partner on the ground in China for the whole road: the company, the supplier, the factory, the shipment — and everything in between.",
+    "heroPromise": "One accountable partner. Twelve steps. No surprises.",
     "statsTitle": "Experience on the ground, not from behind a screen",
     "stats": {
       "cities": "Chinese cities visited",
@@ -45,8 +50,8 @@
       "followers": "Instagram followers",
       "subscribers": "YouTube subscribers"
     },
-    "servicesTitle": "What we do for you",
-    "servicesLead": "Twenty services across importing, company setup, banking, e-commerce and visas. Take one, or hand us the whole journey.",
+    "servicesTitle": "Everything on the road, as a service",
+    "servicesLead": "Twenty services in six areas. Take one, or hand us the whole journey.",
     "processTitle": "How it works",
     "processLead": "No surprises. At every stage you know where your goods are and what you have paid.",
     "process": {
@@ -68,7 +73,7 @@
     "contactLead": "Fill in the form or message us directly on WhatsApp. We reply within one working day.",
     "heroChipReply": "We reply within one working day",
     "heroChipCities": "235+ Chinese cities",
-    "journeyTitle": "Your import journey",
+    "journeyTitle": "Twelve steps, one connected road",
     "journeyStatus": "One partner, start to finish",
     "journeyDone": "Done",
     "journeyNow": "In progress",
@@ -82,7 +87,69 @@
     "statsEyebrow": "Numbers, not promises",
     "categoriesEyebrow": "One partner",
     "categoriesTitle": "Whatever you need in China, in one place",
-    "categoriesLead": "From the first product search to a registered company, a bank account and a work visa. Pick the area you need."
+    "categoriesLead": "From the first product search to a registered company, a bank account and a work visa. Pick the area you need.",
+    "journeyEyebrow": "The journey",
+    "journeyLead": "Tap any step to see what happens there and which service covers it. Start anywhere; most clients do not begin at step one.",
+    "journeyStep": "Step",
+    "journeySteps": {
+      "1": {
+        "title": "The idea",
+        "body": "You bring a product or a plan. We talk it through honestly: what it costs, how long it takes, and whether China is the right place to do it."
+      },
+      "2": {
+        "title": "Market and product research",
+        "body": "Demand, competitors, price points and the factories that already make it, before any money moves."
+      },
+      "3": {
+        "title": "Trademark",
+        "body": "China is first-to-file. Registering your brand before a factory or a competitor does is the cheapest protection you will ever buy."
+      },
+      "4": {
+        "title": "Company setup",
+        "body": "A registered company with a licence, a registered address and a bank account, in the city that suits your business."
+      },
+      "5": {
+        "title": "Structure and residence",
+        "body": "Who signs, who owns what, and the work permit and residence card if you or your staff will live in China."
+      },
+      "6": {
+        "title": "Accounting and compliance",
+        "body": "Monthly books, tax filings and the annual report, done by licensed accountants, so the company stays in good standing."
+      },
+      "7": {
+        "title": "Find the supplier",
+        "body": "Verified factories, not trading companies pretending to be one. Samples, comparisons and negotiation in Chinese."
+      },
+      "8": {
+        "title": "Production and quality",
+        "body": "Production followed on the ground, inspections before you pay and before it ships, with photographs and a report."
+      },
+      "9": {
+        "title": "Shipping",
+        "body": "Sea, air or rail, chosen for your timeline and budget, with one landed price instead of five invoices."
+      },
+      "10": {
+        "title": "Customs clearance",
+        "body": "Export paperwork in China and import clearance at your end, prepared so nothing waits at the port."
+      },
+      "11": {
+        "title": "Local delivery",
+        "body": "From the port to your door, arranged and tracked until it is signed for."
+      },
+      "12": {
+        "title": "Your warehouse",
+        "body": "Goods delivered, company running, next order easier than the first. The road loops back to step seven."
+      }
+    },
+    "consultEyebrow": "Not sure where to start?",
+    "consultTitle": "Start with a conversation",
+    "consultLead": "A video or WhatsApp call with someone who is in China and has done this hundreds of times. You leave with a plan and real numbers.",
+    "consult30": "30 minutes",
+    "consult60": "60 minutes",
+    "consultPrice30": "$135",
+    "consultPrice60": "$225",
+    "consultNote": "The fee is credited against any service you go on to book with us.",
+    "heroCardTitle": "Your import journey"
   },
   "services": {
     "title": "Our services",
@@ -501,7 +568,8 @@
       "productsHint": "What the brand sells, e.g. “perfume and cosmetics”.",
       "existingRegistration": "Is it registered anywhere else?",
       "existingRegistrationHint": "In your own country or internationally.",
-      "capitalCurrency": "Currency of the capital"
+      "capitalCurrency": "Currency of the capital",
+      "duration": "Consultation length"
     },
     "options": {
       "common": {
@@ -665,6 +733,53 @@
       "capitalCurrency": {
         "usd": "US dollars",
         "cny": "Chinese yuan"
+      },
+      "duration": {
+        "min30": "30 minutes — $135",
+        "min60": "60 minutes — $225"
+      }
+    }
+  },
+  "estimator": {
+    "eyebrow": "Instant estimate",
+    "title": "What would your company cost?",
+    "lead": "Pick the options that fit you. The total is a starting estimate in Chinese yuan; your written quote confirms it before any payment.",
+    "city": "City",
+    "registration": "Registration",
+    "address": "Registered address",
+    "bank": "Bank account",
+    "extras": "Add",
+    "total": "Estimated total",
+    "perYear": "per year",
+    "onceOff": "one-off",
+    "quoted": "quoted separately",
+    "cta": "Start the application with these options",
+    "note": "Official fees, translations and the annual address renewal are itemised in the quote. Prices last reviewed September 2026.",
+    "options": {
+      "city": {
+        "shenzhen": "Shenzhen",
+        "guangzhou": "Guangzhou",
+        "shanghai": "Shanghai",
+        "yiwu": "Yiwu",
+        "hongkong": "Hong Kong"
+      },
+      "registration": {
+        "inPerson": "In person (you travel to China)",
+        "remote": "Remote (documents legalised in your country)"
+      },
+      "address": {
+        "basic": "Virtual address — no work visa",
+        "residence": "Virtual address — work-visa eligible",
+        "physical": "Physical office"
+      },
+      "bank": {
+        "none": "Not now",
+        "inPerson": "In person",
+        "remote": "Remote"
+      },
+      "extras": {
+        "accounting": "One year of accounting and tax filing",
+        "workPermit": "Work permit and residence card"
       }
     }
   }

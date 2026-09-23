@@ -182,7 +182,9 @@ const CORE_SERVICES: SeedService[] = [
     featured: false,
     icon: 'building',
     category: 'company',
-    priceFrom: 7200,
+    // Owner's "Company Registration Quotation System" sheet, September 2026:
+    // remote ¥6,000, in person ¥7,000. The 2025 price list said ¥8,200/¥7,200.
+    priceFrom: 6000,
     applicationType: 'company-registration',
     ar: {
       title: 'تأسيس شركة في الصين',

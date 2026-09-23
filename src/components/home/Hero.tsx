@@ -41,7 +41,7 @@ export async function Hero({ locale, settings }: { locale: Locale; settings: Sit
 
   return (
     <section className="relative isolate overflow-hidden bg-surface bg-gradient-hero">
-      <div className="absolute inset-0 -z-10 bg-dots opacity-80" aria-hidden="true" />
+      <div className="absolute inset-0 -z-10 bg-dots opacity-40" aria-hidden="true" />
 
       <Container className="grid items-center gap-14 py-14 md:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12 lg:py-28">
         <div className="max-w-[40rem]">
@@ -70,12 +70,21 @@ export async function Hero({ locale, settings }: { locale: Locale; settings: Sit
           </p>
 
           <div className="reveal reveal-3 mt-9 flex flex-wrap gap-3">
-            <ButtonLink href="/contact" size="lg">
-              {t('cta.enquire')}
+            <ButtonLink href="#journey" size="lg">
+              {t('cta.exploreJourney')}
             </ButtonLink>
-            <ButtonLink href={whatsapp} size="lg" variant="secondary">
+            <ButtonLink href="/apply/consultation" size="lg" variant="secondary">
+              {t('cta.bookConsultation')}
+            </ButtonLink>
+            <ButtonLink
+              href={whatsapp}
+              size="lg"
+              variant="ghost"
+              aria-label={t('cta.whatsapp')}
+              title={t('cta.whatsapp')}
+            >
               <WhatsAppIcon size={20} className="text-text-brand" />
-              {t('cta.whatsapp')}
+              <span className="sm:hidden">{t('cta.whatsapp')}</span>
             </ButtonLink>
           </div>
 
@@ -106,7 +115,7 @@ export async function Hero({ locale, settings }: { locale: Locale; settings: Sit
             <div className="flex items-center gap-3">
               <PlayMark size={42} />
               <div className="min-w-0">
-                <p className="font-bold text-heading">{t('home.journeyTitle')}</p>
+                <p className="font-bold text-heading">{t('home.heroCardTitle')}</p>
                 <p className="truncate text-caption text-text-muted">{t('home.journeyStatus')}</p>
               </div>
             </div>

@@ -131,7 +131,7 @@ export const CATALOGUE_SERVICES: SeedService[] = [
     featured: false,
     icon: 'calculator',
     category: 'company',
-    priceFrom: 3800,
+    priceFrom: 3200,
     priceUnit: 'year',
     ar: {
       title: 'المحاسبة والإقرارات الضريبية',
@@ -244,13 +244,13 @@ export const CATALOGUE_SERVICES: SeedService[] = [
     featured: false,
     icon: 'landmark',
     category: 'banking',
-    priceFrom: 1400,
+    priceFrom: 1200,
     applicationType: 'account-opening',
     ar: {
       title: 'فتح حساب بنكي للشركة',
       summary:
         'حساب بنكي لشركتك في الصين باليوان والعملات الأجنبية، أو حساب لشركتك في هونغ كونغ. نرتّب الموعد ونجهّز الملف ونرافقك في البنك.',
-      body: 'الحساب البنكي هو ما يجعل الشركة قابلة للعمل فعلًا: به تستلم من عملائك، تدفع لمورّديك، وتربط حسابات علي باي ووي تشات باي. لكن البنوك الصينية تدقّق في الشركات الأجنبية، وطلب ناقص أو إجابة مرتبكة في المقابلة يعني رفضًا وانتظارًا لأشهر قبل محاولة أخرى.\n\nنعرف ما يسأل عنه كل بنك، ونجهّز الملف بناءً عليه، ونرافقك في الموعد مترجمين وشارحين.\n\n## الخيارات\n\n- حساب شركة في الصين: باليوان والدولار وغيرها، مع الخدمات المصرفية الإلكترونية. من 1,400 يوان.\n- حساب شركة في هونغ كونغ: لمن يحتاج حرية أكبر في تحويل العملات الأجنبية. من 1,700 يوان، ويشترط شركة مسجّلة في هونغ كونغ.\n\nحضور الممثل القانوني شخصيًا مطلوب في أغلب البنوك، وبعضها يقبل الفتح عن بُعد لحالات محددة؛ أخبرنا بوضعك ونحدّد لك البنك المناسب.',
+      body: 'الحساب البنكي هو ما يجعل الشركة قابلة للعمل فعلًا: به تستلم من عملائك، تدفع لمورّديك، وتربط حسابات علي باي ووي تشات باي. لكن البنوك الصينية تدقّق في الشركات الأجنبية، وطلب ناقص أو إجابة مرتبكة في المقابلة يعني رفضًا وانتظارًا لأشهر قبل محاولة أخرى.\n\nنعرف ما يسأل عنه كل بنك، ونجهّز الملف بناءً عليه، ونرافقك في الموعد مترجمين وشارحين.\n\n## الخيارات\n\n- حساب شركة في الصين: باليوان والدولار وغيرها، مع الخدمات المصرفية الإلكترونية. من 1,200 يوان بالحضور الشخصي، ومن 1,700 يوان عن بُعد.\n- حساب شركة في هونغ كونغ: لمن يحتاج حرية أكبر في تحويل العملات الأجنبية. من 1,700 يوان، ويشترط شركة مسجّلة في هونغ كونغ.\n\nحضور الممثل القانوني شخصيًا مطلوب في أغلب البنوك، وبعضها يقبل الفتح عن بُعد لحالات محددة؛ أخبرنا بوضعك ونحدّد لك البنك المناسب.',
       highlights: [
         'اختيار البنك المناسب لنوع نشاطك',
         'تجهيز الملف كاملًا قبل الموعد',
@@ -269,7 +269,7 @@ export const CATALOGUE_SERVICES: SeedService[] = [
       title: 'Corporate bank account opening',
       summary:
         'A bank account for your Chinese company in yuan and foreign currencies, or for your Hong Kong company. We book the appointment, prepare the file and accompany you at the bank.',
-      body: 'The bank account is what makes a company actually usable: it is how you receive from customers, pay suppliers, and connect Alipay and WeChat Pay. But Chinese banks scrutinise foreign-owned companies, and an incomplete file or a muddled answer in the interview means a refusal and months of waiting before the next attempt.\n\nWe know what each bank asks, prepare the file accordingly, and sit with you at the appointment to translate and explain.\n\n## The options\n\n- Mainland China company account: yuan, dollars and other currencies, with online banking. From ¥1,400.\n- Hong Kong company account: for those who need more freedom moving foreign currency. From ¥1,700; requires a company registered in Hong Kong.\n\nMost banks require the legal representative in person; a few accept remote opening in specific cases. Tell us your situation and we will match the bank.',
+      body: 'The bank account is what makes a company actually usable: it is how you receive from customers, pay suppliers, and connect Alipay and WeChat Pay. But Chinese banks scrutinise foreign-owned companies, and an incomplete file or a muddled answer in the interview means a refusal and months of waiting before the next attempt.\n\nWe know what each bank asks, prepare the file accordingly, and sit with you at the appointment to translate and explain.\n\n## The options\n\n- Mainland China company account: yuan, dollars and other currencies, with online banking. From ¥1,200 in person, ¥1,700 remote.\n- Hong Kong company account: for those who need more freedom moving foreign currency. From ¥1,700; requires a company registered in Hong Kong.\n\nMost banks require the legal representative in person; a few accept remote opening in specific cases. Tell us your situation and we will match the bank.',
       highlights: [
         'The right bank for your type of business',
         'The complete file prepared before the appointment',
@@ -495,7 +495,7 @@ export const CATALOGUE_SERVICES: SeedService[] = [
     featured: false,
     icon: 'id-card',
     category: 'visas',
-    priceFrom: 7600,
+    priceFrom: 4600,
     applicationType: 'visa',
     ar: {
       title: 'تأشيرة العمل والإقامة',

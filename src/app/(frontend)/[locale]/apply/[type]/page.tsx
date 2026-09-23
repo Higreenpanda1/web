@@ -24,7 +24,7 @@ import type { Locale } from '@/i18n/routing'
 import type { Metadata } from 'next'
 
 type Params = Promise<{ locale: Locale; type: string }>
-type Search = Promise<{ service?: string }>
+type Search = Promise<{ service?: string; city?: string; address?: string; extras?: string }>
 
 export function generateStaticParams() {
   return APPLICATION_TYPES.map((type) => ({ type }))
@@ -58,7 +58,28 @@ export default async function ApplyPage({
   params: Params
   searchParams: Search
 }) {
-  const [{ locale, type }, { service: serviceSlug }] = await Promise.all([params, searchParams])
+  const [{ locale, type }, { service: serviceSlug, ...query }] = await Promise.all([
+    params,
+    searchParams,
+  ])
+  // Choices carried over from the cost estimator, mapped to form values.
+  const ADDRESS: Record<string, string> = {
+    basic: 'virtual-basic',
+    residence: 'virtual-work-visa',
+    physical: 'own-office',
+  }
+  const defaults: Record<string, string | string[]> = {}
+  if (query.city) defaults.city = query.city
+  const addressOption = query.address ? ADDRESS[query.address] : undefined
+  if (addressOption) defaults.addressOption = addressOption
+  if (query.extras) {
+    const map: Record<string, string> = {
+      accounting: 'accounting',
+      workPermit: 'work-visa',
+      'bank-account': 'bank-account',
+    }
+    defaults.extras = query.extras.split(',').flatMap((k) => (map[k] ? [map[k]] : []))
+  }
   if (!isApplicationType(type)) notFound()
   setRequestLocale(locale)
   // The token must be minted per request, never baked into a static page.
@@ -125,6 +146,7 @@ export default async function ApplyPage({
               type={type}
               formToken={issueFormToken()}
               serviceId={service?.id ?? null}
+              defaults={defaults}
             />
           </div>
 

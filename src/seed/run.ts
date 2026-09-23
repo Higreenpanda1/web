@@ -53,6 +53,7 @@ async function main() {
       },
       primaryNav: [
         { label: 'الخدمات', href: '/services' },
+        { label: 'استشارة', href: '/apply/consultation' },
         { label: 'من نحن', href: '/about' },
         { label: 'المدونة', href: '/blog' },
         { label: 'تواصل معنا', href: '/contact' },
@@ -75,6 +76,7 @@ async function main() {
       ],
       primaryNav: [
         { label: 'Services', href: '/services' },
+        { label: 'Consultation', href: '/apply/consultation' },
         { label: 'About', href: '/about' },
         { label: 'Blog', href: '/blog' },
         { label: 'Contact', href: '/contact' },

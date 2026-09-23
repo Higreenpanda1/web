@@ -37,12 +37,15 @@ export function ApplicationForm({
   type,
   formToken,
   serviceId,
+  defaults = {},
   className,
 }: {
   locale: Locale
   type: ApplicationType
   formToken: string
   serviceId?: number | null
+  /** Pre-selected answers, e.g. carried over from the cost estimator. */
+  defaults?: Record<string, string | string[]>
   className?: string
 }) {
   const def = FORMS[type]
@@ -57,7 +60,11 @@ export function ApplicationForm({
   const [step, setStep] = useState(0)
   const [stepError, setStepError] = useState(false)
   // The current value of every field another field depends on.
-  const [controls, setControls] = useState<Record<string, string>>({})
+  const [controls, setControls] = useState<Record<string, string>>(() =>
+    Object.fromEntries(
+      Object.entries(defaults).flatMap(([k, v]) => (typeof v === 'string' ? [[k, v]] : [])),
+    ),
+  )
   useEffect(() => setEnhanced(true), [])
 
   // A server-side error takes the visitor back to the first step that has one.
@@ -198,6 +205,7 @@ export function ApplicationForm({
                     field={field}
                     id={fieldId(field.name)}
                     locale={locale}
+                    defaultValue={defaults[field.name]}
                     disabled={!visible}
                     error={
                       fieldErrors[field.name]
@@ -277,6 +285,7 @@ function FieldControl({
   field,
   id,
   locale,
+  defaultValue,
   disabled,
   error,
   onControlChange,
@@ -285,6 +294,7 @@ function FieldControl({
   field: FieldDef
   id: string
   locale: Locale
+  defaultValue?: string | string[]
   disabled: boolean
   error?: string
   onControlChange?: (value: string) => void
@@ -318,7 +328,7 @@ function FieldControl({
       control = (
         <select
           {...common}
-          defaultValue=""
+          defaultValue={typeof defaultValue === 'string' ? defaultValue : ''}
           onChange={onControlChange ? (e) => onControlChange(e.target.value) : undefined}
         >
           <option value="" disabled={field.required}>
@@ -375,6 +385,7 @@ function FieldControl({
                     type="checkbox"
                     name={field.name}
                     value={code}
+                    defaultChecked={Array.isArray(defaultValue) && defaultValue.includes(code)}
                     className="peer sr-only"
                     aria-describedby={describedBy}
                   />

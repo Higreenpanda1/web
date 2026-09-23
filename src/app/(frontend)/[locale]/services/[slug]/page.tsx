@@ -8,6 +8,7 @@ import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon'
 import { JsonLd } from '@/components/JsonLd'
 import { RichText } from '@/components/RichText'
 import { ServiceIcon } from '@/components/ServiceIcon'
+import { CostEstimator } from '@/components/services/CostEstimator'
 import { PriceTag } from '@/components/services/PriceTag'
 import { Accordion } from '@/components/ui/Accordion'
 import { Breadcrumb } from '@/components/ui/Breadcrumb'
@@ -166,6 +167,10 @@ export default async function ServicePage({
                   ))}
                 </ul>
               </div>
+            ) : null}
+
+            {service.applicationType === 'company-registration' ? (
+              <CostEstimator locale={locale} className="mt-12" />
             ) : null}
 
             {requirements.length > 0 ? (
