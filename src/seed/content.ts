@@ -407,6 +407,8 @@ export type SeedPost = {
   slug: string
   categories: string[]
   publishedAt: string
+  /** File in src/seed/assets, plus alt text. Uploaded once; matched by Arabic alt on re-runs. */
+  cover?: { file: string; alt: { ar: string; en: string } }
   ar: { title: string; excerpt: string; body: string }
   en: { title: string; excerpt: string; body: string }
 }
@@ -416,6 +418,10 @@ export const POSTS: SeedPost[] = [
     slug: 'open-an-online-store-through-a-chinese-company',
     categories: ['ecommerce', 'company-setup'],
     publishedAt: '2026-08-12T09:00:00.000Z',
+    cover: {
+      file: 'post-online-store.jpg',
+      alt: { ar: 'أفق مدينة قوانزو ليلًا', en: 'The Guangzhou skyline at night' },
+    },
     ar: {
       title: 'كيف تفتح متجرًا إلكترونيًا عبر شركة في الصين',
       excerpt:
@@ -433,6 +439,13 @@ export const POSTS: SeedPost[] = [
     slug: 'what-importing-from-china-actually-costs',
     categories: ['importing'],
     publishedAt: '2026-08-26T09:00:00.000Z',
+    cover: {
+      file: 'post-import-costs.jpg',
+      alt: {
+        ar: 'سفينة حاويات ورافعات في ميناء صيني',
+        en: 'A container ship and cranes at a Chinese port',
+      },
+    },
     ar: {
       title: 'ما التكلفة الحقيقية للاستيراد من الصين؟',
       excerpt:
@@ -450,6 +463,13 @@ export const POSTS: SeedPost[] = [
     slug: 'how-to-inspect-a-factory-before-you-pay',
     categories: ['importing'],
     publishedAt: '2026-09-09T09:00:00.000Z',
+    cover: {
+      file: 'post-inspect-factory.jpg',
+      alt: {
+        ar: 'عمال يفحصون لوحات إلكترونية في مصنع صيني',
+        en: 'Workers checking circuit boards in a Chinese factory',
+      },
+    },
     ar: {
       title: 'كيف تتحقق من المصنع قبل أن تدفع',
       excerpt:

@@ -212,6 +212,13 @@ export const FORMS: Record<ApplicationType, FormDef> = {
             max: 100_000_000,
           },
           {
+            name: 'capitalCurrency',
+            kind: 'select',
+            required: true,
+            width: 'half',
+            options: ['usd', 'cny'],
+          },
+          {
             name: 'addressOption',
             kind: 'select',
             required: true,
@@ -267,6 +274,7 @@ export const FORMS: Record<ApplicationType, FormDef> = {
             hint: true,
             options: [
               'bank-account',
+              'bank-registrant',
               'alipay-wechat',
               'accounting',
               'financial-officer',

@@ -399,7 +399,7 @@
       "companyNamesHint": "Three options, in English and Chinese if you have them. Avoid names of countries, oceans or famous people.",
       "businessScope": "Scope of business",
       "businessScopeHint": "Be specific: “clothing — women’s and children’s wear”, not “trading”. Food and medical goods need extra licences.",
-      "registeredCapital": "Registered capital (USD)",
+      "registeredCapital": "Registered capital",
       "registeredCapitalHint": "Not paid up front — it can be deposited within five years. Above 15,000 USD is recommended if you want a residence permit.",
       "addressOption": "Registered address",
       "addressOptionHint": "A physical office is required if you will live in China. Otherwise a virtual address with a formal lease works.",
@@ -500,7 +500,8 @@
       "products": "Goods or services covered",
       "productsHint": "What the brand sells, e.g. “perfume and cosmetics”.",
       "existingRegistration": "Is it registered anywhere else?",
-      "existingRegistrationHint": "In your own country or internationally."
+      "existingRegistrationHint": "In your own country or internationally.",
+      "capitalCurrency": "Currency of the capital"
     },
     "options": {
       "common": {
@@ -574,7 +575,8 @@
         "accounting": "Accounting and tax filing",
         "financial-officer": "Appointed financial officer",
         "trademark": "Trademark registration",
-        "work-visa": "Work visa and residence permit"
+        "work-visa": "Work visa and residence permit",
+        "bank-registrant": "Chinese-citizen registrant for the bank account"
       },
       "purpose": {
         "factory-visits": "Factory visits",
@@ -659,6 +661,10 @@
       "applicantType": {
         "individual": "An individual",
         "company": "A company"
+      },
+      "capitalCurrency": {
+        "usd": "US dollars",
+        "cny": "Chinese yuan"
       }
     }
   }

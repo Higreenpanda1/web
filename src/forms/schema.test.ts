@@ -68,6 +68,7 @@ test('a hidden conditional field is neither required nor stored', () => {
       companyNames: 'A / B / C',
       businessScope: 'Clothing',
       registeredCapital: '20000',
+      capitalCurrency: 'usd',
       addressOption: 'virtual-work-visa',
       needResidence: 'yes',
       ownership: 'sole',

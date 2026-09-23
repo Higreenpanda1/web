@@ -178,6 +178,16 @@ async function main() {
 
   console.log('→ Blog')
   for (const post of POSTS) {
+    const coverId = post.cover
+      ? await upsertMedia(payload, {
+          filePath: path.join(
+            path.dirname(fileURLToPath(import.meta.url)),
+            'assets',
+            post.cover.file,
+          ),
+          alt: post.cover.alt,
+        })
+      : null
     const id = await upsert(
       payload,
       'posts',
@@ -190,6 +200,8 @@ async function main() {
           body: richText(post.ar.body),
           publishedAt: post.publishedAt,
           author: founderId,
+          // Only set when the upload worked; never blank an editor's own choice.
+          ...(coverId ? { coverImage: coverId } : {}),
           categories: post.categories.flatMap((slug) => {
             const id = categoryIds.get(slug)
             return id ? [id] : []
