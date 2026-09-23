@@ -223,8 +223,8 @@ const darkBackground = await darkPage.evaluate(
   () => getComputedStyle(document.body).backgroundColor,
 )
 note(`canvas ${darkBackground}`)
-if (darkBackground !== 'rgb(14, 20, 16)') {
-  fail(`Dark mode canvas should be #0E1410, got ${darkBackground}`)
+if (darkBackground !== 'rgb(15, 16, 15)') {
+  fail(`Dark mode canvas should be #0F100F (charcoal, not green), got ${darkBackground}`)
 }
 
 // ── Nothing the policy blocks, nothing that throws ───────────────────────────

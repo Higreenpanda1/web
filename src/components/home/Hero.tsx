@@ -13,6 +13,7 @@ import { getTranslations } from 'next-intl/server'
 import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon'
 import { PlayMark } from '@/components/layout/Logo'
 import { ButtonLink } from '@/components/ui/Button'
+import { CountUp } from '@/components/ui/CountUp'
 import { Container } from '@/components/ui/Container'
 import { cn } from '@/lib/cn'
 import { whatsappLink } from '@/lib/url'
@@ -41,7 +42,17 @@ export async function Hero({ locale, settings }: { locale: Locale; settings: Sit
 
   return (
     <section className="relative isolate overflow-hidden bg-surface bg-gradient-hero">
-      <div className="absolute inset-0 -z-10 bg-dots opacity-40" aria-hidden="true" />
+      <div className="absolute inset-0 -z-10 bg-dots opacity-30" aria-hidden="true" />
+      {/* Two soft orbs drifting behind the card — depth without colour blocks. */}
+      <div
+        aria-hidden="true"
+        className="orb -top-24 end-[8%] -z-10 size-[28rem] bg-brand-200/60 dark:bg-brand-700/25"
+      />
+      <div
+        aria-hidden="true"
+        className="orb bottom-0 start-[30%] -z-10 size-[22rem] bg-[#e9e6dc]/70 dark:bg-white/5"
+        style={{ animationDelay: '-9s', animationDuration: '24s' }}
+      />
 
       <Container className="grid items-center gap-14 py-14 md:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12 lg:py-28">
         <div className="max-w-[40rem]">
@@ -50,8 +61,15 @@ export async function Hero({ locale, settings }: { locale: Locale; settings: Sit
             {t('home.heroEyebrow')}
           </p>
 
-          <h1 className="reveal reveal-1 mt-6 text-display">
-            {t('home.heroTitle')}
+          <h1 className="word-reveal mt-6 text-display">
+            {t('home.heroTitle')
+              .split(' ')
+              .map((word, index) => (
+                <span key={index} className="word" style={{ '--i': index } as React.CSSProperties}>
+                  {word}
+                  {'\u00a0'}
+                </span>
+              ))}
             {/* The green disc as punctuation: the brand's one device, used the
                 way a full stop is used. */}
             <PlayMark size={24} className="ms-3 inline-block size-[0.42em] align-baseline" />
@@ -97,7 +115,9 @@ export async function Hero({ locale, settings }: { locale: Locale; settings: Sit
               ] as const
             ).map(([value, label]) => (
               <div key={label}>
-                <dt className="ltr-nums text-h2 font-bold text-text-brand">{value}</dt>
+                <dt className="ltr-nums text-h2 font-bold text-heading">
+                  <CountUp value={value} />
+                </dt>
                 <dd className="mt-0.5 text-caption text-text-muted">{label}</dd>
               </div>
             ))}
@@ -108,7 +128,7 @@ export async function Hero({ locale, settings }: { locale: Locale; settings: Sit
         <div className="reveal reveal-2 relative mx-auto w-full max-w-[26rem] lg:mx-0 lg:justify-self-end">
           <div
             aria-hidden="true"
-            className="absolute -inset-6 -z-10 rounded-[3rem] bg-gradient-brand opacity-[0.14] blur-2xl"
+            className="absolute -inset-6 -z-10 rounded-[3rem] bg-brand-300 opacity-[0.12] blur-2xl"
           />
 
           <div className="rounded-xl border border-border-soft bg-surface p-6 shadow-float">

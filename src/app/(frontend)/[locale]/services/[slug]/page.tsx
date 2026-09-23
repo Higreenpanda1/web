@@ -209,7 +209,7 @@ export default async function ServicePage({
 
           <aside className="space-y-6 lg:sticky lg:top-[calc(var(--header-height)+1.5rem)] lg:self-start">
             {applyHref ? (
-              <div className="relative isolate overflow-hidden rounded-xl bg-gradient-brand p-6 text-white shadow-float">
+              <div className="relative isolate overflow-hidden rounded-xl bg-gradient-deep p-6 text-white shadow-float">
                 <div
                   className="absolute inset-0 -z-10 bg-dots-inverse opacity-30"
                   aria-hidden="true"

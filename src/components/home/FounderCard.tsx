@@ -32,7 +32,7 @@ export function FounderCard({
       <div className="relative mx-auto w-full max-w-[22rem]">
         <div
           aria-hidden="true"
-          className="absolute -inset-4 -z-10 rounded-[2.5rem] bg-gradient-brand opacity-20 blur-2xl"
+          className="absolute -inset-4 -z-10 rounded-[2.5rem] bg-brand-200 opacity-30 blur-2xl"
         />
         {src ? (
           <Image

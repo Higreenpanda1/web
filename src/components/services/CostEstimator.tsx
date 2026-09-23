@@ -150,9 +150,12 @@ export function CostEstimator({ locale, className }: { locale: Locale; className
         </div>
 
         <aside className="lg:sticky lg:top-[calc(var(--header-height)+1.5rem)] lg:self-start">
-          <div className="rounded-xl bg-brand-900 p-6 text-white">
-            <p className="text-caption text-brand-200">{t('total')}</p>
-            <p className="ltr-nums mt-1 text-display leading-none font-bold" aria-live="polite">
+          <div className="rounded-xl bg-gradient-deep p-6 text-white">
+            <p className="text-caption text-white/60">{t('total')}</p>
+            <p
+              className="ltr-nums mt-1 text-display leading-none font-bold text-brand-400"
+              aria-live="polite"
+            >
               {yuan(total)}
               {hasQuoted ? <span className="text-h3 font-semibold text-brand-200"> +</span> : null}
             </p>

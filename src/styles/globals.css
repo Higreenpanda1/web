@@ -361,7 +361,7 @@
      bottom so it never fights the content below it. */
   .bg-dots {
     background-image: radial-gradient(
-      color-mix(in srgb, var(--brand-700) 14%, transparent) 1px,
+      color-mix(in srgb, var(--text) 9%, transparent) 1px,
       transparent 1px
     );
     background-size: 22px 22px;
@@ -406,6 +406,95 @@
     html.js-reveal [data-reveal] {
       opacity: 1;
       transform: none;
+      transition: none;
+    }
+  }
+
+  /* Reveal variants: slide in from the side the element sits on. */
+  html.js-reveal [data-reveal='left'] {
+    transform: translateX(-28px);
+  }
+  html.js-reveal [data-reveal='right'] {
+    transform: translateX(28px);
+  }
+  html.js-reveal [data-reveal='scale'] {
+    transform: scale(0.96);
+  }
+  [dir='rtl'] html.js-reveal [data-reveal='left'],
+  html[dir='rtl'].js-reveal [data-reveal='left'] {
+    transform: translateX(28px);
+  }
+  html[dir='rtl'].js-reveal [data-reveal='right'] {
+    transform: translateX(-28px);
+  }
+
+  /* Headline words rise in one after another (Hero). */
+  .word-reveal > .word {
+    display: inline-block;
+    animation: word-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--i, 0) * 90ms + 120ms);
+  }
+  @keyframes word-up {
+    from {
+      opacity: 0;
+      transform: translateY(0.6em) rotate(0.5deg);
+      filter: blur(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+      filter: blur(0);
+    }
+  }
+
+  /* The journey: the step nearest the middle of the screen is "active" — its
+     node fills and its card lifts — so scrolling feels like travelling. */
+  .journey-node {
+    transition:
+      background-color 0.4s ease,
+      border-color 0.4s ease,
+      color 0.4s ease,
+      transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.4s ease;
+  }
+  .journey-step.is-active .journey-node {
+    transform: scale(1.08);
+  }
+  .journey-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .journey-panel[data-open='true'] {
+    grid-template-rows: 1fr;
+  }
+  .journey-panel > div {
+    overflow: hidden;
+  }
+
+  /* Soft ambient orbs behind the hero card: two blurred discs drifting. */
+  .orb {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(60px);
+    opacity: 0.55;
+    animation: orb-drift 18s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+  @keyframes orb-drift {
+    from {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    to {
+      transform: translate3d(6%, -8%, 0) scale(1.12);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .word-reveal > .word,
+    .orb {
+      animation: none;
+    }
+    .journey-panel {
       transition: none;
     }
   }

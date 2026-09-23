@@ -68,6 +68,7 @@ export function Journey({
   className?: string
 }) {
   const [open, setOpen] = useState(0)
+  const [active, setActive] = useState(0)
   const spineRef = useRef<SVGLineElement>(null)
   const sectionRef = useRef<HTMLOListElement>(null)
   const Arrow = locale === 'ar' ? ArrowLeft : ArrowRight
@@ -89,12 +90,32 @@ export function Journey({
       const passed = Math.min(Math.max(window.innerHeight * 0.7 - rect.top, 0), total)
       line.style.strokeDashoffset = `${length * (1 - passed / total)}`
     }
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onScroll)
+    // The step whose node is nearest the middle of the viewport is "active".
+    const items = Array.from(list.querySelectorAll<HTMLElement>('.journey-step'))
+    const pick = () => {
+      const mid = window.innerHeight * 0.45
+      let best = 0
+      let bestDist = Infinity
+      items.forEach((item, index) => {
+        const r = item.getBoundingClientRect()
+        const d = Math.abs(r.top + Math.min(r.height, 120) / 2 - mid)
+        if (d < bestDist) {
+          bestDist = d
+          best = index
+        }
+      })
+      setActive(best)
+    }
+    const onScrollAll = () => {
+      onScroll()
+      pick()
+    }
+    onScrollAll()
+    window.addEventListener('scroll', onScrollAll, { passive: true })
+    window.addEventListener('resize', onScrollAll)
     return () => {
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onScroll)
+      window.removeEventListener('scroll', onScrollAll)
+      window.removeEventListener('resize', onScrollAll)
     }
   }, [])
 
@@ -130,19 +151,20 @@ export function Journey({
           return (
             <li
               key={step.href + index}
-              data-reveal
+              data-reveal={left ? 'left' : 'right'}
               className={cn(
-                'relative ps-14 lg:grid lg:grid-cols-[1fr_3.5rem_1fr] lg:items-start lg:gap-0 lg:ps-0',
+                'journey-step relative ps-14 lg:grid lg:grid-cols-[1fr_3.5rem_1fr] lg:items-start lg:gap-0 lg:ps-0',
+                active === index && 'is-active',
               )}
             >
               {/* Node on the spine */}
               <span
                 aria-hidden="true"
                 className={cn(
-                  'absolute top-3 start-0 z-10 inline-flex size-11 items-center justify-center rounded-full border-2 transition-colors duration-300 lg:static lg:col-start-2 lg:mx-auto lg:size-14',
-                  isOpen
+                  'journey-node absolute top-3 start-0 z-10 inline-flex size-11 items-center justify-center rounded-full border-2 lg:static lg:col-start-2 lg:mx-auto lg:size-14',
+                  isOpen || active === index
                     ? 'border-brand-700 bg-brand-700 text-white shadow-glow'
-                    : 'border-border bg-surface text-text-brand',
+                    : 'border-border bg-surface text-text-muted',
                 )}
               >
                 <Icon size={isOpen ? 22 : 20} strokeWidth={1.75} />
@@ -174,17 +196,23 @@ export function Journey({
 
                 <div
                   id={`journey-panel-${index}`}
-                  hidden={!isOpen}
-                  className="rounded-b-lg border border-t-0 border-brand-300 bg-surface-tint-soft px-5 pt-3 pb-5"
+                  data-open={isOpen}
+                  aria-hidden={!isOpen}
+                  className="journey-panel"
                 >
-                  <p className="text-text-muted">{step.body}</p>
-                  <Link
-                    href={step.href}
-                    className="mt-3 inline-flex items-center gap-1.5 font-semibold text-text-brand no-underline"
-                  >
-                    {step.linkLabel}
-                    <Arrow size={16} strokeWidth={2} aria-hidden="true" />
-                  </Link>
+                  <div>
+                    <div className="rounded-b-lg border border-t-0 border-brand-300 bg-surface-tint-soft px-5 pt-3 pb-5">
+                      <p className="text-text-muted">{step.body}</p>
+                      <Link
+                        href={step.href}
+                        tabIndex={isOpen ? 0 : -1}
+                        className="mt-3 inline-flex items-center gap-1.5 font-semibold text-text-brand no-underline"
+                      >
+                        {step.linkLabel}
+                        <Arrow size={16} strokeWidth={2} aria-hidden="true" />
+                      </Link>
+                    </div>
+                  </div>
                 </div>
               </div>
             </li>

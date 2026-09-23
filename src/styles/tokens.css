@@ -29,10 +29,10 @@
 
   /* --- Neutrals ---------------------------------------------------------- */
   --ink: #111111; /* body text, the wordmark — 18.9:1 */
-  --slate: #4c574f; /* secondary text, captions — 7.5:1 */
-  --mist: #d8e0da; /* borders, dividers */
+  --slate: #555b57; /* secondary text, captions — 7.2:1, near-neutral */
+  --mist: #e3e5e3; /* borders, dividers — neutral, not green */
   --paper: #ffffff; /* surfaces */
-  --canvas: #f7f9f7; /* page background */
+  --canvas: #f6f6f5; /* page background — warm off-white, no green cast */
 
   /* --- Accent (brief §12: one element per screen, no more) ---------------- */
   --accent: #e0a32e; /* warm gold — highlights, badges, large elements */
@@ -51,35 +51,34 @@
   /* --- Derived roles (what components actually reference) ----------------- */
   --surface: var(--paper);
   --surface-sunken: var(--canvas);
-  --surface-tint: var(--brand-100);
-  --surface-tint-soft: var(--brand-50);
+  --surface-tint: #e9f3eb; /* the one soft green, for icon chips and selected states */
+  --surface-tint-soft: #f4f8f5;
   --surface-inverse: var(--brand-900);
   --text: var(--ink);
   --text-muted: var(--slate);
   --text-on-inverse: #ffffff;
   --text-brand: var(--brand-700); /* never --brand-600. See the rule above. */
-  --heading: var(--brand-900);
+  --heading: #131513; /* headings are ink, not green — green is for accents only */
   --border: var(--mist);
   --border-soft: color-mix(in srgb, var(--mist) 60%, transparent);
-  --border-strong: #b9c5bc;
+  --border-strong: #c4c8c5;
   --focus-ring: var(--brand-700);
   --overlay-photo: color-mix(in srgb, var(--brand-900) 55%, transparent);
 
   /* --- Gradients: the brand's "moments". Fixed greens, so they read the same
          in both colour schemes. ---------------------------------------------- */
   --gradient-brand: linear-gradient(135deg, var(--brand-800) 0%, var(--brand-600) 100%);
-  --gradient-deep: linear-gradient(155deg, #1b4f27 0%, #12341b 55%, #0b2011 100%);
+  /* Dark panels (footer, contact) are charcoal with a green accent, not a
+     wall of green — the owner's verdict on the green-on-green version was
+     "I feel like I'm in a forest" (23 September 2026). */
+  --gradient-deep: linear-gradient(155deg, #1c1e1c 0%, #141614 60%, #0f110f 100%);
   --gradient-hero:
     radial-gradient(
       60rem 36rem at 85% -10%,
-      color-mix(in srgb, var(--brand-100) 90%, transparent),
+      color-mix(in srgb, var(--brand-100) 45%, transparent),
       transparent 70%
     ),
-    radial-gradient(
-      40rem 28rem at -10% 90%,
-      color-mix(in srgb, var(--brand-50) 100%, transparent),
-      transparent 70%
-    );
+    radial-gradient(40rem 28rem at -10% 90%, #f3f4f2, transparent 70%);
 
   /* ---------------------------------------------------------------------------
      Type scale (brief §13). Fluid: each heading reaches the brief's size at a
@@ -147,31 +146,31 @@
   :root:not([data-theme='light']) {
     color-scheme: dark;
 
-    --paper: #161e18;
-    --canvas: #0e1410;
-    --ink: #e6ede7;
-    --slate: #a9b6ac;
-    --mist: #26332a;
+    --paper: #171817;
+    --canvas: #0f100f;
+    --ink: #ececea;
+    --slate: #a8aca9;
+    --mist: #2a2c2a;
 
     --surface: var(--paper);
     --surface-sunken: var(--canvas);
-    --surface-tint: #16261b;
-    --surface-tint-soft: #111a14;
-    --surface-inverse: #0a0f0c;
+    --surface-tint: #1d261f;
+    --surface-tint-soft: #151915;
+    --surface-inverse: #0a0b0a;
     --text: var(--ink);
     --text-muted: var(--slate);
     --text-brand: var(--brand-400);
-    --heading: #e6f2e8;
+    --heading: #f3f4f2;
     --border: var(--mist);
     --border-soft: color-mix(in srgb, var(--mist) 70%, transparent);
-    --border-strong: #3c4a40;
+    --border-strong: #454845;
     --focus-ring: var(--brand-400);
     --accent-text: #f0c874;
     --error: #f2b8b5;
     --info: #8fc4e6;
     --gradient-hero:
-      radial-gradient(60rem 36rem at 85% -10%, rgb(39 107 52 / 0.25), transparent 70%),
-      radial-gradient(40rem 28rem at -10% 90%, rgb(27 79 39 / 0.2), transparent 70%);
+      radial-gradient(60rem 36rem at 85% -10%, rgb(55 141 66 / 0.12), transparent 70%),
+      radial-gradient(40rem 28rem at -10% 90%, rgb(255 255 255 / 0.03), transparent 70%);
     --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 30px -14px rgb(0 0 0 / 0.6);
     --shadow-float: 0 1px 2px rgb(0 0 0 / 0.5), 0 30px 60px -24px rgb(0 0 0 / 0.8);
   }
@@ -180,31 +179,31 @@
 [data-theme='dark'] {
   color-scheme: dark;
 
-  --paper: #161e18;
-  --canvas: #0e1410;
-  --ink: #e6ede7;
-  --slate: #a9b6ac;
-  --mist: #26332a;
+  --paper: #171817;
+  --canvas: #0f100f;
+  --ink: #ececea;
+  --slate: #a8aca9;
+  --mist: #2a2c2a;
 
   --surface: var(--paper);
   --surface-sunken: var(--canvas);
-  --surface-tint: #16261b;
-  --surface-tint-soft: #111a14;
-  --surface-inverse: #0a0f0c;
+  --surface-tint: #1d261f;
+  --surface-tint-soft: #151915;
+  --surface-inverse: #0a0b0a;
   --text: var(--ink);
   --text-muted: var(--slate);
   --text-brand: var(--brand-400);
-  --heading: #e6f2e8;
+  --heading: #f3f4f2;
   --border: var(--mist);
   --border-soft: color-mix(in srgb, var(--mist) 70%, transparent);
-  --border-strong: #3c4a40;
+  --border-strong: #454845;
   --focus-ring: var(--brand-400);
   --accent-text: #f0c874;
   --error: #f2b8b5;
   --info: #8fc4e6;
   --gradient-hero:
-    radial-gradient(60rem 36rem at 85% -10%, rgb(39 107 52 / 0.25), transparent 70%),
-    radial-gradient(40rem 28rem at -10% 90%, rgb(27 79 39 / 0.2), transparent 70%);
+    radial-gradient(60rem 36rem at 85% -10%, rgb(55 141 66 / 0.12), transparent 70%),
+    radial-gradient(40rem 28rem at -10% 90%, rgb(255 255 255 / 0.03), transparent 70%);
   --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 30px -14px rgb(0 0 0 / 0.6);
   --shadow-float: 0 1px 2px rgb(0 0 0 / 0.5), 0 30px 60px -24px rgb(0 0 0 / 0.8);
 }
