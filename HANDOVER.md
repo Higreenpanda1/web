@@ -229,27 +229,52 @@ Two GoDaddy traps, learned the hard way:
 
 ## Still to do
 
-1. **Resend API key** — until it is set, enquiries and applications are
-   stored but not emailed. The owner creates the account and the key;
-   set it in `.env` with a command that reads it silently
-   (`read -rs`), never by pasting it into a chat.
-2. **Off-server backups** — `S3_*` in `.env` are empty, so the nightly job
-   writes to `./.backups` on the same machine. That is not a backup. See
-   `DEPLOY.md` §7, including the restore drill. Cloudflare R2 or Backblaze B2.
-3. **HubSpot** — `DEPLOY.md` §4b, parked. The portal has not completed
+1. **HubSpot** — `DEPLOY.md` §4b, parked. The portal has not completed
    onboarding, so the DKIM CNAMEs do not exist yet. That portal step is a hard
    prerequisite; do not add DNS records for it before then.
-4. **SSH key**, then re-run `ops/bootstrap.sh` to disable password login.
-5. **Photographs** for the new service pages — every `image` field is empty.
+2. **SSH key**, then re-run `ops/bootstrap.sh` to disable password login.
+3. **Photographs** for the new service pages — every `image` field is empty.
    The blog covers came from the old site's `wp-content/uploads` (in the
    owner's backup archive); most of that library has captions baked into the
    pixels, so only text-free crops are usable.
-6. **Price check.** The 2025 price list (used for the "from" prices) and the
+4. **Price check.** The 2025 price list (used for the "from" prices) and the
    owner's newer "Company Registration Quotation System" sheet (Google Drive,
    23 September 2026) disagree: remote registration ¥8,200 vs ¥6,000,
    in-person ¥7,200 vs ¥7,000, bank account ¥1,400 vs ¥1,200/¥1,700, work
    permit ¥7,600 vs ¥4,600, accounting ¥3,800 vs ¥3,200. Confirm with the
    owner and correct in the CMS (Services → price from).
+5. **Tighten the Backblaze key.** The key was made in the web UI, whose
+   "Read and Write" preset includes `deleteFiles`. A key without delete needs
+   the `b2` CLI (`b2 key create --capabilities listBuckets,listFiles,readFiles,writeFiles`).
+   Also worth rotating at some point: the first characters of the current
+   application key were echoed to the web console when it was pasted into
+   the wrong prompt (see below), then corrected.
+6. **Restore drill** — `DEPLOY.md` §7, twice a year. The first one has not
+   been done against the Backblaze copy.
+
+## Email and backups (done 23 September 2026)
+
+- **Resend** is live. Domain `higreenpanda.com` verified (region Tokyo);
+  records at GoDaddy: `TXT resend._domainkey`, `CNAME rsend`, `CNAME send`.
+  Resend also offers an `MX @` record for _receiving_ — it was **not** added,
+  because that would take mail away from Google Workspace. Never add it.
+  API key "website" (sending only) is in `.env` as `RESEND_API_KEY`; the
+  owner pasted it into a `read -rs` prompt, so it was never displayed. A test
+  enquiry (`HGP-20260923-B4B7EA`) was emailed and `notifiedAt` was set.
+- **Backblaze B2** holds the nightly backups: bucket `higreenpanda-backups`
+  (private, `s3.us-east-005.backblazeb2.com`), key `higreenpanda-server`
+  restricted to that bucket. `S3_*` are set in `.env`. First run verified:
+  `db/…dump` and `media/…tar.gz` listed in the bucket.
+- **Bug fixed on the way:** the backup container never mapped `S3_*` to the
+  `AWS_*` variables the CLI reads, so uploads would have failed with
+  "Unable to locate credentials" for anyone who set keys. Fixed in
+  `docker-compose.prod.yml`.
+- **Paste trap:** when two values are requested one after the other in the
+  console, the first prompt echoes what is typed (only the secret prompt is
+  silent). The owner pasted the application key into the keyID prompt; the
+  keyID is public (it is on Backblaze's key list) so it was simply set by
+  hand afterwards, but treat the current application key as lightly exposed
+  and rotate when convenient.
 
 ## Verified, so you do not have to re-check
 
