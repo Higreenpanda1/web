@@ -20,6 +20,44 @@ on the real domain.
 - **CMS:** https://higreenpanda.com/hgp-studio-gate
 - **Repository:** `Higreenpanda1/web`, branch `claude/practical-newton-m55sbw`
 
+## The homepage journey (23 September 2026, later the same day)
+
+The owner shared a "Website Structure" document and a design mock (Google
+Drive, shared drive `0AIYXQxja0eIeUk9PVA`). The homepage was rebuilt to match:
+
+- **Hero** "From idea to your warehouse" with two quiet buttons (explore the
+  journey, book a consultation). Dot grid dimmed; one accent colour.
+- **Twelve-step journey** (`src/components/home/Journey.tsx`): the owner's
+  roadmap — idea, research, trademark, company, structure and residence,
+  accounting, supplier, production and quality, shipping, customs, local
+  delivery, your warehouse. Each step expands and links to the service that
+  does it (`JOURNEY_LINKS` in `DefaultHome.tsx`). Step text lives under
+  `home.journeySteps.*` in both catalogues.
+- **Consultation offer** with the owner's prices: 30 minutes $135, 60 minutes
+  $225 (`home.consult*`). The consultation form now asks which one.
+- **Type scale down one step** in `tokens.css` (body 16px English / 17px
+  Arabic; display at most 52/56px). The owner found the previous sizes large.
+- **Motion**: `ScrollReveal` (one IntersectionObserver per page) reveals any
+  element with `data-reveal`; the journey's spine draws as you scroll. Both
+  are off under `prefers-reduced-motion`, and nothing is hidden without JS.
+- **Cost estimator** on the company-formation page
+  (`src/components/services/CostEstimator.tsx`, prices in `src/lib/quote.ts`,
+  from the owner's quotation-system sheet). Its choices carry into
+  `/apply/company-registration` as query parameters the form pre-fills.
+  The sheet also asked for admin-editable prices and for saving abandoned
+  estimates as leads; neither is done — prices are a code constant for now,
+  and a half-filled estimate is not consent to be contacted.
+- **Prices aligned to the quotation sheet** (it is newer than the 2025 list
+  and was written for the site): registration from ¥6,000, bank account from
+  ¥1,200, accounting from ¥3,200, work permit from ¥4,600. The owner has not
+  explicitly confirmed; if they prefer the 2025 list, change `priceFrom` in
+  the CMS and `src/lib/quote.ts`.
+- Header CTA is **Start a company** (`/apply/company-registration`);
+  **Consultation** is in the primary navigation (seeded and fallback).
+- Not done from the documents: the "Insights" rename of the blog, the twelve
+  blog categories, online payment for consultations, and a date/time picker
+  (the owner chose a request form over live booking).
+
 ## The service catalogue (23 September 2026, third session)
 
 The owner supplied the old WordPress site's backup (`u530724501…tar.gz` and
