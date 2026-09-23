@@ -404,7 +404,16 @@ const paths = ['/', '/en', '/services', '/slot-gacor', '/en/home/'];
 # ── second factor ────────────────────────────────────────────────────────────
 step "Setting up two-factor sign-in for the CMS"
 
-if [ -z "$TTY" ]; then
+# Never offer to enrol again on a machine that already has an authenticator:
+# a stray keypress at the prompt starts a NEW secret, and although the script
+# only saves it after a live code is verified, the QR code and key it prints
+# are a phishing-grade leak of the next secret. Ask the database first.
+enrolled=$($COMPOSE exec -T db psql -U "${POSTGRES_USER:-higreenpanda}" \
+             -d "${POSTGRES_DB:-higreenpanda}" -tAc \
+             "select count(*) from users where totp_secret is not null" 2>/dev/null | tr -d '[:space:]')
+if [ "${enrolled:-0}" -gt 0 ] 2>/dev/null; then
+  ok "an authenticator is already enrolled; nothing to do"
+elif [ -z "$TTY" ]; then
   warn "no terminal available, so the QR code cannot be shown here."
   echo "    Run this later, logged in to the server:"
   echo "      cd $APP_DIR && $COMPOSE run --rm tools npm run totp:enrol -- $ADMIN_EMAIL"

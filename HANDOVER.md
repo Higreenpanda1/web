@@ -205,6 +205,14 @@ curl -fsSL https://raw.githubusercontent.com/Higreenpanda1/web/<full-sha>/ops/de
   when the container starts and immediately dies, and for the proxy that means
   the whole site is down. Both scripts validate in a throwaway container first.
 
+## DNS, apart from email
+
+CAA records were added at GoDaddy on 23 September 2026:
+`0 issue "letsencrypt.org"` and `0 issue "sectigo.com"` (Caddy's ZeroSSL
+fallback issues through Sectigo). Verified at the authoritative nameserver.
+If a third certificate authority is ever needed, add a third CAA record;
+do not delete these two while Caddy issues the site's certificate.
+
 ## Do not touch email DNS
 
 MX, SPF, DKIM and DMARC are **correct and working**. Mail was never broken —
@@ -221,23 +229,27 @@ Two GoDaddy traps, learned the hard way:
 
 ## Still to do
 
-1. **Cover images for the three blog posts.** Media has to be uploaded and
-   attached in the CMS; a placeholder shows until then.
-2. **Resend API key** — until it is set, enquiries and applications are
+1. **Resend API key** — until it is set, enquiries and applications are
    stored but not emailed. The owner creates the account and the key;
    set it in `.env` with a command that reads it silently
    (`read -rs`), never by pasting it into a chat.
-3. **Off-server backups** — `S3_*` in `.env` are empty, so the nightly job
+2. **Off-server backups** — `S3_*` in `.env` are empty, so the nightly job
    writes to `./.backups` on the same machine. That is not a backup. See
    `DEPLOY.md` §7, including the restore drill. Cloudflare R2 or Backblaze B2.
-4. **Optional CAA record** at GoDaddy: `0 issue "letsencrypt.org"` and
-   `0 issue "sectigo.com"` (Caddy falls back to ZeroSSL, which issues through
-   Sectigo). New records; they do not touch email DNS.
-5. **HubSpot** — `DEPLOY.md` §4b, parked. The portal has not completed
+3. **HubSpot** — `DEPLOY.md` §4b, parked. The portal has not completed
    onboarding, so the DKIM CNAMEs do not exist yet. That portal step is a hard
    prerequisite; do not add DNS records for it before then.
-6. **SSH key**, then re-run `ops/bootstrap.sh` to disable password login.
-7. **Photographs** for the new service pages — every `image` field is empty.
+4. **SSH key**, then re-run `ops/bootstrap.sh` to disable password login.
+5. **Photographs** for the new service pages — every `image` field is empty.
+   The blog covers came from the old site's `wp-content/uploads` (in the
+   owner's backup archive); most of that library has captions baked into the
+   pixels, so only text-free crops are usable.
+6. **Price check.** The 2025 price list (used for the "from" prices) and the
+   owner's newer "Company Registration Quotation System" sheet (Google Drive,
+   23 September 2026) disagree: remote registration ¥8,200 vs ¥6,000,
+   in-person ¥7,200 vs ¥7,000, bank account ¥1,400 vs ¥1,200/¥1,700, work
+   permit ¥7,600 vs ¥4,600, accounting ¥3,800 vs ¥3,200. Confirm with the
+   owner and correct in the CMS (Services → price from).
 
 ## Verified, so you do not have to re-check
 
