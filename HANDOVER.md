@@ -20,6 +20,28 @@ on the real domain.
 - **CMS:** https://higreenpanda.com/hgp-studio-gate
 - **Repository:** `Higreenpanda1/web`, branch `claude/practical-newton-m55sbw`
 
+## Where the last session stopped (night of 23–24 September 2026)
+
+- **Commit `91b0be8` is pushed but NOT deployed.** It is the "green as an
+  accent, not a forest" pass: neutral surfaces, charcoal dark mode, ink
+  headings, and the richer motion (word-by-word headline, drifting orbs,
+  count-up stats, side-sliding journey steps that light up as you scroll).
+  The live site still runs `23e4503` (journey homepage, first palette).
+  Deploy with the commit-pinned `ops/deploy.sh` URL; run it detached
+  (`nohup … < /dev/null &`) because the Hostinger web console drops during
+  the build. Then confirm `curl https://higreenpanda.com/en` shows the new
+  build and take light + dark screenshots for the owner.
+- **admin@higreenpanda.com does not exist yet.** Plan: in the console,
+  `read -rs` a password the owner types, then
+  `docker compose -f docker-compose.prod.yml run --rm -T -e SEED_ADMIN_EMAIL=admin@higreenpanda.com -e SEED_ADMIN_PASSWORD="$P" tools npm run seed`,
+  then `docker compose -f docker-compose.prod.yml run --rm tools npm run totp:enrol -- admin@higreenpanda.com`
+  with the owner scanning the QR on their phone. Do not screenshot the QR.
+- The owner's brief for the look: "very attractive, UI/UX important, not
+  distracting, fonts were too large, too green". Offer a bolder direction
+  (imagery, editorial hero) if the quiet one is not enough.
+- Both browsers (Claude in Chrome and the built-in pane) were unreachable at
+  the end of the session after the Mac slept; that is why the deploy waited.
+
 ## The homepage journey (23 September 2026, later the same day)
 
 The owner shared a "Website Structure" document and a design mock (Google
