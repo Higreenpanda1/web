@@ -194,6 +194,13 @@ curl -fsSL https://raw.githubusercontent.com/Higreenpanda1/web/<full-sha>/ops/de
   `resolves_to()` helper in both scripts.
 - **git refuses a repo owned by someone else.** `deploy.sh` chowns the tree to
   `deploy` and runs as root, so `safe.directory` is registered for it.
+- **The `tools` image must be rebuilt before migrating.** `docker compose run`
+  reuses the existing image, which on a redeploy is last time's checkout —
+  so `npm run migrate` says "Done" having found no new files, the seed runs
+  the old seed, and the new app 500s on a missing column. That took the
+  live site down for about four minutes on 23 September 2026. `deploy.sh`
+  now passes `--build`; if you ever run migrate or seed by hand, do the
+  same: `docker compose -f docker-compose.prod.yml run --rm --build tools npm run migrate`.
 - **Caddy must be validated before restarting.** `up -d` reports success even
   when the container starts and immediately dies, and for the proxy that means
   the whole site is down. Both scripts validate in a throwaway container first.

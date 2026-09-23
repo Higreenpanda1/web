@@ -300,9 +300,14 @@ ok "database running"
 # the way out — the migration lands, the script dies. So these two are checked
 # by hand: the exit code is reported, and migrate specifically is re-tested by
 # asking the database whether the tables are actually there before deciding.
+# --build is load-bearing. `run` reuses whatever `tools` image exists, and
+# on a redeploy that image is last time's checkout: it does not contain the
+# new migration files or the new seed, so migrate prints "Done" having done
+# nothing and the freshly built app then 500s on a column that is not there.
+# That is exactly what happened on 23 September 2026.
 step "Creating the database tables (this can take a minute)"
 migrate_code=0
-$COMPOSE run --rm -T tools npm run migrate </dev/null || migrate_code=$?
+$COMPOSE run --rm --build -T tools npm run migrate </dev/null || migrate_code=$?
 if [ "$migrate_code" -ne 0 ]; then
   warn "migrate exited $migrate_code — checking whether the tables landed anyway"
   if $COMPOSE exec -T db psql -U "${POSTGRES_USER:-higreenpanda}" \
