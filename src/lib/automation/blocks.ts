@@ -59,7 +59,8 @@ export function inlineToLexical(source: string): Array<Record<string, unknown>> 
   let match: RegExpExecArray | null
   while ((match = linkRe.exec(source)) !== null) {
     if (match.index > last) out.push(...boldRuns(source.slice(last, match.index)))
-    const [, label, href] = match
+    const label = match[1] ?? ''
+    const href = match[2] ?? ''
     out.push({
       ...BASE,
       type: 'link',
@@ -126,5 +127,5 @@ export function blocksLinks(blocks: ArticleBlock[]): string[] {
   const text = blocks
     .map((block) => ('items' in block ? block.items.join('\n') : block.text))
     .join('\n')
-  return Array.from(text.matchAll(/\]\(([^)\s]+)\)/g), (match) => match[1])
+  return Array.from(text.matchAll(/\]\(([^)\s]+)\)/g), (match) => match[1] ?? '')
 }

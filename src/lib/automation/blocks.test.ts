@@ -12,7 +12,7 @@ describe('inlineToLexical', () => {
     )
     const link = nodes[1] as { fields: { url: string }; children: Array<{ text: string }> }
     assert.equal(link.fields.url, '/blog/x')
-    assert.equal(link.children[0].text, 'the guide')
+    assert.equal(link.children[0]?.text, 'the guide')
     assert.equal((nodes[3] as { format: number }).format, 1)
   })
   it('leaves text without markup untouched', () => {
@@ -38,7 +38,7 @@ describe('blocksToLexical', () => {
         ['list', 'ol'],
       ],
     )
-    assert.equal(kids[2].children.length, 2)
+    assert.equal(kids[2]?.children.length, 2)
   })
 })
 
