@@ -383,6 +383,170 @@ export const REDIRECTS: Array<{
     type: '410',
     note: 'WordPress default page. Never real content — tell crawlers it is gone.',
   },
+  // The old WordPress pages, from the owner's backup (wp_posts, post_type page).
+  { from: '/en/homepage', to: '/en', type: '301', note: 'Old English homepage.' },
+  { from: '/home-ar', to: '/', type: '301', note: 'Old Arabic homepage.' },
+  { from: '/blogs-ar', to: '/blog', type: '301', note: 'Old Arabic blog index.' },
+  { from: '/en/blogs', to: '/en/blog', type: '301', note: 'Old English blog index.' },
+  { from: '/category/uncategorized-ar', to: '/blog', type: '301', note: 'Old category archive.' },
+  {
+    from: '/en/category/uncategorized-en',
+    to: '/en/blog',
+    type: '301',
+    note: 'Old category archive.',
+  },
+  { from: '/en/category/english', to: '/en/blog', type: '301', note: 'Old category archive.' },
+  {
+    from: '/consultation-and-reservations-ar',
+    to: '/apply/consultation',
+    type: '301',
+    note: 'Old booking page.',
+  },
+  {
+    from: '/en/book-an-appointment',
+    to: '/en/apply/consultation',
+    type: '301',
+    note: 'Old booking page.',
+  },
+  {
+    from: '/company-registration-ar',
+    to: '/services/company-formation',
+    type: '301',
+    note: 'Old service page.',
+  },
+  {
+    from: '/en/company-registration',
+    to: '/en/services/company-formation',
+    type: '301',
+    note: 'Old service page.',
+  },
+  {
+    from: '/company-establishment-and-management-ar',
+    to: '/services/company-formation',
+    type: '301',
+    note: 'Old service page.',
+  },
+  {
+    from: '/en/company-establishment-and-management',
+    to: '/en/services/company-formation',
+    type: '301',
+    note: 'Old service page.',
+  },
+  {
+    from: '/search-for-a-product-ar',
+    to: '/services/product-sourcing',
+    type: '301',
+    note: 'Old service page.',
+  },
+  {
+    from: '/en/search-for-a-product',
+    to: '/en/services/product-sourcing',
+    type: '301',
+    note: 'Old service page.',
+  },
+  {
+    from: '/search-and-import-ar',
+    to: '/services/full-import-management',
+    type: '301',
+    note: 'Old service page.',
+  },
+  {
+    from: '/en/search-and-import',
+    to: '/en/services/full-import-management',
+    type: '301',
+    note: 'Old service page.',
+  },
+  {
+    from: '/e-commerce-ar',
+    to: '/services/ecommerce-launch',
+    type: '301',
+    note: 'Old service page.',
+  },
+  {
+    from: '/en/e-commerce',
+    to: '/en/services/ecommerce-launch',
+    type: '301',
+    note: 'Old service page.',
+  },
+  {
+    from: '/trademarks-and-invitations-ar',
+    to: '/services/trademark-registration',
+    type: '301',
+    note: 'Old service page.',
+  },
+  {
+    from: '/en/trademarks-and-invitations',
+    to: '/en/services/trademark-registration',
+    type: '301',
+    note: 'Old service page.',
+  },
+  {
+    from: '/shipping-ar',
+    to: '/services/shipping-and-freight',
+    type: '301',
+    note: 'Old service page.',
+  },
+  {
+    from: '/en/shipping',
+    to: '/en/services/shipping-and-freight',
+    type: '301',
+    note: 'Old service page.',
+  },
+  {
+    from: '/request-for-a-business-invitation-ar',
+    to: '/services/business-invitation-letter',
+    type: '301',
+    note: 'Old service page.',
+  },
+  {
+    from: '/en/request-for-a-business-invitation-m-visa',
+    to: '/en/services/business-invitation-letter',
+    type: '301',
+    note: 'Old service page.',
+  },
+  {
+    from: '/en/opening-a-bank-account-in-hong-kong',
+    to: '/en/services/bank-account-opening',
+    type: '301',
+    note: 'Old service page.',
+  },
+  {
+    from: '/en/opening-an-enterprise-alipay-account',
+    to: '/en/services/alipay-wechat-business-accounts',
+    type: '301',
+    note: 'Old service page.',
+  },
+  {
+    from: '/en/opening-an-enterprise-wechat-account',
+    to: '/en/services/alipay-wechat-business-accounts',
+    type: '301',
+    note: 'Old service page.',
+  },
+  {
+    from: '/en/temu-store-setup',
+    to: '/en/services/marketplace-store-setup',
+    type: '301',
+    note: 'Old service page.',
+  },
+  {
+    from: '/en/amazon-store-setup',
+    to: '/en/services/marketplace-store-setup',
+    type: '301',
+    note: 'Old service page.',
+  },
+  {
+    from: '/en/aliexpress-store-setup',
+    to: '/en/services/marketplace-store-setup',
+    type: '301',
+    note: 'Old service page.',
+  },
+  {
+    from: '/en/alibaba-store-setup',
+    to: '/en/services/marketplace-store-setup',
+    type: '301',
+    note: 'Old service page.',
+  },
+  { from: '/en/price-quotation', to: '/en/contact', type: '301', note: 'Old quotation page.' },
 ]
 
 /**
@@ -397,12 +561,128 @@ export const REDIRECTS: Array<{
  * Written Arabic-first, English second — the correct direction for this
  * business, and the opposite of how most bilingual sites are built.
  */
-export type SeedCategory = { slug: string; ar: string; en: string }
+export type SeedCategory = {
+  slug: string
+  ar: string
+  en: string
+  description?: { ar: string; en: string }
+}
 
+/**
+ * The twelve categories the owner asked for (HANDOVER.md, "the twelve blog
+ * categories"), derived from what the 212 recovered articles are actually
+ * about. The first three slugs predate the import and are kept so existing
+ * links to them survive.
+ */
 export const CATEGORIES: SeedCategory[] = [
-  { slug: 'importing', ar: 'الاستيراد من الصين', en: 'Importing from China' },
-  { slug: 'ecommerce', ar: 'التجارة الإلكترونية', en: 'E-commerce' },
-  { slug: 'company-setup', ar: 'تأسيس الشركات', en: 'Company formation' },
+  {
+    slug: 'importing',
+    ar: 'الاستيراد من الصين',
+    en: 'Importing from China',
+    description: {
+      ar: 'خطوات الاستيراد من الصين من أول طلب حتى التخليص الجمركي، والأخطاء التي تكلّف المستوردين الجدد.',
+      en: 'Importing from China step by step, from the first order to customs clearance, and the mistakes that cost new importers.',
+    },
+  },
+  {
+    slug: 'company-setup',
+    ar: 'تأسيس الشركات في الصين',
+    en: 'Company formation in China',
+    description: {
+      ar: 'تأسيس شركة أجنبية في الصين: الرخصة، العنوان المسجّل، الحساب البنكي، تصاريح العمل والمحاسبة.',
+      en: 'Setting up a foreign-owned company in China: the licence, the registered address, the bank account, work permits and accounting.',
+    },
+  },
+  {
+    slug: 'trade-fairs',
+    ar: 'المعارض التجارية',
+    en: 'Trade fairs',
+    description: {
+      ar: 'معرض كانتون والمعارض المتخصصة في الصين: الدعوات، المواعيد، وكيف تحوّل الزيارة إلى صفقات.',
+      en: "The Canton Fair and China's specialist exhibitions: invitations, dates, and how to turn a visit into orders.",
+    },
+  },
+  {
+    slug: 'suppliers-sourcing',
+    ar: 'الموردون والتوريد',
+    en: 'Suppliers and sourcing',
+    description: {
+      ar: 'كيف تجد المورد الصيني المناسب وتتحقق منه وتدفع له بأمان، وماذا تفعل حين يتوقف فجأة.',
+      en: 'How to find the right Chinese supplier, verify them, pay safely, and what to do when one disappears.',
+    },
+  },
+  {
+    slug: 'shipping-logistics',
+    ar: 'الشحن واللوجستيات',
+    en: 'Shipping and logistics',
+    description: {
+      ar: 'الشحن البحري والجوي والبري من الصين، اختيار وكيل الشحن، والموانئ وسلاسل التوريد.',
+      en: 'Sea, air and land freight from China, choosing a forwarder, and the ports and supply chains behind it.',
+    },
+  },
+  {
+    slug: 'quality-inspection',
+    ar: 'الجودة والفحص',
+    en: 'Quality and inspection',
+    description: {
+      ar: 'فحص المصنع والبضاعة قبل الشحن، معايير المنتجات الصينية، والتصنيع التعاقدي.',
+      en: 'Factory and pre-shipment inspection, Chinese product standards, and contract manufacturing.',
+    },
+  },
+  {
+    slug: 'ecommerce',
+    ar: 'التجارة الإلكترونية',
+    en: 'E-commerce',
+    description: {
+      ar: 'إطلاق متجرك عبر شركة صينية، البيع على المنصات، والتسويق للمستهلك الصيني.',
+      en: 'Launching a store through a Chinese company, selling on marketplaces, and marketing to Chinese consumers.',
+    },
+  },
+  {
+    slug: 'investment',
+    ar: 'الاستثمار في الصين',
+    en: 'Investing in China',
+    description: {
+      ar: 'فرص الاستثمار في القطاعات الصينية، الحوافز الحكومية، ومناطق التجارة الحرة.',
+      en: 'Investment opportunities across Chinese sectors, government incentives, and the free trade zones.',
+    },
+  },
+  {
+    slug: 'industries',
+    ar: 'الصناعات والقطاعات',
+    en: 'Industries and sectors',
+    description: {
+      ar: 'قراءة في الصناعات الصينية قطاعًا بقطاع: السيارات الكهربائية، الأدوية، المنسوجات، الأغذية وغيرها.',
+      en: 'Chinese industry sector by sector: electric vehicles, pharmaceuticals, textiles, food and more.',
+    },
+  },
+  {
+    slug: 'legal-compliance',
+    ar: 'القانون والملكية الفكرية',
+    en: 'Legal and intellectual property',
+    description: {
+      ar: 'حماية الملكية الفكرية، الامتثال التنظيمي، وإدارة المخاطر والنزاعات التجارية في الصين.',
+      en: 'Intellectual property protection, regulatory compliance, and managing risk and commercial disputes in China.',
+    },
+  },
+  {
+    slug: 'business-culture',
+    ar: 'ثقافة الأعمال والتفاوض',
+    en: 'Business culture and negotiation',
+    description: {
+      ar: 'العلاقات (قوانشي)، آداب التعامل، وكيف تتفاوض بفعالية مع الشركات الصينية.',
+      en: 'Guanxi, business etiquette, and how to negotiate effectively with Chinese companies.',
+    },
+  },
+  {
+    slug: 'economy-belt-road',
+    ar: 'الاقتصاد والحزام والطريق',
+    en: 'Economy and the Belt and Road',
+    description: {
+      ar: 'الاقتصاد الصيني، مبادرة الحزام والطريق، والتجارة بين الصين والعالم العربي.',
+      en: 'The Chinese economy, the Belt and Road Initiative, and trade between China and the Arab world.',
+    },
+  },
 ]
 
 export type SeedPost = {

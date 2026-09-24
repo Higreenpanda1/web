@@ -310,8 +310,7 @@ async function lookupRedirect(
   pathname: string,
 ): Promise<RedirectRule | null> {
   await ensureRedirects(request)
-  const trimmed = pathname.replace(/\/+$/, '') || '/'
-  return redirectCache.rules.get(trimmed) ?? null
+  return redirectCache.rules.get(normalise(pathname)) ?? null
 }
 
 async function ensureRedirects(request: NextRequest): Promise<void> {
@@ -354,8 +353,20 @@ async function fetchRedirects(request: NextRequest): Promise<void> {
   }
 }
 
+/**
+ * Trailing slashes are not a difference, and neither is percent-encoding: the
+ * old site's Arabic article URLs arrive as `/%d8%aa%d8%a3...` and are stored
+ * in the Redirects collection as the readable `/تأسيس-شركة.../`. Both forms
+ * normalise to the decoded path. An undecodable path is used as it came.
+ */
 function normalise(path: string): string {
-  return path.replace(/\/+$/, '') || '/'
+  let decoded = path
+  try {
+    decoded = decodeURIComponent(path)
+  } catch {
+    // Malformed escape sequence — match the raw path instead.
+  }
+  return decoded.replace(/\/+$/, '') || '/'
 }
 
 function withRequestHeaders(request: NextRequest, nonce: string, csp: string): Headers {
@@ -391,6 +402,6 @@ export const config = {
      * routing, and keeping them out of middleware is most of the reason the
      * site stays fast on a slow connection.
      */
-    '/((?!_next/static|_next/image|fonts/|brand/|media/|favicon\\.ico|favicon\\.svg|apple-touch-icon\\.png|icon-\\d+\\.png|icon-maskable-512\\.png|robots\\.txt|sitemap\\.xml|manifest\\.webmanifest).*)',
+    '/((?!_next/static|_next/image|fonts/|brand/|media/|favicon\\.ico|favicon\\.svg|apple-touch-icon\\.png|icon-\\d+\\.png|icon-maskable-512\\.png|robots\\.txt|sitemap\\.xml|manifest\\.webmanifest|feed\\.xml|en/feed\\.xml|llms\\.txt|llms-full\\.txt|indexnow-key\\.txt).*)',
   ],
 }

@@ -25,9 +25,16 @@
     "test": "node --test --experimental-strip-types \"src/**/*.test.ts\"",
     "test:e2e": "node tests/e2e.mjs",
     "prestart": "mkdir -p .next/standalone/public .next/standalone/.next && cp -r public/. .next/standalone/public/ && cp -r .next/static .next/standalone/.next/",
-    "test:admin": "node --experimental-strip-types tests/admin-gate.mjs"
+    "test:admin": "node --experimental-strip-types tests/admin-gate.mjs",
+    "automation": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/automation.ts",
+    "posts:distribute": "npm run automation -- distribute",
+    "posts:enrich": "npm run automation -- enrich",
+    "posts:translate": "npm run automation -- translate",
+    "posts:draft": "npm run automation -- draft",
+    "seo:indexnow": "npm run automation -- indexnow"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "0.128.0",
     "@payloadcms/db-postgres": "3.90.1",
     "@payloadcms/email-resend": "3.90.1",
     "@payloadcms/next": "3.90.1",
@@ -53,14 +60,14 @@
     "@types/react": "19.2.0",
     "@types/react-dom": "19.2.0",
     "cross-env": "7.0.3",
+    "dotenv": "16.6.1",
     "eslint": "9.39.5",
     "eslint-config-next": "15.4.11",
     "playwright": "1.56.1",
     "prettier": "3.6.2",
     "tailwindcss": "4.1.14",
     "tsx": "4.20.6",
-    "typescript": "5.9.3",
-    "dotenv": "16.6.1"
+    "typescript": "5.9.3"
   },
   "overrides": {
     "graphql": "16.14.2"

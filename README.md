@@ -23,7 +23,7 @@ cp .env.example .env         # then fill in PAYLOAD_SECRET and POSTGRES_PASSWORD
 docker compose up -d db      # or point DATABASE_URI at your own Postgres
 npm install
 npm run migrate
-npm run seed                 # twenty services, the founder, redirects, an admin user
+npm run seed                 # services, founder, 12 categories, 112 recovered articles, redirects, an admin user
 npm run dev
 ```
 
@@ -38,11 +38,24 @@ npm run dev
 ```bash
 npm run lint          # ESLint
 npm run typecheck     # tsc --noEmit
-npm test              # 23 unit tests: TOTP, rate limiter, form guard, spam patterns
+npm test              # 57 unit tests: TOTP, rate limiter, form guard, spam patterns, Lexical helpers
 npm run build && npm start
 npm run test:e2e      # Chromium: routes, RTL, type scale, the form, CSP, keyboard
 npm run test:admin    # the 2FA gate — needs real credentials, see the file header
 ```
+
+### The blog jobs
+
+```bash
+npm run posts:distribute -- --dry-run   # what would be announced (IndexNow, Metricool)
+npm run posts:enrich -- 3               # takeaways + questions for 3 articles (needs ANTHROPIC_API_KEY)
+npm run posts:translate                 # English draft for one Arabic-only article
+npm run posts:draft                     # one bilingual draft from the content queue
+npm run seo:indexnow                    # submit every live URL to IndexNow once
+```
+
+In production the same jobs run on a timer inside the app
+(`src/instrumentation.ts`); see DEPLOY.md §8b for the switches.
 
 `npm run test:e2e` needs a server already running. It drives a real browser at
 phone width: 23 routes for the status they should return, then the Arabic type

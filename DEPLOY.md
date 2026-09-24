@@ -192,10 +192,14 @@ to invalidate. Seed against a already-running site and it serves pre-seed
 content for up to an hour — the seed prints a restart command when it
 finishes, for exactly that case.
 
-`seed` creates the twenty services, the three articles, the founder record, the
+`seed` creates the twenty services, the founder record, the twelve blog
+categories, the 112 articles recovered from the old WordPress site (with their
+cover images and the 301s from their old URLs), the content queue, the
 redirects and the first admin user from `SEED_ADMIN_EMAIL` /
 `SEED_ADMIN_PASSWORD`. It is idempotent — re-running it updates rather than
-duplicates, and it never deletes anything an editor has created.
+duplicates, and it never deletes anything an editor has created. The first run
+uploads about 130 images through sharp and takes several minutes; later runs
+skip every article whose source has not changed and finish in seconds.
 
 Then **clear `SEED_ADMIN_EMAIL` and `SEED_ADMIN_PASSWORD` from `.env`**; they
 are only needed once.
@@ -720,6 +724,43 @@ docker compose -f docker-compose.prod.yml exec backup \
    showing as redirected, not as errors.
 5. Add any spam URL Search Console reports that the site still answers with 404
    to the **Redirects** collection in the CMS as a `410` — no deploy needed.
+6. **Bing Webmaster Tools** as well: import the Google property, then submit the
+   sitemap. With `INDEXNOW_KEY` set (§8b) new articles reach Bing, Yandex, Naver
+   and Seznam within minutes of publishing without this step, but the import
+   gives you their reports.
+
+### 8b. Blog automation — the switches in `.env`
+
+Everything the blog does on its own is controlled by environment variables and
+is silent until its value is set. All of them are listed with comments in
+`.env.example`; set them in `/home/deploy/higreenpanda/.env` and restart `app`.
+
+| Variable                         | What switching it on does                                                                                                                                                          |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `INDEXNOW_KEY`                   | Every article that goes live is submitted to IndexNow at once. Any 8–128 hex characters: `openssl rand -hex 16`. The key is served at `/indexnow-key.txt`.                            |
+| `METRICOOL_TOKEN` + ids          | One social post per network (default Facebook and Instagram) is scheduled through Metricool when an article goes live. Token: Metricool → Settings → API. Ids are in `.env.example`. |
+| `ANTHROPIC_API_KEY`              | Nightly: key takeaways and questions are written for articles lacking them; one Arabic-only article gets an English draft. Weekly: one new bilingual draft from the content queue.   |
+| `AUTOMATION=off`                 | Stops all of the above (the scheduler in `src/instrumentation.ts`).                                                                                                                 |
+
+Nothing the Claude jobs write is published on its own. Enrichment adds
+takeaways and questions to articles that are already live; translations and
+new articles are saved as **drafts** for the owner to read and publish in the
+CMS. Publishing is what triggers the announcement — and a publish date in the
+future schedules it, so the owner can line up a month of articles on a Sunday.
+
+To run a job by hand from the server:
+
+```bash
+cd ~/higreenpanda
+docker compose -f docker-compose.prod.yml run --rm --build tools npm run posts:distribute -- --dry-run
+docker compose -f docker-compose.prod.yml run --rm --build tools npm run posts:enrich -- 5
+docker compose -f docker-compose.prod.yml run --rm --build tools npm run posts:draft
+docker compose -f docker-compose.prod.yml run --rm --build tools npm run seo:indexnow
+```
+
+The last one submits every live URL once; run it after the first deploy of the
+imported blog so the search engines learn the 212 new addresses today rather
+than on their next crawl.
 
 ---
 
@@ -734,6 +775,8 @@ docker compose -f docker-compose.prod.yml exec backup \
 | Dependency alerts      | GitHub → Security → Dependabot                                                | As they arrive        |
 | Disk space             | `df -h` and `docker system df`                                                | Monthly               |
 | New enquiries          | `/hgp-studio` → Enquiries                                                     | Daily                 |
+| Drafts to review       | `/hgp-studio` → Blog, filter Status = Draft; Content queue → Drafted          | Weekly                |
+| Automation ran         | `docker compose -f docker-compose.prod.yml logs app \| grep automation`     | Weekly                |
 | Mail records unchanged | `dig +short MX higreenpanda.com` and one `v=spf1` / one `_dmarc` TXT          | After any DNS change  |
 
 Set `SENTRY_DSN` in `.env` to get errors reported rather than discovered.

@@ -1,8 +1,8 @@
 # Handover — HiGreenPanda website
 
 Written 20 September 2026, at the end of the session that deployed the site,
-updated the same day after the front-end redesign, and again on 23 September
-2026 after go-live and the service catalogue. Everything below is verified
+updated the same day after the front-end redesign, on 23 September 2026 after
+go-live and the service catalogue, and on 24 September 2026 after the blog. Everything below is verified
 state, not intention. Where something is unfinished it says so.
 
 ---
@@ -19,6 +19,65 @@ on the real domain.
 - **Site:** https://higreenpanda.com (Arabic) · https://higreenpanda.com/en
 - **CMS:** https://higreenpanda.com/hgp-studio-gate
 - **Repository:** `Higreenpanda1/web`, branch `claude/practical-newton-m55sbw`
+
+## The blog (24 September 2026, fourth session)
+
+The owner asked for the blog to be the traffic engine: "robust traffic, fully
+optimised, automated, top-notch SEO, GEO, AEO". This session did three things.
+
+**1. The old blog is back.** The Hostinger backup the owner supplied
+(`u530724501…sql.gz` and the `tar.gz`) held 214 published WordPress articles —
+the brief assumed they were lost. They were extracted, paired into 112
+bilingual documents (100 with both languages, 12 Arabic-only), converted from
+Gutenberg HTML to Lexical, given their Yoast descriptions, their covers
+(re-encoded to WebP, 16 MB in `src/seed/wp/media/`) and Latin slugs, and sorted
+into twelve categories. Every old URL — the percent-encoded Arabic ones
+included — 301s to the new article; the middleware now decodes paths before
+matching. Two video-only posts arrive as drafts. The data is
+`src/seed/wp/posts.json`; `npm run seed` imports it idempotently (a hash per
+article; unchanged articles are skipped, an editor's edits are never
+overwritten unless the source changes). The generator script is not in the
+repository — the JSON is the source of truth.
+
+**2. The SEO / GEO / AEO layer.** On every article: a key-takeaways box and a
+questions-and-answers section (fields on Posts, rendered and emitted as
+`FAQPage`), a table of contents from the headings (which now carry ids), an
+author card, share links, older/newer navigation, related articles by category,
+"updated on". Structured data: `BlogPosting` with author as a `Person` carrying
+the founder's profiles, `wordCount`, `articleSection`, `speakable`, and the
+Arabic↔English `workTranslation` link; `CollectionPage` on the index and the
+twelve category pages (`/blog/category/<slug>`). `hreflang` and the sitemap
+honour `localesAvailable`, so an Arabic-only article never advertises an
+English page (and `/en/blog/<slug>` answers 404 for it instead of showing
+Arabic). RSS at `/feed.xml` and `/en/feed.xml`; `/llms.txt` and
+`/llms-full.txt` for AI crawlers; `robots.txt` names and allows the AI
+crawlers. Sitemap entries carry the cover image. Page 2+ of any list is
+`noindex, follow`.
+
+**3. Automation, all opt-in by `.env` (DEPLOY.md §8b).** A scheduler in
+`src/instrumentation.ts` runs inside the `app` container. Every ten minutes it
+announces articles that have gone live — including ones scheduled with a future
+publish date — by dropping the cache, submitting to IndexNow (`INDEXNOW_KEY`)
+and scheduling a social post per network through Metricool
+(`METRICOOL_TOKEN`; brand 6019177, user 4648321, Asia/Shanghai). Nightly, with
+`ANTHROPIC_API_KEY`, Claude writes takeaways and questions for three articles
+lacking them, drafts the English of one Arabic-only article, and on Mondays
+writes one bilingual draft from the **Content queue** collection (24 topics
+seeded from what this audience searches for). Drafts are never published by
+the machine. `npm run posts:*` and `npm run seo:indexnow` run the same jobs by
+hand (`src/scripts/automation.ts`).
+
+Migration `20260924_043615_blog_seo_automation` adds the fields and the
+`topics` table. Verified locally against Postgres 16: typecheck, lint,
+prettier, 57 unit tests, the seed (all 112 articles), and every blog route in
+both languages; see the commit message for what was not verified on the server.
+
+Not done, worth doing next: put the twelve categories in the header or footer
+navigation; get `INDEXNOW_KEY`, `METRICOOL_TOKEN` and `ANTHROPIC_API_KEY` from
+the owner and set them; verify the site in Bing Webmaster Tools; translate the
+12 Arabic-only articles (the nightly job will do one a day once the key is
+set); Semrush had no API units left this session, so no keyword volumes were
+checked — the content queue is built from what customers ask, not from data.
 
 ## Where the last session stopped (night of 23–24 September 2026)
 

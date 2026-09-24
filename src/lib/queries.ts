@@ -123,6 +123,8 @@ export const getPosts = (
         where: {
           _status: { equals: 'published' },
           publishedAt: { less_than_equal: new Date().toISOString() },
+          // An Arabic-only article is not listed on the English site.
+          ...(locale === 'en' ? { localesAvailable: { contains: 'en' } } : {}),
           ...(options.category ? { 'categories.slug': { equals: options.category } } : {}),
         },
         locale,
@@ -154,7 +156,12 @@ export const getPostBySlug = (slug: string, locale: Locale) =>
       const payload = await getPayloadClient()
       const result = await payload.find({
         collection: 'posts',
-        where: { slug: { equals: slug }, _status: { equals: 'published' } },
+        where: {
+          slug: { equals: slug },
+          _status: { equals: 'published' },
+          // A scheduled article is not reachable before its time, even by URL.
+          publishedAt: { less_than_equal: new Date().toISOString() },
+        },
         locale,
         depth: 2,
         limit: 1,
@@ -220,20 +227,181 @@ export const getFounder = async (locale: Locale): Promise<TeamMember | null> => 
  *  are shared between languages by design. */
 export const getAllSlugs = (collection: 'services' | 'posts' | 'pages') =>
   unstable_cache(
-    async (): Promise<Array<{ slug: string; updatedAt: string }>> => {
+    async (): Promise<Array<{ slug: string; updatedAt: string; locales: Locale[] }>> => {
       const payload = await getPayloadClient()
       const result = await payload.find({
         collection,
-        where: { _status: { equals: 'published' } },
+        where: {
+          _status: { equals: 'published' },
+          ...(collection === 'posts'
+            ? { publishedAt: { less_than_equal: new Date().toISOString() } }
+            : {}),
+        },
         limit: 1000,
         depth: 0,
-        select: { slug: true, updatedAt: true },
+        select: {
+          slug: true,
+          updatedAt: true,
+          ...(collection === 'posts' ? { localesAvailable: true } : {}),
+        },
       })
       return result.docs.flatMap((doc) => {
-        const record = doc as { slug?: string | null; updatedAt?: string | null }
-        return record.slug ? [{ slug: record.slug, updatedAt: record.updatedAt ?? '' }] : []
+        const record = doc as {
+          slug?: string | null
+          updatedAt?: string | null
+          localesAvailable?: Locale[] | null
+        }
+        if (!record.slug) return []
+        const locales = record.localesAvailable?.length
+          ? record.localesAvailable
+          : (['ar', 'en'] as Locale[])
+        return [{ slug: record.slug, updatedAt: record.updatedAt ?? '', locales }]
       })
     },
     ['slugs', collection],
     { tags: [CACHE_TAGS[collection]], revalidate: ONE_HOUR },
+  )()
+
+export const getCategoryBySlug = (slug: string, locale: Locale) =>
+  unstable_cache(
+    async (): Promise<Category | null> => {
+      const payload = await getPayloadClient()
+      const result = await payload.find({
+        collection: 'categories',
+        where: { slug: { equals: slug } },
+        locale,
+        limit: 1,
+        depth: 0,
+      })
+      return result.docs[0] ?? null
+    },
+    ['category', slug, locale],
+    { tags: [CACHE_TAGS.categories], revalidate: ONE_HOUR },
+  )()
+
+/** How many published articles each category holds, keyed by category id. */
+export const getCategoryCounts = (locale: Locale) =>
+  unstable_cache(
+    async (): Promise<Record<number, number>> => {
+      const payload = await getPayloadClient()
+      const result = await payload.find({
+        collection: 'posts',
+        where: {
+          _status: { equals: 'published' },
+          publishedAt: { less_than_equal: new Date().toISOString() },
+          ...(locale === 'en' ? { localesAvailable: { contains: 'en' } } : {}),
+        },
+        limit: 1000,
+        depth: 0,
+        select: { categories: true },
+      })
+      const counts: Record<number, number> = {}
+      for (const doc of result.docs) {
+        for (const entry of (doc as { categories?: Array<number | { id: number }> }).categories ??
+          []) {
+          const id = typeof entry === 'object' ? entry.id : entry
+          counts[id] = (counts[id] ?? 0) + 1
+        }
+      }
+      return counts
+    },
+    ['category-counts', locale],
+    { tags: [CACHE_TAGS.posts], revalidate: ONE_HOUR },
+  )()
+
+/** The article before and after this one, by publish date. */
+export const getAdjacentPosts = (post: Post, locale: Locale) =>
+  unstable_cache(
+    async (): Promise<{ previous: Post | null; next: Post | null }> => {
+      const payload = await getPayloadClient()
+      const base = {
+        _status: { equals: 'published' as const },
+        publishedAt: { less_than_equal: new Date().toISOString() },
+        ...(locale === 'en' ? { localesAvailable: { contains: 'en' as const } } : {}),
+      }
+      const [older, newer] = await Promise.all([
+        payload.find({
+          collection: 'posts',
+          where: { ...base, publishedAt: { less_than: post.publishedAt } },
+          locale,
+          sort: '-publishedAt',
+          limit: 1,
+          depth: 0,
+          select: { title: true, slug: true, publishedAt: true },
+        }),
+        payload.find({
+          collection: 'posts',
+          where: {
+            ...base,
+            publishedAt: {
+              greater_than: post.publishedAt,
+              less_than_equal: new Date().toISOString(),
+            },
+          },
+          locale,
+          sort: 'publishedAt',
+          limit: 1,
+          depth: 0,
+          select: { title: true, slug: true, publishedAt: true },
+        }),
+      ])
+      return {
+        previous: (older.docs[0] as Post | undefined) ?? null,
+        next: (newer.docs[0] as Post | undefined) ?? null,
+      }
+    },
+    ['adjacent', String(post.id), locale],
+    { tags: [CACHE_TAGS.posts], revalidate: ONE_HOUR },
+  )()
+
+/** Latest articles sharing a category with this one, for the "related" block
+ *  when an editor has not chosen any. */
+export const getRelatedPosts = (post: Post, locale: Locale, limit = 3) =>
+  unstable_cache(
+    async (): Promise<Post[]> => {
+      const payload = await getPayloadClient()
+      const categoryIds = (post.categories ?? []).map((entry) =>
+        typeof entry === 'object' && entry !== null ? entry.id : entry,
+      )
+      const result = await payload.find({
+        collection: 'posts',
+        where: {
+          _status: { equals: 'published' },
+          publishedAt: { less_than_equal: new Date().toISOString() },
+          id: { not_equals: post.id },
+          ...(locale === 'en' ? { localesAvailable: { contains: 'en' } } : {}),
+          ...(categoryIds.length ? { categories: { in: categoryIds } } : {}),
+        },
+        locale,
+        sort: '-publishedAt',
+        limit,
+        depth: 1,
+      })
+      return result.docs
+    },
+    ['related', String(post.id), locale, String(limit)],
+    { tags: [CACHE_TAGS.posts], revalidate: ONE_HOUR },
+  )()
+
+/** Every live article in one locale, newest first — for the feed and llms.txt. */
+export const getAllPosts = (locale: Locale, options: { depth?: number; limit?: number } = {}) =>
+  unstable_cache(
+    async (): Promise<Post[]> => {
+      const payload = await getPayloadClient()
+      const result = await payload.find({
+        collection: 'posts',
+        where: {
+          _status: { equals: 'published' },
+          publishedAt: { less_than_equal: new Date().toISOString() },
+          ...(locale === 'en' ? { localesAvailable: { contains: 'en' } } : {}),
+        },
+        locale,
+        sort: '-publishedAt',
+        limit: options.limit ?? 1000,
+        depth: options.depth ?? 1,
+      })
+      return result.docs
+    },
+    ['all-posts', locale, String(options.depth ?? 1), String(options.limit ?? 1000)],
+    { tags: [CACHE_TAGS.posts], revalidate: ONE_HOUR },
   )()

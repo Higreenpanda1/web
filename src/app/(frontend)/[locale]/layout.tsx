@@ -86,7 +86,12 @@ export async function generateMetadata({
     },
     description: t('site.description'),
     applicationName: t('site.name'),
-    alternates: alternatesFor('/'),
+    alternates: {
+      ...alternatesFor('/'),
+      types: {
+        'application/rss+xml': `${serverURL}${locale === 'en' ? '/en' : ''}/feed.xml`,
+      },
+    },
     manifest: '/manifest.webmanifest',
     icons: {
       icon: [

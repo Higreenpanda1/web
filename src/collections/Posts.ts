@@ -11,6 +11,12 @@ import type { CollectionConfig } from 'payload'
  * the main SEO engine here too. Reading time is computed on save rather than at
  * render, because it has to be right in the Arabic locale as well and counting
  * Arabic words at request time on every list page is wasted work.
+ *
+ * Beyond the article itself, a post carries the pieces that answer engines and
+ * AI assistants lift out of a page: a short list of key takeaways, a set of
+ * questions with direct answers (rendered as FAQPage structured data) and the
+ * keyword the article targets. Editors can leave all three empty — the
+ * enrichment script (`npm run posts:enrich`) fills them in from the body.
  */
 export const Posts: CollectionConfig = {
   slug: 'posts',
@@ -51,7 +57,34 @@ export const Posts: CollectionConfig = {
       type: 'upload',
       relationTo: 'media',
     },
+    {
+      name: 'keyTakeaways',
+      type: 'array',
+      localized: true,
+      labels: { singular: 'Takeaway', plural: 'Key takeaways' },
+      maxRows: 6,
+      admin: {
+        description:
+          'Three to five one-sentence answers a reader could act on. Shown in a box above the article and quoted by AI assistants.',
+      },
+      fields: [{ name: 'text', type: 'text', required: true, maxLength: 220 }],
+    },
     bodyField(),
+    {
+      name: 'faqs',
+      type: 'array',
+      localized: true,
+      labels: { singular: 'Question', plural: 'Questions this article answers' },
+      maxRows: 8,
+      admin: {
+        description:
+          'Real questions people type into search, each with a direct answer of two or three sentences. Rendered as FAQ structured data.',
+      },
+      fields: [
+        { name: 'question', type: 'text', required: true, maxLength: 200 },
+        { name: 'answer', type: 'textarea', required: true, maxLength: 800 },
+      ],
+    },
     {
       name: 'publishedAt',
       type: 'date',
@@ -61,6 +94,8 @@ export const Posts: CollectionConfig = {
       admin: {
         position: 'sidebar',
         date: { pickerAppearance: 'dayAndTime' },
+        description:
+          'A future date schedules the article: it goes live, is indexed and is posted to social media at that time.',
       },
     },
     {
@@ -79,6 +114,31 @@ export const Posts: CollectionConfig = {
       admin: { position: 'sidebar' },
     },
     {
+      name: 'focusKeyword',
+      type: 'text',
+      localized: true,
+      maxLength: 120,
+      admin: {
+        position: 'sidebar',
+        description: 'The search phrase this article should rank for, in this language.',
+      },
+    },
+    {
+      name: 'localesAvailable',
+      type: 'select',
+      hasMany: true,
+      defaultValue: ['ar', 'en'],
+      options: [
+        { label: 'العربية', value: 'ar' },
+        { label: 'English', value: 'en' },
+      ],
+      admin: {
+        position: 'sidebar',
+        description:
+          'Languages this article is actually written in. An article without English is not listed on the English site and carries no English hreflang.',
+      },
+    },
+    {
       name: 'readingMinutes',
       type: 'number',
       localized: true,
@@ -95,6 +155,26 @@ export const Posts: CollectionConfig = {
       hasMany: true,
       maxDepth: 1,
       filterOptions: ({ id }) => (id ? { id: { not_equals: id } } : true),
+      admin: {
+        description: 'Leave empty to show the latest articles from the same category.',
+      },
+    },
+    {
+      name: 'legacyPaths',
+      type: 'array',
+      admin: {
+        position: 'sidebar',
+        description: 'URLs this article had on the old site. Each one redirects here.',
+      },
+      fields: [{ name: 'path', type: 'text', required: true }],
+    },
+    {
+      // A fingerprint of the imported source, so re-running the import skips
+      // articles that have not changed instead of rewriting an editor's work.
+      name: 'importKey',
+      type: 'text',
+      index: true,
+      admin: { hidden: true },
     },
     seoField,
   ],
@@ -125,7 +205,7 @@ export function estimateReadingMinutes(node: unknown): number {
   return Math.max(1, Math.round(words / WORDS_PER_MINUTE))
 }
 
-function countWords(node: unknown): number {
+export function countWords(node: unknown): number {
   if (typeof node === 'string') {
     const trimmed = node.trim()
     return trimmed ? trimmed.split(/\s+/).length : 0

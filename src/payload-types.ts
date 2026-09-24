@@ -72,12 +72,14 @@ export interface Config {
     services: Service;
     posts: Post;
     categories: Category;
+    topics: Topic;
     testimonials: Testimonial;
     'team-members': TeamMember;
     media: Media;
     enquiries: Enquiry;
     applications: Application;
     redirects: Redirect;
+    announcements: Announcement;
     users: User;
     customers: Customer;
     'payload-kv': PayloadKv;
@@ -91,12 +93,14 @@ export interface Config {
     services: ServicesSelect<false> | ServicesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    topics: TopicsSelect<false> | TopicsSelect<true>;
     testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
     'team-members': TeamMembersSelect<false> | TeamMembersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     enquiries: EnquiriesSelect<false> | EnquiriesSelect<true>;
     applications: ApplicationsSelect<false> | ApplicationsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
+    announcements: AnnouncementsSelect<false> | AnnouncementsSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     customers: CustomersSelect<false> | CustomersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -668,6 +672,15 @@ export interface Post {
    */
   excerpt: string;
   coverImage?: (number | null) | Media;
+  /**
+   * Three to five one-sentence answers a reader could act on. Shown in a box above the article and quoted by AI assistants.
+   */
+  keyTakeaways?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
   body?: {
     root: {
       type: string;
@@ -683,14 +696,48 @@ export interface Post {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Real questions people type into search, each with a direct answer of two or three sentences. Rendered as FAQ structured data.
+   */
+  faqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * A future date schedules the article: it goes live, is indexed and is posted to social media at that time.
+   */
   publishedAt: string;
   author?: (number | null) | TeamMember;
   categories?: (number | Category)[] | null;
   /**
+   * The search phrase this article should rank for, in this language.
+   */
+  focusKeyword?: string | null;
+  /**
+   * Languages this article is actually written in. An article without English is not listed on the English site and carries no English hreflang.
+   */
+  localesAvailable?: ('ar' | 'en')[] | null;
+  /**
    * Calculated on save, per language.
    */
   readingMinutes?: number | null;
+  /**
+   * Leave empty to show the latest articles from the same category.
+   */
   relatedPosts?: (number | Post)[] | null;
+  /**
+   * URLs this article had on the old site. Each one redirects here.
+   */
+  legacyPaths?:
+    | {
+        path: string;
+        id?: string | null;
+      }[]
+    | null;
+  importKey?: string | null;
   /**
    * Optional. Leave empty to use the page title and summary.
    */
@@ -728,6 +775,47 @@ export interface Category {
    */
   slug: string;
   description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Articles waiting to be written. The weekly draft job takes the highest priority queued topic and writes a draft for review.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "topics".
+ */
+export interface Topic {
+  id: number;
+  /**
+   * Working title. The draft may improve on it.
+   */
+  title: string;
+  /**
+   * The exact search phrase to target, in this language.
+   */
+  keyword: string;
+  /**
+   * What the article must cover, who it is for, and any figures or steps it has to include. Two to five lines.
+   */
+  brief?: string | null;
+  category: number | Category;
+  /**
+   * Lower is sooner. 10 is urgent, 90 is someday.
+   */
+  priority?: number | null;
+  status?: ('queued' | 'drafted' | 'published' | 'dropped') | null;
+  /**
+   * Optional. The job will not draft this topic before this date.
+   */
+  scheduledFor?: string | null;
+  /**
+   * The draft written for this topic.
+   */
+  post?: (number | null) | Post;
+  /**
+   * Anything the writer should know. Not published.
+   */
+  notes?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -967,6 +1055,23 @@ export interface Redirect {
   createdAt: string;
 }
 /**
+ * Articles that have been announced to search engines and social networks. Delete a row to announce the article again.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "announcements".
+ */
+export interface Announcement {
+  id: number;
+  post: number | Post;
+  announcedAt: string;
+  /**
+   * Where it went, e.g. "indexnow, facebook, instagram". Empty means nothing was configured.
+   */
+  channels?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -1007,6 +1112,10 @@ export interface PayloadLockedDocument {
         value: number | Category;
       } | null)
     | ({
+        relationTo: 'topics';
+        value: number | Topic;
+      } | null)
+    | ({
         relationTo: 'testimonials';
         value: number | Testimonial;
       } | null)
@@ -1029,6 +1138,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'redirects';
         value: number | Redirect;
+      } | null)
+    | ({
+        relationTo: 'announcements';
+        value: number | Announcement;
       } | null)
     | ({
         relationTo: 'users';
@@ -1320,12 +1433,34 @@ export interface PostsSelect<T extends boolean = true> {
   slug?: T;
   excerpt?: T;
   coverImage?: T;
+  keyTakeaways?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
   body?: T;
+  faqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
   publishedAt?: T;
   author?: T;
   categories?: T;
+  focusKeyword?: T;
+  localesAvailable?: T;
   readingMinutes?: T;
   relatedPosts?: T;
+  legacyPaths?:
+    | T
+    | {
+        path?: T;
+        id?: T;
+      };
+  importKey?: T;
   seo?:
     | T
     | {
@@ -1346,6 +1481,23 @@ export interface CategoriesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "topics_select".
+ */
+export interface TopicsSelect<T extends boolean = true> {
+  title?: T;
+  keyword?: T;
+  brief?: T;
+  category?: T;
+  priority?: T;
+  status?: T;
+  scheduledFor?: T;
+  post?: T;
+  notes?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1540,6 +1692,17 @@ export interface RedirectsSelect<T extends boolean = true> {
   to?: T;
   enabled?: T;
   note?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "announcements_select".
+ */
+export interface AnnouncementsSelect<T extends boolean = true> {
+  post?: T;
+  announcedAt?: T;
+  channels?: T;
   updatedAt?: T;
   createdAt?: T;
 }

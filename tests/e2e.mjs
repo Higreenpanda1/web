@@ -66,6 +66,15 @@ const ROUTES = [
   ['/blog', 200],
   ['/en/blog', 200],
   ['/blog/how-to-inspect-a-factory-before-you-pay', 200],
+  ['/blog/how-to-find-reliable-suppliers-in-china', 200], // recovered from the old site
+  ['/en/blog/how-to-find-reliable-suppliers-in-china', 200],
+  ['/blog/category/importing', 200],
+  ['/en/blog/category/trade-fairs', 200],
+  ['/en/blog/10-common-mistakes-importing-from-china', 404], // Arabic-only article: no English page
+  ['/feed.xml', 200],
+  ['/en/feed.xml', 200],
+  ['/llms.txt', 200],
+  ['/llms-full.txt', 200],
   ['/about', 200],
   ['/en/about', 200],
   ['/contact', 200],
@@ -80,6 +89,8 @@ const ROUTES = [
   // which is how a build-time-prerendered empty table was caught.
   ['/en/home/', 200], // 301 to /en, followed
   ['/about-us/', 200], // 301 to /about, followed
+  ['/en/how-to-find-reliable-suppliers-in-china/', 200], // old article URL, 301 followed
+  ['/blogs-ar/', 200], // old blog index, 301 followed
   ['/slot-gacor', 410],
   ['/wp-admin/', 410],
   ['/admin', 404],

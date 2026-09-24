@@ -226,7 +226,7 @@
   },
   "blog": {
     "title": "Blog",
-    "lead": "Practical guides on importing from China, e-commerce, and company formation.",
+    "lead": "Practical guides on importing from China, company formation, trade fairs, shipping and investing in the Chinese market.",
     "readingTime": "{minutes} min read",
     "publishedOn": "Published {date}",
     "updatedOn": "Updated {date}",
@@ -243,7 +243,27 @@
       "label": "Article pagination"
     },
     "eyebrow": "Blog",
-    "noCover": "Article"
+    "noCover": "Article",
+    "contents": "In this article",
+    "keyTakeaways": "Key takeaways",
+    "faqTitle": "Questions this article answers",
+    "share": "Share this article",
+    "shareWhatsApp": "Share on WhatsApp",
+    "shareX": "Share on X",
+    "shareLinkedIn": "Share on LinkedIn",
+    "copyLink": "Copy link",
+    "copied": "Link copied",
+    "aboutAuthor": "About the author",
+    "previousPost": "Previous article",
+    "nextPost": "Next article",
+    "inCategory": "Articles on {category}",
+    "categoryLead": "Everything we have written about {category}, newest first.",
+    "articleCount": "{count} articles",
+    "allArticles": "All articles",
+    "rss": "Subscribe by RSS",
+    "onlyInArabic": "This article is available in Arabic only.",
+    "ctaTitle": "Want to put this into practice?",
+    "ctaLead": "Message us on WhatsApp with your product and your country, and we reply with a plan and a clear cost."
   },
   "contact": {
     "title": "Contact",

@@ -7,6 +7,7 @@ import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { buildConfig } from 'payload'
 import sharp from 'sharp'
 
+import { Announcements } from '@/collections/Announcements'
 import { Applications } from '@/collections/Applications'
 import { Categories } from '@/collections/Categories'
 import { Customers } from '@/collections/Customers'
@@ -18,6 +19,7 @@ import { Redirects } from '@/collections/Redirects'
 import { Services } from '@/collections/Services'
 import { TeamMembers } from '@/collections/TeamMembers'
 import { Testimonials } from '@/collections/Testimonials'
+import { Topics } from '@/collections/Topics'
 import { Users } from '@/collections/Users'
 import { SiteSettings } from '@/globals/SiteSettings'
 
@@ -91,12 +93,14 @@ export default buildConfig({
     Services,
     Posts,
     Categories,
+    Topics,
     Testimonials,
     TeamMembers,
     Media,
     Enquiries,
     Applications,
     Redirects,
+    Announcements,
     Users,
     Customers,
   ],

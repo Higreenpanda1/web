@@ -7,6 +7,8 @@ import { getPayload } from 'payload'
 
 import config from '../payload.config'
 import { CATEGORIES, FOUNDER, POSTS, REDIRECTS, SERVICES } from './content'
+import { TOPICS } from './topics'
+import { importWordPressPosts } from './wp/import'
 
 /**
  * Seeds a fresh database with the content from WEBSITE-BRIEF.md.
@@ -170,8 +172,8 @@ async function main() {
       'categories',
       { slug: { equals: category.slug } },
       {
-        ar: { slug: category.slug, title: category.ar },
-        en: { title: category.en },
+        ar: { slug: category.slug, title: category.ar, description: category.description?.ar },
+        en: { title: category.en, description: category.description?.en },
       },
     )
     categoryIds.set(category.slug, id)
@@ -220,6 +222,42 @@ async function main() {
     )
     console.log(`  ${post.slug} → ${id}`)
   }
+
+  console.log('→ Blog — articles recovered from the old WordPress site')
+  await importWordPressPosts(payload, { founderId, categoryIds })
+
+  console.log('→ Content queue')
+  for (const topic of TOPICS) {
+    const categoryId = categoryIds.get(topic.category)
+    if (!categoryId) continue
+    const existing = await payload.find({
+      collection: 'topics',
+      where: { keyword: { equals: topic.ar.keyword } },
+      limit: 1,
+      depth: 0,
+      locale: 'ar',
+    })
+    if (existing.docs.length > 0) continue
+    const created = await payload.create({
+      collection: 'topics',
+      locale: 'ar',
+      data: {
+        title: topic.ar.title,
+        keyword: topic.ar.keyword,
+        brief: topic.ar.brief,
+        category: categoryId,
+        priority: topic.priority,
+        status: 'queued',
+      },
+    })
+    await payload.update({
+      collection: 'topics',
+      id: created.id,
+      locale: 'en',
+      data: { title: topic.en.title, keyword: topic.en.keyword, brief: topic.en.brief },
+    })
+  }
+  console.log(`  ${TOPICS.length} topics`)
 
   console.log('→ Redirects')
   for (const redirect of REDIRECTS) {
