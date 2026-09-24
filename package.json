@@ -31,7 +31,8 @@
     "posts:enrich": "npm run automation -- enrich",
     "posts:translate": "npm run automation -- translate",
     "posts:draft": "npm run automation -- draft",
-    "seo:indexnow": "npm run automation -- indexnow"
+    "seo:indexnow": "npm run automation -- indexnow",
+    "posts:rewrite-archive": "npm run automation -- rewrite-archive"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.128.0",

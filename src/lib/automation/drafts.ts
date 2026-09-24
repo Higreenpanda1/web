@@ -6,6 +6,8 @@ import { z } from 'zod/v4'
 import { lexicalToPlainText } from '@/lib/lexical'
 import { getPayloadClient } from '@/lib/payload'
 
+import { articleSchema, blocksToLexical, type ArticleDraft } from './blocks'
+
 import type { Post, Topic } from '@/payload-types'
 
 /**
@@ -37,7 +39,7 @@ import type { Post, Topic } from '@/payload-types'
 
 const MODEL = process.env.ANTHROPIC_MODEL?.trim() || 'claude-opus-5'
 
-const VOICE = `You write for HiGreenPanda (هاي جرين باندا), a China trade-services firm in Shenzhen and Shanghai serving Arabic-speaking importers and entrepreneurs in the Gulf, Yemen and the wider Arab world. Services: product sourcing, manufacturing, quality inspection, shipping, company formation in China, e-commerce launch support, trade-fair accompaniment.
+export const VOICE = `You write for HiGreenPanda (هاي جرين باندا), a China trade-services firm in Shenzhen and Shanghai serving Arabic-speaking importers and entrepreneurs in the Gulf, Yemen and the wider Arab world. Services: product sourcing, manufacturing, quality inspection, shipping, company formation in China, e-commerce launch support, trade-fair accompaniment.
 
 Voice rules, all binding:
 - Arabic is the primary voice. Write natural Modern Standard Arabic as a Gulf trader reads it; never Arabic that feels translated from English.
@@ -80,30 +82,7 @@ const takeawaysSchema = z.object({
     .describe('The single search phrase this article should rank for.'),
 })
 
-const translationSchema = z.object({
-  title: z.string().min(10).max(120),
-  excerpt: z.string().min(60).max(280),
-  seoDescription: z.string().min(80).max(158),
-  focusKeyword: z.string().min(3).max(120),
-  body: z
-    .array(
-      z.discriminatedUnion('type', [
-        z.object({ type: z.literal('h2'), text: z.string() }),
-        z.object({ type: z.literal('h3'), text: z.string() }),
-        z.object({ type: z.literal('p'), text: z.string() }),
-        z.object({ type: z.literal('ul'), items: z.array(z.string()).min(1) }),
-        z.object({ type: z.literal('ol'), items: z.array(z.string()).min(1) }),
-      ]),
-    )
-    .min(6),
-  keyTakeaways: z.array(z.string().min(20).max(220)).min(3).max(5),
-  faqs: z
-    .array(z.object({ question: z.string().min(10).max(200), answer: z.string().min(60).max(700) }))
-    .min(3)
-    .max(5),
-})
-
-type ArticleDraft = z.infer<typeof translationSchema>
+const translationSchema = articleSchema
 
 let client: Anthropic | null = null
 function anthropic(): Anthropic {
@@ -411,45 +390,6 @@ async function writeArticle(args: {
 }
 
 // ---------------------------------------------------------------------------
-
-/** The model's block list as a Lexical document the editor can open. */
-export function blocksToLexical(blocks: ArticleDraft['body']) {
-  const text = (value: string) => ({
-    type: 'text',
-    detail: 0,
-    format: 0,
-    mode: 'normal',
-    style: '',
-    text: value,
-    version: 1,
-  })
-  const base = { format: '', indent: 0, version: 1, direction: null as null }
-  const children = blocks.map((block) => {
-    switch (block.type) {
-      case 'h2':
-      case 'h3':
-        return { ...base, type: 'heading', tag: block.type, children: [text(block.text)] }
-      case 'ul':
-      case 'ol':
-        return {
-          ...base,
-          type: 'list',
-          listType: block.type === 'ol' ? 'number' : 'bullet',
-          tag: block.type,
-          start: 1,
-          children: block.items.map((item, index) => ({
-            ...base,
-            type: 'listitem',
-            value: index + 1,
-            children: [text(item)],
-          })),
-        }
-      default:
-        return { ...base, type: 'paragraph', textFormat: 0, children: [text(block.text)] }
-    }
-  })
-  return { root: { ...base, type: 'root', children } }
-}
 
 function slugify(input: string): string {
   return input

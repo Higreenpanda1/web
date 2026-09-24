@@ -31,6 +31,8 @@ type LocaleDoc = {
   focusKeyword: string | null
   body: { root: Record<string, unknown> }
   wordCount: number
+  keyTakeaways?: string[]
+  faqs?: Array<{ question: string; answer: string }>
 }
 
 type ImportedPost = {
@@ -97,6 +99,8 @@ export async function importWordPressPosts(
       excerpt: arabic.excerpt,
       body: resolveUploads(arabic.body, imageIds),
       focusKeyword: arabic.focusKeyword ?? undefined,
+      keyTakeaways: (arabic.keyTakeaways ?? []).map((text) => ({ text })),
+      faqs: arabic.faqs ?? [],
       seo: { description: arabic.seoDescription },
       publishedAt: post.publishedAt,
       author: founderId,
@@ -142,6 +146,8 @@ export async function importWordPressPosts(
           excerpt: english.excerpt,
           body: resolveUploads(english.body, imageIds),
           focusKeyword: english.focusKeyword ?? undefined,
+          keyTakeaways: (english.keyTakeaways ?? []).map((text) => ({ text })),
+          faqs: english.faqs ?? [],
           seo: { description: english.seoDescription },
           _status: base._status,
         } as never,

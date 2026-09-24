@@ -10,6 +10,8 @@ import 'dotenv/config'
  *   npm run posts:translate    English draft for one Arabic-only article
  *   npm run posts:draft        one new bilingual draft from the content queue
  *   npm run seo:indexnow       submit every live URL to IndexNow once
+ *   npm run posts:rewrite-archive -- [n] [--slug=x] [--parallel=3] [--force]
+ *                              rewrite the recovered archive (src/seed/wp/posts.json)
  *
  * Add `-- --dry-run` to distribute to see what would be announced.
  */
@@ -48,6 +50,23 @@ async function main() {
       await draftFromQueue()
       break
     }
+    case 'rewrite-archive': {
+      requireKey()
+      const { rewriteArchive } = await import('@/lib/automation/rewrite')
+      const limit = Number(flags.find((flag) => /^\d+$/.test(flag)) ?? '0') || undefined
+      const only = flags.find((flag) => flag.startsWith('--slug='))?.slice(7)
+      const concurrency = Number(
+        flags.find((flag) => flag.startsWith('--parallel='))?.slice(11) ?? '3',
+      )
+      const done = await rewriteArchive({
+        limit,
+        only,
+        concurrency,
+        force: flags.includes('--force'),
+      })
+      console.log(`rewrote ${done} article version(s); commit src/seed/wp/posts.json and deploy`)
+      break
+    }
     case 'indexnow': {
       const { submitEverythingToIndexNow } = await import('@/lib/automation/distribute')
       const count = await submitEverythingToIndexNow()
@@ -60,7 +79,7 @@ async function main() {
     }
     default:
       console.error(
-        'usage: npm run automation -- <distribute|enrich|translate|draft|indexnow> [--dry-run] [n]',
+        'usage: npm run automation -- <distribute|enrich|translate|draft|indexnow|rewrite-archive> [--dry-run] [n]',
       )
       process.exit(2)
   }
