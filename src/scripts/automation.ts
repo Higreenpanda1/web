@@ -67,6 +67,23 @@ async function main() {
       console.log(`rewrote ${done} article version(s); commit src/seed/wp/posts.json and deploy`)
       break
     }
+    case 'rewrite-packs': {
+      const { writePacks } = await import('@/lib/automation/rewrite-files')
+      const dir = flags.find((flag) => flag.startsWith('--dir='))?.slice(6) ?? '.rewrites'
+      const count = writePacks(dir)
+      console.log(`wrote ${count} source packs to ${dir}/packs`)
+      break
+    }
+    case 'rewrite-apply': {
+      const { applyRewrites } = await import('@/lib/automation/rewrite-files')
+      const dir = flags.find((flag) => flag.startsWith('--dir='))?.slice(6) ?? '.rewrites'
+      const result = applyRewrites(dir)
+      console.log(
+        `applied ${result.applied}, rejected ${result.rejected.length}` +
+          (result.rejected.length ? `\n` + result.rejected.join('\n') : ''),
+      )
+      break
+    }
     case 'indexnow': {
       const { submitEverythingToIndexNow } = await import('@/lib/automation/distribute')
       const count = await submitEverythingToIndexNow()
@@ -79,7 +96,7 @@ async function main() {
     }
     default:
       console.error(
-        'usage: npm run automation -- <distribute|enrich|translate|draft|indexnow|rewrite-archive> [--dry-run] [n]',
+        'usage: npm run automation -- <distribute|enrich|translate|draft|indexnow|rewrite-archive|rewrite-packs|rewrite-apply> [--dry-run] [n]',
       )
       process.exit(2)
   }

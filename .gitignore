@@ -38,3 +38,6 @@ Thumbs.db
 *.tsbuildinfo
 /coverage/
 /.backups/
+
+# Scratch space for the archive rewrite (source packs and drafts)
+.rewrites/

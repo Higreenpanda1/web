@@ -32,7 +32,9 @@
     "posts:translate": "npm run automation -- translate",
     "posts:draft": "npm run automation -- draft",
     "seo:indexnow": "npm run automation -- indexnow",
-    "posts:rewrite-archive": "npm run automation -- rewrite-archive"
+    "posts:rewrite-archive": "npm run automation -- rewrite-archive",
+    "posts:rewrite-packs": "npm run automation -- rewrite-packs",
+    "posts:rewrite-apply": "npm run automation -- rewrite-apply"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.128.0",

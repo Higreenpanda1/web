@@ -43,9 +43,9 @@ const HERE = path.dirname(fileURLToPath(import.meta.url))
 const ARCHIVE = path.resolve(HERE, '../../seed/wp/posts.json')
 const MODEL = process.env.ANTHROPIC_MODEL?.trim() || 'claude-opus-5'
 
-type Locale = 'ar' | 'en'
+export type Locale = 'ar' | 'en'
 
-type LocaleDoc = {
+export type LocaleDoc = {
   legacyId: string
   title: string
   excerpt: string
@@ -60,7 +60,7 @@ type LocaleDoc = {
   originalWordCount?: number
 }
 
-type ArchivePost = {
+export type ArchivePost = {
   slug: string
   publishedAt: string
   status: 'published' | 'draft'
@@ -71,7 +71,10 @@ type ArchivePost = {
   locales: { ar: LocaleDoc | null; en: LocaleDoc | null }
 }
 
-type Archive = { categories: Array<{ slug: string; ar: string; en: string }>; posts: ArchivePost[] }
+export type Archive = {
+  categories: Array<{ slug: string; ar: string; en: string }>
+  posts: ArchivePost[]
+}
 
 let client: Anthropic | null = null
 function anthropic(): Anthropic {
@@ -88,7 +91,7 @@ export function saveArchive(archive: Archive): void {
 }
 
 /** Pages this article may link to: same-category articles first, then the services. */
-function linkInventory(archive: Archive, post: ArchivePost, locale: Locale): string {
+export function linkInventory(archive: Archive, post: ArchivePost, locale: Locale): string {
   const prefix = locale === 'en' ? '/en' : ''
   const related = archive.posts
     .filter(
@@ -113,7 +116,7 @@ function linkInventory(archive: Archive, post: ArchivePost, locale: Locale): str
   return lines.join('\n')
 }
 
-function targetWords(original: number): [number, number] {
+export function targetWords(original: number): [number, number] {
   if (original >= 1400) return [Math.round(original * 1.15), Math.round(original * 1.5)]
   return [1300, 1900]
 }
@@ -263,4 +266,52 @@ export async function rewriteArchive(options: {
   })
   await Promise.all(workers)
   return done
+}
+
+/** Every (article, language) pair still waiting for a rewrite. */
+export function pendingItems(
+  archive: Archive,
+  force = false,
+): Array<{ post: ArchivePost; locale: Locale }> {
+  const queue: Array<{ post: ArchivePost; locale: Locale }> = []
+  for (const post of archive.posts) {
+    for (const locale of ['ar', 'en'] as const) {
+      const doc = post.locales[locale]
+      if (!doc) continue
+      if (doc.rewrittenAt && !force) continue
+      queue.push({ post, locale })
+    }
+  }
+  return queue
+}
+
+/** The brief a writer (person or model) needs to rewrite one article version. */
+export function sourcePack(archive: Archive, post: ArchivePost, locale: Locale): string {
+  const doc = post.locales[locale]!
+  const original = lexicalToPlainText(doc.body)
+  const originalWords = original.split(/\s+/).filter(Boolean).length
+  const [minWords, maxWords] = targetWords(originalWords)
+  const category = archive.categories.find((entry) => entry.slug === post.categories[0])
+  return [
+    `# ${post.slug} (${locale})`,
+    '',
+    `- language: ${locale === 'ar' ? 'Arabic' : 'English'}`,
+    `- category: ${category?.[locale] ?? ''} (${post.categories.join(', ')})`,
+    `- original words: ${originalWords}`,
+    `- target words: ${minWords} to ${maxWords}`,
+    `- published: ${post.publishedAt.slice(0, 10)}`,
+    '',
+    '## Link inventory (the only URLs allowed)',
+    linkInventory(archive, post, locale),
+    '',
+    `## Original title`,
+    doc.title,
+    '',
+    '## Original excerpt',
+    doc.excerpt,
+    '',
+    '## Original article',
+    original,
+    '',
+  ].join('\n')
 }
