@@ -53,21 +53,21 @@
     "zod": "3.25.76"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "3.3.1",
-    "@tailwindcss/postcss": "4.1.14",
-    "@types/node": "22.18.8",
-    "@types/qrcode": "1.5.5",
+    "@eslint/eslintrc": "3.3.7",
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/node": "26.6.2",
+    "@types/qrcode": "1.5.6",
     "@types/react": "19.2.0",
     "@types/react-dom": "19.2.0",
-    "cross-env": "7.0.3",
-    "dotenv": "16.6.1",
-    "eslint": "9.39.5",
-    "eslint-config-next": "15.4.11",
-    "playwright": "1.56.1",
-    "prettier": "3.6.2",
-    "tailwindcss": "4.1.14",
-    "tsx": "4.20.6",
-    "typescript": "5.9.3"
+    "cross-env": "10.1.0",
+    "dotenv": "18.0.1",
+    "eslint": "10.11.0",
+    "eslint-config-next": "16.3.5",
+    "playwright": "1.63.0",
+    "prettier": "3.9.8",
+    "tailwindcss": "4.3.3",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2"
   },
   "overrides": {
     "graphql": "16.14.2"
