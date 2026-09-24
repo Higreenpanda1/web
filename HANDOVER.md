@@ -79,7 +79,37 @@ the owner and set them; verify the site in Bing Webmaster Tools; translate the
 set); Semrush had no API units left this session, so no keyword volumes were
 checked — the content queue is built from what customers ask, not from data.
 
-## Where the last session stopped (night of 23–24 September 2026)
+## Where the blog session stopped (24 September 2026)
+
+- **Commit `8fcec67` is pushed and NOT deployed.** It carries the blog import,
+  the SEO layer and the automation (section above) plus two lockfile fixes.
+  CI: lint, types, 57 tests, migrations and the build pass; the browser job
+  fails only on the three pre-existing homepage assertions (Arabic body 19px
+  vs 17px, English 17px vs 16px, the 8px overflow at 390px) that have failed
+  since the type scale was reduced on 23 September — update `tests/e2e.mjs`
+  to the new scale and fix the overflow when convenient.
+- **The deploy was not run because the Hostinger web console would not
+  wake.** hPanel → VPS → Web console answered "Looks like your server isn't
+  responding. Try pressing any key to wake it up, or reboot the VPS" to every
+  keypress, while the site itself answered 200. The fix Hostinger offers is a
+  forced reboot of the live server, which was not done without the owner.
+  To deploy, in the console (or over SSH), one line, run detached so the
+  console dropping cannot kill the build:
+
+  ```
+  nohup bash -c 'curl -fsSL https://raw.githubusercontent.com/Higreenpanda1/web/8fcec677e54d98e288e19aa38190298bdd5d221a/ops/deploy.sh | bash' > /root/deploy.log 2>&1 < /dev/null & sleep 1; tail -f /root/deploy.log
+  ```
+
+  It keeps `.env`, applies migration `20260924_050126_blog_seo_automation`,
+  seeds the 112 articles (several minutes: 130 images through sharp), builds
+  and restarts. `.env` needs no change for the site to work; add
+  `INDEXNOW_KEY`, `METRICOOL_*` and `ANTHROPIC_API_KEY` later to switch the
+  automation on (DEPLOY.md §8b), then restart `app`. After the deploy, run
+  `npm run seo:indexnow` through `tools` once a key is set, and check
+  https://higreenpanda.com/blog, /en/blog, /feed.xml, /llms.txt and an old
+  article URL such as /en/how-to-find-reliable-suppliers-in-china/ (301).
+
+## Where the previous session stopped (night of 23–24 September 2026)
 
 - **Commit `91b0be8` is pushed but NOT deployed.** It is the "green as an
   accent, not a forest" pass: neutral surfaces, charcoal dark mode, ink
