@@ -695,76 +695,14 @@ export type SeedPost = {
   en: { title: string; excerpt: string; body: string }
 }
 
-export const POSTS: SeedPost[] = [
-  {
-    slug: 'open-an-online-store-through-a-chinese-company',
-    categories: ['ecommerce', 'company-setup'],
-    publishedAt: '2026-08-12T09:00:00.000Z',
-    cover: {
-      file: 'post-online-store.jpg',
-      alt: { ar: 'أفق مدينة قوانزو ليلًا', en: 'The Guangzhou skyline at night' },
-    },
-    ar: {
-      title: 'كيف تفتح متجرًا إلكترونيًا عبر شركة في الصين',
-      excerpt:
-        'الفرق بين الشراء من علي إكسبرس وبين امتلاك كيان في الصين، ومتى يستحق كل خيار، وما التكلفة الحقيقية لكل منهما.',
-      body: 'أكثر سؤال يصلنا من أصحاب المتاجر الإلكترونية: هل أشتري من علي إكسبرس أم أؤسس شركة في الصين؟ الإجابة تعتمد على حجمك الحالي لا على طموحك.\n\nعلي إكسبرس مناسب للاختبار. تشتري قطعًا قليلة، تجرّب السوق، وتعرف إن كان المنتج يُباع أصلًا. عيبه أن السعر فيه هامش الوسيط، والجودة غير مضمونة، ولا تستطيع تعديل المنتج أو وضع علامتك عليه.\n\nحين تتجاوز مبيعاتك بضع مئات من القطع شهريًا، يبدأ الشراء المباشر من المصنع في التوفير الحقيقي — غالبًا بين 30% و60% مقارنة بمنصات التجزئة. وهنا يظهر سؤال الكيان.\n\nتأسيس شركة في الصين ليس شرطًا للاستيراد. يمكنك الشراء من المصنع بصفتك مستوردًا في بلدك. الكيان الصيني يصبح منطقيًا عندما تحتاج إلى حساب بنكي محلي يقلّل رسوم التحويل، أو إلى التعاقد المباشر مع مصانع تفضّل التعامل محليًا، أو إلى التصدير باسمك ومعالجة استرداد ضريبة التصدير.\n\nالتكلفة: تأسيس كيان في الصين يتطلب رأس مال مسجّلًا، وعنوانًا مسجّلًا، ومحاسبة شهرية، وتدقيقًا سنويًا. هذه مصاريف متكررة لا تُذكر عادةً في الإعلانات. لا تؤسس شركة قبل أن يكون لديك حجم يبرّرها.\n\nالترتيب الذي ننصح به: اختبر على علي إكسبرس، ثم اشترِ مباشرة من المصنع عبر وكيل على الأرض، ثم أسّس كيانًا حين تصبح الأرقام واضحة.',
-    },
-    en: {
-      title: 'How to open an online store through a company in China',
-      excerpt:
-        'The difference between buying on AliExpress and owning an entity in China, when each is worth it, and what each actually costs.',
-      body: 'The question we are asked most by e-commerce sellers: should I buy on AliExpress or set up a company in China? The answer depends on the size you are now, not the size you intend to be.\n\nAliExpress is for testing. You buy a few units, try the market, and find out whether the product sells at all. Its drawbacks are that the price carries a middleman’s margin, quality is not guaranteed, and you cannot modify the product or put your own brand on it.\n\nOnce you are past a few hundred units a month, buying direct from the factory starts to save real money — usually between 30% and 60% against retail platforms. That is where the entity question appears.\n\nSetting up a company in China is not a requirement for importing. You can buy from the factory as an importer in your own country. A Chinese entity starts to make sense when you need a local bank account to cut transfer fees, when you want to contract directly with factories that prefer a domestic counterparty, or when you need to export under your own name and reclaim export tax.\n\nThe cost: an entity in China needs registered capital, a registered address, monthly bookkeeping and an annual audit. Those are recurring, and they are rarely mentioned in the advertising. Do not set up a company before you have the volume to justify it.\n\nThe order we recommend: test on AliExpress, then buy direct from the factory through an agent on the ground, then set up an entity once the numbers are clear.',
-    },
-  },
-  {
-    slug: 'what-importing-from-china-actually-costs',
-    categories: ['importing'],
-    publishedAt: '2026-08-26T09:00:00.000Z',
-    cover: {
-      file: 'post-import-costs.jpg',
-      alt: {
-        ar: 'سفينة حاويات ورافعات في ميناء صيني',
-        en: 'A container ship and cranes at a Chinese port',
-      },
-    },
-    ar: {
-      title: 'ما التكلفة الحقيقية للاستيراد من الصين؟',
-      excerpt:
-        'سعر المصنع ليس التكلفة. هذه قائمة كاملة بما ستدفعه فعلًا حتى تصل البضاعة إلى مستودعك.',
-      body: 'أكثر خطأ يكلّف المستوردين الجدد: مقارنة سعر المصنع بسعر البيع في بلدهم ثم افتراض أن الفرق ربح. بين الرقمين طبقات من التكلفة.\n\nما تدفعه فعلًا:\n\nسعر المصنع للقطعة — وهو السعر الوحيد الذي يذكره المورد عادةً. اسأل دائمًا عن الحد الأدنى للكمية، لأن السعر يتغيّر معه.\n\nالتغليف. التغليف المخصص باسمك يضيف تكلفة للقطعة، وغالبًا حدًا أدنى منفصلًا للكمية.\n\nالنقل الداخلي من المصنع إلى الميناء، ورسوم التخليص في الصين.\n\nالشحن الدولي. الحاوية الكاملة أرخص للقطعة لكنها تتطلب حجمًا؛ الشحن الجزئي أغلى للقطعة وأسهل للبدء؛ الشحن الجوي يضاعف التكلفة ويختصر الوقت من أسابيع إلى أيام.\n\nالتأمين على الشحنة. نسبة صغيرة من القيمة، ولا تستغنِ عنها.\n\nالجمارك والضرائب في بلدك — وهي البند الذي يُفاجأ به أغلب المستوردين، لأنه يُحتسب على قيمة البضاعة زائد الشحن زائد التأمين لا على سعر المصنع وحده.\n\nالنقل المحلي من الميناء إلى مستودعك.\n\nنسبة الهدر. خطّط لنسبة من القطع التالفة أو غير المطابقة. الفحص قبل الشحن يقلّلها لكنه لا يلغيها.\n\nاجمع هذه البنود قبل أن تقرّر. نحن نرسل هذا الحساب كاملًا مع كل عرض سعر، لأن عرضًا بلا تكلفة نهائية ليس عرضًا.',
-    },
-    en: {
-      title: 'What importing from China actually costs',
-      excerpt:
-        'The factory price is not the cost. Here is the full list of what you will really pay before the goods reach your warehouse.',
-      body: 'The mistake that costs new importers most: comparing the factory price with the selling price at home and assuming the difference is profit. There are layers of cost between those two numbers.\n\nWhat you actually pay:\n\nThe factory price per unit — usually the only figure a supplier quotes. Always ask for the minimum order quantity, because the price moves with it.\n\nPackaging. Custom packaging with your brand adds a per-unit cost and often a separate minimum quantity of its own.\n\nInland transport from the factory to the port, and Chinese export clearance.\n\nInternational freight. A full container is cheaper per unit but needs volume; a part load costs more per unit and is easier to start with; air freight roughly doubles the cost and turns weeks into days.\n\nCargo insurance. A small percentage of the value, and not the place to economise.\n\nCustoms duty and tax in your own country — the line that surprises most importers, because it is charged on the goods plus freight plus insurance, not on the factory price alone.\n\nLocal transport from the port to your warehouse.\n\nA wastage allowance. Plan for a percentage of units arriving damaged or off-specification. Pre-shipment inspection reduces it; it does not eliminate it.\n\nAdd these up before you decide. We send this full calculation with every quotation, because a quotation without a landed cost is not a quotation.',
-    },
-  },
-  {
-    slug: 'how-to-inspect-a-factory-before-you-pay',
-    categories: ['importing'],
-    publishedAt: '2026-09-09T09:00:00.000Z',
-    cover: {
-      file: 'post-inspect-factory.jpg',
-      alt: {
-        ar: 'عمال يفحصون لوحات إلكترونية في مصنع صيني',
-        en: 'Workers checking circuit boards in a Chinese factory',
-      },
-    },
-    ar: {
-      title: 'كيف تتحقق من المصنع قبل أن تدفع',
-      excerpt:
-        'كيف تعرف أن من تتعامل معه مصنع حقيقي لا وسيط، وما الذي يجب فحصه قبل الدفعة الأخيرة.',
-      body: 'أغلب من يقدّمون أنفسهم كمصانع على المنصات هم شركات تجارية. هذا ليس احتيالًا بالضرورة — الوسيط المحترم له دور — لكنك تدفع هامشه دون أن تعرف.\n\nكيف تفرّق:\n\nاطلب رخصة العمل. اسم الشركة ونطاق نشاطها المسجّل يكشفان إن كانت تصنيعًا أم تجارة.\n\nاسأل عن خط الإنتاج لمنتج مختلف قليلًا. المصنع يجيب بتفصيل عن قدرته وقيودها؛ الوسيط يجيب بـ«نعم نستطيع» عن كل شيء.\n\nاطلب مقطع فيديو مباشرًا من داخل الورشة، لا صورًا. الصور تُستعار.\n\nقارن العنوان المسجّل بموقع المصنع. الاختلاف ليس دليل إدانة لكنه سؤال يستحق الطرح.\n\nقبل الدفعة الأخيرة، افحص:\n\nالمقاسات والوزن مقابل المواصفات المكتوبة، لا مقابل العينة وحدها.\n\nالكمية الفعلية. العدّ ليس تحصيل حاصل.\n\nالتغليف: هل يتحمّل الشحن؟ هل الباركود صحيح؟ هل بيانات البلد المستورد مطبوعة كما يشترط الجمرك؟\n\nنسبة العيوب على عيّنة عشوائية لا على قطع يختارها المصنع.\n\nتقرير مصوّر بتاريخ. هذا ما يجعل التفاوض على أي خلل ممكنًا قبل أن تغادر البضاعة الصين — وبعدها يصبح أصعب بكثير.',
-    },
-    en: {
-      title: 'How to check a factory before you pay',
-      excerpt:
-        'How to tell a real factory from a trading company, and what to inspect before the final payment leaves your account.',
-      body: 'Most suppliers presenting themselves as factories on the platforms are trading companies. That is not necessarily fraud — a good agent earns their margin — but you are paying it without knowing.\n\nHow to tell:\n\nAsk for the business licence. The registered company name and business scope show whether it is manufacturing or trading.\n\nAsk about a production line for a slightly different product. A factory answers in detail about its capability and its limits; a trading company says "yes we can do that" to everything.\n\nAsk for a live video from inside the workshop, not photographs. Photographs get borrowed.\n\nCompare the registered address with the factory location. A mismatch is not proof of anything, but it is a question worth asking.\n\nBefore the final payment, inspect:\n\nDimensions and weight against the written specification, not against the sample alone.\n\nThe actual quantity. Counting is not a formality.\n\nPackaging: will it survive the voyage? Is the barcode right? Is the importing country’s required labelling printed as customs demands?\n\nThe defect rate, on a randomly drawn sample rather than units the factory selects.\n\nA dated, photographed report. That is what makes it possible to negotiate over a problem while the goods are still in China — afterwards it is far harder.',
-    },
-  },
-]
+/**
+ * Hand-written seed articles. Empty on purpose: the three articles that used
+ * to live here (online store, import costs, factory inspection) moved into
+ * the imported archive, src/seed/wp/posts.json, where they were rewritten
+ * with the rest of the blog. Keeping them here as well would let every
+ * `npm run seed` put the short originals back before the import skips them
+ * as unchanged. Add new articles in the CMS, not here.
+ */
+export const POSTS: SeedPost[] = []
 
 export const SERVICES: SeedService[] = [...CORE_SERVICES, ...CATALOGUE_SERVICES]

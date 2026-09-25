@@ -115,6 +115,16 @@ a draft on its own); an English URL for any future Arabic-only article
 redirects to /en/blog instead of 404. Tools: `posts:links-packs` /
 `posts:links-apply`, `posts:translate-packs`.
 
+Later the same day (`e5f5a3e`): the three hand-written articles that had
+lived in `src/seed/content.ts` (import costs, factory inspection, online
+store) were missed by the rewrite and were the first thing the owner saw
+at the top of the blog. They were moved into the archive, rewritten in
+both languages and linked; `POSTS` in content.ts is now empty so a deploy
+cannot restore them. The whole blog is 115 articles, 230 versions, and the
+live check now reads the visible article text on every page, not only the
+structured data. Lesson: verify what a reader sees, starting from the top
+of the blog index.
+
 ## Where the blog session stopped (24 September 2026)
 
 - **Commit `8fcec67` is pushed and NOT deployed.** It carries the blog import,
