@@ -182,9 +182,10 @@ const CORE_SERVICES: SeedService[] = [
     featured: false,
     icon: 'building',
     category: 'company',
-    // Owner's "Company Registration Quotation System" sheet, September 2026:
-    // remote ¥6,000, in person ¥7,000. The 2025 price list said ¥8,200/¥7,200.
-    priceFrom: 6000,
+    // Owner's price list, 25 September 2026 ("PRICE LIST HiGP.pdf"): in person
+    // ¥7,200, remote ¥8,200. It replaced the quotation-system sheet of
+    // 23 September (¥7,000 / ¥6,000); src/lib/quote.ts carries the same figures.
+    priceFrom: 7200,
     applicationType: 'company-registration',
     ar: {
       title: 'تأسيس شركة في الصين',
@@ -318,29 +319,172 @@ const CORE_SERVICES: SeedService[] = [
   },
 ]
 
+export type FounderMilestone = {
+  kind: 'work' | 'education' | 'award' | 'course'
+  period: string
+  title: string
+  organisation?: string
+  note?: string
+}
+
+/**
+ * The founder record. The bio is the owner's own wording (25 September 2026);
+ * the credentials and the timeline come from the CV they supplied
+ * ("sami cv 2023-2-8_merged.pdf") and the certificates merged into it: the
+ * HarvardX leadership course (verified certificate, November 2020), the
+ * Baosteel / Baowu employment, the Jiangsu awards. Nothing here is inferred.
+ */
 export const FOUNDER = {
   slug: 'sami-al-hajri',
   ar: {
     name: 'سامي الحجري',
     role: 'المؤسس',
-    bio: 'يمني مقيم في الصين. حاصل على البكالوريوس والماجستير في إدارة الأعمال من الصين، وفاز بجائزة جيانغسو البحثية عن عمله حول أثر مبادرة الحزام والطريق على المنطقة العربية. زار أكثر من 235 مدينة صينية وحضر أكثر من 100 معرض تجاري — وهذه ليست أرقامًا للعرض، بل هي سبب معرفته أين يُصنع كل شيء وبكم.',
+    bio: 'يمني مقيم في الصين. حاصل على البكالوريوس والماجستير في إدارة الأعمال من الصين. عمل في مجموعة Baowu Steel، إحدى أكبر شركات الصلب عالميًا والمصنفة ضمن Fortune Global 500، وشارك في مشروع مشترك مع أرامكو السعودية. وفاز بجائزة جيانغسو البحثية عن عمله حول أثر مبادرة الحزام والطريق على المنطقة العربية. زار أكثر من 235 مدينة صينية وحضر أكثر من 100 معرض تجاري — وهذه ليست أرقامًا للعرض، بل هي سبب معرفته أين يُصنع كل شيء وبكم.',
     credentials: [
       'بكالوريوس وماجستير في إدارة الأعمال من الصين',
       'جائزة جيانغسو البحثية — أثر الحزام والطريق على المنطقة العربية',
+      'مجموعة Baowu Steel — من قائمة Fortune Global 500',
+      'مشروع مشترك مع أرامكو السعودية',
+      'دورة القيادة من جامعة هارفارد (HarvardX)',
+      'منحة حكومة جيانغسو — المرتبة الأولى',
       'أكثر من 235 مدينة صينية',
       'أكثر من 100 معرض تجاري',
+      'يتحدث العربية والصينية والإنجليزية',
+      'المرتبة الأولى في اللغة الصينية — جامعة وسط الصين للمعلمين',
     ],
+    timeline: [
+      {
+        kind: 'work',
+        period: '2023 – الآن',
+        title: 'التسويق والمبيعات',
+        organisation: 'Baoshan Iron & Steel — مجموعة Baowu Steel',
+        note: 'إحدى أكبر شركات الصلب في العالم ومصنّفة ضمن Fortune Global 500. تدرّب في أقسام إنتاج الحديد والصلب والصفائح السميكة واللوجستيات والمعدات والطاقة مع تركيز على ضبط الجودة، ثم عمل في إدارة التسويق والمبيعات على توسيع الأسواق، وشارك في مشروع مشترك مع أرامكو السعودية.',
+      },
+      {
+        kind: 'work',
+        period: '2022 – 2023',
+        title: 'مدير مبيعات',
+        organisation: 'فضل العليمي للتجارة والمقاولات',
+        note: 'زيارات ميدانية لفهم احتياج كل مشروع على الأرض، وإعداد عروض توريد مخصّصة، وإدارة العمليات اللوجستية.',
+      },
+      {
+        kind: 'work',
+        period: '2020 – 2022',
+        title: 'مدير تسويق',
+        organisation: 'Best Learn Education Technology Co., Ltd',
+        note: 'تدريب فريق الشركة على جولات تسويقية ميدانية أسبوعية، وتحليل الحالات الاجتماعية والثقافية لاختيار الاستراتيجية الأنسب، وإنتاج محتوى مرئي احترافي لمنصات التواصل.',
+      },
+      {
+        kind: 'education',
+        period: '2020 – 2022',
+        title: 'ماجستير في إدارة الأعمال (MBA)',
+        organisation: 'جامعة جيانغسو للعلوم والتكنولوجيا',
+        note: 'بحث في الطاقة المتجددة من منظور الاقتصاد والطاقة والبيئة. منحة حكومة جيانغسو — المرتبة الأولى (2020).',
+      },
+      {
+        kind: 'award',
+        period: '2021',
+        title: 'جائزة مقاطعة جيانغسو البحثية',
+        organisation: 'حكومة مقاطعة جيانغسو',
+        note: 'عن عمله حول أثر مبادرة الحزام والطريق على المنطقة العربية.',
+      },
+      {
+        kind: 'course',
+        period: '2020',
+        title: 'Exercising Leadership: Foundational Principles',
+        organisation: 'HarvardX — جامعة هارفارد',
+        note: 'شهادة موثّقة من كلية كينيدي الحكومية بجامعة هارفارد، بإشراف البروفيسور رونالد هايفتز.',
+      },
+      {
+        kind: 'education',
+        period: '2016 – 2020',
+        title: 'بكالوريوس في إدارة الأعمال (BBA)',
+        organisation: 'جامعة جيانغسو للعلوم والتكنولوجيا',
+        note: 'الإدارة العامة، إدارة المشاريع، التسويق الحديث، الاقتصاد، الترويج، والتجارة الإلكترونية.',
+      },
+      {
+        kind: 'education',
+        period: '2015 – 2016',
+        title: 'اللغة والثقافة الصينية',
+        organisation: 'جامعة وسط الصين للمعلمين (CCNU)',
+        note: 'المرتبة الأولى في اللغة الصينية وجائزة الاجتهاد الأكاديمي.',
+      },
+    ] satisfies FounderMilestone[],
   },
   en: {
     name: 'Sami Al-Hajri',
     role: 'Founder',
-    bio: 'Yemeni, based in China. He holds a Bachelor’s and a Master’s in Business Administration earned in China, and won the Jiangsu Research Award for his work on the impact of the Belt and Road Initiative on the Arab region. He has travelled to more than 235 Chinese cities and attended more than 100 trade fairs — not as a statistic, but as the reason he knows where things are made and what they should cost.',
+    bio: 'Yemeni, based in China. He holds a Bachelor’s and a Master’s in Business Administration, both earned in China. He worked at Baowu Steel Group, one of the largest steel producers in the world and a Fortune Global 500 company, and took part in a joint venture project with Saudi Aramco. He won the Jiangsu Research Award for his work on the impact of the Belt and Road Initiative on the Arab region. He has travelled to more than 235 Chinese cities and attended more than 100 trade fairs — not as a statistic, but as the reason he knows where things are made and what they should cost.',
     credentials: [
       'Bachelor’s and Master’s in Business Administration, earned in China',
       'Jiangsu Research Award — Belt and Road impact on the Arab region',
+      'Baowu Steel Group — a Fortune Global 500 company',
+      'Joint venture project with Saudi Aramco',
+      'Harvard leadership course (HarvardX)',
+      'Jiangsu Government Scholarship — first prize',
       'More than 235 Chinese cities',
       'More than 100 trade fairs',
+      'Speaks Arabic, Chinese and English',
+      'First prize in Chinese language — Central China Normal University',
     ],
+    timeline: [
+      {
+        kind: 'work',
+        period: '2023 – now',
+        title: 'Marketing and sales',
+        organisation: 'Baoshan Iron & Steel — Baowu Steel Group',
+        note: 'One of the largest steel companies in the world and a Fortune Global 500 company. Trained across iron and steel production, thick plates, logistics, equipment and energy management with a focus on quality control, then worked in the marketing and sales department on market expansion, and took part in a joint venture project with Saudi Aramco.',
+      },
+      {
+        kind: 'work',
+        period: '2022 – 2023',
+        title: 'Sales manager',
+        organisation: 'Fadhl Al-Alaimi for Trade & Contract',
+        note: 'Site visits to understand each project on the ground, tailored procurement proposals, and management of the logistics.',
+      },
+      {
+        kind: 'work',
+        period: '2020 – 2022',
+        title: 'Marketing manager',
+        organisation: 'Best Learn Education Technology Co., Ltd',
+        note: 'Trained the team to run weekly field marketing tours, analysed social and cultural cases to pick the strategy that works, and produced professional video content for social media.',
+      },
+      {
+        kind: 'education',
+        period: '2020 – 2022',
+        title: 'Master of Business Administration (MBA)',
+        organisation: 'Jiangsu University of Science and Technology',
+        note: 'Research on renewable energy from an economy, energy and environment perspective. Jiangsu Government Scholarship, first prize (2020).',
+      },
+      {
+        kind: 'award',
+        period: '2021',
+        title: 'Jiangsu Province Research Award',
+        organisation: 'Government of Jiangsu Province',
+        note: 'For his work on the impact of the Belt and Road Initiative on the Arab region.',
+      },
+      {
+        kind: 'course',
+        period: '2020',
+        title: 'Exercising Leadership: Foundational Principles',
+        organisation: 'HarvardX — Harvard University',
+        note: 'Verified certificate from the Harvard Kennedy School of Government, taught by Professor Ronald Heifetz.',
+      },
+      {
+        kind: 'education',
+        period: '2016 – 2020',
+        title: 'Bachelor of Business Administration (BBA)',
+        organisation: 'Jiangsu University of Science and Technology',
+        note: 'Public administration, project management, modern marketing, economics, promotion and e-commerce.',
+      },
+      {
+        kind: 'education',
+        period: '2015 – 2016',
+        title: 'Chinese language and culture',
+        organisation: 'Central China Normal University (CCNU)',
+        note: 'First prize in Chinese language and the academic diligence award.',
+      },
+    ] satisfies FounderMilestone[],
   },
 }
 

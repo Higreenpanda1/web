@@ -107,6 +107,7 @@ async function main() {
         role: FOUNDER.ar.role,
         bio: FOUNDER.ar.bio,
         credentials: FOUNDER.ar.credentials.map((text) => ({ text })),
+        timeline: FOUNDER.ar.timeline,
         isFounder: true,
         order: 1,
         photo: founderPhotoId,
@@ -121,6 +122,7 @@ async function main() {
         role: FOUNDER.en.role,
         bio: FOUNDER.en.bio,
         credentials: FOUNDER.en.credentials.map((text) => ({ text })),
+        timeline: FOUNDER.en.timeline,
       },
     },
   )

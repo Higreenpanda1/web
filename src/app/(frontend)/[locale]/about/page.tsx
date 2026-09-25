@@ -2,6 +2,7 @@ import { Handshake, MapPinned, MessageSquareText, Receipt } from 'lucide-react'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import Image from 'next/image'
 
+import { Timeline } from '@/components/about/Timeline'
 import { ContactPanel } from '@/components/home/ContactPanel'
 import { FounderCard } from '@/components/home/FounderCard'
 import { StatsBand } from '@/components/home/StatsBand'
@@ -11,7 +12,7 @@ import { Card } from '@/components/ui/Card'
 import { Container } from '@/components/ui/Container'
 import { PageHero } from '@/components/ui/PageHero'
 import { Section, SectionHeading } from '@/components/ui/Section'
-import { breadcrumbJsonLd, organisationJsonLd } from '@/lib/jsonld'
+import { breadcrumbJsonLd, organisationJsonLd, personJsonLd } from '@/lib/jsonld'
 import { getSiteSettings, getTeam } from '@/lib/queries'
 import { buildMetadata, mediaSrc } from '@/lib/seo'
 
@@ -69,6 +70,11 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
   return (
     <>
       <JsonLd data={organisationJsonLd(settings, locale)} />
+      {founder ? (
+        <JsonLd
+          data={{ '@context': 'https://schema.org', ...personJsonLd(founder, locale, settings) }}
+        />
+      ) : null}
       <JsonLd
         data={breadcrumbJsonLd(locale, [
           { name: t('nav.home'), path: '/' },
@@ -112,6 +118,18 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
           <h2 id="founder-heading" className="sr-only">
             {t('about.founderTitle')}
           </h2>
+        </Section>
+      ) : null}
+
+      {founder?.timeline && founder.timeline.length > 0 ? (
+        <Section labelledBy="journey-heading">
+          <SectionHeading
+            id="journey-heading"
+            eyebrow={t('about.journeyEyebrow')}
+            title={t('about.journeyTitle')}
+            lead={t('about.journeyLead')}
+          />
+          <Timeline items={founder.timeline} locale={locale} className="mx-auto max-w-4xl" />
         </Section>
       ) : null}
 

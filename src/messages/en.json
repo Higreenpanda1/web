@@ -51,7 +51,7 @@
       "subscribers": "YouTube subscribers"
     },
     "servicesTitle": "Everything on the road, as a service",
-    "servicesLead": "Twenty services in six areas. Take one, or hand us the whole journey.",
+    "servicesLead": "Twenty-one services in six areas. Take one, or hand us the whole journey.",
     "processTitle": "How it works",
     "processLead": "No surprises. At every stage you know where your goods are and what you have paid.",
     "process": {
@@ -222,7 +222,16 @@
     "teamTitle": "The team",
     "contactTitle": "Talk to us directly",
     "eyebrow": "About HiGreenPanda",
-    "valuesLead": "On the ground, plain-spoken, and transparent about cost and process."
+    "valuesLead": "On the ground, plain-spoken, and transparent about cost and process.",
+    "journeyEyebrow": "The CV",
+    "journeyTitle": "Career and education",
+    "journeyLead": "From learning Chinese to working inside one of the largest steel companies in the world. This is the experience working on your side.",
+    "journeyKinds": {
+      "work": "Work",
+      "education": "Study",
+      "award": "Award",
+      "course": "Course"
+    }
   },
   "blog": {
     "title": "Blog",
@@ -645,6 +654,7 @@
         "yiwu": "Yiwu",
         "hangzhou": "Hangzhou",
         "nanjing": "Nanjing",
+        "hongkong": "Hong Kong",
         "other": "Another city"
       },
       "addressOption": {
@@ -774,7 +784,7 @@
     "onceOff": "one-off",
     "quoted": "quoted separately",
     "cta": "Start the application with these options",
-    "note": "Official fees, translations and the annual address renewal are itemised in the quote. Prices last reviewed September 2026.",
+    "note": "Official fees, translations and the annual address renewal are itemised in the quote. Prices from the HiGreenPanda price list, September 2026.",
     "options": {
       "city": {
         "shenzhen": "Shenzhen",
@@ -794,13 +804,18 @@
       },
       "bank": {
         "none": "Not now",
-        "inPerson": "In person",
-        "remote": "Remote"
+        "mainland": "Mainland China company account (yuan and foreign currencies)",
+        "hongkong": "Hong Kong company account"
       },
       "extras": {
         "accounting": "One year of accounting and tax filing",
         "workPermit": "Work permit and residence card"
       }
-    }
+    },
+    "hongKong": {
+      "title": "Hong Kong company — one package",
+      "body": "Business licence, registered address and the first year of accounting in one price. The mainland options do not apply here."
+    },
+    "govFee": "+ {amount} government fees"
   }
 }

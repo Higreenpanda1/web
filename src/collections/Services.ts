@@ -33,10 +33,11 @@ const ICON_LABELS: Record<ServiceIconName, string> = {
 }
 
 /**
- * Twenty services: the eight from brief section 4, trade-fair accompaniment
- * (confirmed 20 September 2026), and eleven recovered from the old site's
+ * Twenty-one services: the eight from brief section 4, trade-fair accompaniment
+ * (confirmed 20 September 2026), eleven recovered from the old site’s
  * database on 23 September 2026 — visas, accounts, trademark, store setup,
- * accounting, address. They are grouped by `category` on the index, carry a
+ * accounting, address — and the Hong Kong company package from the owner's
+ * price list of 25 September 2026. They are grouped by `category` on the index, carry a
  * "from" price, and may point at one of the structured application forms.
  *
  * Each is one document with both locales on it — Payload's own localisation,

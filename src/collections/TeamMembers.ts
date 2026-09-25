@@ -47,6 +47,49 @@ export const TeamMembers: CollectionConfig = {
       fields: [{ name: 'text', type: 'text', required: true }],
     },
     {
+      name: 'timeline',
+      type: 'array',
+      localized: true,
+      labels: { singular: 'Milestone', plural: 'Career and education' },
+      admin: {
+        description:
+          'The CV as a visitor should read it: newest first. Work, study, awards and courses. Shown on the About page under the founder.',
+      },
+      fields: [
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'kind',
+              type: 'select',
+              required: true,
+              defaultValue: 'work',
+              admin: { width: '40%' },
+              options: [
+                { label: 'Work', value: 'work' },
+                { label: 'Education', value: 'education' },
+                { label: 'Award', value: 'award' },
+                { label: 'Course', value: 'course' },
+              ],
+            },
+            {
+              name: 'period',
+              type: 'text',
+              required: true,
+              admin: { width: '60%', description: '“2023 – now”, “2020 – 2022”, “2021”.' },
+            },
+          ],
+        },
+        { name: 'title', type: 'text', required: true },
+        { name: 'organisation', type: 'text' },
+        {
+          name: 'note',
+          type: 'textarea',
+          admin: { description: 'One or two sentences on what was done there. Optional.' },
+        },
+      ],
+    },
+    {
       name: 'isFounder',
       type: 'checkbox',
       defaultValue: false,

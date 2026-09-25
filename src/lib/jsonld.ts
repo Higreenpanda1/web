@@ -151,6 +151,28 @@ export function personJsonLd(member: TeamMember, locale: Locale, settings: SiteS
     ...(member.credentials?.length
       ? { knowsAbout: member.credentials.map((item) => item.text) }
       : {}),
+    ...personHistory(member),
+  }
+}
+
+/**
+ * `alumniOf`, `award` and the current employer, read from the timeline so the
+ * structured data says what the About page shows. Empty when the record has
+ * no timeline.
+ */
+function personHistory(member: TeamMember) {
+  const items = member.timeline ?? []
+  const alumniOf = items
+    .filter((item) => item.kind === 'education' && item.organisation)
+    .map((item) => ({ '@type': 'EducationalOrganization', name: item.organisation }))
+  const award = items.filter((item) => item.kind === 'award').map((item) => item.title)
+  const affiliation = items
+    .filter((item) => item.kind === 'work' && item.organisation && /now|الآن/.test(item.period))
+    .map((item) => ({ '@type': 'Organization', name: item.organisation }))
+  return {
+    ...(alumniOf.length ? { alumniOf } : {}),
+    ...(award.length ? { award } : {}),
+    ...(affiliation.length ? { affiliation } : {}),
   }
 }
 

@@ -2,8 +2,9 @@
 
 Written 20 September 2026, at the end of the session that deployed the site,
 updated the same day after the front-end redesign, on 23 September 2026 after
-go-live and the service catalogue, and on 24 September 2026 after the blog. Everything below is verified
-state, not intention. Where something is unfinished it says so.
+go-live and the service catalogue, on 24 September 2026 after the blog, and on
+25 September 2026 after the price list and the founder's CV. Everything below
+is verified state, not intention. Where something is unfinished it says so.
 
 ---
 
@@ -78,6 +79,69 @@ the owner and set them; verify the site in Bing Webmaster Tools; translate the
 12 Arabic-only articles (the nightly job will do one a day once the key is
 set); Semrush had no API units left this session, so no keyword volumes were
 checked — the content queue is built from what customers ask, not from data.
+
+## The price list and the founder's CV (25 September 2026) — NOT deployed
+
+The owner sent two files on Google Drive: `PRICE LIST HiGP.pdf` (company
+formation, work permit, Hong Kong, accounts — dated 25 September, it
+supersedes the quotation-system sheet of 23 September) and the CV
+`sami cv 2023-2-8_merged.pdf`, and asked for both on the site. Branch
+`claude/confident-ramanujan-9qnpiz`.
+
+**Prices, everywhere they appear.** `src/lib/quote.ts` (the estimator) and
+the seed (`src/seed/content.ts`, `src/seed/catalogue.ts`) now carry the
+list: company registration in person ¥7,200 / remote ¥8,200 (the list has
+in-person cheaper — the reverse of the old sheet); registered address
+¥3,200 / ¥12,000 a year (unchanged); accounting ¥3,800 a year (was ¥3,200);
+mainland bank account ¥1,400 (one price — the in-person/remote split is
+gone), Hong Kong bank account ¥1,700; work permit and residence ¥7,600
+service fee + ¥400 government fees = ¥8,000 (was ¥4,600); licence
+amendments ¥1,800, Alipay ¥1,700, WeChat Pay ¥2,100 (unchanged). The
+estimator's bank choice is now mainland / Hong Kong / none, and the work
+permit extra shows "+ ¥400 government fees".
+
+**New service: Hong Kong company formation** (`hong-kong-company-formation`,
+order 115, ¥8,900 including registered address and accounting). Choosing
+Hong Kong in the estimator replaces the mainland questions with that one
+package plus the optional Hong Kong bank account, and "Hong Kong" is now a
+city option on the company-registration form. Twenty-one services.
+
+**The work permit page** lists the required documents exactly as the price
+list does (employment reference with stamp and translation; degree and
+police clearance authenticated by the foreign ministry and legalised by the
+Chinese embassy; medical after entry; the photograph specification), and a
+FAQ on the government fee.
+
+**The founder.** The bio is the owner's own text (Baowu Steel Group,
+Fortune Global 500, the Saudi Aramco joint venture). Ten credentials now,
+adding Baowu, Aramco, the HarvardX leadership course, the Jiangsu Government
+Scholarship first prize, the three languages and the CCNU Chinese-language
+prize. A new `timeline` array on Team members (kind / period / title /
+organisation / note, localised) carries the CV — eight entries from Baosteel
+2023 back to CCNU 2015 — and the About page renders it as a vertical
+timeline under the founder card (`src/components/about/Timeline.tsx`). The
+Person structured data on the About page gains `alumniOf`, `award` and
+`affiliation` from it. Migration `20260925_131222_founder_timeline` adds the
+table.
+
+Verified locally against Postgres 16: migrate, seed (both locales, prices
+checked in the database), typecheck, lint, prettier, 62 unit tests, the
+production build, and the About, company-formation, Hong Kong and work
+permit pages in both languages. Not verified on the server.
+
+**Open questions for the owner** (asked in the session; the answers change
+the copy, not the structure): whether the accounting ¥3,800 is per year (the
+list omits the unit; the old list said yearly, and the site says yearly);
+whether the Aramco joint venture belongs to the Baowu period (it is written
+that way); when HiGreenPanda was founded and whether Baosteel is still
+current, for the first timeline entry; whether they want a dedicated
+`/pricing` page reproducing the PDF's tables (the 23 September decision was
+"starting prices, not a full table", so none was added).
+
+To deploy: `ops/deploy.sh` with the commit SHA — it migrates and seeds. The
+seed updates the founder record and the prices in place (an editor's later
+CMS edits to those fields are overwritten by the seed; that is how the seed
+has always worked for services and the team).
 
 ## The archive rewrite (25 September 2026) — deployed
 

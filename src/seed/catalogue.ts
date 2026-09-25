@@ -8,7 +8,9 @@ import type { ApplicationType, PriceUnit, ServiceCategory, ServiceIconName } fro
  * is, what the client must prepare, the starting prices — come from there;
  * the words are new, Arabic first.
  *
- * Prices are the list prices in yuan. The site shows them as "from ¥X" and the
+ * Prices are the list prices in yuan, from the owner's "PRICE LIST HiGP.pdf"
+ * of 25 September 2026 (company setup, work permit, Hong Kong, accounts).
+ * The Hong Kong company package was added from that list the same day. The site shows them as "from ¥X" and the
  * quote confirms the figure, so a price list revision is a CMS edit, not a
  * deploy.
  */
@@ -82,6 +84,69 @@ export const CATALOGUE_SERVICES: SeedService[] = [
     },
   },
   {
+    slug: 'hong-kong-company-formation',
+    order: 115,
+    featured: false,
+    icon: 'building',
+    category: 'company',
+    // One package on the owner's price list: licence, registered address and
+    // accounting together.
+    priceFrom: 8900,
+    applicationType: 'company-registration',
+    ar: {
+      title: 'تأسيس شركة في هونغ كونغ',
+      summary:
+        'شركة في هونغ كونغ بسعر واحد شامل الرخصة التجارية والعنوان المسجّل والمحاسبة، لمن يريد حسابًا بنكيًا حرًّا في تحويل العملات وواجهة دولية لتجارته مع الصين.',
+      body: 'هونغ كونغ هي الخيار المعتاد لمن يشتري من الصين ويبيع في الخليج أو أوروبا ولا ينوي الإقامة في الصين القارية: لا قيود على تحويل العملات الأجنبية، وضرائب منخفضة على الأرباح المحققة خارج هونغ كونغ، وتأسيس لا يستلزم حضورك في أغلب الحالات.\n\nالباقة سعر واحد: 8,900 يوان تشمل تسجيل الشركة والرخصة التجارية، والعنوان المسجّل، وخدمة المحاسبة. الحساب البنكي في هونغ كونغ يُضاف بـ 1,700 يوان.\n\n## متى تناسبك هونغ كونغ ومتى لا\n\n- تناسبك إن كنت تريد كيانًا دوليًا يستلم من عملائك ويدفع لمورّديك بالدولار دون قيود.\n- لا تناسبك إن كنت تحتاج إقامة عمل في الصين القارية أو رخصة استيراد وتصدير صينية؛ عندها شركة في شنجن أو قوانزو أنسب، ونشرح لك الفرق قبل أن تختار.',
+      highlights: [
+        'الرخصة والعنوان المسجّل والمحاسبة في سعر واحد',
+        'حرية تحويل العملات الأجنبية',
+        'تأسيس عن بُعد في أغلب الحالات',
+        'حساب بنكي في هونغ كونغ بـ 1,700 يوان',
+        'شرح الفرق بينها وبين شركة الصين القارية قبل الاختيار',
+      ],
+      requirements: [
+        'صورة واضحة لجواز سفر كل شريك ومدير',
+        'ثلاثة أسماء مقترحة للشركة بالإنجليزية',
+        'وصف النشاط ودول التعامل الرئيسية',
+        'إثبات عنوان سكن حديث لكل شريك',
+      ],
+      faqs: [
+        {
+          question: 'هل يمكنني تأسيس شركة في هونغ كونغ دون السفر؟',
+          answer:
+            'في أغلب الحالات نعم؛ التوقيع على مستندات التأسيس يتم عن بُعد. البنوك في هونغ كونغ قد تطلب حضور المدير لمقابلة، ونخبرك بذلك قبل البدء.',
+        },
+      ],
+    },
+    en: {
+      title: 'Hong Kong company formation',
+      summary:
+        'A Hong Kong company at one price that includes the business licence, the registered address and the accounting, for anyone who wants a bank account free to move currencies and an international front for their China trade.',
+      body: 'Hong Kong is the usual choice for someone who buys in China and sells in the Gulf or Europe without planning to live in mainland China: no restrictions on moving foreign currency, low tax on profits earned outside Hong Kong, and a setup that in most cases does not need you there in person.\n\nThe package is one price: ¥8,900 covers the company registration and business licence, the registered address, and the accounting service. A Hong Kong bank account is added for ¥1,700.\n\n## When Hong Kong suits you, and when it does not\n\n- It suits you if you want an international entity that receives from your customers and pays your suppliers in dollars without restrictions.\n- It does not suit you if you need a work residence permit in mainland China or a Chinese import-export licence; then a company in Shenzhen or Guangzhou fits better, and we explain the difference before you choose.',
+      highlights: [
+        'Licence, registered address and accounting in one price',
+        'Free movement of foreign currency',
+        'Remote setup in most cases',
+        'A Hong Kong bank account for ¥1,700',
+        'The difference from a mainland company explained before you choose',
+      ],
+      requirements: [
+        'A clear passport copy of each shareholder and director',
+        'Three proposed company names in English',
+        'A description of the business and the main trading countries',
+        'A recent proof of residential address for each shareholder',
+      ],
+      faqs: [
+        {
+          question: 'Can I set up a Hong Kong company without travelling?',
+          answer:
+            'In most cases, yes; the incorporation documents are signed remotely. Hong Kong banks may ask the director to attend an interview, and we tell you that before you start.',
+        },
+      ],
+    },
+  },
+  {
     slug: 'business-licence-changes',
     order: 120,
     featured: false,
@@ -131,7 +196,7 @@ export const CATALOGUE_SERVICES: SeedService[] = [
     featured: false,
     icon: 'calculator',
     category: 'company',
-    priceFrom: 3200,
+    priceFrom: 3800,
     priceUnit: 'year',
     ar: {
       title: 'المحاسبة والإقرارات الضريبية',
@@ -244,13 +309,13 @@ export const CATALOGUE_SERVICES: SeedService[] = [
     featured: false,
     icon: 'landmark',
     category: 'banking',
-    priceFrom: 1200,
+    priceFrom: 1400,
     applicationType: 'account-opening',
     ar: {
       title: 'فتح حساب بنكي للشركة',
       summary:
         'حساب بنكي لشركتك في الصين باليوان والعملات الأجنبية، أو حساب لشركتك في هونغ كونغ. نرتّب الموعد ونجهّز الملف ونرافقك في البنك.',
-      body: 'الحساب البنكي هو ما يجعل الشركة قابلة للعمل فعلًا: به تستلم من عملائك، تدفع لمورّديك، وتربط حسابات علي باي ووي تشات باي. لكن البنوك الصينية تدقّق في الشركات الأجنبية، وطلب ناقص أو إجابة مرتبكة في المقابلة يعني رفضًا وانتظارًا لأشهر قبل محاولة أخرى.\n\nنعرف ما يسأل عنه كل بنك، ونجهّز الملف بناءً عليه، ونرافقك في الموعد مترجمين وشارحين.\n\n## الخيارات\n\n- حساب شركة في الصين: باليوان والدولار وغيرها، مع الخدمات المصرفية الإلكترونية. من 1,200 يوان بالحضور الشخصي، ومن 1,700 يوان عن بُعد.\n- حساب شركة في هونغ كونغ: لمن يحتاج حرية أكبر في تحويل العملات الأجنبية. من 1,700 يوان، ويشترط شركة مسجّلة في هونغ كونغ.\n\nحضور الممثل القانوني شخصيًا مطلوب في أغلب البنوك، وبعضها يقبل الفتح عن بُعد لحالات محددة؛ أخبرنا بوضعك ونحدّد لك البنك المناسب.',
+      body: 'الحساب البنكي هو ما يجعل الشركة قابلة للعمل فعلًا: به تستلم من عملائك، تدفع لمورّديك، وتربط حسابات علي باي ووي تشات باي. لكن البنوك الصينية تدقّق في الشركات الأجنبية، وطلب ناقص أو إجابة مرتبكة في المقابلة يعني رفضًا وانتظارًا لأشهر قبل محاولة أخرى.\n\nنعرف ما يسأل عنه كل بنك، ونجهّز الملف بناءً عليه، ونرافقك في الموعد مترجمين وشارحين.\n\n## الخيارات\n\n- حساب شركة في الصين القارية: باليوان والعملات الأجنبية، مع الخدمات المصرفية الإلكترونية. 1,400 يوان.\n- حساب شركة في هونغ كونغ: لمن يحتاج حرية أكبر في تحويل العملات الأجنبية. 1,700 يوان، ويشترط شركة مسجّلة في هونغ كونغ.\n\nحضور الممثل القانوني شخصيًا مطلوب في أغلب البنوك، وبعضها يقبل الفتح عن بُعد لحالات محددة؛ أخبرنا بوضعك ونحدّد لك البنك المناسب.',
       highlights: [
         'اختيار البنك المناسب لنوع نشاطك',
         'تجهيز الملف كاملًا قبل الموعد',
@@ -269,7 +334,7 @@ export const CATALOGUE_SERVICES: SeedService[] = [
       title: 'Corporate bank account opening',
       summary:
         'A bank account for your Chinese company in yuan and foreign currencies, or for your Hong Kong company. We book the appointment, prepare the file and accompany you at the bank.',
-      body: 'The bank account is what makes a company actually usable: it is how you receive from customers, pay suppliers, and connect Alipay and WeChat Pay. But Chinese banks scrutinise foreign-owned companies, and an incomplete file or a muddled answer in the interview means a refusal and months of waiting before the next attempt.\n\nWe know what each bank asks, prepare the file accordingly, and sit with you at the appointment to translate and explain.\n\n## The options\n\n- Mainland China company account: yuan, dollars and other currencies, with online banking. From ¥1,200 in person, ¥1,700 remote.\n- Hong Kong company account: for those who need more freedom moving foreign currency. From ¥1,700; requires a company registered in Hong Kong.\n\nMost banks require the legal representative in person; a few accept remote opening in specific cases. Tell us your situation and we will match the bank.',
+      body: 'The bank account is what makes a company actually usable: it is how you receive from customers, pay suppliers, and connect Alipay and WeChat Pay. But Chinese banks scrutinise foreign-owned companies, and an incomplete file or a muddled answer in the interview means a refusal and months of waiting before the next attempt.\n\nWe know what each bank asks, prepare the file accordingly, and sit with you at the appointment to translate and explain.\n\n## The options\n\n- Mainland China company account: yuan and foreign currencies, with online banking. ¥1,400.\n- Hong Kong company account: for those who need more freedom moving foreign currency. ¥1,700; requires a company registered in Hong Kong.\n\nMost banks require the legal representative in person; a few accept remote opening in specific cases. Tell us your situation and we will match the bank.',
       highlights: [
         'The right bank for your type of business',
         'The complete file prepared before the appointment',
@@ -495,13 +560,16 @@ export const CATALOGUE_SERVICES: SeedService[] = [
     featured: false,
     icon: 'id-card',
     category: 'visas',
-    priceFrom: 4600,
+    // Service fee ¥7,600 plus ¥400 government fees — ¥8,000 in total on the
+    // owner's price list. The "from" price is the service fee; the body
+    // states the total.
+    priceFrom: 7600,
     applicationType: 'visa',
     ar: {
       title: 'تأشيرة العمل والإقامة',
       summary:
         'تصريح العمل وتأشيرة Z وبطاقة الإقامة لمالك الشركة أو موظفيها، من تقييم الأهلية حتى استلام بطاقة الإقامة في الصين.',
-      body: 'الإقامة في الصين تمرّ عبر تصريح عمل: تحصل عليه شركتك لك بصفتك ممثلها القانوني أو موظفًا فيها، ثم تحصل على تأشيرة Z من بلدك، وبعد الدخول تُستبدل ببطاقة إقامة لسنة أو أكثر. كل مرحلة لها شروطها ومستنداتها، وبعضها يحتاج تصديقًا من الخارجية والسفارة في بلدك قبل أن تسافر.\n\nنبدأ بتقييم صادق لأهليتك — الشهادة، سنوات الخبرة، العمر، رأس مال الشركة — ونخبرك بفرصك قبل أن تدفع. ثم ندير الملف كاملًا حتى بطاقة الإقامة.\n\n## المراحل\n\n- تقييم الأهلية وتحديد الفئة\n- إشعار تصريح العمل من مكتب العمل\n- تأشيرة Z من السفارة الصينية في بلدك\n- الفحص الطبي والتسجيل بعد الوصول\n- تصريح العمل وبطاقة الإقامة\n\nليس لديك شركة بعد؟ الإقامة تشترطها، ونؤسّسها لك ضمن الخطة نفسها بالعنوان ورأس المال المناسبين.',
+      body: 'الإقامة في الصين تمرّ عبر تصريح عمل: تحصل عليه شركتك لك بصفتك ممثلها القانوني أو موظفًا فيها، ثم تحصل على تأشيرة Z من بلدك، وبعد الدخول تُستبدل ببطاقة إقامة لسنة أو أكثر. كل مرحلة لها شروطها ومستنداتها، وبعضها يحتاج تصديقًا من الخارجية والسفارة في بلدك قبل أن تسافر.\n\nنبدأ بتقييم صادق لأهليتك — الشهادة، سنوات الخبرة، العمر، رأس مال الشركة — ونخبرك بفرصك قبل أن تدفع. ثم ندير الملف كاملًا حتى بطاقة الإقامة.\n\n## المراحل\n\n- تقييم الأهلية وتحديد الفئة\n- إشعار تصريح العمل من مكتب العمل\n- تأشيرة Z من السفارة الصينية في بلدك\n- الفحص الطبي والتسجيل بعد الوصول\n- تصريح العمل وبطاقة الإقامة\n\nليس لديك شركة بعد؟ الإقامة تشترطها، ونؤسّسها لك ضمن الخطة نفسها بالعنوان ورأس المال المناسبين.\n\n## التكلفة\n\n- أتعاب الخدمة: 7,600 يوان\n- الرسوم الحكومية: 400 يوان (غير مشمولة في الأتعاب)\n- الإجمالي شامل الرسوم الحكومية: 8,000 يوان\n\nيُجرى الفحص الطبي بعد دخول الصين لدى جهة معتمدة، وتُطلب صورة شخصية حديثة بخلفية بيضاء بصيغة JPG بحجم 40–120 كيلوبايت وأبعاد من 354 × 472 إلى 420 × 560 بكسل.',
       highlights: [
         'تقييم صادق للأهلية قبل الدفع',
         'إدارة المراحل الخمس كاملة',
@@ -511,9 +579,11 @@ export const CATALOGUE_SERVICES: SeedService[] = [
       ],
       requirements: [
         'صورة جواز السفر',
-        'أعلى شهادة دراسية',
-        'شهادة خبرة تغطي سنتين على الأقل',
-        'شهادة خلو سوابق مصدّقة',
+        'شهادة خبرة وترجمتها: خبرة مرتبطة بالوظيفة لمدة سنتين أو أكثر بدوام كامل، تتضمن المسمى الوظيفي ومدة العمل وبيانات التواصل، مع ختم جهة العمل السابقة أو توقيع المسؤول',
+        'أعلى مؤهل دراسي: تعميد من وزارة الخارجية وتصديق من السفارة الصينية',
+        'شهادة عدم محكومية وترجمتها: صادرة خلال آخر 6 أشهر، مع تعميد من وزارة الخارجية وتصديق من السفارة الصينية',
+        'شهادة الفحص الطبي: تُجرى بعد دخول الصين لدى جهة معتمدة',
+        'صورة شخصية حديثة بخلفية بيضاء (JPG، 40–120 كيلوبايت، من 354 × 472 إلى 420 × 560 بكسل)',
         'رخصة الشركة الصينية (أو نؤسّسها أولًا)',
       ],
       faqs: [
@@ -522,13 +592,18 @@ export const CATALOGUE_SERVICES: SeedService[] = [
           answer:
             'من شهرين إلى ثلاثة أشهر عادةً من اكتمال المستندات المصدّقة حتى بطاقة الإقامة، حسب المدينة وسرعة التصديق في بلدك.',
         },
+        {
+          question: 'هل السعر شامل الرسوم الحكومية؟',
+          answer:
+            'أتعاب الخدمة 7,600 يوان، والرسوم الحكومية 400 يوان تُدفع على حدة، فيكون الإجمالي 8,000 يوان. الترجمة والتصديق في بلدك خارج هذا المبلغ.',
+        },
       ],
     },
     en: {
       title: 'Work visa and residence permit',
       summary:
         'The work permit, the Z visa and the residence card for a company owner or staff, from eligibility assessment to holding the residence card in China.',
-      body: 'Living in China goes through a work permit: your company obtains it for you as its legal representative or an employee, you then get a Z visa from your country, and after entry it is exchanged for a residence card of a year or more. Each stage has its conditions and documents, and some need legalisation by your foreign ministry and the Chinese embassy before you travel.\n\nWe start with an honest assessment of your eligibility — degree, years of experience, age, the company’s capital — and tell you your chances before you pay. Then we run the whole file through to the residence card.\n\n## The stages\n\n- Eligibility assessment and category\n- Work permit notification from the labour bureau\n- Z visa from the Chinese embassy in your country\n- Medical check and registration after arrival\n- Work permit and residence card\n\nNo company yet? Residence requires one, and we register it within the same plan, with the right address and capital.',
+      body: 'Living in China goes through a work permit: your company obtains it for you as its legal representative or an employee, you then get a Z visa from your country, and after entry it is exchanged for a residence card of a year or more. Each stage has its conditions and documents, and some need legalisation by your foreign ministry and the Chinese embassy before you travel.\n\nWe start with an honest assessment of your eligibility — degree, years of experience, age, the company’s capital — and tell you your chances before you pay. Then we run the whole file through to the residence card.\n\n## The stages\n\n- Eligibility assessment and category\n- Work permit notification from the labour bureau\n- Z visa from the Chinese embassy in your country\n- Medical check and registration after arrival\n- Work permit and residence card\n\nNo company yet? Residence requires one, and we register it within the same plan, with the right address and capital.\n\n## The cost\n\n- Service fee: ¥7,600\n- Government fees: ¥400 (not included in the service fee)\n- Total including government fees: ¥8,000\n\nThe medical examination is completed at an approved institution after entering China, and a recent photograph is needed: white background, JPG, 40–120 KB, between 354 × 472 and 420 × 560 pixels.',
       highlights: [
         'An honest eligibility assessment before you pay',
         'All five stages managed',
@@ -538,9 +613,11 @@ export const CATALOGUE_SERVICES: SeedService[] = [
       ],
       requirements: [
         'Passport copy',
-        'Highest educational certificate',
-        'Experience certificate covering at least two years',
-        'Legalised criminal record certificate',
+        'Employment reference and its translation: at least two years of relevant full-time experience, stating the job title, employment period and contact details, with the former employer’s stamp or an authorised signature',
+        'Highest academic qualification, authenticated by the Ministry of Foreign Affairs and legalised by the Chinese Embassy',
+        'Police clearance certificate and its translation, issued within the last six months, authenticated by the Ministry of Foreign Affairs and legalised by the Chinese Embassy',
+        'Medical examination certificate, completed at an approved institution after entering China',
+        'A recent photograph on a white background (JPG, 40–120 KB, 354 × 472 to 420 × 560 pixels)',
         'The Chinese company licence (or we register it first)',
       ],
       faqs: [
@@ -548,6 +625,11 @@ export const CATALOGUE_SERVICES: SeedService[] = [
           question: 'How long does it take?',
           answer:
             'Usually two to three months from complete legalised documents to the residence card, depending on the city and how quickly legalisation goes in your country.',
+        },
+        {
+          question: 'Does the price include government fees?',
+          answer:
+            'The service fee is ¥7,600 and the government fees of ¥400 are paid separately, so the total is ¥8,000. Translation and legalisation in your country are outside this amount.',
         },
       ],
     },

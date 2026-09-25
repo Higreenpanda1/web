@@ -620,6 +620,25 @@ export interface TeamMember {
         id?: string | null;
       }[]
     | null;
+  /**
+   * The CV as a visitor should read it: newest first. Work, study, awards and courses. Shown on the About page under the founder.
+   */
+  timeline?:
+    | {
+        kind: 'work' | 'education' | 'award' | 'course';
+        /**
+         * “2023 – now”, “2020 – 2022”, “2021”.
+         */
+        period: string;
+        title: string;
+        organisation?: string | null;
+        /**
+         * One or two sentences on what was done there. Optional.
+         */
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   isFounder?: boolean | null;
   order?: number | null;
   links?: {
@@ -1531,6 +1550,16 @@ export interface TeamMembersSelect<T extends boolean = true> {
     | T
     | {
         text?: T;
+        id?: T;
+      };
+  timeline?:
+    | T
+    | {
+        kind?: T;
+        period?: T;
+        title?: T;
+        organisation?: T;
+        note?: T;
         id?: T;
       };
   isFounder?: T;

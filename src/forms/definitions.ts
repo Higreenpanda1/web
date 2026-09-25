@@ -189,7 +189,16 @@ export const FORMS: Record<ApplicationType, FormDef> = {
             kind: 'select',
             required: true,
             width: 'half',
-            options: ['shenzhen', 'guangzhou', 'shanghai', 'yiwu', 'hangzhou', 'nanjing', 'other'],
+            options: [
+              'shenzhen',
+              'guangzhou',
+              'shanghai',
+              'yiwu',
+              'hangzhou',
+              'nanjing',
+              'hongkong',
+              'other',
+            ],
           },
           {
             name: 'cityOther',
