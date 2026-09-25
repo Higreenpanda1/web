@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 
 import { LegalPage } from '@/components/LegalPage'
+import { ConsentSettings } from '@/components/analytics/ConsentSettings'
 import { getSiteSettings } from '@/lib/queries'
 import { buildMetadata } from '@/lib/seo'
 
@@ -49,11 +50,18 @@ export default async function PrivacyPage({ params }: { params: Promise<{ locale
               للردّ على طلبك فقط. لا نبيع بياناتك ولا نشاركها مع معلنين، ولا نستخدمها لإرسال رسائل
               تسويقية لم تطلبها.
             </p>
-            <h2>ملفات تعريف الارتباط</h2>
+            <h2>ملفات تعريف الارتباط وإحصاءات الزيارة</h2>
             <p>
-              لا يستخدم هذا الموقع ملفات تعريف ارتباط للتتبع ولا إعلانات. إحصاءات الزيارة — إن كانت
-              مفعّلة — تعمل بلا ملفات تعريف ارتباط وبلا تعريف للأفراد، ولهذا لا ترى نافذة موافقة.
+              لا يعرض هذا الموقع إعلانات ولا يبيع بياناتك. لفهم الصفحات التي تفيد الزوار نستخدم
+              Google Analytics، وهو لا يحفظ أي ملف تعريف ارتباط على جهازك إلا إذا اخترت «موافق» في
+              شريط الموافقة. إن اخترت «الضروري فقط» يعمل العدّ بلا ملفات تعريف ارتباط وبلا تعريف
+              للأفراد، ولا تُفعَّل أي ميزات إعلانية في أي حال. يمكنك تغيير اختيارك هنا في أي وقت.
             </p>
+            <ConsentSettings
+              labelGranted={t('consent.statusGranted')}
+              labelDenied={t('consent.statusDenied')}
+              changeLabel={t('consent.change')}
+            />
             <h2>أين تُحفظ بياناتك</h2>
             <p>
               في قاعدة بيانات على خادم نملكه نحن، مع نسخ احتياطية مشفّرة يومية. الوصول محصور بفريقنا
@@ -83,12 +91,19 @@ export default async function PrivacyPage({ params }: { params: Promise<{ locale
               To answer your enquiry. We do not sell your data, we do not share it with advertisers,
               and we do not use it to send you marketing you did not ask for.
             </p>
-            <h2>Cookies</h2>
+            <h2>Cookies and visitor statistics</h2>
             <p>
-              This site sets no tracking cookies and carries no advertising. Visitor statistics, if
-              enabled, run without cookies and without identifying individuals — which is why you
-              see no consent banner.
+              This site carries no advertising and does not sell your data. To see which pages help
+              visitors we use Google Analytics, which sets no cookie on your device unless you
+              choose “Accept” in the consent bar. If you choose “Essential only”, counting runs
+              without cookies and without identifying individuals, and no advertising feature is
+              ever switched on either way. You can change your choice here at any time.
             </p>
+            <ConsentSettings
+              labelGranted={t('consent.statusGranted')}
+              labelDenied={t('consent.statusDenied')}
+              changeLabel={t('consent.change')}
+            />
             <h2>Where your data lives</h2>
             <p>
               In a database on a server we own, with encrypted daily backups. Access is limited to

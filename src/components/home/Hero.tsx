@@ -100,6 +100,8 @@ export async function Hero({ locale, settings }: { locale: Locale; settings: Sit
               variant="ghost"
               aria-label={t('cta.whatsapp')}
               title={t('cta.whatsapp')}
+              data-analytics-event="whatsapp_click"
+              data-analytics-location="hero"
             >
               <WhatsAppIcon size={20} className="text-text-brand" />
               <span className="sm:hidden">{t('cta.whatsapp')}</span>

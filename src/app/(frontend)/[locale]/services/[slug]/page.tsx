@@ -121,7 +121,13 @@ export default async function ServicePage({
             <ButtonLink href={applyHref ?? '#service-enquiry'} size="lg">
               {applicationType ? t(`apply.types.${applicationType}.cta`) : t('cta.enquire')}
             </ButtonLink>
-            <ButtonLink href={whatsapp} size="lg" variant="secondary">
+            <ButtonLink
+              href={whatsapp}
+              size="lg"
+              variant="secondary"
+              data-analytics-event="whatsapp_click"
+              data-analytics-location="service"
+            >
               <WhatsAppIcon size={20} className="text-text-brand" />
               {t('cta.whatsapp')}
             </ButtonLink>

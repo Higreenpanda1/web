@@ -802,5 +802,16 @@
         "workPermit": "Work permit and residence card"
       }
     }
+  },
+  "consent": {
+    "title": "Cookies and visitor statistics",
+    "body": "We use Google Analytics to see which pages help visitors. No analytics cookie is set unless you agree.",
+    "accept": "Accept",
+    "decline": "Essential only",
+    "privacy": "Privacy policy",
+    "region": "Cookie consent",
+    "statusGranted": "Visitor statistics: you accepted analytics cookies.",
+    "statusDenied": "Visitor statistics: you chose essential only, so no analytics cookie is set.",
+    "change": "Change my choice"
   }
 }

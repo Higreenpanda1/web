@@ -213,7 +213,13 @@ export default async function ApplyPage({
                 {t('apply.aside.helpTitle')}
               </h2>
               <p className="mt-2 text-brand-100">{t('apply.aside.helpBody')}</p>
-              <ButtonLink href={whatsapp} variant="inverse" className="mt-5 w-full">
+              <ButtonLink
+                href={whatsapp}
+                variant="inverse"
+                className="mt-5 w-full"
+                data-analytics-event="whatsapp_click"
+                data-analytics-location="apply"
+              >
                 <WhatsAppIcon size={20} className="text-brand-700" />
                 {t('cta.whatsapp')}
               </ButtonLink>

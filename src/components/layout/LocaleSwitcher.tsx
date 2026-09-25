@@ -4,6 +4,7 @@ import { Languages } from 'lucide-react'
 import { useTransition } from 'react'
 
 import { Link, usePathname } from '@/i18n/navigation'
+import { trackEvent } from '@/lib/analytics-events'
 import { cn } from '@/lib/cn'
 import type { Locale } from '@/i18n/routing'
 
@@ -34,6 +35,10 @@ export function LocaleSwitcher({
       locale={target}
       hrefLang={target}
       lang={target}
+      // Tracked on the click, not in `onNavigate`: a middle-click or
+      // ctrl-click opens the other language in a new tab and never navigates
+      // this one, and it is still a language switch.
+      onClick={() => trackEvent('language_switch', { from: locale, to: target })}
       onNavigate={() => startTransition(() => {})}
       className={cn(
         'inline-flex min-h-11 items-center gap-2 rounded-full border border-border bg-surface px-3.5 py-1.5 text-caption font-semibold text-text no-underline transition-colors hover:border-brand-300 hover:bg-surface-tint-soft',

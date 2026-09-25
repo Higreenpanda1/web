@@ -14,6 +14,10 @@ import { whatsappLink } from '@/lib/url'
  * as the footer's, and without it the button vanishes the moment a visitor
  * scrolls to the bottom of a page. The slow pulse behind it is the one piece
  * of motion on the page that runs unprompted; it stops for reduced-motion.
+ *
+ * `--consent-offset` is set by the consent banner (analytics/ConsentBanner.tsx)
+ * while it is open on a phone, so the two never fight for the same corner;
+ * it is 0 the rest of the time.
  */
 export function WhatsAppButton({
   number,
@@ -32,7 +36,9 @@ export function WhatsAppButton({
       target="_blank"
       rel="noopener noreferrer"
       aria-label={ariaLabel}
-      className="group fixed bottom-5 end-5 z-40 inline-flex min-h-14 items-center gap-2.5 rounded-full bg-brand-700 px-4 py-3 font-semibold text-white no-underline shadow-float ring-2 ring-white/90 transition-colors hover:bg-brand-800 md:px-5"
+      data-analytics-event="whatsapp_click"
+      data-analytics-location="floating"
+      className="group fixed bottom-[calc(1.25rem+var(--consent-offset,0px))] end-5 z-40 inline-flex min-h-14 items-center gap-2.5 rounded-full bg-brand-700 px-4 py-3 font-semibold text-white no-underline shadow-float ring-2 ring-white/90 transition-colors hover:bg-brand-800 md:px-5"
     >
       <span className="relative inline-flex size-6 items-center justify-center">
         <span

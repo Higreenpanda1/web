@@ -712,22 +712,62 @@ docker compose -f docker-compose.prod.yml exec backup \
 
 ## 8. Search Console, after go-live
 
-1. Verify `https://higreenpanda.com` in Google Search Console (a DNS TXT record
-   is easiest and survives a hosting change).
-2. Submit `https://higreenpanda.com/sitemap.xml`.
-3. **Remove the injected spam URLs.** They are still in the index from the July
-   compromise. Use _Removals → Temporary removals_ for anything visible now, and
-   list the patterns under _Pages → Not indexed_ to catch the rest. The site
-   already answers `410 Gone` for them, which Google acts on far faster than a
-   404, so the removals are a shortcut rather than the mechanism.
-4. Check _Pages_ after a fortnight: the old URLs from §5 of the brief should be
+Two ways to prove ownership; both are supported, and both can be active at
+once. Verification is checked again by Google from time to time, so leave
+whichever you used in place.
+
+**A. The HTML tag (no DNS change; this is what was done on 25 September 2026).**
+
+1. Search Console → _Add property_ → **URL prefix** → `https://higreenpanda.com`
+   → _HTML tag_. Copy only the token from `content="…"`, not the whole tag.
+2. On the server, put it in `.env` as `GOOGLE_SITE_VERIFICATION=<token>` and
+   recreate the app container (§8c shows the one-line command for `.env`
+   edits). Every page then carries
+   `<meta name="google-site-verification" content="…">` in its head.
+3. Confirm from the server before pressing _Verify_:
+   `curl -s https://higreenpanda.com/ | grep -o 'google-site-verification[^>]*'`
+4. Press _Verify_. A URL-prefix property covers `https://higreenpanda.com/…`
+   including `/en/…`; it does not cover `http://` or `www.` — both redirect
+   here, so nothing is lost.
+
+**B. The DNS TXT record (backup; survives a hosting change).**
+
+1. Search Console → _Add property_ → **Domain** → `higreenpanda.com`. Google
+   shows a record like `google-site-verification=abc…`.
+2. At GoDaddy → DNS: **Add** a `TXT` record, host `@`, value exactly as shown,
+   TTL 1 hour. This is a _new_ row with a new value — it does not replace
+   anything. Do **not** edit or delete the existing `TXT @` rows: the SPF
+   record (`v=spf1 …`) and any other TXT at `@` must stay exactly as they are,
+   and `_dmarc`, `resend._domainkey` and the Google DKIM record are off-limits
+   (§4). Several TXT records at `@` are normal; SPF is the only one whose count
+   matters, and this is not an SPF record.
+3. Check before pressing _Verify_: `dig +short TXT higreenpanda.com` must list
+   both the SPF line and the new `google-site-verification=…` line, and
+   `dig +short MX higreenpanda.com` must be unchanged.
+4. Press _Verify_. The Domain property then also covers `www.` and `http://`.
+
+Then, in whichever property is verified:
+
+1. Submit `https://higreenpanda.com/sitemap.xml` under _Sitemaps_.
+2. **Remove the injected spam URLs.** They are still in the index from the July
+   compromise. Use _Removals → Temporary removals_ for anything visible now
+   (`site:higreenpanda.com slot`, `… judi`, `… togel`, `… gacor` in Google
+   show them), and list the patterns under _Pages → Not indexed_ to catch the
+   rest. The site already answers `410 Gone` for them, which Google acts on
+   far faster than a 404, so the removals are a shortcut rather than the
+   mechanism. A prefix removal (`https://higreenpanda.com/wp-`, …) clears a
+   whole family in one request.
+3. Check _Pages_ after a fortnight: the old URLs from §5 of the brief should be
    showing as redirected, not as errors.
-5. Add any spam URL Search Console reports that the site still answers with 404
+4. Add any spam URL Search Console reports that the site still answers with 404
    to the **Redirects** collection in the CMS as a `410` — no deploy needed.
-6. **Bing Webmaster Tools** as well: import the Google property, then submit the
-   sitemap. With `INDEXNOW_KEY` set (§8b) new articles reach Bing, Yandex, Naver
-   and Seznam within minutes of publishing without this step, but the import
-   gives you their reports.
+5. **Bing Webmaster Tools** as well: sign in with the same Google account,
+   choose _Import from Google Search Console_, tick the property, and the
+   sitemap comes with it. If the import is not offered, add the site by URL and
+   verify with the meta tag: `BING_SITE_VERIFICATION=<token>` in `.env` renders
+   `<meta name="msvalidate.01" …>`. With `INDEXNOW_KEY` set (§8b) new articles
+   reach Bing, Yandex, Naver and Seznam within minutes of publishing without
+   this step, but the import gives you their reports.
 
 ### 8b. Blog automation — the switches in `.env`
 
@@ -761,6 +801,74 @@ docker compose -f docker-compose.prod.yml run --rm --build tools npm run seo:ind
 The last one submits every live URL once; run it after the first deploy of the
 imported blog so the search engines learn the 212 new addresses today rather
 than on their next crawl.
+
+### 8c. Google Analytics 4 — `GA_MEASUREMENT_ID`
+
+Google Analytics runs alongside (not instead of) the self-hosted option above
+it in `.env.example`. It is off until `GA_MEASUREMENT_ID` holds a measurement
+ID (`G-` followed by letters and digits, from GA4 → _Admin_ → _Data streams_
+→ the web stream). With it set, on every public page:
+
+- the Google tag (`gtag.js`) loads from `www.googletagmanager.com` with the
+  page's CSP nonce, under **Consent Mode v2** with all four signals denied;
+- a small bilingual consent bar appears until the visitor answers. _Accept_
+  grants `analytics_storage` only; _Essential only_ keeps everything denied,
+  in which case the tag sets **no cookie** and sends cookieless pings (Google
+  models the gaps). The answer is kept in the browser's `localStorage`
+  (`hgp-consent`) and can be changed on `/privacy`;
+- the advertising signals (`ad_storage`, `ad_user_data`,
+  `ad_personalization`) are never granted, and Google Signals is switched
+  off in the tag configuration. Leave it off in the property too (_Admin_ →
+  _Data collection_): switching it on would also need `*.google.com` and
+  `*.doubleclick.net` in the CSP, and is the start of the policy leaking;
+- the Content Security Policy gains exactly the Google origins the tag needs
+  (`src/lib/security-headers.ts`, `GOOGLE_ANALYTICS_SOURCES`) and nothing
+  else — a unit test checks that no other directive changes.
+
+Events the site sends, all visible under _Reports → Engagement → Events_
+within a day, and worth marking as **key events** (_Admin → Events → Mark as
+key event_) so they appear as conversions:
+
+| Event              | When                                          | Parameters                    |
+| ------------------ | --------------------------------------------- | ----------------------------- |
+| `whatsapp_click`   | Any WhatsApp button or link                   | `location` (floating, header, hero, footer, service, apply, contact, home_contact, mobile_menu) |
+| `enquiry_sent`     | The general enquiry form was accepted         | `form` (full / compact)       |
+| `application_sent` | An `/apply/…` form was accepted               | `application_type`            |
+| `language_switch`  | The Arabic ↔ English switcher                 | `from`, `to`                  |
+
+Page views on client-side navigation are counted by GA4's own _Enhanced
+measurement → Page changes based on browser history events_, which is on by
+default; do not add a manual `page_view`.
+
+`npm run test:analytics` (Playwright, against a production server started
+with the three variables set — the header of `tests/analytics.mjs` shows the
+exact line) checks all of the above without contacting Google: the tag
+executes under the CSP, the consent default → update sequence, the banner
+on a phone and a desktop in both languages, the four events, and that no
+`_ga` cookie exists before consent.
+
+Setting or changing any of `GA_MEASUREMENT_ID`, `GOOGLE_SITE_VERIFICATION`,
+`BING_SITE_VERIFICATION` and `INDEXNOW_KEY` is a `.env` edit plus a container
+recreate, no rebuild. From the browser terminal, one line each — the first
+appends the variable when it is missing, the second replaces it when it is
+already there — then recreate `app`:
+
+```bash
+cd /home/deploy/higreenpanda && grep -q '^GA_MEASUREMENT_ID=' .env && sed -i 's|^GA_MEASUREMENT_ID=.*|GA_MEASUREMENT_ID=G-XXXXXXXXXX|' .env || echo 'GA_MEASUREMENT_ID=G-XXXXXXXXXX' >> .env
+cd /home/deploy/higreenpanda && docker compose -f docker-compose.prod.yml up -d app
+```
+
+Check on the live site afterwards:
+
+```bash
+curl -s https://higreenpanda.com/en | grep -o 'googletagmanager.com/gtag/js?id=G-[A-Z0-9]*'
+curl -sI https://higreenpanda.com/en | grep -io 'connect-src[^;]*'
+```
+
+The first must print the measurement ID; the second must include
+`google-analytics.com`. In a browser, the consent bar shows once at the bottom
+of the page; after _Accept_, GA4 → _Reports → Realtime_ shows the visit within
+a minute.
 
 ---
 

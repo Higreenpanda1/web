@@ -7,6 +7,7 @@ import { useActionState, useEffect, useId, useRef, useState } from 'react'
 import { submitApplication, type ApplicationState } from '@/app/actions/application'
 import { Button, ButtonLink } from '@/components/ui/Button'
 import { FORMS } from '@/forms/definitions'
+import { trackEvent } from '@/lib/analytics-events'
 import { cn } from '@/lib/cn'
 import { countryName, OTHER_COUNTRIES, PRIORITY_COUNTRIES } from '@/lib/countries'
 import { HONEYPOT_FIELD, TIMESTAMP_FIELD } from '@/lib/form-fields'
@@ -66,6 +67,11 @@ export function ApplicationForm({
     ),
   )
   useEffect(() => setEnhanced(true), [])
+
+  // The conversion event, once per successful send.
+  useEffect(() => {
+    if (state.status === 'success') trackEvent('application_sent', { application_type: type })
+  }, [state.status, type])
 
   // A server-side error takes the visitor back to the first step that has one.
   const fieldErrors = state.status === 'error' ? (state.fieldErrors ?? {}) : {}

@@ -61,6 +61,8 @@ export async function Header({ locale, settings }: { locale: Locale; settings: S
             rel="noopener noreferrer"
             aria-label={t('cta.whatsapp')}
             title={t('cta.whatsapp')}
+            data-analytics-event="whatsapp_click"
+            data-analytics-location="header"
             className="hidden size-11 items-center justify-center rounded-full border border-border bg-surface text-text-brand transition-colors hover:border-brand-300 hover:bg-surface-tint-soft md:inline-flex"
           >
             <WhatsAppIcon size={20} />

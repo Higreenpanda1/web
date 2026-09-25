@@ -78,7 +78,14 @@ export default async function ContactPage({
               />
               <h3 className="text-white">{t('contact.directTitle')}</h3>
               <p className="mt-2 text-brand-100">{t('contact.whatsappNote')}</p>
-              <ButtonLink href={whatsapp} size="lg" variant="inverse" className="mt-6 w-full">
+              <ButtonLink
+                href={whatsapp}
+                size="lg"
+                variant="inverse"
+                className="mt-6 w-full"
+                data-analytics-event="whatsapp_click"
+                data-analytics-location="contact"
+              >
                 <WhatsAppIcon size={22} className="text-brand-700" />
                 {t('cta.whatsapp')}
               </ButtonLink>

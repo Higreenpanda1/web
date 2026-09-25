@@ -2,11 +2,12 @@
 
 import { CheckCircle2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useActionState, useId, useRef } from 'react'
+import { useActionState, useEffect, useId, useRef } from 'react'
 
 import { submitEnquiry, type EnquiryState } from '@/app/actions/enquiry'
 import { Button } from '@/components/ui/Button'
 import { FieldError, FormAlert, Hint, inputClass, Label, SubmitButton } from './fields'
+import { trackEvent } from '@/lib/analytics-events'
 import { HONEYPOT_FIELD, TIMESTAMP_FIELD } from '@/lib/form-fields'
 import { countryName, OTHER_COUNTRIES, PRIORITY_COUNTRIES } from '@/lib/countries'
 
@@ -51,6 +52,13 @@ export function EnquiryForm({
   const fieldError = (name: string) =>
     state.status === 'error' ? state.fieldErrors?.[name] : undefined
   const errorMessage = (key?: string) => (key ? t(`errors.${key}` as 'errors.generic') : undefined)
+
+  // The conversion event, once per successful send. `status` is the dependency,
+  // not `state`, so a re-render with the same result does not count twice.
+  useEffect(() => {
+    if (state.status === 'success')
+      trackEvent('enquiry_sent', { form: compact ? 'compact' : 'full' })
+  }, [state.status, compact])
 
   if (state.status === 'success') {
     return (

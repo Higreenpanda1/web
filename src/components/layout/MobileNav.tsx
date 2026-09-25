@@ -129,6 +129,8 @@ export function MobileNav({
                     href={whatsappHref}
                     target="_blank"
                     rel="noopener noreferrer"
+                    data-analytics-event="whatsapp_click"
+                    data-analytics-location="mobile_menu"
                     className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-brand-300 bg-surface-tint-soft px-6 text-body-lg font-semibold text-heading no-underline"
                   >
                     <WhatsAppIcon size={20} />

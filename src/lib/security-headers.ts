@@ -14,7 +14,40 @@
  * apart.
  */
 
-export function buildCsp(nonce: string, isProduction: boolean): string {
+export type CspOptions = {
+  /**
+   * Google Analytics 4 is on. Adds exactly the origins the Google tag needs
+   * (see `GOOGLE_ANALYTICS_SOURCES`) and nothing else; when it is off the
+   * policy is byte-for-byte what it was before GA4 existed.
+   */
+  googleAnalytics?: boolean
+}
+
+/**
+ * The origins Google Analytics 4 talks to, per Google's own CSP guidance for
+ * gtag.js. Google Signals and Ads features are *not* enabled on this property,
+ * so `*.g.doubleclick.net` and `*.google.com` are deliberately absent — adding
+ * them would be the moment the strict policy started to leak.
+ *
+ * `script-src` is unaffected in any browser that understands 'strict-dynamic'
+ * (all current ones): the tag loads because the page's nonce is on the
+ * `<script>` element, and the host entry is a fallback for old engines only.
+ * The collection endpoints are regional (`region1.google-analytics.com`), hence
+ * the wildcards.
+ */
+export const GOOGLE_ANALYTICS_SOURCES = {
+  'script-src': ['https://www.googletagmanager.com'],
+  'connect-src': [
+    'https://*.google-analytics.com',
+    'https://*.analytics.google.com',
+    'https://*.googletagmanager.com',
+  ],
+  // The tag falls back to an image beacon when `fetch`/`sendBeacon` is not
+  // available or a request is blocked.
+  'img-src': ['https://*.google-analytics.com', 'https://*.googletagmanager.com'],
+} as const
+
+export function buildCsp(nonce: string, isProduction: boolean, options: CspOptions = {}): string {
   const scriptSrc = ["'self'", `'nonce-${nonce}'`, "'strict-dynamic'"]
 
   /**
@@ -60,6 +93,12 @@ export function buildCsp(nonce: string, isProduction: boolean): string {
     // Next's dev overlay and fast refresh need eval and a websocket.
     directives['script-src'] = [...scriptSrc, "'unsafe-eval'"]
     directives['connect-src'] = ["'self'", 'ws:', 'wss:']
+  }
+
+  if (options.googleAnalytics) {
+    for (const [directive, sources] of Object.entries(GOOGLE_ANALYTICS_SOURCES)) {
+      directives[directive] = [...(directives[directive] ?? []), ...sources]
+    }
   }
 
   return Object.entries(directives)

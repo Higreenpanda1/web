@@ -24,6 +24,7 @@
     "totp:enrol": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/enrol-totp.ts",
     "test": "node --test --experimental-strip-types \"src/**/*.test.ts\"",
     "test:e2e": "node tests/e2e.mjs",
+    "test:analytics": "node tests/analytics.mjs",
     "prestart": "mkdir -p .next/standalone/public .next/standalone/.next && cp -r public/. .next/standalone/public/ && cp -r .next/static .next/standalone/.next/",
     "test:admin": "node --experimental-strip-types tests/admin-gate.mjs",
     "automation": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/automation.ts",

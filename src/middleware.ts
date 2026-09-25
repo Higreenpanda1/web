@@ -2,6 +2,7 @@ import createIntlMiddleware from 'next-intl/middleware'
 import { NextResponse, type NextRequest } from 'next/server'
 
 import { routing } from '@/i18n/routing'
+import { googleAnalyticsId } from '@/lib/env'
 import { consume, networkPrefix } from '@/lib/rate-limit'
 import { buildCsp, staticSecurityHeaders } from '@/lib/security-headers'
 import { isInjectedSpamPath } from '@/lib/spam-patterns'
@@ -62,7 +63,9 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith(`${ADMIN_PATH}/`) ||
     pathname === ADMIN_GATE_PATH ||
     pathname.startsWith(`${ADMIN_GATE_PATH}/`)
-  const csp = buildCsp(nonce, isProduction)
+  // Runtime, not build time: the flag follows `.env` on the server, exactly
+  // as `googleAnalyticsId` in src/lib/env.ts does for the tag itself.
+  const csp = buildCsp(nonce, isProduction, { googleAnalytics: Boolean(googleAnalyticsId) })
 
   // --- 1. Injected spam: gone, permanently ---------------------------------
   // Before trailing-slash canonicalisation, so /slot-gacor/ is answered in one

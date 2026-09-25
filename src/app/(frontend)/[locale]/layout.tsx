@@ -8,7 +8,7 @@ import { Footer } from '@/components/layout/Footer'
 import { Header } from '@/components/layout/Header'
 import { WhatsAppButton } from '@/components/layout/WhatsAppButton'
 import { directionOf, routing, type Locale } from '@/i18n/routing'
-import { serverURL } from '@/lib/env'
+import { serverURL, siteVerification } from '@/lib/env'
 import { plexArabic, plexLatin } from '@/lib/fonts'
 import { getSiteSettings } from '@/lib/queries'
 import { alternatesFor } from '@/lib/url'
@@ -102,6 +102,12 @@ export async function generateMetadata({
     },
     formatDetection: { telephone: false },
     robots: { index: true, follow: true },
+    // Search Console / Bing Webmaster ownership, as a <meta> tag on every page.
+    // Empty values render nothing. The DNS TXT alternative is in DEPLOY.md §8.
+    verification: {
+      ...(siteVerification.google ? { google: siteVerification.google } : {}),
+      ...(siteVerification.bing ? { other: { 'msvalidate.01': siteVerification.bing } } : {}),
+    },
   }
 }
 
@@ -156,9 +162,11 @@ export default async function LocaleLayout({
             ariaLabel={t('cta.whatsappAria', { number: settings.whatsappNumber })}
             prefill={settings.whatsappPrefill}
           />
-        </NextIntlClientProvider>
 
-        <Analytics nonce={nonce} />
+          {/* Inside the provider: the consent banner is a client component
+              with a localised link to the privacy page. */}
+          <Analytics nonce={nonce} locale={typedLocale} />
+        </NextIntlClientProvider>
       </body>
     </html>
   )

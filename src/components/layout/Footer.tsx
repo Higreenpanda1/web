@@ -132,6 +132,8 @@ export async function Footer({ locale, settings }: { locale: Locale; settings: S
               href={whatsappLink(settings.whatsappNumber, settings.whatsappPrefill ?? undefined)}
               target="_blank"
               rel="noopener noreferrer"
+              data-analytics-event="whatsapp_click"
+              data-analytics-location="footer"
               className="inline-flex min-h-12 w-full items-center justify-center gap-2.5 rounded-full bg-white px-5 font-semibold text-brand-900 no-underline transition-colors hover:bg-brand-50"
             >
               <WhatsAppIcon size={20} className="text-brand-700" />

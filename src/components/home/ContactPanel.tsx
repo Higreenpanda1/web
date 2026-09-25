@@ -67,7 +67,13 @@ export async function ContactPanel({
           {lead ? <p className="mt-4 text-body-lg text-brand-100">{lead}</p> : null}
 
           <div className="mt-8 flex flex-wrap gap-3">
-            <ButtonLink href={whatsapp} size="lg" variant="inverse">
+            <ButtonLink
+              href={whatsapp}
+              size="lg"
+              variant="inverse"
+              data-analytics-event="whatsapp_click"
+              data-analytics-location="home_contact"
+            >
               <WhatsAppIcon size={22} className="text-brand-700" />
               {t('cta.whatsapp')}
             </ButtonLink>

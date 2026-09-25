@@ -2,7 +2,8 @@
 
 Written 20 September 2026, at the end of the session that deployed the site,
 updated the same day after the front-end redesign, on 23 September 2026 after
-go-live and the service catalogue, and on 24 September 2026 after the blog. Everything below is verified
+go-live and the service catalogue, on 24 September 2026 after the blog, and
+on 25 September 2026 for analytics and Search Console. Everything below is verified
 state, not intention. Where something is unfinished it says so.
 
 ---
@@ -19,6 +20,70 @@ on the real domain.
 - **Site:** https://higreenpanda.com (Arabic) · https://higreenpanda.com/en
 - **CMS:** https://higreenpanda.com/hgp-studio-gate
 - **Repository:** `Higreenpanda1/web`, branch `claude/practical-newton-m55sbw`
+
+## Google Analytics 4 and Search Console (25 September 2026) — code pushed, NOT yet deployed
+
+The owner asked for Google Analytics 4 and Google Search Console (with Bing
+and IndexNow) on the live site. The code side is done on branch
+`claude/quirky-fermi-uhk5ct` (this session's branch; it contains
+`claude/practical-newton-m55sbw` plus these commits). Nothing is on the server
+until the deploy in "Where this session stopped" below runs.
+
+**What the code does now** (`DEPLOY.md` §8 and §8c have the runbook):
+
+- `GA_MEASUREMENT_ID=G-…` in `.env` switches on the Google tag
+  (`src/components/analytics/GoogleAnalytics.tsx`) under **Consent Mode v2**:
+  every signal denied by default, `analytics_storage` granted only after the
+  visitor presses _Accept_ on the bilingual consent bar
+  (`ConsentBanner.tsx`; text under `consent.*` in both catalogues). Ads
+  signals and Google Signals are never enabled. The answer lives in
+  `localStorage` (`hgp-consent`) and can be changed on `/privacy`, whose
+  cookie paragraph was rewritten in both languages (it used to say "no
+  consent banner"). Verified in a browser: no `_ga` cookie exists before
+  _Accept_ or after _Essential only_.
+- The tag and its inline bootstrap carry the page's CSP nonce, and
+  `buildCsp()` gains exactly Google's origins in `script-src`, `connect-src`
+  and `img-src` — only while the ID is set. `src/lib/security-headers.test.ts`
+  fails if any other directive changes.
+- Events: `whatsapp_click` (with `location`, from every WhatsApp button via
+  one delegated listener, `ClickTracking.tsx`), `enquiry_sent`,
+  `application_sent` (`application_type`), `language_switch` (`from`, `to`).
+  Mark them as key events in GA4 once they show up.
+- On a phone the bar publishes its height as `--consent-offset` and the
+  floating WhatsApp button moves up while the bar is open, so the two never
+  share a corner.
+- `GOOGLE_SITE_VERIFICATION=<token>` renders the Search Console meta tag on
+  every page (`verification` in the root layout's metadata);
+  `BING_SITE_VERIFICATION` does the same for Bing. Both are the `content`
+  value only. The DNS TXT alternative is written up in DEPLOY.md §8 with the
+  email-record warnings; it was deliberately not used.
+- All three, plus `INDEXNOW_KEY`, are read at runtime: a `.env` edit and
+  `docker compose … up -d app` is enough, no rebuild.
+
+**Verified locally** against Postgres 16 with a production build: typecheck,
+lint, prettier, 65 unit tests (8 new for the CSP), and a Playwright run
+(`GA_MEASUREMENT_ID` set, Google stubbed since this sandbox has no route to
+it): tag executes under the CSP, consent default → update sequence in
+`dataLayer`, banner/offset behaviour at 390px and 1440px in both languages,
+all four events fire (the enquiry one exactly once), zero CSP violations,
+zero JS errors. Screenshots were reviewed by eye.
+
+**Spam URLs still in Google's index** (found with `site:higreenpanda.com` on
+25 September; all answer 410 on the new site, confirmed against the matcher):
+`/japan-togel-x-boeing-777300-air-france-siege/`,
+`/cacing-2d-togel-bergambar-x-777-stirling/`,
+`/angka-sapi-dalam-togel-x-boeing-777-max-crash/`,
+`/sihir-jitu-togel-login-x-variasi-777-login/`,
+`/angka-togel-sapi-x-premium-economy-klm-777/`,
+`/shio-togel-sdy-x-nikke-777-squad/`,
+`/next-togel-x-boeing-777300er-asientos-qatar-airways/`. Google also still
+lists `/en/home/` (301 → `/en`, fine). Semrush had no API units again, so
+this is from web search, not a crawl export.
+
+**This sandbox could not reach the server or the site**: outbound SSH is
+blocked and the egress policy denies `higreenpanda.com`, so the live checks
+are done by the owner pasting `curl` lines in the hPanel browser terminal and
+reading back the output.
 
 ## The blog (24 September 2026, fourth session)
 
