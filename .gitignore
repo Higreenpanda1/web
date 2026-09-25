@@ -42,3 +42,4 @@ Thumbs.db
 # Scratch space for the archive rewrite (source packs and drafts)
 .rewrites/
 .links/
+.translate/

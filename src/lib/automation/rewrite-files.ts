@@ -18,6 +18,7 @@ import {
   pendingItems,
   saveArchive,
   sourcePack,
+  translationPack,
 } from './rewrite'
 
 /**
@@ -93,7 +94,11 @@ export function applyRewrites(dir: string): { applied: number; rejected: string[
     const slug = match[1] ?? ''
     const locale = match[2] as 'ar' | 'en'
     const post = archive.posts.find((entry) => entry.slug === slug)
-    if (!post || !post.locales[locale]) {
+    // A new English version of an Arabic-only article is a translation.
+    const isTranslation = Boolean(
+      post && !post.locales[locale] && locale === 'en' && post.locales.ar,
+    )
+    if (!post || (!post.locales[locale] && !isTranslation)) {
       rejected.push(`${file}: no such article version`)
       continue
     }
@@ -153,4 +158,18 @@ export function applyRewrites(dir: string): { applied: number; rejected: string[
   }
   if (applied) saveArchive(archive)
   return { applied, rejected }
+}
+
+/** One translation brief per Arabic-only article, into the same packs/out layout. */
+export function writeTranslationPacks(dir: string): number {
+  const archive = loadArchive()
+  mkdirSync(path.join(dir, 'packs'), { recursive: true })
+  mkdirSync(path.join(dir, 'out'), { recursive: true })
+  let count = 0
+  for (const post of archive.posts) {
+    if (post.status !== 'published' || !post.locales.ar || post.locales.en) continue
+    writeFileSync(path.join(dir, 'packs', `${post.slug}.en.md`), translationPack(archive, post))
+    count++
+  }
+  return count
 }

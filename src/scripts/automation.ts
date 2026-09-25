@@ -74,6 +74,12 @@ async function main() {
       console.log(`wrote ${count} source packs to ${dir}/packs`)
       break
     }
+    case 'translate-packs': {
+      const { writeTranslationPacks } = await import('@/lib/automation/rewrite-files')
+      const dir = flags.find((flag) => flag.startsWith('--dir='))?.slice(6) ?? '.translate'
+      console.log(`wrote ${writeTranslationPacks(dir)} translation packs to ${dir}/packs`)
+      break
+    }
     case 'rewrite-apply': {
       const { applyRewrites } = await import('@/lib/automation/rewrite-files')
       const dir = flags.find((flag) => flag.startsWith('--dir='))?.slice(6) ?? '.rewrites'

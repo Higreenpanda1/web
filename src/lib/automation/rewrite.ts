@@ -196,7 +196,16 @@ ${original.slice(0, 60_000)}`
 }
 
 export function applyDraft(post: ArchivePost, locale: Locale, draft: ArticleDraft): void {
-  const doc = post.locales[locale]!
+  // A missing language is a new translation: start from an empty version.
+  const doc: LocaleDoc = post.locales[locale] ?? {
+    legacyId: '',
+    title: '',
+    excerpt: '',
+    seoDescription: '',
+    focusKeyword: null,
+    body: { root: {} },
+    wordCount: 0,
+  }
   const words = blocksWordCount(draft.body)
   post.locales[locale] = {
     ...doc,
@@ -312,6 +321,39 @@ export function sourcePack(archive: Archive, post: ArchivePost, locale: Locale):
     '',
     '## Original article',
     original,
+    '',
+  ].join('\n')
+}
+
+/** Brief for translating an Arabic article into English (the version is missing today). */
+export function translationPack(archive: Archive, post: ArchivePost): string {
+  const ar = post.locales.ar!
+  const category = archive.categories.find((entry) => entry.slug === post.categories[0])
+  const words = lexicalToPlainText(ar.body).split(/\s+/).filter(Boolean).length
+  return [
+    `# ${post.slug} (en) — TRANSLATION`,
+    '',
+    '- language: English (write the English version of the Arabic article below)',
+    `- category: ${category?.en ?? ''} (${post.categories.join(', ')})`,
+    `- target words: ${Math.max(1300, Math.round(words * 0.9))} to ${Math.max(1900, Math.round(words * 1.3))}`,
+    '',
+    '## Link inventory (the only URLs allowed)',
+    linkInventory(archive, post, 'en'),
+    '',
+    '## Arabic title',
+    ar.title,
+    '',
+    '## Arabic focus keyword',
+    ar.focusKeyword ?? '',
+    '',
+    '## Arabic key takeaways',
+    ...(ar.keyTakeaways ?? []).map((item) => `- ${item}`),
+    '',
+    '## Arabic questions',
+    ...(ar.faqs ?? []).map((item) => `Q: ${item.question}\nA: ${item.answer}`),
+    '',
+    '## Arabic article',
+    lexicalToPlainText(ar.body),
     '',
   ].join('\n')
 }

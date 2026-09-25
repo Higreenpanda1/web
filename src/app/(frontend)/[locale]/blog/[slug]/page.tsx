@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import Image from 'next/image'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 
 import { AuthorCard } from '@/components/blog/AuthorCard'
 import { KeyTakeaways } from '@/components/blog/KeyTakeaways'
@@ -101,9 +101,11 @@ export default async function PostPage({
   const post = await getPostBySlug(slug, locale)
   if (!post) notFound()
   const locales = localesOf(post)
-  // An Arabic-only article is not served under /en: the fallback would show
-  // Arabic on an English URL, which is worse for the reader and for search.
-  if (!locales.includes(locale)) notFound()
+  // An article not written in this language is not served here: the fallback
+  // would show Arabic on an English URL. The language switcher still links to
+  // this address, so send the reader to this language's blog, not a 404.
+  // Temporary (307): the page may get a translation later.
+  if (!locales.includes(locale)) redirect(locale === 'en' ? '/en/blog' : '/blog')
 
   const [t, settings, adjacent, chosenRelated] = await Promise.all([
     getTranslations({ locale }),
