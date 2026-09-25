@@ -2,6 +2,7 @@ import * as migration_20260920_072112_initial from './20260920_072112_initial'
 import * as migration_20260923_073515_add_catalogue_and_applications from './20260923_073515_add_catalogue_and_applications'
 import * as migration_20260924_050126_blog_seo_automation from './20260924_050126_blog_seo_automation'
 import * as migration_20260925_131222_founder_timeline from './20260925_131222_founder_timeline'
+import * as migration_20260925_135802_business_licences from './20260925_135802_business_licences'
 
 export const migrations = [
   {
@@ -23,5 +24,10 @@ export const migrations = [
     up: migration_20260925_131222_founder_timeline.up,
     down: migration_20260925_131222_founder_timeline.down,
     name: '20260925_131222_founder_timeline',
+  },
+  {
+    up: migration_20260925_135802_business_licences.up,
+    down: migration_20260925_135802_business_licences.down,
+    name: '20260925_135802_business_licences',
   },
 ]

@@ -1889,6 +1889,34 @@ export interface SiteSetting {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Each registered company, with a photo of its business licence (营业执照). Shown on the About page so a visitor can check the company is real.
+   */
+  licences?:
+    | {
+        /**
+         * Exactly as printed on the licence, in Chinese.
+         */
+        legalName: string;
+        nameAr: string;
+        nameEn: string;
+        /**
+         * The 18-character unified social credit code (统一社会信用代码).
+         */
+        creditCode: string;
+        /**
+         * As on the licence, e.g. 2025-12-26.
+         */
+        established?: string | null;
+        cityAr?: string | null;
+        cityEn?: string | null;
+        /**
+         * A clear, upright photo or scan of the licence.
+         */
+        image?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
   social?: {
     instagram?: string | null;
     youtube?: string | null;
@@ -1955,6 +1983,19 @@ export interface SiteSettingsSelect<T extends boolean = true> {
               href?: T;
               id?: T;
             };
+        id?: T;
+      };
+  licences?:
+    | T
+    | {
+        legalName?: T;
+        nameAr?: T;
+        nameEn?: T;
+        creditCode?: T;
+        established?: T;
+        cityAr?: T;
+        cityEn?: T;
+        image?: T;
         id?: T;
       };
   social?:

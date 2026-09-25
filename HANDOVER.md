@@ -140,6 +140,31 @@ seed updates the founder record and the prices in place (an editor's later
 CMS edits to those fields are overwritten by the seed; that is how the seed
 has always worked for services and the team).
 
+## Business licences on the About page (25 September 2026, evening)
+
+The owner asked for "our two company licences" on the site. They are in
+Google Drive under Trade Photos (found by OCR on 营业执照):
+广州海吉鹏国际商务服务有限公司 (credit code 91440106MAK38EQ97M, Sami as
+legal representative, 2025-12-26, Tianhe, Guangzhou) and
+那社尔电子商贸（上海）有限公司 — Nasher E-Commerce (Shanghai) — (credit code
+91310120MADC3UP68E, 2024-02-26, Fengxian, Shanghai). A new **Licences** tab
+in Site settings holds them (legal name, Arabic and English names, code,
+date, city, photo), and the About page shows them as cards with a link to
+gsxt.gov.cn. Migration `20260925_135802_business_licences`.
+
+The seed writes the two entries only when the list is empty, so a photo
+replaced in the CMS survives later deploys. The Shanghai photo is seeded
+(`src/seed/assets/licence-shanghai.webp`, rotated upright). **The Guangzhou
+photo is not**: the Drive file is 6 MB and every download attempt dropped
+the Drive connection. Upload it in the CMS (Site settings → Licences →
+first row → image). Until then the card shows the details with an icon in
+place of the photo.
+
+Local testing note: run the seed with `NODE_ENV=production` against a
+migrated database. Without it Payload pushes the schema in dev mode and the
+next `npm run migrate` stops at a data-loss prompt. The server always runs
+in production mode, so it is not affected.
+
 ## The archive rewrite (25 September 2026) — deployed
 
 All 212 article versions (112 Arabic, 100 English) were rewritten as full

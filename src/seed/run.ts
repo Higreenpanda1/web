@@ -1,5 +1,6 @@
 import 'dotenv/config'
 
+import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -85,6 +86,9 @@ async function main() {
       ],
     },
   })
+
+  console.log('→ Business licences')
+  await seedLicences(payload)
 
   console.log('→ Founder photo')
   const founderPhotoId = await upsertMedia(payload, {
@@ -353,6 +357,57 @@ async function upsert(
  * of uploading a second copy — and an editor who replaces the photo in the
  * CMS keeps their replacement, because the alt text is what is looked up.
  */
+/**
+ * The two registered companies, from the licence photos the owner keeps on
+ * Google Drive (25 September 2026). Written only when the list is empty, so
+ * a licence photo an editor uploads or replaces in the CMS survives every
+ * later deploy. A missing image file is skipped, not an error: the card then
+ * shows the details without the photo until one is uploaded.
+ */
+async function seedLicences(payload: Awaited<ReturnType<typeof getPayload>>) {
+  const current = await payload.findGlobal({ slug: 'site-settings', depth: 0 })
+  if ((current.licences ?? []).length > 0) {
+    console.log(`  ${current.licences?.length} already set — left as they are`)
+    return
+  }
+  const assets = path.join(path.dirname(fileURLToPath(import.meta.url)), 'assets')
+  const image = async (file: string, alt: { ar: string; en: string }) =>
+    fs.existsSync(path.join(assets, file))
+      ? upsertMedia(payload, { filePath: path.join(assets, file), alt })
+      : null
+
+  const licences = [
+    {
+      legalName: '广州海吉鹏国际商务服务有限公司',
+      nameAr: 'قوانغتشو هايجيبنغ (HiGP) للخدمات التجارية الدولية المحدودة',
+      nameEn: 'Guangzhou Haijipeng (HiGP) International Business Services Co., Ltd.',
+      creditCode: '91440106MAK38EQ97M',
+      established: '2025-12-26',
+      cityAr: 'قوانغتشو، حي تيانخه',
+      cityEn: 'Tianhe District, Guangzhou',
+      image: await image('licence-guangzhou.webp', {
+        ar: 'الرخصة التجارية لشركة قوانغتشو هايجيبنغ للخدمات التجارية الدولية',
+        en: 'Business licence of Guangzhou Haijipeng International Business Services',
+      }),
+    },
+    {
+      legalName: '那社尔电子商贸（上海）有限公司',
+      nameAr: 'ناشر للتجارة الإلكترونية (شنغهاي) المحدودة',
+      nameEn: 'Nasher E-Commerce (Shanghai) Co., Ltd.',
+      creditCode: '91310120MADC3UP68E',
+      established: '2024-02-26',
+      cityAr: 'شنغهاي، حي فنغشيان',
+      cityEn: 'Fengxian District, Shanghai',
+      image: await image('licence-shanghai.webp', {
+        ar: 'الرخصة التجارية لشركة ناشر للتجارة الإلكترونية في شنغهاي',
+        en: 'Business licence of Nasher E-Commerce (Shanghai)',
+      }),
+    },
+  ]
+  await payload.updateGlobal({ slug: 'site-settings', data: { licences } })
+  console.log(`  ${licences.length} licences`)
+}
+
 async function upsertMedia(
   payload: Awaited<ReturnType<typeof getPayload>>,
   { filePath, alt }: { filePath: string; alt: { ar: string; en: string } },

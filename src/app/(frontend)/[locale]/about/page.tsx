@@ -2,6 +2,7 @@ import { Handshake, MapPinned, MessageSquareText, Receipt } from 'lucide-react'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import Image from 'next/image'
 
+import { Licences } from '@/components/about/Licences'
 import { Timeline } from '@/components/about/Timeline'
 import { ContactPanel } from '@/components/home/ContactPanel'
 import { FounderCard } from '@/components/home/FounderCard'
@@ -152,6 +153,18 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
           ))}
         </ul>
       </Section>
+
+      {settings.licences && settings.licences.length > 0 ? (
+        <Section tone="sunken" labelledBy="licences-heading">
+          <SectionHeading
+            id="licences-heading"
+            eyebrow={t('about.licencesEyebrow')}
+            title={t('about.licencesTitle')}
+            lead={t('about.licencesLead')}
+          />
+          <Licences items={settings.licences} locale={locale} />
+        </Section>
+      ) : null}
 
       {others.length > 0 ? (
         <Section tone="sunken" labelledBy="team-heading">

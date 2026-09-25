@@ -231,7 +231,14 @@
       "education": "Study",
       "award": "Award",
       "course": "Course"
-    }
+    },
+    "licencesEyebrow": "Officially registered",
+    "licencesTitle": "Our business licences in China",
+    "licencesLead": "We work through two companies registered with China’s market regulator. You can check any credit code yourself on the National Enterprise Credit Information Publicity System.",
+    "licenceCode": "Unified social credit code",
+    "licenceEstablished": "Established",
+    "licenceView": "View the full licence",
+    "licenceVerify": "Verify on gsxt.gov.cn"
   },
   "blog": {
     "title": "Blog",
