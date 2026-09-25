@@ -117,8 +117,8 @@ Fortune Global 500, the Saudi Aramco joint venture). Ten credentials now,
 adding Baowu, Aramco, the HarvardX leadership course, the Jiangsu Government
 Scholarship first prize, the three languages and the CCNU Chinese-language
 prize. A new `timeline` array on Team members (kind / period / title /
-organisation / note, localised) carries the CV — eight entries from Baosteel
-2023 back to CCNU 2015 — and the About page renders it as a vertical
+organisation / note, localised) carries the CV — nine entries from founding
+HiGreenPanda in 2021 and Baosteel back to CCNU 2015 — and the About page renders it as a vertical
 timeline under the founder card (`src/components/about/Timeline.tsx`). The
 Person structured data on the About page gains `alumniOf`, `award` and
 `affiliation` from it. Migration `20260925_131222_founder_timeline` adds the
@@ -129,14 +129,11 @@ checked in the database), typecheck, lint, prettier, 62 unit tests, the
 production build, and the About, company-formation, Hong Kong and work
 permit pages in both languages. Not verified on the server.
 
-**Open questions for the owner** (asked in the session; the answers change
-the copy, not the structure): whether the accounting ¥3,800 is per year (the
-list omits the unit; the old list said yearly, and the site says yearly);
-whether the Aramco joint venture belongs to the Baowu period (it is written
-that way); when HiGreenPanda was founded and whether Baosteel is still
-current, for the first timeline entry; whether they want a dedicated
-`/pricing` page reproducing the PDF's tables (the 23 September decision was
-"starting prices, not a full table", so none was added).
+**Answered by the owner the same day:** accounting ¥3,800 is per year;
+the Aramco joint venture was between Aramco and Baowu (written under the
+Baowu entry); HiGreenPanda was founded in 2021, now the first timeline
+entry; no dedicated pricing page — each service shows its own price and
+nothing else (the 23 September decision stands).
 
 To deploy: `ops/deploy.sh` with the commit SHA — it migrates and seeds. The
 seed updates the founder record and the prices in place (an editor's later

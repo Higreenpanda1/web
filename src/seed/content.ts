@@ -355,6 +355,13 @@ export const FOUNDER = {
     timeline: [
       {
         kind: 'work',
+        period: '2021 – الآن',
+        title: 'المؤسس',
+        organisation: 'هاي جرين باندا للتسويق',
+        note: 'أسّس الشركة في الصين لخدمة التجار ورواد الأعمال الناطقين بالعربية: التوريد والتصنيع والفحص والشحن وتأسيس الشركات، بشريك واحد مسؤول من الفكرة حتى التسليم.',
+      },
+      {
+        kind: 'work',
         period: '2023 – الآن',
         title: 'التسويق والمبيعات',
         organisation: 'Baoshan Iron & Steel — مجموعة Baowu Steel',
@@ -428,6 +435,13 @@ export const FOUNDER = {
       'First prize in Chinese language — Central China Normal University',
     ],
     timeline: [
+      {
+        kind: 'work',
+        period: '2021 – now',
+        title: 'Founder',
+        organisation: 'HiGreen Panda Marketing',
+        note: 'Founded the company in China to serve Arabic-speaking traders and entrepreneurs: sourcing, manufacturing, inspection, shipping and company formation, with one accountable partner from idea to delivery.',
+      },
       {
         kind: 'work',
         period: '2023 – now',
