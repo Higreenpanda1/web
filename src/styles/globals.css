@@ -387,9 +387,12 @@
   }
 
   /* Scroll-triggered entrance. Elements carry `data-reveal`; the tiny
-     ScrollReveal client component adds `is-visible` as they enter the
-     viewport. Without JavaScript nothing is hidden — the base state below is
-     only applied once the observer has attached (`.js-reveal` on <html>). */
+     ScrollReveal client component sets `data-revealed` as they enter the
+     viewport, and it is never removed — an element that has appeared stays
+     put. (An attribute rather than a class so a React re-render that changes
+     `className` cannot wipe it.) Without JavaScript nothing is hidden — the
+     base state below is only applied once the observer has attached
+     (`.js-reveal` on <html>). */
   html.js-reveal [data-reveal] {
     opacity: 0;
     transform: translateY(18px);
@@ -397,10 +400,6 @@
       opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
       transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
     transition-delay: var(--reveal-delay, 0ms);
-  }
-  html.js-reveal [data-reveal].is-visible {
-    opacity: 1;
-    transform: none;
   }
   @media (prefers-reduced-motion: reduce) {
     html.js-reveal [data-reveal] {
@@ -420,12 +419,18 @@
   html.js-reveal [data-reveal='scale'] {
     transform: scale(0.96);
   }
-  [dir='rtl'] html.js-reveal [data-reveal='left'],
   html[dir='rtl'].js-reveal [data-reveal='left'] {
     transform: translateX(28px);
   }
   html[dir='rtl'].js-reveal [data-reveal='right'] {
     transform: translateX(-28px);
+  }
+
+  /* The revealed state. Declared after every variant (and at no lower
+     specificity than the RTL ones) so it wins for each of them. */
+  html.js-reveal [data-reveal][data-revealed] {
+    opacity: 1;
+    transform: none;
   }
 
   /* Headline words rise in one after another (Hero). */
