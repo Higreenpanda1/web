@@ -2,6 +2,7 @@
 
 import { Menu, X } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 
 import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon'
 import { Link, usePathname } from '@/i18n/navigation'
@@ -16,6 +17,10 @@ type NavItem = { label: string; href: string }
  *
  * The language switcher is passed in as `children` so the same component
  * serves both the desktop header and this sheet.
+ *
+ * The sheet is portalled to <body>: the header's backdrop-blur makes it the
+ * containing block for fixed descendants, which would otherwise squash the
+ * sheet to the header's own height and leave it invisible.
  */
 export function MobileNav({
   items,
@@ -42,6 +47,11 @@ export function MobileNav({
   const pathname = usePathname()
   const triggerRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     setOpen(false)
@@ -83,50 +93,55 @@ export function MobileNav({
         )}
       </button>
 
-      <div
-        id="mobile-nav-panel"
-        ref={panelRef}
-        hidden={!open}
-        className={cn(
-          'fixed inset-x-0 top-[var(--header-height)] bottom-0 z-40 overflow-y-auto bg-surface',
-          open && 'animate-fade-in',
-        )}
-      >
-        <nav aria-label={navLabel} className="container-page flex min-h-full flex-col py-4">
-          <ul className="flex flex-col">
-            {items.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className="block border-b border-border-soft py-4 text-h3 font-bold text-heading no-underline"
-                >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-
-          <div className="mt-6 flex flex-col gap-3">
-            <Link
-              href={ctaHref}
-              className="inline-flex min-h-12 items-center justify-center rounded-full bg-brand-700 px-6 text-body-lg font-semibold text-white no-underline"
+      {mounted
+        ? createPortal(
+            <div
+              id="mobile-nav-panel"
+              ref={panelRef}
+              hidden={!open}
+              className={cn(
+                'fixed inset-x-0 top-[var(--header-height)] bottom-0 z-40 overflow-y-auto bg-surface lg:hidden',
+                open && 'animate-fade-in',
+              )}
             >
-              {ctaLabel}
-            </Link>
-            <a
-              href={whatsappHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-brand-300 bg-surface-tint-soft px-6 text-body-lg font-semibold text-heading no-underline"
-            >
-              <WhatsAppIcon size={20} />
-              {whatsappLabel}
-            </a>
-          </div>
+              <nav aria-label={navLabel} className="container-page flex min-h-full flex-col py-4">
+                <ul className="flex flex-col">
+                  {items.map((item) => (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        className="block border-b border-border-soft py-4 text-h3 font-bold text-heading no-underline"
+                      >
+                        {item.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
 
-          {children ? <div className="mt-auto pt-8">{children}</div> : null}
-        </nav>
-      </div>
+                <div className="mt-6 flex flex-col gap-3">
+                  <Link
+                    href={ctaHref}
+                    className="inline-flex min-h-12 items-center justify-center rounded-full bg-brand-700 px-6 text-body-lg font-semibold text-white no-underline"
+                  >
+                    {ctaLabel}
+                  </Link>
+                  <a
+                    href={whatsappHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-brand-300 bg-surface-tint-soft px-6 text-body-lg font-semibold text-heading no-underline"
+                  >
+                    <WhatsAppIcon size={20} />
+                    {whatsappLabel}
+                  </a>
+                </div>
+
+                {children ? <div className="mt-auto pt-8">{children}</div> : null}
+              </nav>
+            </div>,
+            document.body,
+          )
+        : null}
     </div>
   )
 }
