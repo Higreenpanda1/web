@@ -129,3 +129,26 @@ export function blocksLinks(blocks: ArticleBlock[]): string[] {
     .join('\n')
   return Array.from(text.matchAll(/\]\(([^)\s]+)\)/g), (match) => match[1] ?? '')
 }
+
+export type MarkupNode = {
+  type?: string
+  tag?: string
+  text?: string
+  format?: number
+  fields?: { url?: string }
+  children?: MarkupNode[]
+}
+
+/** A Lexical paragraph back to the inline markup the writers use; the inverse of inlineToLexical. */
+export function toMarkup(node: MarkupNode): string {
+  return (node.children ?? [])
+    .map((child) => {
+      if (child.type === 'link') return `[${toMarkup(child)}](${child.fields?.url ?? ''})`
+      if (child.type === 'linebreak') return ' '
+      if (typeof child.text === 'string') {
+        return (child.format ?? 0) & 1 ? `**${child.text}**` : child.text
+      }
+      return toMarkup(child)
+    })
+    .join('')
+}

@@ -1,7 +1,13 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 
-import { blocksLinks, blocksToLexical, blocksWordCount, inlineToLexical } from './blocks.ts'
+import {
+  blocksLinks,
+  blocksToLexical,
+  blocksWordCount,
+  inlineToLexical,
+  toMarkup,
+} from './blocks.ts'
 
 describe('inlineToLexical', () => {
   it('turns markdown links into Lexical link nodes and keeps the rest as text', () => {
@@ -50,5 +56,13 @@ describe('helpers', () => {
     ]
     assert.equal(blocksWordCount(blocks), 5)
     assert.deepEqual(blocksLinks(blocks), ['/a', '/b'])
+  })
+})
+
+describe('toMarkup', () => {
+  it('turns a Lexical paragraph back into link and bold markup, and round-trips', () => {
+    const source = 'Read [this guide](/blog/a) and **act now**.'
+    const paragraph = { type: 'paragraph', children: inlineToLexical(source) }
+    assert.equal(toMarkup(paragraph as never), source)
   })
 })

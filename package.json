@@ -34,7 +34,9 @@
     "seo:indexnow": "npm run automation -- indexnow",
     "posts:rewrite-archive": "npm run automation -- rewrite-archive",
     "posts:rewrite-packs": "npm run automation -- rewrite-packs",
-    "posts:rewrite-apply": "npm run automation -- rewrite-apply"
+    "posts:rewrite-apply": "npm run automation -- rewrite-apply",
+    "posts:links-packs": "npm run automation -- links-packs",
+    "posts:links-apply": "npm run automation -- links-apply"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.128.0",

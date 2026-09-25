@@ -84,6 +84,22 @@ async function main() {
       )
       break
     }
+    case 'links-packs': {
+      const { writeLinkPacks } = await import('@/lib/automation/interlink')
+      const dir = flags.find((flag) => flag.startsWith('--dir='))?.slice(6) ?? '.links'
+      console.log(`wrote ${writeLinkPacks(dir)} link packs to ${dir}/packs`)
+      break
+    }
+    case 'links-apply': {
+      const { applyLinkEdits } = await import('@/lib/automation/interlink')
+      const dir = flags.find((flag) => flag.startsWith('--dir='))?.slice(6) ?? '.links'
+      const result = applyLinkEdits(dir)
+      console.log(
+        `applied ${result.applied} link(s), rejected ${result.rejected.length}` +
+          (result.rejected.length ? '\n' + result.rejected.join('\n') : ''),
+      )
+      break
+    }
     case 'indexnow': {
       const { submitEverythingToIndexNow } = await import('@/lib/automation/distribute')
       const count = await submitEverythingToIndexNow()
