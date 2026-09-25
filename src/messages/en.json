@@ -263,7 +263,12 @@
     "rss": "Subscribe by RSS",
     "onlyInArabic": "This article is available in Arabic only.",
     "ctaTitle": "Want to put this into practice?",
-    "ctaLead": "Message us on WhatsApp with your product and your country, and we reply with a plan and a clear cost."
+    "ctaLead": "Message us on WhatsApp with your product and your country, and we reply with a plan and a clear cost.",
+    "nextStepEyebrow": "The next step",
+    "nextStepLead": "The service that does what you have just read, on the ground in China.",
+    "whatsappPrefill": "Hello, I read your article and would like to ask about {service}.",
+    "sourcesTitle": "Sources",
+    "sourcesLead": "Where the figures in this article come from."
   },
   "contact": {
     "title": "Contact",

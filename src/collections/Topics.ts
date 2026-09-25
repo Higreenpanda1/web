@@ -10,14 +10,17 @@ import type { CollectionConfig } from 'payload'
  * the owner to review. Nothing is published without a person pressing Publish.
  *
  * Editors add topics here from what customers ask on WhatsApp — those questions
- * are the best keyword research this business has.
+ * are the best keyword research this business has. The weekly market-research
+ * job (`src/lib/automation/research/`) adds its own, marked `source:
+ * research`, each with the search signals it was chosen on, the intent it
+ * serves and the service page its article should lead to.
  */
 export const Topics: CollectionConfig = {
   slug: 'topics',
   labels: { singular: 'Topic', plural: 'Content queue' },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'category', 'priority', 'status', 'scheduledFor'],
+    defaultColumns: ['title', 'category', 'priority', 'status', 'source', 'demandScore'],
     group: 'Content',
     description:
       'Articles waiting to be written. The weekly draft job takes the highest priority queued topic and writes a draft for review.',
@@ -95,6 +98,78 @@ export const Topics: CollectionConfig = {
         position: 'sidebar',
         readOnly: true,
         description: 'The draft written for this topic.',
+      },
+    },
+    {
+      name: 'source',
+      type: 'select',
+      defaultValue: 'editor',
+      index: true,
+      options: [
+        { label: 'Editor', value: 'editor' },
+        { label: 'Market research', value: 'research' },
+        { label: 'Trend', value: 'trend' },
+      ],
+      admin: {
+        position: 'sidebar',
+        description: 'Who put this here: a person, the weekly research job, or a trend it caught.',
+      },
+    },
+    {
+      name: 'intent',
+      type: 'select',
+      options: [
+        { label: 'Informational — learning how', value: 'informational' },
+        { label: 'Commercial — comparing options', value: 'commercial' },
+        { label: 'Transactional — ready to buy', value: 'transactional' },
+      ],
+      admin: {
+        position: 'sidebar',
+        description:
+          'What the searcher wants. Commercial and transactional topics lead to a service.',
+      },
+    },
+    {
+      name: 'targetService',
+      type: 'relationship',
+      relationTo: 'services',
+      admin: {
+        position: 'sidebar',
+        description:
+          'The service this article should sell. Its card is shown inside the article and the writer links to it.',
+      },
+    },
+    {
+      name: 'demandScore',
+      type: 'number',
+      min: 0,
+      max: 100,
+      admin: {
+        position: 'sidebar',
+        description:
+          'Research estimate of demand and fit, 0–100. Sets the priority for research topics.',
+      },
+    },
+    {
+      name: 'audience',
+      type: 'text',
+      maxLength: 120,
+      admin: { description: 'Who searches for this, e.g. "Saudi importer placing a first order".' },
+    },
+    {
+      name: 'seasonalHook',
+      type: 'text',
+      maxLength: 160,
+      admin: {
+        description: 'An event that makes this timely (Canton Fair, Ramadan stock, year-end).',
+      },
+    },
+    {
+      name: 'evidence',
+      type: 'textarea',
+      admin: {
+        description:
+          'The search signals this topic was chosen on: autocomplete phrases, trends, keyword data. Not published.',
       },
     },
     {

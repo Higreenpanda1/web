@@ -31,6 +31,8 @@
     "posts:enrich": "npm run automation -- enrich",
     "posts:translate": "npm run automation -- translate",
     "posts:draft": "npm run automation -- draft",
+    "posts:research": "npm run automation -- research",
+    "posts:digest": "npm run automation -- digest",
     "seo:indexnow": "npm run automation -- indexnow",
     "posts:rewrite-archive": "npm run automation -- rewrite-archive",
     "posts:rewrite-packs": "npm run automation -- rewrite-packs",

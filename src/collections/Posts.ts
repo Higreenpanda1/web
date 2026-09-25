@@ -17,6 +17,12 @@ import type { CollectionConfig } from 'payload'
  * questions with direct answers (rendered as FAQPage structured data) and the
  * keyword the article targets. Editors can leave all three empty — the
  * enrichment script (`npm run posts:enrich`) fills them in from the body.
+ *
+ * Two fields exist to turn readers into enquiries and citations: `ctaService`
+ * names the service the article sells (rendered as a card with the price and
+ * the application button) and `sources` lists where the figures came from
+ * (rendered as a list and emitted as `citation` in the structured data, which
+ * is what generative engines reward).
  */
 export const Posts: CollectionConfig = {
   slug: 'posts',
@@ -147,6 +153,33 @@ export const Posts: CollectionConfig = {
         readOnly: true,
         description: 'Calculated on save, per language.',
       },
+    },
+    {
+      name: 'ctaService',
+      type: 'relationship',
+      relationTo: 'services',
+      maxDepth: 1,
+      admin: {
+        position: 'sidebar',
+        description:
+          'The service this article leads to. Its card — price, what is included, the application button — is shown after the article and in the sidebar.',
+      },
+    },
+    {
+      name: 'sources',
+      type: 'array',
+      localized: true,
+      maxRows: 10,
+      labels: { singular: 'Source', plural: 'Sources' },
+      admin: {
+        description:
+          'Where the figures come from: official bodies, statistics offices, the exchange, the port. Shown at the end of the article and emitted as citations for search and AI engines.',
+      },
+      fields: [
+        { name: 'title', type: 'text', required: true, maxLength: 200 },
+        { name: 'url', type: 'text', required: true, maxLength: 500 },
+        { name: 'publisher', type: 'text', maxLength: 120 },
+      ],
     },
     {
       name: 'relatedPosts',

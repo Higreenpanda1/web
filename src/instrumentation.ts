@@ -12,8 +12,10 @@
  *     publishing work end to end
  *   - once a day, in the small hours China time: the content jobs
  *     (src/lib/automation/drafts.ts) — enrich imported articles with takeaways
- *     and questions, translate what is Arabic-only, and write the week's draft
- *     from the content queue. These only run when ANTHROPIC_API_KEY is set.
+ *     and questions, translate what is Arabic-only, run the weekly market
+ *     research (src/lib/automation/research/) on its day, write the week's
+ *     articles from the content queue on theirs, and email the owner a
+ *     digest. These only run when ANTHROPIC_API_KEY is set.
  *
  * Disabled with AUTOMATION=off, and never started at build time or in the
  * Edge runtime. Each tick is guarded so one failure cannot stop the loop.

@@ -73,6 +73,7 @@ export interface Config {
     posts: Post;
     categories: Category;
     topics: Topic;
+    'research-runs': ResearchRun;
     testimonials: Testimonial;
     'team-members': TeamMember;
     media: Media;
@@ -94,6 +95,7 @@ export interface Config {
     posts: PostsSelect<false> | PostsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     topics: TopicsSelect<false> | TopicsSelect<true>;
+    'research-runs': ResearchRunsSelect<false> | ResearchRunsSelect<true>;
     testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
     'team-members': TeamMembersSelect<false> | TeamMembersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
@@ -725,6 +727,21 @@ export interface Post {
    */
   readingMinutes?: number | null;
   /**
+   * The service this article leads to. Its card — price, what is included, the application button — is shown after the article and in the sidebar.
+   */
+  ctaService?: (number | null) | Service;
+  /**
+   * Where the figures come from: official bodies, statistics offices, the exchange, the port. Shown at the end of the article and emitted as citations for search and AI engines.
+   */
+  sources?:
+    | {
+        title: string;
+        url: string;
+        publisher?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
    * Leave empty to show the latest articles from the same category.
    */
   relatedPosts?: (number | Post)[] | null;
@@ -813,9 +830,70 @@ export interface Topic {
    */
   post?: (number | null) | Post;
   /**
+   * Who put this here: a person, the weekly research job, or a trend it caught.
+   */
+  source?: ('editor' | 'research' | 'trend') | null;
+  /**
+   * What the searcher wants. Commercial and transactional topics lead to a service.
+   */
+  intent?: ('informational' | 'commercial' | 'transactional') | null;
+  /**
+   * The service this article should sell. Its card is shown inside the article and the writer links to it.
+   */
+  targetService?: (number | null) | Service;
+  /**
+   * Research estimate of demand and fit, 0–100. Sets the priority for research topics.
+   */
+  demandScore?: number | null;
+  /**
+   * Who searches for this, e.g. "Saudi importer placing a first order".
+   */
+  audience?: string | null;
+  /**
+   * An event that makes this timely (Canton Fair, Ramadan stock, year-end).
+   */
+  seasonalHook?: string | null;
+  /**
+   * The search signals this topic was chosen on: autocomplete phrases, trends, keyword data. Not published.
+   */
+  evidence?: string | null;
+  /**
    * Anything the writer should know. Not published.
    */
   notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * What the weekly research job found and which topics it queued. Read-only; the topics themselves are in the content queue.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "research-runs".
+ */
+export interface ResearchRun {
+  id: number;
+  ranAt: string;
+  /**
+   * One line: what was gathered and what was queued.
+   */
+  summary: string;
+  topicsAdded?: number | null;
+  /**
+   * The full report: signals, candidates, the topics chosen and the reasons.
+   */
+  report?: string | null;
+  /**
+   * The raw signals the run gathered, for anyone checking the reasoning.
+   */
+  signals?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1114,6 +1192,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'topics';
         value: number | Topic;
+      } | null)
+    | ({
+        relationTo: 'research-runs';
+        value: number | ResearchRun;
       } | null)
     | ({
         relationTo: 'testimonials';
@@ -1453,6 +1535,15 @@ export interface PostsSelect<T extends boolean = true> {
   focusKeyword?: T;
   localesAvailable?: T;
   readingMinutes?: T;
+  ctaService?: T;
+  sources?:
+    | T
+    | {
+        title?: T;
+        url?: T;
+        publisher?: T;
+        id?: T;
+      };
   relatedPosts?: T;
   legacyPaths?:
     | T
@@ -1497,7 +1588,27 @@ export interface TopicsSelect<T extends boolean = true> {
   status?: T;
   scheduledFor?: T;
   post?: T;
+  source?: T;
+  intent?: T;
+  targetService?: T;
+  demandScore?: T;
+  audience?: T;
+  seasonalHook?: T;
+  evidence?: T;
   notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "research-runs_select".
+ */
+export interface ResearchRunsSelect<T extends boolean = true> {
+  ranAt?: T;
+  summary?: T;
+  topicsAdded?: T;
+  report?: T;
+  signals?: T;
   updatedAt?: T;
   createdAt?: T;
 }

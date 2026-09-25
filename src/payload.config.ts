@@ -16,6 +16,7 @@ import { Media } from '@/collections/Media'
 import { Pages } from '@/collections/Pages'
 import { Posts } from '@/collections/Posts'
 import { Redirects } from '@/collections/Redirects'
+import { ResearchRuns } from '@/collections/ResearchRuns'
 import { Services } from '@/collections/Services'
 import { TeamMembers } from '@/collections/TeamMembers'
 import { Testimonials } from '@/collections/Testimonials'
@@ -94,6 +95,7 @@ export default buildConfig({
     Posts,
     Categories,
     Topics,
+    ResearchRuns,
     Testimonials,
     TeamMembers,
     Media,

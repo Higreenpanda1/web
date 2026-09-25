@@ -172,6 +172,9 @@ export function blogPostingJsonLd(
     ...categories.map((category) => category.title),
   ])
   const words = lexicalToPlainText(post.body).split(/\s+/).filter(Boolean).length
+  const ctaService =
+    typeof post.ctaService === 'object' && post.ctaService ? (post.ctaService as Service) : null
+  const citations = citationsOf(post.sources)
 
   return {
     '@context': 'https://schema.org',
@@ -192,6 +195,22 @@ export function blogPostingJsonLd(
     ...(keywords.length ? { keywords: keywords.join(', ') } : {}),
     ...(categories[0] ? { articleSection: categories[0].title } : {}),
     ...(words ? { wordCount: words } : {}),
+    // What the article is about and what it points at: the search phrase as
+    // the subject, the service it leads to as a mention, the sources its
+    // figures rest on as citations. Answer engines weigh cited figures.
+    ...(post.focusKeyword ? { about: { '@type': 'Thing', name: post.focusKeyword } } : {}),
+    ...(ctaService
+      ? {
+          mentions: {
+            '@type': 'Service',
+            '@id': `${absoluteUrl(locale, `/services/${ctaService.slug}`)}#service`,
+            name: ctaService.title,
+            url: absoluteUrl(locale, `/services/${ctaService.slug}`),
+            provider: { '@id': ORGANISATION_ID },
+          },
+        }
+      : {}),
+    ...(citations.length ? { citation: citations } : {}),
     author: author
       ? personJsonLd(author, locale, settings)
       : { '@type': 'Organization', '@id': ORGANISATION_ID },
@@ -216,6 +235,20 @@ export function blogPostingJsonLd(
       : {}),
     isAccessibleForFree: true,
   }
+}
+
+/** The article's sources as schema.org citations; entries without a real URL are left out. */
+export function citationsOf(sources: Post['sources']) {
+  return (sources ?? [])
+    .filter((source) => source.url && /^https?:\/\//.test(source.url))
+    .map((source) => ({
+      '@type': 'CreativeWork',
+      name: source.title,
+      url: source.url,
+      ...(source.publisher
+        ? { publisher: { '@type': 'Organization', name: source.publisher } }
+        : {}),
+    }))
 }
 
 export function blogCollectionJsonLd(

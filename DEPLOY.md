@@ -739,14 +739,32 @@ is silent until its value is set. All of them are listed with comments in
 | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `INDEXNOW_KEY`                   | Every article that goes live is submitted to IndexNow at once. Any 8–128 hex characters: `openssl rand -hex 16`. The key is served at `/indexnow-key.txt`.                            |
 | `METRICOOL_TOKEN` + ids          | One social post per network (default Facebook and Instagram) is scheduled through Metricool when an article goes live. Token: Metricool → Settings → API. Ids are in `.env.example`. |
-| `ANTHROPIC_API_KEY`              | Nightly: key takeaways and questions are written for articles lacking them; one Arabic-only article gets an English draft. Weekly: one new bilingual draft from the content queue.   |
+| `ANTHROPIC_API_KEY`              | Nightly: key takeaways and questions for articles lacking them; one Arabic-only article gets an English draft. Weekly: market research queues new topics; the week's articles are written from the queue; the owner gets a digest email. |
+| `RESEARCH_*`, `SEMRUSH_API_KEY`  | Research day (default Saturday), topics per week (default 6), request cap, optional Semrush keyword data.                                                                            |
+| `DRAFTS_PER_WEEK` / `DRAFT_WEEKDAYS` | How many articles a week (default 3, on Sunday, Tuesday and Thursday China time) or the exact days.                                                                              |
+| `BLOG_AUTOPUBLISH=true`          | An article that passes the quality gate in both languages is published with a publish date `BLOG_PUBLISH_DELAY_HOURS` (default 48) ahead; the owner has that window to read it. Off by default. |
 | `AUTOMATION=off`                 | Stops all of the above (the scheduler in `src/instrumentation.ts`).                                                                                                                 |
 
-Nothing the Claude jobs write is published on its own. Enrichment adds
-takeaways and questions to articles that are already live; translations and
-new articles are saved as **drafts** for the owner to read and publish in the
-CMS. Publishing is what triggers the announcement — and a publish date in the
-future schedules it, so the owner can line up a month of articles on a Sunday.
+How the week runs, China time, in the small hours: **Saturday** the research
+job gathers Google autocomplete (Arabic and English, Saudi Arabia and the
+Emirates), Google Trends, the trade calendar and — with a key — Semrush data,
+reads what the blog already covers, and queues the topics with the best
+demand and the clearest path to a service (Content queue, `source: research`,
+with the evidence on each; the run is recorded under Market research). The
+digest email goes to `ENQUIRY_NOTIFY_TO` the same night. **Sunday, Tuesday
+and Thursday** an article is written from the top of the queue: a direct
+answer first, figures with sources, internal links from an inventory of real
+pages, the service it sells, takeaways, questions, meta description, in
+Arabic and then English. The quality gate (`src/lib/automation/quality.ts`)
+checks length, the search phrase, links, tone and language; sources whose
+pages do not answer are dropped.
+
+With `BLOG_AUTOPUBLISH` off (the default) every new article is a **draft** for
+the owner to read and publish in the CMS. With it on, an article that passes
+the gate is published with a publish date two days out; it is visible in the
+CMS at once, goes live at that time and is announced then. Anything that
+fails the gate stays a draft with the reasons in the topic's notes.
+Enrichment adds takeaways and questions to articles that are already live.
 
 To run a job by hand from the server:
 
@@ -754,9 +772,18 @@ To run a job by hand from the server:
 cd ~/higreenpanda
 docker compose -f docker-compose.prod.yml run --rm --build tools npm run posts:distribute -- --dry-run
 docker compose -f docker-compose.prod.yml run --rm --build tools npm run posts:enrich -- 5
-docker compose -f docker-compose.prod.yml run --rm --build tools npm run posts:draft
+docker compose -f docker-compose.prod.yml run --rm --build tools npm run posts:research -- --dry-run
+docker compose -f docker-compose.prod.yml run --rm --build tools npm run posts:research
+docker compose -f docker-compose.prod.yml run --rm --build tools npm run posts:draft -- --dry-run
+docker compose -f docker-compose.prod.yml run --rm --build tools npm run posts:draft -- 2
+docker compose -f docker-compose.prod.yml run --rm --build tools npm run posts:digest -- --dry-run
 docker compose -f docker-compose.prod.yml run --rm --build tools npm run seo:indexnow
 ```
+
+`--dry-run` on research prints the report without queuing anything; on draft
+it writes the article and prints the quality report without saving it. The
+number after `posts:draft` writes that many articles from the queue in one go —
+the way to fill a fortnight after the first deploy.
 
 The last one submits every live URL once; run it after the first deploy of the
 imported blog so the search engines learn the 212 new addresses today rather

@@ -50,12 +50,18 @@ npm run test:admin    # the 2FA gate — needs real credentials, see the file he
 npm run posts:distribute -- --dry-run   # what would be announced (IndexNow, Metricool)
 npm run posts:enrich -- 3               # takeaways + questions for 3 articles (needs ANTHROPIC_API_KEY)
 npm run posts:translate                 # English draft for one Arabic-only article
-npm run posts:draft                     # one bilingual draft from the content queue
+npm run posts:research -- --dry-run     # weekly market research: the report, nothing queued
+npm run posts:research                  # …and queue the topics it chose (needs ANTHROPIC_API_KEY)
+npm run posts:draft -- --dry-run        # write the next article and print its quality report
+npm run posts:draft -- 2                # write two articles from the queue
+npm run posts:digest -- --dry-run       # the weekly owner email, printed
 npm run seo:indexnow                    # submit every live URL to IndexNow once
 ```
 
 In production the same jobs run on a timer inside the app
-(`src/instrumentation.ts`); see DEPLOY.md §8b for the switches.
+(`src/instrumentation.ts`): research on Saturday night, articles on Sunday,
+Tuesday and Thursday, all China time; see DEPLOY.md §8b for the switches,
+including `BLOG_AUTOPUBLISH`.
 
 `npm run test:e2e` needs a server already running. It drives a real browser at
 phone width: 23 routes for the status they should return, then the Arabic type

@@ -8,7 +8,12 @@
  * already free-standing and will not need to change.
  */
 const DISTRIBUTE_EVERY_MS = 10 * 60_000
-/** Hour (China time) after which the daily content jobs may run. */
+/**
+ * Hour (China time) after which the daily content jobs may run. Three in the
+ * morning in Shenzhen is ten at night in Riyadh: research and writing happen
+ * while the audience sleeps, and an article published with a two-day delay
+ * goes live in their working day.
+ */
 const CONTENT_JOBS_AFTER_HOUR = 3
 
 let started = false

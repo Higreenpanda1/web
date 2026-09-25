@@ -8,12 +8,15 @@ import 'dotenv/config'
  *   npm run posts:distribute   announce articles that have gone live
  *   npm run posts:enrich       takeaways + questions for articles lacking them
  *   npm run posts:translate    English draft for one Arabic-only article
- *   npm run posts:draft        one new bilingual draft from the content queue
+ *   npm run posts:research     weekly market research → new topics in the queue
+ *   npm run posts:draft        one new bilingual article from the content queue
+ *   npm run posts:digest       the weekly summary email to the owner
  *   npm run seo:indexnow       submit every live URL to IndexNow once
  *   npm run posts:rewrite-archive -- [n] [--slug=x] [--parallel=3] [--force]
  *                              rewrite the recovered archive (src/seed/wp/posts.json)
  *
- * Add `-- --dry-run` to distribute to see what would be announced.
+ * Add `-- --dry-run` to distribute, research, draft or digest to see what
+ * would happen without writing anything.
  */
 async function main() {
   const [command, ...flags] = process.argv.slice(2)
@@ -47,7 +50,29 @@ async function main() {
     case 'draft': {
       requireKey()
       const { draftFromQueue } = await import('@/lib/automation/drafts')
-      await draftFromQueue()
+      const count = Number(flags.find((flag) => /^\d+$/.test(flag)) ?? '1') || 1
+      for (let i = 0; i < count; i++) {
+        const outcome = await draftFromQueue({ dryRun })
+        if (!outcome && !dryRun) break
+      }
+      break
+    }
+    case 'research': {
+      requireKey()
+      const { researchTopics } = await import('@/lib/automation/research/plan')
+      const limit = Number(flags.find((flag) => /^\d+$/.test(flag)) ?? '0') || undefined
+      const result = await researchTopics({ limit, dryRun })
+      if (result) {
+        console.log(result.report)
+        console.log(
+          `\n${dryRun ? 'would queue' : 'queued'} ${result.added.length} topic(s), skipped ${result.skipped.length}`,
+        )
+      }
+      break
+    }
+    case 'digest': {
+      const { sendWeeklyDigest } = await import('@/lib/automation/digest')
+      console.log(await sendWeeklyDigest({ dryRun }))
       break
     }
     case 'rewrite-archive': {
@@ -154,7 +179,7 @@ async function main() {
     }
     default:
       console.error(
-        'usage: npm run automation -- <distribute|enrich|translate|draft|indexnow|rewrite-archive|rewrite-packs|rewrite-apply> [--dry-run] [n]',
+        'usage: npm run automation -- <distribute|enrich|translate|research|draft|digest|publish|indexnow|rewrite-archive|rewrite-packs|rewrite-apply|links-packs|links-apply|translate-packs> [--dry-run] [n]',
       )
       process.exit(2)
   }

@@ -5,7 +5,9 @@ import { notFound, redirect } from 'next/navigation'
 import { AuthorCard } from '@/components/blog/AuthorCard'
 import { KeyTakeaways } from '@/components/blog/KeyTakeaways'
 import { PostNav } from '@/components/blog/PostNav'
+import { ServiceCta } from '@/components/blog/ServiceCta'
 import { ShareLinks } from '@/components/blog/ShareLinks'
+import { Sources } from '@/components/blog/Sources'
 import { TableOfContents } from '@/components/blog/TableOfContents'
 import { ContactPanel } from '@/components/home/ContactPanel'
 import { JsonLd } from '@/components/JsonLd'
@@ -26,7 +28,7 @@ import { buildMetadata, mediaSrc } from '@/lib/seo'
 import { absoluteUrl } from '@/lib/url'
 
 import type { Locale } from '@/i18n/routing'
-import type { Category, Media, Post, TeamMember } from '@/payload-types'
+import type { Category, Media, Post, Service, TeamMember } from '@/payload-types'
 import type { Metadata } from 'next'
 
 function localesOf(post: Post): Locale[] {
@@ -129,6 +131,8 @@ export default async function PostPage({
   const headings = extractHeadings(post.body)
   const takeaways = post.keyTakeaways ?? []
   const faqs = (post.faqs ?? []).map((item) => ({ question: item.question, answer: item.answer }))
+  const ctaService =
+    typeof post.ctaService === 'object' && post.ctaService ? (post.ctaService as Service) : null
   const url = absoluteUrl(locale, `/blog/${slug}`)
   // "Updated on" only when a person edited the article after it was created:
   // the import and the migration both set updatedAt without changing a word.
@@ -241,6 +245,12 @@ export default async function PostPage({
                 }
               />
 
+              {ctaService ? (
+                <div className="mt-12">
+                  <ServiceCta service={ctaService} locale={locale} settings={settings} />
+                </div>
+              ) : null}
+
               {faqs.length > 0 ? (
                 <section aria-labelledby="faq-heading" className="mt-14">
                   <h2 id="faq-heading" className="text-h2">
@@ -249,6 +259,12 @@ export default async function PostPage({
                   <Accordion items={faqs} className="mt-5" />
                 </section>
               ) : null}
+
+              <Sources
+                items={post.sources ?? []}
+                title={t('blog.sourcesTitle')}
+                lead={t('blog.sourcesLead')}
+              />
 
               <div className="mt-12 border-t border-border-soft pt-8">
                 <ShareLinks
@@ -293,6 +309,14 @@ export default async function PostPage({
             <aside className="hidden lg:block">
               <div className="sticky top-28 space-y-6">
                 <TableOfContents headings={headings} title={t('blog.contents')} />
+                {ctaService ? (
+                  <ServiceCta
+                    service={ctaService}
+                    locale={locale}
+                    settings={settings}
+                    variant="sidebar"
+                  />
+                ) : null}
                 <div className="rounded-lg bg-gradient-deep p-6 text-text-on-inverse">
                   <p className="text-h3 font-bold">{t('blog.ctaTitle')}</p>
                   <p className="mt-2 text-caption text-white/80">{t('blog.ctaLead')}</p>

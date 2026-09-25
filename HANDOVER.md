@@ -79,6 +79,66 @@ the owner and set them; verify the site in Bing Webmaster Tools; translate the
 set); Semrush had no API units left this session, so no keyword volumes were
 checked — the content queue is built from what customers ask, not from data.
 
+## The weekly engine (25 September 2026, this session) — NOT deployed
+
+The owner asked for the blog to run itself: articles from market research,
+several a week, full SEO / AEO / GEO, following what is trending, and every
+article leading to a sale. Built on the automation from 24 September, in
+`src/lib/automation/`:
+
+- **Market research, weekly** (`research/`): Google autocomplete in Arabic and
+  English for Saudi Arabia and the Emirates (seeds × question and cost
+  modifiers, `seeds.ts`), Google Trends daily RSS filtered to China-trade
+  terms, the trade calendar (`calendar.ts`: Canton Fair, Yiwu, CIIE, Golden
+  Week, Chinese New Year and Ramadan for 2026–2028, peak freight season,
+  White Friday…), and Semrush keyword data when `SEMRUSH_API_KEY` is set
+  (the connector had no API units this session, so that path is tested on a
+  fixture only). Claude turns the signals into topics — search phrase in
+  both languages, brief with the figures to include, intent, audience, the
+  service the article sells, a demand score — and `plan.ts` drops anything
+  the blog already covers (`similarity.ts`, Arabic-normalised token overlap
+  against every live title and keyword). Survivors go to the Content queue
+  with `source: research` and the evidence attached; each run is recorded
+  under **Market research** in the CMS.
+- **Writing, three times a week** (`drafts.ts`, `cadence.ts`): the top of the
+  queue becomes a bilingual article with a 40–70-word direct answer first,
+  figures with their year, 3–6 internal links from an inventory of real
+  pages (unknown links are stripped), one link to the service it sells,
+  takeaways, questions, meta description and 2–5 **sources** (each URL is
+  fetched; ones that do not answer are dropped). The quality gate
+  (`quality.ts`) checks length, the search phrase in title / lead / meta,
+  sections and lists, links, tone (no "cheap", no exclamation marks, no
+  guarantees) and language. With `BLOG_AUTOPUBLISH=true` an article that
+  passes in both languages is published with a publish date 48 hours out —
+  the owner's review window — and announced when it goes live; otherwise
+  (the default) it is a draft with the reasons in the topic's notes.
+- **On the page**: a **service card** after the article and in the sidebar
+  (`ServiceCta.tsx`: price from, what is included, the application form
+  button, WhatsApp pre-filled with the service name) — `ctaService` on
+  Posts, set by the writer from the topic or the category — and a
+  **Sources** list. Structured data gained `citation`, `about` and
+  `mentions` (the service).
+- **Digest email** every research night to `ENQUIRY_NOTIFY_TO`: what went
+  live, what was written, what waits for review, what the market says, what
+  is next in the queue (`digest.ts`, needs `RESEND_API_KEY`, already set).
+- Commands: `posts:research [n] [--dry-run]`, `posts:draft [n] [--dry-run]`,
+  `posts:digest [--dry-run]` (DEPLOY.md §8b).
+
+Migration `20260925_134518_blog_research_automation` adds the Topics and
+Posts fields and the `research_runs` table. Verified locally against
+Postgres 16: typecheck, lint, prettier, 91 unit tests (34 new: calendar,
+parsers, similarity, quality gate, cadence), the seed, the build and the
+article page with a service card and sources. **Not verified**: any call to
+Claude or to Google from this sandbox (its network policy blocks both) — the
+first `posts:research -- --dry-run` on the server is the real test.
+
+To switch it on: deploy, then add to `.env` and restart `app`:
+`ANTHROPIC_API_KEY`, `DRAFTS_PER_WEEK=3`, and — once the owner has read a
+few drafts and trusts them — `BLOG_AUTOPUBLISH=true`. Run
+`posts:research` once by hand so the queue is full before the first draft
+day. `INDEXNOW_KEY` and `METRICOOL_TOKEN` are still unset; without them a
+new article is live but not announced.
+
 ## The archive rewrite (25 September 2026) — deployed
 
 All 212 article versions (112 Arabic, 100 English) were rewritten as full
