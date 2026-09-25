@@ -105,9 +105,15 @@ market**, all phrased with "check the current rule" where it matters:
 - 2024 Company Law 5-year capital rule, the 2026 VAT Law, Apostille (Nov 2023)
 - the EV article's "533,000 exported in 2014" (kept from the original, looks wrong)
 
-57 articles have no inbound link from another article's body yet (they are
-still reached through categories, related articles and older/newer
-navigation). A second pass adding links into them is the next SEO step.
+Follow-up the same day, deployed at `5b81fe3` and verified on the live
+site: the 12 Arabic-only articles were translated, so all 112 articles are
+bilingual (224 versions, 1,128 questions); 155 contextual links were added
+so every article has at least one inbound link from another article
+(median 3; 1,464 internal links, none broken); the two former drafts were
+published (`npm run posts:publish -- <slug>` — the import never publishes
+a draft on its own); an English URL for any future Arabic-only article
+redirects to /en/blog instead of 404. Tools: `posts:links-packs` /
+`posts:links-apply`, `posts:translate-packs`.
 
 ## Where the blog session stopped (24 September 2026)
 
