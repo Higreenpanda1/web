@@ -98,7 +98,10 @@ export const StatsBlock: Block = {
           name: 'value',
           type: 'text',
           required: true,
-          admin: { description: 'Western Arabic numerals in both languages, e.g. 235+.' },
+          admin: {
+            description:
+              'Western Arabic numerals in both languages, e.g. 235+. For a live follower count type {instagram}, {tiktok}, {youtube}, {facebook} or {total}.',
+          },
         },
         { name: 'label', type: 'text', required: true, localized: true },
       ],

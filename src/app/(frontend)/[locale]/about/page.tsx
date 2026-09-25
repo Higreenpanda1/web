@@ -14,6 +14,7 @@ import { Section, SectionHeading } from '@/components/ui/Section'
 import { breadcrumbJsonLd, organisationJsonLd } from '@/lib/jsonld'
 import { getSiteSettings, getTeam } from '@/lib/queries'
 import { buildMetadata, mediaSrc } from '@/lib/seo'
+import { formatCount, getFollowerCounts } from '@/lib/social-followers'
 
 import type { Locale } from '@/i18n/routing'
 import type { Media } from '@/payload-types'
@@ -44,10 +45,11 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
   const { locale } = await params
   setRequestLocale(locale)
 
-  const [t, team, settings] = await Promise.all([
+  const [t, team, settings, followers] = await Promise.all([
     getTranslations({ locale }),
     getTeam(locale),
     getSiteSettings(locale),
+    getFollowerCounts(),
   ])
 
   const founder = team.find((member) => member.isFounder) ?? team[0] ?? null
@@ -95,8 +97,8 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
             items={[
               { value: '235+', label: t('home.stats.cities') },
               { value: '100+', label: t('home.stats.fairs') },
-              { value: '46,000', label: t('home.stats.followers') },
-              { value: '29,000', label: t('home.stats.subscribers') },
+              { value: formatCount(followers.instagram), label: t('home.stats.followers') },
+              { value: formatCount(followers.youtube), label: t('home.stats.subscribers') },
             ]}
           />
         </Container>

@@ -16,6 +16,7 @@ import { ButtonLink } from '@/components/ui/Button'
 import { CountUp } from '@/components/ui/CountUp'
 import { Container } from '@/components/ui/Container'
 import { cn } from '@/lib/cn'
+import { formatCount, getFollowerCounts } from '@/lib/social-followers'
 import { whatsappLink } from '@/lib/url'
 
 import type { Locale } from '@/i18n/routing'
@@ -36,7 +37,7 @@ const STEP_STATE: StepState[] = ['done', 'done', 'now', 'next']
  * hold its own until they arrive.
  */
 export async function Hero({ locale, settings }: { locale: Locale; settings: SiteSetting }) {
-  const t = await getTranslations({ locale })
+  const [t, followers] = await Promise.all([getTranslations({ locale }), getFollowerCounts()])
   const whatsapp = whatsappLink(settings.whatsappNumber, settings.whatsappPrefill ?? undefined)
   const steps = [1, 2, 3, 4] as const
 
@@ -111,7 +112,7 @@ export async function Hero({ locale, settings }: { locale: Locale; settings: Sit
               [
                 ['235+', t('home.stats.cities')],
                 ['100+', t('home.stats.fairs')],
-                ['75K+', t('home.stats.followers')],
+                [formatCount(followers.total), t('home.stats.socialFollowers')],
               ] as const
             ).map(([value, label]) => (
               <div key={label}>
