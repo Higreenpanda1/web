@@ -55,6 +55,9 @@ npm run posts:research                  # …and queue the topics it chose (need
 npm run posts:draft -- --dry-run        # write the next article and print its quality report
 npm run posts:draft -- 2                # write two articles from the queue
 npm run posts:digest -- --dry-run       # the weekly owner email, printed
+npm run posts:plan-pack                 # no API: the research brief for a person or a Claude session
+npm run posts:write-packs               # no API: writing briefs from .plan/topics.json
+npm run posts:write-apply               # no API: validate .write/out/*.json into src/seed/wp/posts.json
 npm run seo:indexnow                    # submit every live URL to IndexNow once
 ```
 

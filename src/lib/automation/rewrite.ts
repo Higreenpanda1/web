@@ -55,6 +55,7 @@ export type LocaleDoc = {
   wordCount: number
   keyTakeaways?: string[]
   faqs?: Array<{ question: string; answer: string }>
+  sources?: Array<{ title: string; url: string; publisher?: string }>
   rewrittenAt?: string
   rewriteModel?: string
   originalWordCount?: number
@@ -65,6 +66,7 @@ export type ArchivePost = {
   publishedAt: string
   status: 'published' | 'draft'
   categories: string[]
+  service?: string | null
   cover: unknown
   images: unknown[]
   legacy: unknown

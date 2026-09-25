@@ -84,7 +84,7 @@ export const TRADE_EVENTS: TradeEvent[] = [
     name: 'China National Day holiday (Golden Week)',
     nameAr: 'عطلة العيد الوطني الصيني',
     start: '10-01',
-    end: '10-08',
+    end: '10-07',
     leadWeeks: 4,
     angle: 'factories and ports close for a week; what to order and ship before it',
   },

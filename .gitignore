@@ -43,3 +43,6 @@ Thumbs.db
 .rewrites/
 .links/
 .translate/
+# Scratch space for the weekly research and writing (packs and drafts)
+.plan/
+.write/

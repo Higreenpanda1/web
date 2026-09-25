@@ -132,7 +132,22 @@ article page with a service card and sources. **Not verified**: any call to
 Claude or to Google from this sandbox (its network policy blocks both) — the
 first `posts:research -- --dry-run` on the server is the real test.
 
-To switch it on: deploy, then add to `.env` and restart `app`:
+**Without the API key (the owner's choice for now)**, the same pipeline
+runs as a Routine — a scheduled Claude Code session every Saturday at 04:47
+Riyadh (Routine "Weekly blog: market research and articles (no API)",
+created 25 September 2026 from this session; manage it under Routines in
+the Claude app) that does the research and writing itself and opens a pull
+request
+(DEPLOY.md §8c; `src/lib/automation/offline.ts`; commands
+`posts:plan-pack`, `posts:write-packs`, `posts:write-apply`). The first run
+was done by hand in this session on 25 September 2026: four articles
+(Hormuz-era shipping routes and costs, the Q4 factory-holiday calendar,
+SABER's 2026 changes, visa-free China for GCC passports) are in
+`src/seed/wp/posts.json` with publish dates on 27 and 29 September and 1
+and 4 October, each with a service card and sources; the report is
+`docs/research/2026-09-25.md`. They go live with the next deploy.
+
+To switch the API path on instead: deploy, then add to `.env` and restart `app`:
 `ANTHROPIC_API_KEY`, `DRAFTS_PER_WEEK=3`, and — once the owner has read a
 few drafts and trusts them — `BLOG_AUTOPUBLISH=true`. Run
 `posts:research` once by hand so the queue is full before the first draft

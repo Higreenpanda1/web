@@ -11,6 +11,9 @@ import 'dotenv/config'
  *   npm run posts:research     weekly market research → new topics in the queue
  *   npm run posts:draft        one new bilingual article from the content queue
  *   npm run posts:digest       the weekly summary email to the owner
+ *   npm run posts:plan-pack    the research brief, for a session without the API
+ *   npm run posts:write-packs  writing briefs from .plan/topics.json
+ *   npm run posts:write-apply  validate .write/out/*.json into src/seed/wp/posts.json
  *   npm run seo:indexnow       submit every live URL to IndexNow once
  *   npm run posts:rewrite-archive -- [n] [--slug=x] [--parallel=3] [--force]
  *                              rewrite the recovered archive (src/seed/wp/posts.json)
@@ -68,6 +71,41 @@ async function main() {
           `\n${dryRun ? 'would queue' : 'queued'} ${result.added.length} topic(s), skipped ${result.skipped.length}`,
         )
       }
+      break
+    }
+    case 'plan-pack': {
+      const { writePlanPack } = await import('@/lib/automation/offline')
+      const dir = flags.find((flag) => flag.startsWith('--dir='))?.slice(6) ?? '.plan'
+      console.log(`wrote ${writePlanPack(dir)} — research, then write ${dir}/topics.json`)
+      break
+    }
+    case 'write-packs': {
+      const { writeArticlePacks } = await import('@/lib/automation/offline')
+      const dir = flags.find((flag) => flag.startsWith('--dir='))?.slice(6) ?? '.write'
+      const planDir = flags.find((flag) => flag.startsWith('--plan='))?.slice(7) ?? '.plan'
+      const result = writeArticlePacks({ planDir, dir })
+      console.log(
+        `wrote ${result.written} writing pack(s) to ${dir}/packs` +
+          (result.rejected.length ? `\nrejected:\n- ${result.rejected.join('\n- ')}` : ''),
+      )
+      break
+    }
+    case 'write-apply': {
+      const { applyArticles } = await import('@/lib/automation/offline')
+      const dir = flags.find((flag) => flag.startsWith('--dir='))?.slice(6) ?? '.write'
+      const from = flags.find((flag) => flag.startsWith('--from='))?.slice(7)
+      const result = await applyArticles({
+        dir,
+        from: from ? new Date(from) : undefined,
+        verify: !flags.includes('--no-verify'),
+      })
+      for (const item of result.applied) {
+        console.log(
+          `applied ${item.slug} → live ${item.publishedAt.slice(0, 16)}Z (${item.words[0]}/${item.words[1]} words)`,
+        )
+      }
+      if (result.rejected.length) console.log(`notes:\n- ${result.rejected.join('\n- ')}`)
+      console.log(`${result.applied.length} applied; commit src/seed/wp/posts.json and deploy`)
       break
     }
     case 'digest': {

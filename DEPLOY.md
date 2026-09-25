@@ -789,6 +789,40 @@ The last one submits every live URL once; run it after the first deploy of the
 imported blog so the search engines learn the 212 new addresses today rather
 than on their next crawl.
 
+### 8c. The weekly engine without the API key — the Routine
+
+The owner asked for no API spend for now, so the same research → topics →
+articles pipeline also runs as a **Routine**: a scheduled Claude Code
+session that does the research and the writing itself, every Saturday, and
+lands the result in git. The commands it uses work for a person too:
+
+```bash
+npm run posts:plan-pack          # .plan/PLAN.md — the research brief (what we sell, what exists, calendar, seeds, rules)
+# research with web search, then write .plan/topics.json (shape in .plan/FORMAT.md)
+npm run posts:write-packs        # .write/packs/<slug>.md — one writing brief per topic, link inventories included
+# write .write/out/<slug>.json per article, both languages (shape in .write/FORMAT.md)
+npm run posts:write-apply        # validates each article (schema, quality gate, links, sources), appends it to
+                                 # src/seed/wp/posts.json with a publish date on the next Sunday/Tuesday/Thursday
+                                 # 09:00 Riyadh, and moves the file to .write/applied/
+```
+
+`write-apply` refuses an article that fails the same gate the API path uses
+(length, the search phrase in title / lead / meta, sections and lists, links
+outside the inventory, tone, language) and prints why. What it accepts is a
+diff in `src/seed/wp/posts.json`; `npm run seed` (inside `ops/deploy.sh`)
+imports it, article by article, and the site publishes each one at its
+date and announces it then. The research report goes to
+`docs/research/<date>.md`.
+
+The Routine ("Weekly blog: market research and articles (no API)", in the
+Claude app under Routines; Saturdays 04:47 Riyadh) pushes a branch
+`claude/weekly-blog-<date>` and opens a pull request against the deploy
+branch with the report as its description — or, when the session has no
+GitHub tools, gives the owner a one-click compare link to open it. To
+put the week live: merge the pull request, then run the one-line deploy
+(§8) — it seeds the new articles and restarts. Nothing reaches the site
+without that merge and deploy.
+
 ---
 
 ## 9. What to watch

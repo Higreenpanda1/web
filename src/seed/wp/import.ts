@@ -33,6 +33,7 @@ type LocaleDoc = {
   wordCount: number
   keyTakeaways?: string[]
   faqs?: Array<{ question: string; answer: string }>
+  sources?: Array<{ title: string; url: string; publisher?: string }>
 }
 
 type ImportedPost = {
@@ -40,6 +41,8 @@ type ImportedPost = {
   publishedAt: string
   status: 'published' | 'draft'
   categories: string[]
+  /** Slug of the service the article leads to (the card after the article). */
+  service?: string | null
   cover: { file: string; alt: { ar: string; en: string } } | null
   images: Array<{ file: string; alt: string }>
   legacy: Partial<Record<'ar' | 'en', { id: string; path: string }>>
@@ -60,6 +63,12 @@ export async function importWordPressPosts(
   let updated = 0
   let skipped = 0
   let redirects = 0
+  const serviceIds = new Map<string, number>()
+  for (const service of (
+    await payload.find({ collection: 'services', limit: 100, depth: 0, select: { slug: true } })
+  ).docs) {
+    serviceIds.set(service.slug, service.id)
+  }
 
   for (const post of posts) {
     const importKey = fingerprint(post)
@@ -101,8 +110,12 @@ export async function importWordPressPosts(
       focusKeyword: arabic.focusKeyword ?? undefined,
       keyTakeaways: (arabic.keyTakeaways ?? []).map((text) => ({ text })),
       faqs: arabic.faqs ?? [],
+      sources: arabic.sources ?? [],
       seo: { description: arabic.seoDescription },
       publishedAt: post.publishedAt,
+      ...(post.service && serviceIds.get(post.service)
+        ? { ctaService: serviceIds.get(post.service) }
+        : {}),
       author: founderId,
       categories: post.categories.flatMap((slug) => {
         const id = categoryIds.get(slug)
@@ -148,6 +161,7 @@ export async function importWordPressPosts(
           focusKeyword: english.focusKeyword ?? undefined,
           keyTakeaways: (english.keyTakeaways ?? []).map((text) => ({ text })),
           faqs: english.faqs ?? [],
+          sources: english.sources ?? [],
           seo: { description: english.seoDescription },
           _status: base._status,
         } as never,
