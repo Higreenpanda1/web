@@ -8,6 +8,8 @@ import {
 } from 'node:fs'
 import path from 'node:path'
 
+import { SERVICES } from '@/seed/content'
+
 import { articleSchema, blocksLinks, blocksWordCount } from './blocks'
 import {
   applyDraft,
@@ -115,11 +117,22 @@ export function applyRewrites(dir: string): { applied: number; rejected: string[
     const problems: string[] = []
     const words = blocksWordCount(draft.body)
     if (words < 1000) problems.push(`only ${words} words`)
-    const allowed = new Set(
-      linkInventory(archive, post, locale)
+    // A link is acceptable if it points at a page that exists in this
+    // language: anything in the inventory, any other published article, any
+    // service page. The inventory is a suggestion to the writer, not a fence.
+    const prefix = locale === 'en' ? '/en' : ''
+    const allowed = new Set([
+      ...(linkInventory(archive, post, locale)
         .match(/^- (\S+)/gm)
-        ?.map((line) => line.slice(2)) ?? [],
-    )
+        ?.map((line) => line.slice(2)) ?? []),
+      ...archive.posts
+        .filter(
+          (other) =>
+            other.slug !== post.slug && other.status === 'published' && other.locales[locale],
+        )
+        .map((other) => `${prefix}/blog/${other.slug}`),
+      ...SERVICES.map((service) => `${prefix}/services/${service.slug}`),
+    ])
     const links = blocksLinks(draft.body)
     const bad = links.filter((href) => !allowed.has(href))
     if (bad.length) problems.push(`links not in inventory: ${bad.join(', ')}`)

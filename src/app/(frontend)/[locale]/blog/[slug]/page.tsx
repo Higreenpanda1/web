@@ -19,7 +19,7 @@ import { Eyebrow } from '@/components/ui/Eyebrow'
 import { Section, SectionHeading } from '@/components/ui/Section'
 import { formatDate, isoDate } from '@/i18n/format'
 import { Link } from '@/i18n/navigation'
-import { blogPostingJsonLd, breadcrumbJsonLd, faqJsonLd } from '@/lib/jsonld'
+import { blogPostingJsonLd, breadcrumbJsonLd, faqJsonLd, uniqueKeywords } from '@/lib/jsonld'
 import { extractHeadings } from '@/lib/lexical'
 import { getAdjacentPosts, getPostBySlug, getRelatedPosts, getSiteSettings } from '@/lib/queries'
 import { buildMetadata, mediaSrc } from '@/lib/seo'
@@ -78,9 +78,7 @@ export async function generateMetadata({
     ...metadata,
     ...(post.focusKeyword || categories.length
       ? {
-          keywords: [post.focusKeyword, ...categories.map((c) => c.title)].filter(
-            Boolean,
-          ) as string[],
+          keywords: uniqueKeywords([post.focusKeyword, ...categories.map((c) => c.title)]),
         }
       : {}),
     openGraph: {

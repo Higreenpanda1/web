@@ -167,9 +167,10 @@ export function blogPostingJsonLd(
   const categories = (post.categories ?? []).filter(
     (entry): entry is Category => typeof entry === 'object' && entry !== null,
   )
-  const keywords = [post.focusKeyword, ...categories.map((category) => category.title)].filter(
-    (value): value is string => Boolean(value),
-  )
+  const keywords = uniqueKeywords([
+    post.focusKeyword,
+    ...categories.map((category) => category.title),
+  ])
   const words = lexicalToPlainText(post.body).split(/\s+/).filter(Boolean).length
 
   return {
@@ -269,4 +270,19 @@ export function faqJsonLd(items: Array<{ question: string; answer: string }>) {
       acceptedAnswer: { '@type': 'Answer', text: item.answer },
     })),
   }
+}
+
+/** Keywords without blanks or case-insensitive repeats, in their first-seen order. */
+export function uniqueKeywords(values: Array<string | null | undefined>): string[] {
+  const seen = new Set<string>()
+  const out: string[] = []
+  for (const value of values) {
+    const trimmed = value?.trim()
+    if (!trimmed) continue
+    const key = trimmed.toLowerCase()
+    if (seen.has(key)) continue
+    seen.add(key)
+    out.push(trimmed)
+  }
+  return out
 }
