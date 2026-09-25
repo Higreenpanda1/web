@@ -100,6 +100,42 @@ async function main() {
       )
       break
     }
+    case 'publish': {
+      // Publish articles by slug, e.g. drafts the import will not publish on
+      // its own (it never re-publishes what is a draft in the CMS).
+      const slugs = flags.filter((flag) => !flag.startsWith('--'))
+      if (slugs.length === 0) {
+        console.error('usage: npm run posts:publish -- <slug> [slug…]')
+        process.exit(2)
+      }
+      const { getPayloadClient } = await import('@/lib/payload')
+      const payload = await getPayloadClient()
+      for (const slug of slugs) {
+        const found = await payload.find({
+          collection: 'posts',
+          where: { slug: { equals: slug } },
+          limit: 1,
+          depth: 0,
+          draft: true,
+        })
+        const post = found.docs[0]
+        if (!post) {
+          console.log(`${slug}: not found`)
+          continue
+        }
+        for (const locale of (post.localesAvailable ?? ['ar']) as Array<'ar' | 'en'>) {
+          await payload.update({
+            collection: 'posts',
+            id: post.id,
+            locale,
+            depth: 0,
+            data: { _status: 'published' },
+          })
+        }
+        console.log(`${slug}: published`)
+      }
+      break
+    }
     case 'indexnow': {
       const { submitEverythingToIndexNow } = await import('@/lib/automation/distribute')
       const count = await submitEverythingToIndexNow()

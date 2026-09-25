@@ -36,7 +36,8 @@
     "posts:rewrite-packs": "npm run automation -- rewrite-packs",
     "posts:rewrite-apply": "npm run automation -- rewrite-apply",
     "posts:links-packs": "npm run automation -- links-packs",
-    "posts:links-apply": "npm run automation -- links-apply"
+    "posts:links-apply": "npm run automation -- links-apply",
+    "posts:publish": "npm run automation -- publish"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.128.0",
