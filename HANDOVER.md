@@ -79,6 +79,36 @@ the owner and set them; verify the site in Bing Webmaster Tools; translate the
 set); Semrush had no API units left this session, so no keyword volumes were
 checked — the content queue is built from what customers ask, not from data.
 
+## The archive rewrite (25 September 2026) — deployed
+
+All 212 article versions (112 Arabic, 100 English) were rewritten as full
+guides and deployed at `b433383`. Averages went from 389 to 1,525 words
+(Arabic) and 415 to 1,499 (English). Every article has takeaways, 3–6
+questions with answers (FAQPage schema), a focus keyword, a meta
+description and 4–7 internal links; 1,239 links in total, none broken.
+The owner asked for no API spend, so the writing was done by agents in the
+editor session through `npm run posts:rewrite-packs` → write JSON →
+`npm run posts:rewrite-apply` (validation: schema, length, links, language).
+`npm run posts:rewrite-archive` does the same through the API when a key
+exists.
+
+Writers corrected plainly wrong or outdated claims (2020 Foreign
+Investment Law, CIQ inside GACC since 2018, EXW/FOB caveats, bank-transfer
+advice, a South Korea "land route", mistranslated Hainan) and removed
+contact blocks and a competitor's promotion. They also added some facts
+from general knowledge. **Worth a spot-check by someone who knows the
+market**, all phrased with "check the current rule" where it matters:
+- mBridge participants and the UAE's January 2024 digital-dirham payment
+- visa-free entry for Gulf passports and the 240-hour transit rule
+- GCC 5% duty, Saudi 15% / UAE 5% VAT, SABER
+- China's CNY 5,000 / 26,000 cross-border e-commerce limits
+- 2024 Company Law 5-year capital rule, the 2026 VAT Law, Apostille (Nov 2023)
+- the EV article's "533,000 exported in 2014" (kept from the original, looks wrong)
+
+57 articles have no inbound link from another article's body yet (they are
+still reached through categories, related articles and older/newer
+navigation). A second pass adding links into them is the next SEO step.
+
 ## Where the blog session stopped (24 September 2026)
 
 - **Commit `8fcec67` is pushed and NOT deployed.** It carries the blog import,
