@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 import { getPayload } from 'payload'
 
 import config from '../payload.config'
-import { CATEGORIES, FOUNDER, POSTS, REDIRECTS, SERVICES } from './content'
+import { CATEGORIES, FOUNDER, POSTS, REDIRECTS, SERVICES, TEAM } from './content'
 import { TOPICS } from './topics'
 import { importWordPressPosts } from './wp/import'
 
@@ -125,6 +125,37 @@ async function main() {
     },
   )
   console.log(`  founder id ${founderId}`)
+
+  console.log('→ Team')
+  for (const member of TEAM) {
+    const photoId = await upsertMedia(payload, {
+      filePath: path.join(
+        path.dirname(fileURLToPath(import.meta.url)),
+        'assets',
+        `team-${member.slug}.jpg`,
+      ),
+      alt: {
+        ar: `${member.ar.name}، ${member.ar.role} في هاي جرين باندا`,
+        en: `${member.en.name}, ${member.en.role} at HiGreenPanda`,
+      },
+    })
+    await upsert(
+      payload,
+      'team-members',
+      { slug: { equals: member.slug } },
+      {
+        ar: {
+          slug: member.slug,
+          name: member.ar.name,
+          role: member.ar.role,
+          isFounder: false,
+          order: member.order,
+          photo: photoId,
+        },
+        en: { name: member.en.name, role: member.en.role },
+      },
+    )
+  }
 
   console.log('→ Services')
   for (const service of SERVICES) {

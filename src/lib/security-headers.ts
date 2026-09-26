@@ -39,7 +39,8 @@ export function buildCsp(nonce: string, isProduction: boolean): string {
     'script-src': scriptSrc,
     'style-src': styleSrc,
     // data: covers the inlined blur placeholders next/image generates.
-    'img-src': ["'self'", 'data:', 'blob:'],
+    // i.ytimg.com: the thumbnails in the homepage's latest-videos band.
+    'img-src': ["'self'", 'data:', 'blob:', 'https://i.ytimg.com'],
     'font-src': ["'self'"],
     'connect-src': ["'self'"],
     'media-src': ["'self'"],

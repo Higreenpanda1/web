@@ -1,7 +1,7 @@
 import { Handshake, MapPinned, MessageSquareText, Receipt } from 'lucide-react'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
-import Image from 'next/image'
 
+import { TeamMemberCard } from '@/components/about/TeamMemberCard'
 import { ContactPanel } from '@/components/home/ContactPanel'
 import { FounderCard } from '@/components/home/FounderCard'
 import { StatsBand } from '@/components/home/StatsBand'
@@ -13,10 +13,9 @@ import { PageHero } from '@/components/ui/PageHero'
 import { Section, SectionHeading } from '@/components/ui/Section'
 import { breadcrumbJsonLd, organisationJsonLd } from '@/lib/jsonld'
 import { getSiteSettings, getTeam } from '@/lib/queries'
-import { buildMetadata, mediaSrc } from '@/lib/seo'
+import { buildMetadata } from '@/lib/seo'
 
 import type { Locale } from '@/i18n/routing'
-import type { Media } from '@/payload-types'
 import type { Metadata } from 'next'
 
 export async function generateMetadata({
@@ -52,6 +51,8 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
 
   const founder = team.find((member) => member.isFounder) ?? team[0] ?? null
   const others = team.filter((member) => member.id !== founder?.id)
+  const left = others.slice(0, Math.ceil(others.length / 2))
+  const right = others.slice(left.length)
 
   // The brand personality table (brief section 10), as the four things a
   // visitor can hold us to.
@@ -135,32 +136,25 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         </ul>
       </Section>
 
-      {others.length > 0 ? (
+      {founder && others.length > 0 ? (
         <Section tone="sunken" labelledBy="team-heading">
-          <SectionHeading id="team-heading" title={t('about.teamTitle')} />
-          <ul className="grid list-none gap-5 p-0 sm:grid-cols-2 lg:grid-cols-3">
-            {others.map((member) => {
-              const photo = typeof member.photo === 'object' ? (member.photo as Media) : null
-              const src = mediaSrc(photo, 'thumbnail')
-              return (
-                <Card as="li" key={member.id}>
-                  {src ? (
-                    <Image
-                      src={src}
-                      alt={photo?.alt ?? member.name}
-                      width={320}
-                      height={320}
-                      sizes="320px"
-                      className="mb-4 size-20 rounded-full object-cover"
-                    />
-                  ) : null}
-                  <h3>{member.name}</h3>
-                  <p className="text-text-muted">{member.role}</p>
-                  {member.bio ? <p className="mt-3">{member.bio}</p> : null}
-                </Card>
-              )
-            })}
-          </ul>
+          <SectionHeading id="team-heading" title={t('about.teamTitle')} align="center" />
+          {/* The owner's team sheet: the founder in the middle, the team split
+              either side of him in order. On a phone it is one column, founder
+              first. */}
+          <div className="grid gap-5 lg:grid-cols-[1fr_1.6fr_1fr] lg:items-center">
+            <TeamMemberCard member={founder} featured className="lg:col-start-2 lg:row-start-1" />
+            <ul className="grid list-none grid-cols-2 gap-4 p-0 sm:gap-5 lg:col-start-1 lg:row-start-1 lg:grid-cols-1">
+              {left.map((member) => (
+                <TeamMemberCard key={member.id} as="li" member={member} />
+              ))}
+            </ul>
+            <ul className="grid list-none grid-cols-2 gap-4 p-0 sm:gap-5 lg:col-start-3 lg:row-start-1 lg:grid-cols-1">
+              {right.map((member) => (
+                <TeamMemberCard key={member.id} as="li" member={member} />
+              ))}
+            </ul>
+          </div>
         </Section>
       ) : null}
 

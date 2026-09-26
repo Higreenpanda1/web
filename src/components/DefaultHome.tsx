@@ -5,6 +5,7 @@ import { ContactPanel } from '@/components/home/ContactPanel'
 import { FounderCard } from '@/components/home/FounderCard'
 import { Hero } from '@/components/home/Hero'
 import { Journey, type JourneyStep } from '@/components/home/Journey'
+import { LatestVideos } from '@/components/home/LatestVideos'
 import { PostCard } from '@/components/PostCard'
 import { CategoryTiles } from '@/components/services/CategoryTiles'
 import { ButtonLink } from '@/components/ui/Button'
@@ -188,6 +189,8 @@ export async function DefaultHome({ locale }: { locale: Locale }) {
           </h2>
         </Section>
       ) : null}
+
+      <LatestVideos locale={locale} channelUrl={settings.social?.youtube} />
 
       <Section tone="sunken" labelledBy="home-contact-heading" className="pt-4 md:pt-8">
         <ContactPanel

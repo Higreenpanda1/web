@@ -345,6 +345,55 @@ export const FOUNDER = {
 }
 
 /**
+ * The rest of the team, in the order of the owner's team sheet (26 September
+ * 2026): the first three sit left of the founder on the About page, the last
+ * three right. Photos are in `assets/team-<slug>.jpg`.
+ */
+export const TEAM: Array<{
+  slug: string
+  order: number
+  ar: { name: string; role: string }
+  en: { name: string; role: string }
+}> = [
+  {
+    slug: 'fang-jing',
+    order: 10,
+    ar: { name: 'فانغ جينغ', role: 'تأسيس الشركات' },
+    en: { name: 'Fang Jing', role: 'Company Formation' },
+  },
+  {
+    slug: 'vicky',
+    order: 20,
+    ar: { name: 'فيكي', role: 'الشحن والخدمات اللوجستية' },
+    en: { name: 'Vicky', role: 'Shipping & Logistics' },
+  },
+  {
+    slug: 'amber',
+    order: 30,
+    ar: { name: 'أمبر', role: 'المحاسبة' },
+    en: { name: 'Amber', role: 'Accounting' },
+  },
+  {
+    slug: 'huang',
+    order: 40,
+    ar: { name: 'هوانغ', role: 'الخدمات القانونية' },
+    en: { name: 'Huang', role: 'Legal Services' },
+  },
+  {
+    slug: 'yuan',
+    order: 50,
+    ar: { name: 'يوان', role: 'الخدمات القانونية' },
+    en: { name: 'Yuan', role: 'Legal Services' },
+  },
+  {
+    slug: 'cindy',
+    order: 60,
+    ar: { name: 'سيندي', role: 'الشؤون الإدارية' },
+    en: { name: 'Cindy', role: 'Administration' },
+  },
+]
+
+/**
  * 301s for the old site's URLs. `/en/home/` in particular is called out in the
  * brief: it is the English homepage path that still ranks.
  */

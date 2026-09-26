@@ -137,9 +137,10 @@ export const CATALOGUE_SERVICES: SeedService[] = [
       title: 'المحاسبة والإقرارات الضريبية',
       summary:
         'مسك الدفاتر الشهري والإقرارات الضريبية والتقرير السنوي لشركتك في الصين، بيد محاسبين مرخّصين، حتى تبقى الشركة سليمة أمام الجهات الرسمية.',
-      body: 'الشركة في الصين مطالَبة بإقرار ضريبي شهري أو ربع سنوي وتقرير سنوي حتى لو لم يكن لها أي إيراد. التأخر يعني غرامات، وتكراره يضع الشركة في قائمة الشركات غير المنتظمة، وهو ما يعطّل الحساب البنكي والتأشيرات لاحقًا.\n\nيتولّى فريقنا من المحاسبين المرخّصين في الصين مسك الدفاتر وتقديم الإقرارات في مواعيدها، ويرسل لك ملخصًا شهريًا بالعربية تفهمه دون خلفية محاسبية.\n\n## ما تشمله الخدمة\n\n- تنظيم الفواتير ومراجعتها وإعداد سندات القيد\n- الإقرارات الشهرية وربع السنوية: ضريبة القيمة المضافة وضريبة دخل الشركات\n- إقرار ضريبة الدخل الشخصي للموظفين\n- التقرير السنوي للشركة لدى إدارة تنظيم السوق\n- استشارات ضريبية لتقليل العبء بشكل قانوني\n\nالسعر المبدئي للمؤسسات الصغيرة (دافع الضريبة صغير الحجم). الشركات ذات النظام الضريبي العام تُسعَّر حسب حجم العمليات.',
+      body: 'الشركة في الصين مطالَبة بإقرار ضريبي شهري أو ربع سنوي وتقرير سنوي حتى لو لم يكن لها أي إيراد. التأخر يعني غرامات، وتكراره يضع الشركة في قائمة الشركات غير المنتظمة، وهو ما يعطّل الحساب البنكي والتأشيرات لاحقًا.\n\nيتولّى فريقنا من المحاسبين المرخّصين في الصين مسك الدفاتر وتقديم الإقرارات في مواعيدها، ويرسل لك ملخصًا شهريًا بالعربية تفهمه دون خلفية محاسبية.\n\n## ما تشمله الخدمة\n\n- تنظيم الفواتير ومراجعتها وإعداد سندات القيد\n- الإقرارات الشهرية وربع السنوية: ضريبة القيمة المضافة وضريبة دخل الشركات\n- إقرار ضريبة الدخل الشخصي للموظفين\n- التقرير السنوي للشركة لدى إدارة تنظيم السوق\n- استشارات ضريبية لتقليل العبء بشكل قانوني\n\nالسعر المبدئي للمؤسسات الصغيرة (دافع الضريبة صغير الحجم). الشركات ذات النظام الضريبي العام تُسعَّر حسب حجم العمليات.\n\n## شهادة المحاسبة\n\nنقدّم الخدمة بموجب شهادة وكالة المحاسبة المرخّصة الخاصة بنا، وعنوانها المسجّل: الطابق 41، البرج A، مبنى كينغكي 100، رقم 5016 طريق شنان الشرقي، حي لوهو، شنجن (深圳市罗湖区深南东路5016号京基一百大厦A座41楼).',
       highlights: [
         'محاسبون مرخّصون في الصين',
+        'وكالة محاسبة مرخّصة، مبنى كينغكي 100، شنجن',
         'الإقرارات الشهرية والسنوية في مواعيدها',
         'ملخص شهري بالعربية',
         'تجنّب الغرامات وقوائم الشركات غير المنتظمة',
@@ -151,9 +152,10 @@ export const CATALOGUE_SERVICES: SeedService[] = [
       title: 'Accounting and tax filing',
       summary:
         'Monthly bookkeeping, tax returns and the annual report for your Chinese company, by licensed accountants, so it stays in good standing with the authorities.',
-      body: 'A company in China must file a monthly or quarterly tax return and an annual report even when it has no revenue. Missing one means a fine; missing several puts the company on the irregular list, which later blocks the bank account and visas.\n\nOur team of accountants licensed in China keeps the books and files on time, and sends you a monthly summary in Arabic you can follow without an accounting background.\n\n## What is included\n\n- Organising and checking invoices, preparing vouchers\n- Monthly and quarterly returns: VAT and corporate income tax\n- Personal income tax filing for employees\n- The company’s annual report to the market regulator\n- Tax advice to reduce the burden legally\n\nThe starting price is for small-scale taxpayers. General taxpayers are priced by transaction volume.',
+      body: 'A company in China must file a monthly or quarterly tax return and an annual report even when it has no revenue. Missing one means a fine; missing several puts the company on the irregular list, which later blocks the bank account and visas.\n\nOur team of accountants licensed in China keeps the books and files on time, and sends you a monthly summary in Arabic you can follow without an accounting background.\n\n## What is included\n\n- Organising and checking invoices, preparing vouchers\n- Monthly and quarterly returns: VAT and corporate income tax\n- Personal income tax filing for employees\n- The company’s annual report to the market regulator\n- Tax advice to reduce the burden legally\n\nThe starting price is for small-scale taxpayers. General taxpayers are priced by transaction volume.\n\n## Our accounting certificate\n\nThe work is done under our licensed accounting agency certificate, registered at 41/F, Tower A, Kingkey 100, 5016 Shennan East Road, Luohu District, Shenzhen (深圳市罗湖区深南东路5016号京基一百大厦A座41楼).',
       highlights: [
         'Accountants licensed in China',
+        'Licensed accounting agency, Kingkey 100, Shenzhen',
         'Monthly and annual filings on time',
         'A monthly summary in Arabic',
         'No fines, no irregular-company listing',
