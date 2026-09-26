@@ -1,6 +1,7 @@
 import { Handshake, MapPinned, MessageSquareText, Receipt } from 'lucide-react'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 
+import { Certificates } from '@/components/about/Certificates'
 import { Licences } from '@/components/about/Licences'
 import { TeamMemberCard } from '@/components/about/TeamMemberCard'
 import { Timeline } from '@/components/about/Timeline'
@@ -167,8 +168,18 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         </Section>
       ) : null}
 
+      <Section labelledBy="certificates-heading">
+        <SectionHeading
+          id="certificates-heading"
+          eyebrow={t('about.certificatesEyebrow')}
+          title={t('about.certificatesTitle')}
+          lead={t('about.certificatesLead')}
+        />
+        <Certificates locale={locale} />
+      </Section>
+
       {founder && others.length > 0 ? (
-        <Section labelledBy="team-heading">
+        <Section tone="sunken" labelledBy="team-heading">
           <SectionHeading id="team-heading" title={t('about.teamTitle')} align="center" />
           {/* The owner's team sheet: the founder in the middle, the team split
               either side of him in order. On a phone it is one column, founder

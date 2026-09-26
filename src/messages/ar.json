@@ -242,7 +242,16 @@
     "licenceCode": "الرمز الائتماني الاجتماعي الموحد",
     "licenceEstablished": "تاريخ التأسيس",
     "licenceView": "عرض الرخصة بالحجم الكامل",
-    "licenceVerify": "تحقّق على gsxt.gov.cn"
+    "licenceVerify": "تحقّق على gsxt.gov.cn",
+    "certificatesEyebrow": "المحاسبة",
+    "certificatesTitle": "شهادات المحاسبة",
+    "certificatesLead": "المؤهلات الوطنية التي يحملها فريق المحاسبة لدينا.",
+    "certificates": {
+      "accounting": "شهادة التأهيل المهني في المحاسبة",
+      "tax": "مستشار ضريبي معتمد",
+      "holder": "أمبر، المحاسبة",
+      "address": "عنوان مكتب المحاسبة"
+    }
   },
   "blog": {
     "title": "المدونة",

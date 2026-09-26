@@ -242,7 +242,16 @@
     "licenceCode": "Unified social credit code",
     "licenceEstablished": "Established",
     "licenceView": "View the full licence",
-    "licenceVerify": "Verify on gsxt.gov.cn"
+    "licenceVerify": "Verify on gsxt.gov.cn",
+    "certificatesEyebrow": "Accounting",
+    "certificatesTitle": "Accounting certificates",
+    "certificatesLead": "The national qualifications held by our accounting team.",
+    "certificates": {
+      "accounting": "Accounting Professional Qualification",
+      "tax": "Certified Tax Advisor",
+      "holder": "Amber, Accounting",
+      "address": "Accounting office address"
+    }
   },
   "blog": {
     "title": "Blog",
