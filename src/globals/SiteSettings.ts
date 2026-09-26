@@ -126,6 +126,76 @@ export const SiteSettings: GlobalConfig = {
           ],
         },
         {
+          label: 'Licences',
+          fields: [
+            {
+              /**
+               * The registered companies behind the brand, shown on the About
+               * page with a photo of each business licence. Deliberately not
+               * localised: the legal name, the credit code and the image are the
+               * same in every language, and the Arabic and English trading names
+               * sit side by side as plain fields. (A non-localised array holding
+               * localised fields loses rows between languages — see primaryNav.)
+               */
+              name: 'licences',
+              type: 'array',
+              labels: { singular: 'Licence', plural: 'Business licences' },
+              admin: {
+                description:
+                  'Each registered company, with a photo of its business licence (营业执照). Shown on the About page so a visitor can check the company is real.',
+              },
+              fields: [
+                {
+                  name: 'legalName',
+                  type: 'text',
+                  required: true,
+                  admin: { description: 'Exactly as printed on the licence, in Chinese.' },
+                },
+                {
+                  type: 'row',
+                  fields: [
+                    { name: 'nameAr', type: 'text', required: true, admin: { width: '50%' } },
+                    { name: 'nameEn', type: 'text', required: true, admin: { width: '50%' } },
+                  ],
+                },
+                {
+                  type: 'row',
+                  fields: [
+                    {
+                      name: 'creditCode',
+                      type: 'text',
+                      required: true,
+                      admin: {
+                        width: '50%',
+                        description:
+                          'The 18-character unified social credit code (统一社会信用代码).',
+                      },
+                    },
+                    {
+                      name: 'established',
+                      type: 'text',
+                      admin: { width: '50%', description: 'As on the licence, e.g. 2025-12-26.' },
+                    },
+                  ],
+                },
+                {
+                  type: 'row',
+                  fields: [
+                    { name: 'cityAr', type: 'text', admin: { width: '50%' } },
+                    { name: 'cityEn', type: 'text', admin: { width: '50%' } },
+                  ],
+                },
+                {
+                  name: 'image',
+                  type: 'upload',
+                  relationTo: 'media',
+                  admin: { description: 'A clear, upright photo or scan of the licence.' },
+                },
+              ],
+            },
+          ],
+        },
+        {
           label: 'Social',
           fields: [
             {

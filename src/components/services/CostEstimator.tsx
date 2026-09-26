@@ -8,7 +8,7 @@ import { ButtonLink } from '@/components/ui/Button'
 import { Eyebrow } from '@/components/ui/Eyebrow'
 import { formatNumber } from '@/i18n/format'
 import { cn } from '@/lib/cn'
-import { QUOTE, quoteTotal, type QuoteSelection } from '@/lib/quote'
+import { QUOTE, isHongKong, quoteTotal, type QuoteSelection } from '@/lib/quote'
 
 import type { Locale } from '@/i18n/routing'
 
@@ -22,6 +22,10 @@ import type { Locale } from '@/i18n/routing'
  * first is a CMS task for later (prices live in src/lib/quote.ts for now); the
  * second is deliberately not done — a half-filled estimate is not consent to
  * be contacted.
+ *
+ * Hong Kong is priced as one package (licence, registered address and
+ * accounting together), so choosing it swaps the mainland questions for that
+ * single line plus the optional Hong Kong bank account.
  */
 export function CostEstimator({ locale, className }: { locale: Locale; className?: string }) {
   const t = useTranslations('estimator')
@@ -29,10 +33,18 @@ export function CostEstimator({ locale, className }: { locale: Locale; className
     city: 'shenzhen',
     registration: 'inPerson',
     address: 'basic',
-    bank: 'inPerson',
+    bank: 'mainland',
     extras: [],
   })
   const { total, hasQuoted } = quoteTotal(sel)
+  const hongKong = isHongKong(sel)
+  // The mainland account cannot be opened for a Hong Kong company and vice
+  // versa, so the bank choice follows the city.
+  const bankOptions = (Object.keys(QUOTE.bank) as Array<keyof typeof QUOTE.bank>).filter((k) =>
+    hongKong ? k !== 'mainland' : k !== 'hongkong',
+  )
+  const bankValue: keyof typeof QUOTE.bank =
+    sel.bank === 'none' ? 'none' : hongKong ? 'hongkong' : 'mainland'
   const Arrow = locale === 'ar' ? ArrowLeft : ArrowRight
   const yuan = (n: number) => `¥${formatNumber(n, locale)}`
 
@@ -66,87 +78,104 @@ export function CostEstimator({ locale, className }: { locale: Locale; className
             value={sel.city}
             onChange={(city) => setSel((s) => ({ ...s, city: city as QuoteSelection['city'] }))}
           />
-          <Choice
-            label={t('registration')}
-            options={(
-              Object.keys(QUOTE.registration) as Array<keyof typeof QUOTE.registration>
-            ).map((k) => ({
-              value: k,
-              label: t(`options.registration.${k}`),
-              price: yuan(QUOTE.registration[k]),
-            }))}
-            value={sel.registration}
-            onChange={(v) =>
-              setSel((s) => ({ ...s, registration: v as QuoteSelection['registration'] }))
-            }
-            stacked
-          />
-          <Choice
-            label={t('address')}
-            options={(Object.keys(QUOTE.address) as Array<keyof typeof QUOTE.address>).map((k) => {
-              const price = QUOTE.address[k]
-              return {
-                value: k,
-                label: t(`options.address.${k}`),
-                price: price === null ? t('quoted') : `${yuan(price)} ${t('perYear')}`,
-              }
-            })}
-            value={sel.address}
-            onChange={(v) => setSel((s) => ({ ...s, address: v as QuoteSelection['address'] }))}
-            stacked
-          />
+          {hongKong ? (
+            <div className="rounded-lg border border-brand-600 bg-surface-tint p-4">
+              <p className="font-medium text-heading">{t('hongKong.title')}</p>
+              <p className="mt-1 text-caption text-text-muted">{t('hongKong.body')}</p>
+              <p className="ltr-nums mt-2 font-bold text-heading">{yuan(QUOTE.hongkong.company)}</p>
+            </div>
+          ) : (
+            <>
+              <Choice
+                label={t('registration')}
+                options={(
+                  Object.keys(QUOTE.registration) as Array<keyof typeof QUOTE.registration>
+                ).map((k) => ({
+                  value: k,
+                  label: t(`options.registration.${k}`),
+                  price: yuan(QUOTE.registration[k]),
+                }))}
+                value={sel.registration}
+                onChange={(v) =>
+                  setSel((s) => ({ ...s, registration: v as QuoteSelection['registration'] }))
+                }
+                stacked
+              />
+              <Choice
+                label={t('address')}
+                options={(Object.keys(QUOTE.address) as Array<keyof typeof QUOTE.address>).map(
+                  (k) => {
+                    const price = QUOTE.address[k]
+                    return {
+                      value: k,
+                      label: t(`options.address.${k}`),
+                      price: price === null ? t('quoted') : `${yuan(price)} ${t('perYear')}`,
+                    }
+                  },
+                )}
+                value={sel.address}
+                onChange={(v) => setSel((s) => ({ ...s, address: v as QuoteSelection['address'] }))}
+                stacked
+              />
+            </>
+          )}
           <Choice
             label={t('bank')}
-            options={(Object.keys(QUOTE.bank) as Array<keyof typeof QUOTE.bank>).map((k) => ({
+            options={bankOptions.map((k) => ({
               value: k,
               label: t(`options.bank.${k}`),
               price: QUOTE.bank[k] ? yuan(QUOTE.bank[k]) : undefined,
             }))}
-            value={sel.bank}
+            value={bankValue}
             onChange={(v) => setSel((s) => ({ ...s, bank: v as QuoteSelection['bank'] }))}
           />
-          <fieldset className="m-0 min-w-0 border-0 p-0">
-            <legend className="mb-2.5 font-semibold text-heading">{t('extras')}</legend>
-            <div className="grid gap-2 sm:grid-cols-2">
-              {(Object.keys(QUOTE.extras) as Array<keyof typeof QUOTE.extras>).map((k) => {
-                const on = sel.extras.includes(k)
-                return (
-                  <label
-                    key={k}
-                    className={cn(
-                      'flex cursor-pointer items-start gap-3 rounded-lg border p-3.5 transition-colors',
-                      on
-                        ? 'border-brand-600 bg-surface-tint'
-                        : 'border-border hover:border-brand-300',
-                    )}
-                  >
-                    <input
-                      type="checkbox"
-                      className="sr-only"
-                      checked={on}
-                      onChange={() => toggleExtra(k)}
-                    />
-                    <span
-                      aria-hidden="true"
+          {hongKong ? null : (
+            <fieldset className="m-0 min-w-0 border-0 p-0">
+              <legend className="mb-2.5 font-semibold text-heading">{t('extras')}</legend>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {(Object.keys(QUOTE.extras) as Array<keyof typeof QUOTE.extras>).map((k) => {
+                  const on = sel.extras.includes(k)
+                  return (
+                    <label
+                      key={k}
                       className={cn(
-                        'mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-sm border',
-                        on ? 'border-brand-700 bg-brand-700 text-white' : 'border-border-strong',
+                        'flex cursor-pointer items-start gap-3 rounded-lg border p-3.5 transition-colors',
+                        on
+                          ? 'border-brand-600 bg-surface-tint'
+                          : 'border-border hover:border-brand-300',
                       )}
                     >
-                      {on ? <Check size={14} strokeWidth={3} /> : null}
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block font-medium">{t(`options.extras.${k}`)}</span>
-                      <span className="ltr-nums block text-caption text-text-muted">
-                        {yuan(QUOTE.extras[k])}
-                        {k === 'accounting' ? ` ${t('perYear')}` : ''}
+                      <input
+                        type="checkbox"
+                        className="sr-only"
+                        checked={on}
+                        onChange={() => toggleExtra(k)}
+                      />
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          'mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-sm border',
+                          on ? 'border-brand-700 bg-brand-700 text-white' : 'border-border-strong',
+                        )}
+                      >
+                        {on ? <Check size={14} strokeWidth={3} /> : null}
                       </span>
-                    </span>
-                  </label>
-                )
-              })}
-            </div>
-          </fieldset>
+                      <span className="min-w-0 flex-1">
+                        <span className="block font-medium">{t(`options.extras.${k}`)}</span>
+                        <span className="ltr-nums block text-caption text-text-muted">
+                          {yuan(QUOTE.extras[k])}
+                          {k === 'accounting' ? ` ${t('perYear')}` : ''}
+                          {k === 'workPermit'
+                            ? ` ${t('govFee', { amount: yuan(QUOTE.workPermitGovernmentFee) })}`
+                            : ''}
+                        </span>
+                      </span>
+                    </label>
+                  )
+                })}
+              </div>
+            </fieldset>
+          )}
         </div>
 
         <aside className="lg:sticky lg:top-[calc(var(--header-height)+1.5rem)] lg:self-start">

@@ -1,7 +1,9 @@
 import { Handshake, MapPinned, MessageSquareText, Receipt } from 'lucide-react'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 
+import { Licences } from '@/components/about/Licences'
 import { TeamMemberCard } from '@/components/about/TeamMemberCard'
+import { Timeline } from '@/components/about/Timeline'
 import { ContactPanel } from '@/components/home/ContactPanel'
 import { FounderCard } from '@/components/home/FounderCard'
 import { StatsBand } from '@/components/home/StatsBand'
@@ -11,7 +13,7 @@ import { Card } from '@/components/ui/Card'
 import { Container } from '@/components/ui/Container'
 import { PageHero } from '@/components/ui/PageHero'
 import { Section, SectionHeading } from '@/components/ui/Section'
-import { breadcrumbJsonLd, organisationJsonLd } from '@/lib/jsonld'
+import { breadcrumbJsonLd, organisationJsonLd, personJsonLd } from '@/lib/jsonld'
 import { getSiteSettings, getTeam } from '@/lib/queries'
 import { buildMetadata } from '@/lib/seo'
 
@@ -70,6 +72,11 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
   return (
     <>
       <JsonLd data={organisationJsonLd(settings, locale)} />
+      {founder ? (
+        <JsonLd
+          data={{ '@context': 'https://schema.org', ...personJsonLd(founder, locale, settings) }}
+        />
+      ) : null}
       <JsonLd
         data={breadcrumbJsonLd(locale, [
           { name: t('nav.home'), path: '/' },
@@ -116,6 +123,18 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         </Section>
       ) : null}
 
+      {founder?.timeline && founder.timeline.length > 0 ? (
+        <Section labelledBy="journey-heading">
+          <SectionHeading
+            id="journey-heading"
+            eyebrow={t('about.journeyEyebrow')}
+            title={t('about.journeyTitle')}
+            lead={t('about.journeyLead')}
+          />
+          <Timeline items={founder.timeline} locale={locale} className="mx-auto max-w-4xl" />
+        </Section>
+      ) : null}
+
       <Section labelledBy="values-heading">
         <SectionHeading
           id="values-heading"
@@ -136,8 +155,20 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         </ul>
       </Section>
 
+      {settings.licences && settings.licences.length > 0 ? (
+        <Section tone="sunken" labelledBy="licences-heading">
+          <SectionHeading
+            id="licences-heading"
+            eyebrow={t('about.licencesEyebrow')}
+            title={t('about.licencesTitle')}
+            lead={t('about.licencesLead')}
+          />
+          <Licences items={settings.licences} locale={locale} />
+        </Section>
+      ) : null}
+
       {founder && others.length > 0 ? (
-        <Section tone="sunken" labelledBy="team-heading">
+        <Section labelledBy="team-heading">
           <SectionHeading id="team-heading" title={t('about.teamTitle')} align="center" />
           {/* The owner's team sheet: the founder in the middle, the team split
               either side of him in order. On a phone it is one column, founder
