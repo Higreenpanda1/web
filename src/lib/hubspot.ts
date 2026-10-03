@@ -91,8 +91,43 @@ function owner(): Record<string, string> {
   return hubspotConfig.ownerId ? { hubspot_owner_id: hubspotConfig.ownerId } : {}
 }
 
+export type HubSpotDocument = { filename: string; mime: string; content: Uint8Array }
+
+/**
+ * Uploads a document to HubSpot's file manager as a private file (only
+ * signed-in users can open it) and returns its id for the note. Needs the
+ * `files` scope on the token; without it this returns null and the note is
+ * created without attachments — the email still carries them.
+ */
+async function uploadDocument(reference: string, doc: HubSpotDocument): Promise<string | null> {
+  try {
+    const form = new FormData()
+    form.append('file', new Blob([new Uint8Array(doc.content)], { type: doc.mime }), doc.filename)
+    form.append('folderPath', `/website-applications/${reference}`)
+    form.append('options', JSON.stringify({ access: 'PRIVATE', overwrite: false }))
+    const response = await fetch('https://api.hubapi.com/files/v3/files', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${hubspotConfig.token}` },
+      body: form,
+      signal: AbortSignal.timeout(30_000),
+    })
+    if (!response.ok) {
+      const text = await response.text().catch(() => '')
+      throw new Error(`HubSpot file upload → ${response.status} ${text.slice(0, 300)}`)
+    }
+    const { id } = (await response.json()) as Created
+    return id
+  } catch (error) {
+    console.error(`[application ${reference}] HubSpot file upload failed`, error)
+    return null
+  }
+}
+
 /** Never throws. Returns true when everything was created. */
-export async function syncApplicationToHubSpot(app: HubSpotApplication): Promise<boolean> {
+export async function syncApplicationToHubSpot(
+  app: HubSpotApplication,
+  documents: HubSpotDocument[] = [],
+): Promise<boolean> {
   if (!hubspotConfig.configured) return false
 
   try {
@@ -112,10 +147,15 @@ export async function syncApplicationToHubSpot(app: HubSpotApplication): Promise
       dealId = deal.id
     }
 
+    const attachmentIds = (
+      await Promise.all(documents.map((doc) => uploadDocument(app.reference, doc)))
+    ).filter((id): id is string => Boolean(id))
+
     await call<Created>('POST', '/crm/v3/objects/notes', {
       properties: {
         hs_timestamp: new Date().toISOString(),
         hs_note_body: noteBody(app),
+        ...(attachmentIds.length ? { hs_attachment_ids: attachmentIds.join(';') } : {}),
         ...owner(),
       },
       associations: [

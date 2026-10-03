@@ -34,6 +34,7 @@ export type FieldKind =
   | 'tel'
   | 'email'
   | 'url'
+  | 'file'
 
 export type FieldDef = {
   name: string
@@ -54,6 +55,12 @@ export type FieldDef = {
    * is never demanded and never stored.
    */
   showIf?: { field: string; in: readonly string[] }
+  /**
+   * For `file` fields: accepted MIME types. Files are checked again on the
+   * server by their first bytes, never trusted from the browser, and kept in
+   * a private folder — see src/lib/documents.ts.
+   */
+  accept?: readonly string[]
 }
 
 export type StepDef = { key: string; fields: readonly FieldDef[] }
@@ -74,9 +81,13 @@ export const CONTACT_STEP: StepDef = {
     { name: 'name', kind: 'text', required: true, width: 'half', max: 120 },
     { name: 'country', kind: 'country', required: true, width: 'half' },
     { name: 'whatsapp', kind: 'tel', required: true, width: 'half', hint: true },
-    { name: 'email', kind: 'email', width: 'half', hint: true },
+    // Required: the client is sent a written confirmation of the request.
+    { name: 'email', kind: 'email', required: true, width: 'half', hint: true },
   ],
 }
+
+/** Photos of an ID page or a stamp: what phones produce, plus PDF scans. */
+export const DOCUMENT_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'] as const
 
 const NOTES: FieldDef = { name: 'notes', kind: 'textarea', rows: 4, max: 4000 }
 
@@ -179,6 +190,13 @@ export const FORMS: Record<ApplicationType, FormDef> = {
             options: YES_NO,
           },
           { name: 'inChinaNow', kind: 'select', required: true, width: 'half', options: YES_NO },
+        ],
+      },
+      {
+        key: 'documents',
+        fields: [
+          { name: 'passport', kind: 'file', required: true, hint: true, accept: DOCUMENT_TYPES },
+          { name: 'entryStamp', kind: 'file', hint: true, accept: DOCUMENT_TYPES },
         ],
       },
       {

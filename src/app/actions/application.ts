@@ -5,8 +5,14 @@ import { headers } from 'next/headers'
 import { getTranslations } from 'next-intl/server'
 
 import { FORMS, allFields } from '@/forms/definitions'
-import { reader, validateApplication } from '@/forms/schema'
-import { sendApplicationNotification, type NotificationRow } from '@/lib/email'
+import { isVisible, reader, validateApplication } from '@/forms/schema'
+import { checkDocuments, documentFileName, formatSize } from '@/lib/documents'
+import { storeDocuments } from '@/lib/documents-store'
+import {
+  sendApplicationConfirmation,
+  sendApplicationNotification,
+  type NotificationRow,
+} from '@/lib/email'
 import { syncApplicationToHubSpot } from '@/lib/hubspot'
 import { isApplicationType } from '@/lib/catalogue'
 import { HONEYPOT_FIELD, TIMESTAMP_FIELD } from '@/lib/form-fields'
@@ -57,9 +63,21 @@ export async function submitApplication(
     return { status: 'error', errorKey: 'rateLimited' }
   }
 
-  const result = validateApplication(def, reader(formData))
-  if (!result.ok) {
-    return { status: 'error', errorKey: 'stepIncomplete', fieldErrors: result.errors }
+  const read = reader(formData)
+  const result = validateApplication(def, read)
+  // Files are checked even when the text has errors, so the visitor hears
+  // about a missing passport in the same round trip, not the next one.
+  const files = await checkDocuments(
+    allFields(def),
+    (name) => formData.get(name),
+    (field) => isVisible(field, read),
+  )
+  if (!result.ok || !files.ok) {
+    return {
+      status: 'error',
+      errorKey: 'stepIncomplete',
+      fieldErrors: { ...(result.ok ? {} : result.errors), ...(files.ok ? {} : files.errors) },
+    }
   }
 
   const { name, country, whatsapp, email, ...details } = result.details as Record<
@@ -74,6 +92,16 @@ export async function submitApplication(
   const payload = await getPayloadClient()
   const reference = generateReference()
   const headline = def.headline(details).slice(0, 200)
+
+  // The documents are written before the row so the row can say where they
+  // are; storeDocuments never throws, and the email carries them regardless.
+  const stored = await storeDocuments(reference, files.documents)
+  for (const doc of files.documents) {
+    const kept = stored.find((item) => item.field === doc.field)
+    details[doc.field] =
+      `${documentFileName(reference, doc)} (${formatSize(doc.bytes.byteLength)})` +
+      (kept ? '' : ' — not saved on the server, see the email')
+  }
 
   try {
     const application = await payload.create({
@@ -107,6 +135,11 @@ export async function submitApplication(
         : null
     const label = await typeLabel(type)
     const rows = await describeDetails(type, details)
+    const attachments = files.documents.map((doc) => ({
+      filename: documentFileName(reference, doc),
+      mime: doc.mime,
+      content: doc.bytes,
+    }))
     const [notified] = await Promise.all([
       sendApplicationNotification({
         reference,
@@ -120,19 +153,24 @@ export async function submitApplication(
         locale,
         sourcePath: headerList.get('x-pathname'),
         rows,
+        attachments,
       }),
       // Best-effort, like the email: logs on failure, never throws.
-      syncApplicationToHubSpot({
-        reference,
-        type,
-        typeLabel: label,
-        name,
-        country,
-        whatsapp,
-        email: email || null,
-        headline,
-        rows,
-      }),
+      syncApplicationToHubSpot(
+        {
+          reference,
+          type,
+          typeLabel: label,
+          name,
+          country,
+          whatsapp,
+          email: email || null,
+          headline,
+          rows,
+        },
+        attachments,
+      ),
+      email ? sendConfirmation({ to: email, name, reference, type, locale }) : false,
     ])
 
     if (notified) {
@@ -188,6 +226,36 @@ async function describeDetails(
     rows.push({ label: t(`fields.${field.name}`), value: rendered })
   }
   return rows
+}
+
+/** The client's confirmation, in the language they filled the form in. */
+async function sendConfirmation(args: {
+  to: string
+  name: string
+  reference: string
+  type: keyof typeof FORMS
+  locale: Locale
+}) {
+  const t = await getTranslations({ locale: args.locale, namespace: 'confirmationEmail' })
+  const apply = await getTranslations({ locale: args.locale, namespace: 'apply' })
+  const typeTitle = apply(`types.${args.type}.title`)
+  const values = { name: args.name, reference: args.reference, type: typeTitle }
+  return sendApplicationConfirmation({
+    to: args.to,
+    name: args.name,
+    reference: args.reference,
+    typeTitle,
+    locale: args.locale,
+    text: {
+      subject: t('subject', values),
+      greeting: t('greeting', values),
+      received: t('received', values),
+      reference: t('reference', values),
+      next: t('next', values),
+      questions: t('questions', values),
+      signoff: t('signoff', values),
+    },
+  })
 }
 
 async function typeLabel(type: keyof typeof FORMS): Promise<string> {

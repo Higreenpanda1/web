@@ -39,7 +39,8 @@ test('missing required fields are reported by name, with catalogue keys', () => 
   assert.equal(result.errors.whatsapp, 'required')
   assert.equal(result.errors.productName, 'required')
   assert.equal(result.errors.quantity, 'required')
-  assert.equal('email' in result.errors, false)
+  // Required since the client is sent a written confirmation.
+  assert.equal(result.errors.email, 'required')
 })
 
 test('a select only accepts its own options', () => {

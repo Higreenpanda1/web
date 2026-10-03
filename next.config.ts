@@ -56,6 +56,15 @@ const nextConfig: NextConfig = {
 
   experimental: {
     optimizePackageImports: ['lucide-react'],
+    // The company-registration form carries a passport photo and an entry
+    // stamp, up to 10 MB each (src/lib/documents.ts). The default 1 MB would
+    // reject the request before the action could say why. The browser shrinks
+    // large photos first, so real requests are far smaller than this.
+    serverActions: { bodySizeLimit: '22mb' },
+    // Middleware runs on the form's page too, and Next truncates any body it
+    // has to clone for middleware at 10 MB by default — a truncated upload
+    // arrives as a broken request. Same ceiling as the action.
+    middlewareClientMaxBodySize: '22mb',
     // The stylesheet is small and every page needs all of it, so a separate
     // request just delays first paint on a slow connection.
     inlineCss: true,

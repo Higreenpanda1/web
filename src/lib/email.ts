@@ -55,6 +55,8 @@ export type ApplicationNotification = {
   locale: string
   sourcePath: string | null
   rows: NotificationRow[]
+  /** Passport and entry stamp, attached as they were uploaded. */
+  attachments?: { filename: string; content: Uint8Array }[]
 }
 
 /**
@@ -64,7 +66,8 @@ export type ApplicationNotification = {
  * function knows nothing about which form it was.
  */
 export async function sendApplicationNotification(app: ApplicationNotification) {
-  if (!emailConfig.configured || emailConfig.notifyTo.length === 0) {
+  const recipients = [...new Set([...emailConfig.notifyTo, ...emailConfig.applicationNotifyTo])]
+  if (!emailConfig.configured || recipients.length === 0) {
     console.warn(
       `[application ${app.reference}] stored, but no email provider is configured — set RESEND_API_KEY.`,
     )
@@ -87,8 +90,14 @@ export async function sendApplicationNotification(app: ApplicationNotification) 
 
   try {
     await payload.sendEmail({
-      to: emailConfig.notifyTo,
+      to: recipients,
       replyTo: app.email || undefined,
+      // Base64 text rather than raw bytes: the Resend adapter passes content
+      // through to a JSON body, where a Buffer would not survive.
+      attachments: (app.attachments ?? []).map((file) => ({
+        filename: file.filename,
+        content: Buffer.from(file.content).toString('base64'),
+      })),
       subject: `New application ${app.reference} — ${summary} — ${app.name} (${app.country})`,
       text: [
         `New application from higreenpanda.com`,
@@ -112,6 +121,70 @@ ${table(app.rows)}
     return true
   } catch (error) {
     console.error(`[application ${app.reference}] notification failed`, error)
+    return false
+  }
+}
+
+export type ApplicationConfirmation = {
+  to: string
+  name: string
+  reference: string
+  typeTitle: string
+  locale: 'ar' | 'en'
+  /** Already-translated lines, from the `confirmationEmail` catalogue. */
+  text: {
+    subject: string
+    greeting: string
+    received: string
+    reference: string
+    next: string
+    questions: string
+    signoff: string
+  }
+}
+
+/**
+ * The client's own copy: we have your request, here is its number, we will
+ * be in touch. Deliberately nothing about prices or payment — the owner's
+ * rule is that payment is discussed person to person, never in an automatic
+ * message. Same contract as the notifications: never throws.
+ */
+export async function sendApplicationConfirmation(confirmation: ApplicationConfirmation) {
+  if (!emailConfig.configured) return false
+  const payload = await getPayloadClient()
+  const { text } = confirmation
+  const dir = confirmation.locale === 'ar' ? 'rtl' : 'ltr'
+  const replyTo = emailConfig.applicationNotifyTo[0] ?? emailConfig.notifyTo[0]
+
+  try {
+    await payload.sendEmail({
+      to: confirmation.to,
+      replyTo,
+      subject: text.subject,
+      text: [
+        text.greeting,
+        '',
+        text.received,
+        text.reference,
+        text.next,
+        '',
+        text.questions,
+        '',
+        text.signoff,
+      ].join('\n'),
+      html: `<!doctype html><html lang="${confirmation.locale}" dir="${dir}"><body style="font-family:system-ui,sans-serif;color:#111;line-height:1.7">
+<h2 style="color:#276B34;margin:0 0 16px">HiGreenPanda</h2>
+<p>${escapeHtml(text.greeting)}</p>
+<p>${escapeHtml(text.received)}</p>
+<p style="background:#F3FAF4;padding:14px;border-radius:8px"><strong>${escapeHtml(text.reference)}</strong></p>
+<p>${escapeHtml(text.next)}</p>
+<p>${escapeHtml(text.questions)}</p>
+<p style="color:#4C574F">${escapeHtml(text.signoff)}<br><a href="https://higreenpanda.com" style="color:#276B34">higreenpanda.com</a></p>
+</body></html>`,
+    })
+    return true
+  } catch (error) {
+    console.error(`[application ${confirmation.reference}] confirmation to client failed`, error)
     return false
   }
 }

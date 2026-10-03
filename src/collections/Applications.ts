@@ -23,10 +23,14 @@ const TYPE_LABELS: Record<(typeof APPLICATION_TYPES)[number], string> = {
  * view can filter and search them), and the type-specific answers in `details`
  * as JSON, rendered read-only in the admin.
  *
- * Deliberately no file uploads. The forms collect information only; passports,
- * business licences and photographs are requested by email or WhatsApp once
- * the team has looked at the request. That was the owner's decision on
- * 23 September 2026, and it keeps identity documents off this server.
+ * File uploads: none until 4 October 2026, when the owner asked for the
+ * passport photo page and the China entry stamp to come with a company
+ * registration (formation cannot start without them). They are checked by
+ * their bytes and kept in a private folder no route serves
+ * (src/lib/documents.ts, src/lib/documents-store.ts); `details` records the
+ * stored file name and size, and the files themselves reach the team as
+ * email attachments and in HubSpot. Other documents are still requested by
+ * email or WhatsApp.
  *
  * Like Enquiries, `create` is closed: submissions come through the server
  * action in src/app/actions/application.ts, using the local API.

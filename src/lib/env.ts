@@ -34,6 +34,14 @@ export const email = {
     .split(',')
     .map((address) => address.trim())
     .filter(Boolean),
+  /**
+   * Application forms also go to these, on top of ENQUIRY_NOTIFY_TO. The
+   * owner reads sami@ and asked for every application there.
+   */
+  applicationNotifyTo: (process.env.APPLICATION_NOTIFY_TO ?? 'sami@higreenpanda.com')
+    .split(',')
+    .map((address) => address.trim())
+    .filter(Boolean),
   configured: Boolean(process.env.RESEND_API_KEY),
 }
 

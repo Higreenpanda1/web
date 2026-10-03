@@ -39,6 +39,8 @@ const ZH_LABELS: Record<string, string> = {
   'Who makes the major decisions?': '重大事项决策人',
   'Would you also like us to arrange…': '其他需要的服务',
   'Anything else we should know': '备注',
+  'Passport photo page': '护照照片页',
+  'China entry stamp': '中国入境章',
 }
 
 const FOLLOW_UP_DAYS = 7

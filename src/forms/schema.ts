@@ -66,6 +66,9 @@ export function validateApplication(def: FormDef, source: Reader): ValidationRes
   for (const field of allFields(def)) {
     // A hidden field is neither required nor kept. The visitor never saw it.
     if (!isVisible(field, source)) continue
+    // Files are not text; the action reads and checks them separately
+    // (src/lib/documents.ts) and adds the result to the details.
+    if (field.kind === 'file') continue
 
     const outcome = checkField(field, source)
     if (outcome.error) {
@@ -96,6 +99,8 @@ function checkField(field: FieldDef, read: Reader): Outcome {
   if (max !== undefined && raw.length > max && field.kind !== 'number') return { error: 'tooLong' }
 
   switch (field.kind) {
+    case 'file':
+      return {}
     case 'text':
     case 'textarea':
     case 'country':

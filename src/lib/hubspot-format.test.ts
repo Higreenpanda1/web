@@ -27,10 +27,7 @@ test('splitName keeps the rest of the name as the last name', () => {
 })
 
 test('deal name is bilingual and carries the reference', () => {
-  assert.equal(
-    dealName(app),
-    'Company Formation / 公司注册 – Naif Albusais – HGA-20261004-ABC123',
-  )
+  assert.equal(dealName(app), 'Company Formation / 公司注册 – Naif Albusais – HGA-20261004-ABC123')
 })
 
 test('note labels get Chinese when known and escape answers', () => {

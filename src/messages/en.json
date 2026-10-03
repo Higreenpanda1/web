@@ -364,7 +364,7 @@
     "optional": "optional",
     "selectPlaceholder": "Select…",
     "consent": "By sending this form you agree that we may contact you about your request. We never share your details.",
-    "documentsNote": "No documents are uploaded here. If your request needs a passport copy or a business licence, we will ask for it by email or WhatsApp once we have reviewed your answers.",
+    "documentsNote": "Files you upload are seen only by our team. If we need anything else, we will ask for it by email or WhatsApp once we have reviewed your answers.",
     "successTitle": "We have your application",
     "successBody": "Thank you. Your reference is {reference}. We will contact you on WhatsApp within one working day.",
     "successAgain": "Send another application",
@@ -390,7 +390,9 @@
       "stepIncomplete": "Please complete the highlighted fields before continuing.",
       "rateLimited": "You have sent several requests in a short time. Please wait a moment and try again.",
       "tooFast": "We could not verify the form. Please try again.",
-      "generic": "Could not send your application. Please try again, or message us on WhatsApp."
+      "generic": "Could not send your application. Please try again, or message us on WhatsApp.",
+      "fileTooBig": "This file is larger than 10 MB. Please send a smaller photo.",
+      "fileType": "Please upload a JPG, PNG or PDF file."
     },
     "types": {
       "consultation": {
@@ -456,7 +458,8 @@
       "service": "The service",
       "account": "The account",
       "store": "The store",
-      "brand": "The trademark"
+      "brand": "The trademark",
+      "documents": "Passport and entry stamp"
     },
     "fields": {
       "name": "Full name",
@@ -464,7 +467,7 @@
       "whatsapp": "WhatsApp number",
       "whatsappHint": "With country code, e.g. +966501234567",
       "email": "Email",
-      "emailHint": "For documents and written confirmations",
+      "emailHint": "We send your confirmation and reference number here",
       "topic": "Topic",
       "stage": "Where you are now",
       "goals": "What would you like to achieve?",
@@ -594,7 +597,11 @@
       "existingRegistration": "Is it registered anywhere else?",
       "existingRegistrationHint": "In your own country or internationally.",
       "capitalCurrency": "Currency of the capital",
-      "duration": "Consultation length"
+      "duration": "Consultation length",
+      "passport": "Passport photo page",
+      "passportHint": "A clear photo or scan of the page with your photo. JPG, PNG or PDF, up to 10 MB.",
+      "entryStamp": "China entry stamp",
+      "entryStampHint": "If you have already entered China, a photo of the entry stamp in your passport. JPG, PNG or PDF, up to 10 MB."
     },
     "options": {
       "common": {
@@ -807,5 +814,14 @@
         "workPermit": "Work permit and residence card"
       }
     }
+  },
+  "confirmationEmail": {
+    "subject": "We received your request {reference}",
+    "greeting": "Hello {name},",
+    "received": "Thank you for choosing HiGreenPanda. We have received your request: {type}.",
+    "reference": "Your reference number is {reference}. Please keep it for any follow-up.",
+    "next": "Our team will review your request and contact you on WhatsApp within one working day.",
+    "questions": "If you have any questions, simply reply to this email.",
+    "signoff": "The HiGreenPanda team"
   }
 }

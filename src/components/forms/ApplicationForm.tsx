@@ -362,6 +362,20 @@ function FieldControl({
         </select>
       )
       break
+    case 'file':
+      control = (
+        <input
+          {...common}
+          type="file"
+          accept={field.accept?.join(',')}
+          onChange={(event) => void shrinkPhoto(event.currentTarget)}
+          className={cn(
+            inputClass(Boolean(error)),
+            'cursor-pointer file:me-3 file:rounded-full file:border-0 file:bg-[var(--surface-tint)] file:px-4 file:py-2 file:font-semibold file:text-[var(--text-brand)]',
+          )}
+        />
+      )
+      break
     case 'checkboxes':
       return (
         <fieldset className="m-0 min-w-0 border-0 p-0" disabled={disabled}>
@@ -449,6 +463,49 @@ function FieldControl({
       <FieldError id={errorId} message={error} />
     </div>
   )
+}
+
+/**
+ * Phone photos are 3–8 MB; the audience uploads over 4G. A JPEG, PNG or WebP
+ * photo larger than this is redrawn at most 2400 px on its long side as a
+ * JPEG before it is sent — still sharp enough to read a passport — which
+ * also keeps the request well under the server's limits. PDFs, small images,
+ * and browsers that cannot do this are left exactly as chosen; the server
+ * checks the result either way.
+ */
+const SHRINK_ABOVE_BYTES = 1.5 * 1024 * 1024
+const MAX_EDGE = 2400
+
+async function shrinkPhoto(input: HTMLInputElement) {
+  const file = input.files?.[0]
+  if (!file || !/^image\/(jpeg|png|webp)$/.test(file.type) || file.size <= SHRINK_ABOVE_BYTES) {
+    return
+  }
+  try {
+    const bitmap = await createImageBitmap(file)
+    const scale = Math.min(1, MAX_EDGE / Math.max(bitmap.width, bitmap.height))
+    const canvas = document.createElement('canvas')
+    canvas.width = Math.round(bitmap.width * scale)
+    canvas.height = Math.round(bitmap.height * scale)
+    const context = canvas.getContext('2d')
+    if (!context) return
+    context.fillStyle = '#fff'
+    context.fillRect(0, 0, canvas.width, canvas.height)
+    context.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
+    bitmap.close()
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, 'image/jpeg', 0.85),
+    )
+    if (!blob || blob.size >= file.size) return
+    const smaller = new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', {
+      type: 'image/jpeg',
+    })
+    const transfer = new DataTransfer()
+    transfer.items.add(smaller)
+    input.files = transfer.files
+  } catch {
+    // Older browsers: send the original; the server enforces the limit.
+  }
 }
 
 const AUTOCOMPLETE: Record<string, string> = {
