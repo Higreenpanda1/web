@@ -17,15 +17,12 @@ BRANCH="${BRANCH:-claude/practical-newton-m55sbw}"
 [ -f "$ENV_FILE" ] || { echo "No $ENV_FILE — run ops/deploy.sh first." >&2; exit 1; }
 [ -r /dev/tty ] || { echo "Run this in a terminal: it needs to ask for the token." >&2; exit 1; }
 
-printf 'Paste the HubSpot token (it starts with pat-), then press Enter: ' >/dev/tty
+printf 'Paste the HubSpot token, then press Enter (nothing shows while you paste): ' >/dev/tty
 IFS= read -rs token </dev/tty
 printf '\n' >/dev/tty
 token="$(printf '%s' "$token" | tr -d '[:space:]')"
 
-case "$token" in
-  pat-*) ;;
-  *) echo "That does not look like a HubSpot private app token (pat-...). Nothing changed." >&2; exit 1 ;;
-esac
+[ -n "$token" ] || { echo "No token pasted. Nothing changed." >&2; exit 1; }
 
 # Check the token against HubSpot before saving it.
 status="$(curl -s -o /dev/null -w '%{http_code}' \
