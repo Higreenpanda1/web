@@ -55,9 +55,8 @@ function escapeHtml(value: string): string {
 
 /** "Naif Albusais" → first "Naif", last "Albusais". One word goes in firstname. */
 export function splitName(name: string): { firstname: string; lastname: string } {
-  const parts = name.trim().split(/\s+/)
-  if (parts.length <= 1) return { firstname: parts[0] ?? '', lastname: '' }
-  return { firstname: parts[0], lastname: parts.slice(1).join(' ') }
+  const [first = '', ...rest] = name.trim().split(/\s+/)
+  return { firstname: first, lastname: rest.join(' ') }
 }
 
 export function isCompanyRegistration(app: Pick<HubSpotApplication, 'type'>): boolean {
@@ -71,17 +70,17 @@ export function dealName(app: HubSpotApplication): string {
 /** The note: every answer, labels in English with Chinese where we have it. */
 export function noteBody(app: HubSpotApplication): string {
   const head = `<p><b>${escapeHtml(app.typeLabel)} / 网站申请</b> – ${escapeHtml(app.reference)}</p>`
-  const contact = [
+  const contact: Array<[string, string]> = [
     ['Name / 姓名', app.name],
     ['Country / 国家', app.country],
     ['WhatsApp', app.whatsapp],
     ['Email / 邮箱', app.email ?? '—'],
   ]
-  const answers = app.rows.map(({ label, value }) => {
+  const answers = app.rows.map(({ label, value }): [string, string] => {
     const zh = ZH_LABELS[label]
     return [zh ? `${label} / ${zh}` : label, value]
   })
-  const list = (items: string[][]) =>
+  const list = (items: Array<[string, string]>) =>
     `<ul>${items.map(([k, v]) => `<li><b>${escapeHtml(k)}:</b> ${escapeHtml(v)}</li>`).join('')}</ul>`
   const status = isCompanyRegistration(app)
     ? '<p><b>Status / 状态:</b> Not paid yet – work starts after payment / 尚未付款 – 付款后开始办理</p>'
