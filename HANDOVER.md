@@ -20,6 +20,25 @@ on the real domain.
 - **CMS:** https://higreenpanda.com/hgp-studio-gate
 - **Repository:** `Higreenpanda1/web`, branch `claude/practical-newton-m55sbw`
 
+## HubSpot (4 October 2026) — code pushed, token not yet set
+
+Every application form submission is now also copied into HubSpot
+(`src/lib/hubspot.ts`, called from `src/app/actions/application.ts` next to the
+email, best-effort, never throws). All forms: the contact (matched by email)
+and a note with every answer, labels in English and Chinese. Company
+registration also gets a deal in "Services Pipeline - HiGP / 服务流程 - HiGP" at
+"New Inquiry / 新咨询" and a task a week later to check payment — the owner's
+rule is that formation starts only after payment, and an unpaid request is
+moved to "Not Completed / 未完成" after a week, with a polite message to the
+client that does not mention payment.
+
+It is off until `HUBSPOT_TOKEN` is in the server's `.env`. `ops/hubspot.sh`
+asks for the token, checks it with HubSpot, saves it and redeploys. The token
+is a HubSpot private app token with `crm.objects.contacts.read/write` and
+`crm.objects.deals.read/write`. Pipeline, stage and owner ids default to this
+portal (`src/lib/env.ts`). The team works in English and Chinese, so anything
+written to HubSpot is in both.
+
 ## The blog (24 September 2026, fourth session)
 
 The owner asked for the blog to be the traffic engine: "robust traffic, fully

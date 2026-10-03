@@ -7,6 +7,7 @@ import { getTranslations } from 'next-intl/server'
 import { FORMS, allFields } from '@/forms/definitions'
 import { reader, validateApplication } from '@/forms/schema'
 import { sendApplicationNotification, type NotificationRow } from '@/lib/email'
+import { syncApplicationToHubSpot } from '@/lib/hubspot'
 import { isApplicationType } from '@/lib/catalogue'
 import { HONEYPOT_FIELD, TIMESTAMP_FIELD } from '@/lib/form-fields'
 import { verifyFormToken } from '@/lib/form-guard'
@@ -104,19 +105,35 @@ export async function submitApplication(
       typeof application.service === 'object' && application.service
         ? application.service.title
         : null
-    const notified = await sendApplicationNotification({
-      reference,
-      typeLabel: await typeLabel(type),
-      name,
-      country,
-      whatsapp,
-      email: email || null,
-      serviceTitle,
-      headline,
-      locale,
-      sourcePath: headerList.get('x-pathname'),
-      rows: await describeDetails(type, details),
-    })
+    const label = await typeLabel(type)
+    const rows = await describeDetails(type, details)
+    const [notified] = await Promise.all([
+      sendApplicationNotification({
+        reference,
+        typeLabel: label,
+        name,
+        country,
+        whatsapp,
+        email: email || null,
+        serviceTitle,
+        headline,
+        locale,
+        sourcePath: headerList.get('x-pathname'),
+        rows,
+      }),
+      // Best-effort, like the email: logs on failure, never throws.
+      syncApplicationToHubSpot({
+        reference,
+        type,
+        typeLabel: label,
+        name,
+        country,
+        whatsapp,
+        email: email || null,
+        headline,
+        rows,
+      }),
+    ])
 
     if (notified) {
       await payload

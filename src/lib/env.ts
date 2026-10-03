@@ -37,4 +37,16 @@ export const email = {
   configured: Boolean(process.env.RESEND_API_KEY),
 }
 
+/**
+ * HubSpot CRM. The ids default to this brand's portal: the services pipeline,
+ * its "New Inquiry / 新咨询" stage, and the owner (Sami) who gets the tasks.
+ */
+export const hubspot = {
+  token: process.env.HUBSPOT_TOKEN ?? '',
+  pipelineId: process.env.HUBSPOT_PIPELINE_ID || 'default',
+  newStageId: process.env.HUBSPOT_NEW_STAGE_ID || '4392706760',
+  ownerId: process.env.HUBSPOT_OWNER_ID ?? '99402659',
+  configured: Boolean(process.env.HUBSPOT_TOKEN),
+}
+
 export { required }
