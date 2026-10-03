@@ -20,6 +20,20 @@ on the real domain.
 - **CMS:** https://higreenpanda.com/hgp-studio-gate
 - **Repository:** `Higreenpanda1/web`, branch `claude/practical-newton-m55sbw`
 
+## Documents and emails (4 October 2026)
+
+The company-registration form now takes the **passport photo page**
+(required) and the **China entry stamp** (optional) — the owner's request,
+reversing the 23 September "no uploads" decision. Checked by first bytes
+(JPEG/PNG/WebP/PDF, 10 MB), shrunk in the browser when they are large phone
+photos, stored in `media/private/applications/<yyyy-mm>/` (inside the media
+volume, so backed up; no route serves it). Every application email now also
+goes to `sami@higreenpanda.com` (`APPLICATION_NOTIFY_TO`) with the files
+attached, and the client gets a confirmation in their language with the
+reference — nothing about price or payment, by the owner's rule. Email is
+required on every form so that confirmation can be sent. Server action and
+middleware body limits are 22 MB (`next.config.ts`).
+
 ## HubSpot (4 October 2026) — code pushed, token not yet set
 
 Every application form submission is now also copied into HubSpot
@@ -34,8 +48,9 @@ client that does not mention payment.
 
 It is off until `HUBSPOT_TOKEN` is in the server's `.env`. `ops/hubspot.sh`
 asks for the token, checks it with HubSpot, saves it and redeploys. The token
-is a HubSpot private app token with `crm.objects.contacts.read/write` and
-`crm.objects.deals.read/write`. Pipeline, stage and owner ids default to this
+is a HubSpot private app token with `crm.objects.contacts.read/write`,
+`crm.objects.deals.read/write` and `files` (to attach the passport and entry
+stamp to the note as private files). Pipeline, stage and owner ids default to this
 portal (`src/lib/env.ts`). The team works in English and Chinese, so anything
 written to HubSpot is in both.
 
