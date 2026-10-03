@@ -24194,7 +24194,13 @@
    "categories": [
     "company-setup"
    ],
-   "cover": null,
+   "cover": {
+    "file": "accounting-services-china-business-cover.webp",
+    "alt": {
+     "ar": "دليلك الشامل لاختيار شركة محاسبة في الصين لإدارة شركتك",
+     "en": "How to Choose an Accounting Firm in China for Your Company"
+    }
+   },
    "images": [
     {
      "file": "accounting-services-china-business-img-1.webp",
@@ -27620,7 +27626,13 @@
    "categories": [
     "industries"
    ],
-   "cover": null,
+   "cover": {
+    "file": "made-in-china-2025-industrial-plan-cover.webp",
+    "alt": {
+     "ar": "صنع في الصين 2025 للمستوردين: كيف تختار موردك الصيني",
+     "en": "Made in China 2025 for importers: choosing your Chinese supplier"
+    }
+   },
    "images": [
     {
      "file": "made-in-china-2025-industrial-plan-img-1.webp",
@@ -30807,7 +30819,13 @@
    "categories": [
     "trade-fairs"
    ],
-   "cover": null,
+   "cover": {
+    "file": "how-to-apply-for-canton-fair-invitation-cover.webp",
+    "alt": {
+     "ar": "كيف تحصل على دعوة معرض كانتون: التسجيل والتأشيرة والبدائل",
+     "en": "Canton Fair Invitation: Registration, Visa and Other Routes"
+    }
+   },
    "images": [],
    "legacy": {
     "ar": {
@@ -34826,7 +34844,13 @@
    "categories": [
     "trade-fairs"
    ],
-   "cover": null,
+   "cover": {
+    "file": "canton-fair-chinas-great-trade-window-cover.webp",
+    "alt": {
+     "ar": "زيارة معرض كانتون: دليلك إلى نافذة التجارة الكبرى في الصين",
+     "en": "Visiting the Canton Fair: A Guide to China's Great Trade Window"
+    }
+   },
    "images": [
     {
      "file": "canton-fair-chinas-great-trade-window-img-1.webp",
@@ -385967,7 +385991,13 @@
     "importing"
    ],
    "service": "full-import-management",
-   "cover": null,
+   "cover": {
+    "file": "china-factory-holidays-q4-2026-golden-week-canton-fair-white-friday-cover.webp",
+    "alt": {
+     "ar": "عطلات المصانع الصينية 2026 في الربع الأخير: ماذا تطلب وتدفع وتشحن قبل كل موعد؟",
+     "en": "Chinese factory holidays 2026 in Q4: what to order, pay and ship before each date"
+    }
+   },
    "images": [],
    "legacy": {},
    "locales": {
@@ -388957,7 +388987,13 @@
     "shipping-logistics"
    ],
    "service": "shipping-and-freight",
-   "cover": null,
+   "cover": {
+    "file": "shipping-from-china-to-gulf-hormuz-closed-routes-costs-2026-cover.webp",
+    "alt": {
+     "ar": "الشحن من الصين إلى الخليج مع إغلاق مضيق هرمز: الطرق والتكلفة والمدة (سبتمبر 2026)",
+     "en": "Shipping from China to the Gulf while the Strait of Hormuz is closed: routes, costs and lead times (September 2026)"
+    }
+   },
    "images": [],
    "legacy": {},
    "locales": {
@@ -391859,7 +391895,13 @@
     "legal-compliance"
    ],
    "service": "quality-inspection",
-   "cover": null,
+   "cover": {
+    "file": "saber-2026-changes-12-digit-hs-code-product-declaration-fees-cover.webp",
+    "alt": {
+     "ar": "سابر 2026: الرمز الجمركي من 12 خانة وإقرار المنتج والرسوم — كيف لا تتعطل شحنتك في الجمارك السعودية",
+     "en": "SABER 2026 changes: 12-digit HS code, product declaration and fees — how to keep your shipment moving at Saudi customs"
+    }
+   },
    "images": [],
    "legacy": {},
    "locales": {
@@ -394499,7 +394541,13 @@
     "trade-fairs"
    ],
    "service": "business-invitation-letter",
-   "cover": null,
+   "cover": {
+    "file": "china-visa-free-gcc-passports-2026-business-trip-canton-fair-cover.webp",
+    "alt": {
+     "ar": "دخول الصين بدون تأشيرة للسعوديين وحاملي جوازات الخليج حتى ديسمبر 2026: ما ينطبق على رحلة العمل ومعرض كانتون",
+     "en": "China visa-free entry for Saudi Arabia and GCC passports until December 2026: the Canton Fair trip"
+    }
+   },
    "images": [],
    "legacy": {},
    "locales": {
@@ -397243,7 +397291,13 @@
     "shipping-logistics"
    ],
    "service": "shipping-and-freight",
-   "cover": null,
+   "cover": {
+    "file": "importing-china-saudi-jeddah-port-hormuz-2026-cover.webp",
+    "alt": {
+     "ar": "الاستيراد من الصين إلى السعودية عبر ميناء جدة بعد إغلاق هرمز: المدة والتكلفة والتخليص",
+     "en": "Importing from China to Saudi Arabia via Jeddah Port after the Hormuz closure: transit time, cost and clearance"
+    }
+   },
    "images": [],
    "legacy": {},
    "locales": {
@@ -400357,7 +400411,13 @@
     "trade-fairs"
    ],
    "service": "product-sourcing",
-   "cover": null,
+   "cover": {
+    "file": "yiwu-fair-2026-vs-yiwu-market-vs-1688-wholesale-cover.webp",
+    "alt": {
+     "ar": "معرض ييوو 2026 أم سوق ييوو أم 1688: من أين تشتري البضائع الصغيرة للجملة؟",
+     "en": "Yiwu Fair 2026, Yiwu Market or 1688: where should you buy small goods wholesale?"
+    }
+   },
    "images": [],
    "legacy": {},
    "locales": {
@@ -403463,7 +403523,13 @@
     "company-setup"
    ],
    "service": "bank-account-opening",
-   "cover": null,
+   "cover": {
+    "file": "china-bank-account-foreign-company-nra-hong-kong-cover.webp",
+    "alt": {
+     "ar": "فتح حساب بنكي في الصين لشركة أجنبية: حساب غير مقيم أم حساب شركة صينية أم هونغ كونغ؟",
+     "en": "Opening a Bank Account in China for a Foreign Company: NRA, Chinese Company or Hong Kong?"
+    }
+   },
    "images": [],
    "legacy": {},
    "locales": {
