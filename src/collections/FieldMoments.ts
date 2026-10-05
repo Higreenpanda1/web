@@ -87,7 +87,11 @@ export const FieldMoments: CollectionConfig = {
       name: 'showOnHome',
       type: 'checkbox',
       defaultValue: false,
-      admin: { position: 'sidebar', description: 'Up to six are shown on the homepage.' },
+      admin: {
+        position: 'sidebar',
+        description:
+          'Comes first in its group’s rotating photo, on the homepage and the field page.',
+      },
     },
     { name: 'order', type: 'number', defaultValue: 100, admin: { position: 'sidebar' } },
   ],

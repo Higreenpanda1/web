@@ -1,7 +1,7 @@
 import { ArrowLeft, ArrowRight, Clock } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 
-import { FieldGallery } from '@/components/FieldGallery'
+import { FieldGroups } from '@/components/FieldGallery'
 import { ContactPanel } from '@/components/home/ContactPanel'
 import { FounderCard } from '@/components/home/FounderCard'
 import { Hero } from '@/components/home/Hero'
@@ -46,17 +46,14 @@ const JOURNEY_LINKS = [
  * message catalogues; a CMS `home` Page still replaces all of this.
  */
 export async function DefaultHome({ locale }: { locale: Locale }) {
-  const [t, settings, services, { docs: posts }, founder, picked, latestField] = await Promise.all([
+  const [t, settings, services, { docs: posts }, founder, fieldMoments] = await Promise.all([
     getTranslations({ locale }),
     getSiteSettings(locale),
     getServices(locale, { limit: 60 }),
     getPosts(locale, { limit: 3 }),
     getFounder(locale),
-    getFieldMoments(locale, { homeOnly: true, limit: 6 }),
-    getFieldMoments(locale, { limit: 6 }),
+    getFieldMoments(locale),
   ])
-  // The editor's picks when there are any, otherwise the newest six.
-  const fieldMoments = picked.length > 0 ? picked : latestField
 
   const Arrow = locale === 'ar' ? ArrowLeft : ArrowRight
   const groups = groupServices(services)
@@ -165,10 +162,11 @@ export async function DefaultHome({ locale }: { locale: Locale }) {
               </ButtonLink>
             }
           />
-          <FieldGallery
+          <FieldGroups
             moments={fieldMoments}
             locale={locale}
             kindLabel={(kind) => t(`field.kinds.${kind}`)}
+            countLabel={(count) => t('field.count', { count })}
           />
         </Section>
       ) : null}

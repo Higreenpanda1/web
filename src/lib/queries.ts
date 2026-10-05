@@ -203,12 +203,8 @@ export const getTestimonials = (locale: Locale, featuredOnly = true) =>
     { tags: [CACHE_TAGS.testimonials], revalidate: ONE_HOUR },
   )()
 
-/** Field photos cleared for the site, newest first. `homeOnly` keeps the ones
- *  an editor picked for the homepage. */
-export const getFieldMoments = (
-  locale: Locale,
-  options: { homeOnly?: boolean; limit?: number } = {},
-) =>
+/** Field visits cleared for the site, in the editor's order, then newest first. */
+export const getFieldMoments = (locale: Locale, options: { limit?: number } = {}) =>
   unstable_cache(
     async (): Promise<FieldMoment[]> => {
       const payload = await getPayloadClient()
@@ -216,7 +212,6 @@ export const getFieldMoments = (
         collection: 'field-moments',
         where: {
           consentConfirmed: { equals: true },
-          ...(options.homeOnly ? { showOnHome: { equals: true } } : {}),
         },
         locale,
         sort: ['order', '-takenAt'],
@@ -225,7 +220,7 @@ export const getFieldMoments = (
       })
       return result.docs
     },
-    ['field-moments', locale, String(options.homeOnly ?? false), String(options.limit ?? 200)],
+    ['field-moments', locale, String(options.limit ?? 200)],
     { tags: [CACHE_TAGS.fieldMoments], revalidate: ONE_HOUR },
   )()
 

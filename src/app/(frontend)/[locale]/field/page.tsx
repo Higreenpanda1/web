@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 
-import { FieldGallery } from '@/components/FieldGallery'
+import { FieldGallery, FieldGroups } from '@/components/FieldGallery'
 import { ContactPanel } from '@/components/home/ContactPanel'
 import { JsonLd } from '@/components/JsonLd'
 import { Breadcrumb } from '@/components/ui/Breadcrumb'
@@ -71,6 +71,17 @@ export default async function FieldPage({ params }: { params: Promise<{ locale: 
           />
         }
       />
+
+      {groups.length > 0 ? (
+        <Section className="pt-10 pb-4 md:pt-14 md:pb-6">
+          <FieldGroups
+            moments={moments}
+            locale={locale}
+            kindLabel={(kind) => t(`field.kinds.${kind}`)}
+            countLabel={(count) => t('field.count', { count })}
+          />
+        </Section>
+      ) : null}
 
       {groups.length === 0 ? (
         <Section>

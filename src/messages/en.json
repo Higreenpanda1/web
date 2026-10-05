@@ -838,6 +838,7 @@
       "factory": "Factory visits",
       "market": "In the markets"
     },
-    "contactTitle": "Want the next visit to be yours?"
+    "contactTitle": "Want the next visit to be yours?",
+    "count": "{count, plural, one {# visit} other {# visits}}"
   }
 }

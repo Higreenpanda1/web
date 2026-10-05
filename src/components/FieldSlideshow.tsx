@@ -5,12 +5,14 @@ import { useEffect, useRef, useState } from 'react'
 
 import { cn } from '@/lib/cn'
 
-export type Slide = { src: string; alt: string }
+/** `caption` is shown over the photo while it is the current slide. */
+export type Slide = { src: string; alt: string; caption?: string; note?: string }
 
 const INTERVAL_MS = 3500
 
 /**
- * The photos of one visit, cross-fading on their own. It pauses while the
+ * A set of photos cross-fading on their own — on this site, one photo per
+ * client or visit, each with its own one-line caption. It pauses while the
  * pointer is over it, while it is off screen, and entirely for anyone who has
  * asked for reduced motion — they get the cover photo and the dots to step
  * through by hand. Every photo is in the markup from the start, so the first
@@ -23,7 +25,7 @@ export function FieldSlideshow({
   sizes,
 }: {
   slides: Slide[]
-  /** Accessible name for the slideshow, e.g. the visit's title. */
+  /** Accessible name for the slideshow, e.g. the group's title. */
   label: string
   className?: string
   sizes: string
@@ -104,27 +106,39 @@ export function FieldSlideshow({
         />
       ))}
 
-      {slides.length > 1 ? (
-        <div className="absolute inset-x-0 bottom-0 flex justify-center bg-gradient-to-t from-black/45 to-transparent px-3 pt-8 pb-1.5">
-          {slides.map((slide, i) => (
-            <button
-              key={slide.src}
-              type="button"
-              aria-label={`${i + 1} / ${slides.length}`}
-              aria-current={i === index ? 'true' : undefined}
-              onClick={() => loaded[i] && setIndex(i)}
-              className="group/dot flex h-6 items-center px-1"
-            >
-              <span
-                className={cn(
-                  'block h-1.5 rounded-full transition-all duration-300',
-                  i === index ? 'w-5 bg-white' : 'w-1.5 bg-white/60 group-hover/dot:bg-white/90',
-                )}
-              />
-            </button>
-          ))}
-        </div>
-      ) : null}
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/35 to-transparent px-4 pt-16 pb-2 text-white">
+        {slides[index]?.caption ? (
+          <p aria-live="polite" className="m-0 text-body leading-snug font-semibold">
+            {slides[index]?.caption}
+            {slides[index]?.note ? (
+              <span className="mt-0.5 block text-caption font-normal text-white/80">
+                <bdi>{slides[index]?.note}</bdi>
+              </span>
+            ) : null}
+          </p>
+        ) : null}
+        {slides.length > 1 ? (
+          <div className="mt-1 flex flex-wrap justify-center">
+            {slides.map((slide, i) => (
+              <button
+                key={slide.src}
+                type="button"
+                aria-label={`${i + 1} / ${slides.length}`}
+                aria-current={i === index ? 'true' : undefined}
+                onClick={() => loaded[i] && setIndex(i)}
+                className="group/dot flex h-6 items-center px-1"
+              >
+                <span
+                  className={cn(
+                    'block h-1.5 rounded-full transition-all duration-300',
+                    i === index ? 'w-5 bg-white' : 'w-1.5 bg-white/60 group-hover/dot:bg-white/90',
+                  )}
+                />
+              </button>
+            ))}
+          </div>
+        ) : null}
+      </div>
     </div>
   )
 }
