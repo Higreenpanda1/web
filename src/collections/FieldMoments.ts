@@ -4,7 +4,7 @@ import { revalidateCollection } from '@/lib/revalidate'
 import type { CollectionConfig } from 'payload'
 
 /** The groups the "From the field" page is arranged in, in display order. */
-export const FIELD_KINDS = ['office', 'fair', 'factory', 'market'] as const
+export const FIELD_KINDS = ['office', 'business', 'fair', 'factory', 'market'] as const
 export type FieldKind = (typeof FIELD_KINDS)[number]
 
 /**
@@ -62,7 +62,8 @@ export const FieldMoments: CollectionConfig = {
       required: true,
       defaultValue: 'office',
       options: [
-        { label: 'Office meeting', value: 'office' },
+        { label: 'Client meeting', value: 'office' },
+        { label: 'Business meeting or deal with a company', value: 'business' },
         { label: 'Trade fair', value: 'fair' },
         { label: 'Factory visit', value: 'factory' },
         { label: 'Market visit', value: 'market' },

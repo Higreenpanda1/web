@@ -16343,7 +16343,7 @@
     "public.enum_field_moments_kind": {
       "name": "enum_field_moments_kind",
       "schema": "public",
-      "values": ["office", "fair", "factory", "market"]
+      "values": ["office", "business", "fair", "factory", "market"]
     },
     "public.enum_enquiries_status": {
       "name": "enum_enquiries_status",

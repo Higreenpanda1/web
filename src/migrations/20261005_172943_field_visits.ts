@@ -2,7 +2,7 @@ import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.execute(sql`
-   CREATE TYPE "public"."enum_field_moments_kind" AS ENUM('office', 'fair', 'factory', 'market');
+   CREATE TYPE "public"."enum_field_moments_kind" AS ENUM('office', 'business', 'fair', 'factory', 'market');
   CREATE TABLE "field_moments" (
   	"id" serial PRIMARY KEY NOT NULL,
   	"kind" "enum_field_moments_kind" DEFAULT 'office' NOT NULL,

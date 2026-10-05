@@ -834,6 +834,7 @@
     "empty": "Photos from our meetings and visits are coming here soon.",
     "kinds": {
       "office": "At our office",
+      "business": "Meetings and deals with companies",
       "fair": "At trade fairs",
       "factory": "Factory visits",
       "market": "In the markets"

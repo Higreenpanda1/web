@@ -915,14 +915,14 @@ export interface FieldMoment {
    * The first photo is the cover. They rotate on the site in this order.
    */
   photos: (number | Media)[];
-  kind: 'office' | 'fair' | 'factory' | 'market';
+  kind: 'office' | 'business' | 'fair' | 'factory' | 'market';
   takenAt?: string | null;
   /**
    * Tick only once the people in the photo agreed to appear on the website. Unticked photos are not shown.
    */
   consentConfirmed?: boolean | null;
   /**
-   * Up to six are shown on the homepage.
+   * Comes first in its group’s rotating photo, on the homepage and the field page.
    */
   showOnHome?: boolean | null;
   order?: number | null;
