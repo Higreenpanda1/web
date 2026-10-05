@@ -49,6 +49,7 @@ export async function Footer({ locale, settings }: { locale: Locale; settings: S
             title: t('footer.companyTitle'),
             links: [
               { id: 'c1', label: t('nav.about'), href: '/about' },
+              { id: 'c4', label: t('nav.field'), href: '/field' },
               { id: 'c2', label: t('nav.blog'), href: '/blog' },
               { id: 'c3', label: t('nav.contact'), href: '/contact' },
             ],

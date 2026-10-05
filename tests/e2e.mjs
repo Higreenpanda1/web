@@ -77,6 +77,8 @@ const ROUTES = [
   ['/llms-full.txt', 200],
   ['/about', 200],
   ['/en/about', 200],
+  ['/field', 200],
+  ['/en/field', 200],
   ['/contact', 200],
   ['/privacy', 200],
   ['/terms', 200],

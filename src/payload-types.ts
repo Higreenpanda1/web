@@ -75,6 +75,7 @@ export interface Config {
     topics: Topic;
     'research-runs': ResearchRun;
     testimonials: Testimonial;
+    'field-moments': FieldMoment;
     'team-members': TeamMember;
     media: Media;
     enquiries: Enquiry;
@@ -97,6 +98,7 @@ export interface Config {
     topics: TopicsSelect<false> | TopicsSelect<true>;
     'research-runs': ResearchRunsSelect<false> | ResearchRunsSelect<true>;
     testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
+    'field-moments': FieldMomentsSelect<false> | FieldMomentsSelect<true>;
     'team-members': TeamMembersSelect<false> | TeamMembersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     enquiries: EnquiriesSelect<false> | EnquiriesSelect<true>;
@@ -898,6 +900,33 @@ export interface ResearchRun {
   createdAt: string;
 }
 /**
+ * Real photos from meetings, fairs and factory visits. Never name a guest or show a contract, licence, price or screen without their permission.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "field-moments".
+ */
+export interface FieldMoment {
+  id: number;
+  image: number | Media;
+  /**
+   * One line: what happened and where. e.g. "Receiving a trader from Sudan at our Shenzhen office".
+   */
+  caption: string;
+  kind: 'office' | 'fair' | 'factory' | 'market';
+  takenAt?: string | null;
+  /**
+   * Tick only once the people in the photo agreed to appear on the website. Unticked photos are not shown.
+   */
+  consentConfirmed?: boolean | null;
+  /**
+   * Up to six are shown on the homepage.
+   */
+  showOnHome?: boolean | null;
+  order?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Every submission from the website form. Nothing here is public.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1200,6 +1229,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'testimonials';
         value: number | Testimonial;
+      } | null)
+    | ({
+        relationTo: 'field-moments';
+        value: number | FieldMoment;
       } | null)
     | ({
         relationTo: 'team-members';
@@ -1624,6 +1657,21 @@ export interface TestimonialsSelect<T extends boolean = true> {
   avatar?: T;
   serviceUsed?: T;
   featured?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "field-moments_select".
+ */
+export interface FieldMomentsSelect<T extends boolean = true> {
+  image?: T;
+  caption?: T;
+  kind?: T;
+  takenAt?: T;
+  consentConfirmed?: T;
+  showOnHome?: T;
   order?: T;
   updatedAt?: T;
   createdAt?: T;
