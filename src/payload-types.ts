@@ -907,11 +907,14 @@ export interface ResearchRun {
  */
 export interface FieldMoment {
   id: number;
-  image: number | Media;
   /**
-   * One line: what happened and where. e.g. "Receiving a trader from Sudan at our Shenzhen office".
+   * One line: who and where. e.g. "Receiving an investor from South Sudan at our Shenzhen office".
    */
-  caption: string;
+  title: string;
+  /**
+   * The first photo is the cover. They rotate on the site in this order.
+   */
+  photos: (number | Media)[];
   kind: 'office' | 'fair' | 'factory' | 'market';
   takenAt?: string | null;
   /**
@@ -1666,8 +1669,8 @@ export interface TestimonialsSelect<T extends boolean = true> {
  * via the `definition` "field-moments_select".
  */
 export interface FieldMomentsSelect<T extends boolean = true> {
-  image?: T;
-  caption?: T;
+  title?: T;
+  photos?: T;
   kind?: T;
   takenAt?: T;
   consentConfirmed?: T;

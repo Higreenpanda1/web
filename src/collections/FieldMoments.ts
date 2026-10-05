@@ -8,18 +8,19 @@ export const FIELD_KINDS = ['office', 'fair', 'factory', 'market'] as const
 export type FieldKind = (typeof FIELD_KINDS)[number]
 
 /**
- * Real photos from the work: guests at the Shenzhen office, the Canton Fair,
- * factory and market visits. The point is credibility, so nothing here is
+ * One entry per real meeting or visit — a client at the Shenzhen office, a
+ * day at the Canton Fair, a factory visit — with all of its photos, which the
+ * site shows as a slideshow. The point is credibility, so nothing here is
  * stock and nothing is staged — and nothing shows on the site until someone
- * confirms the people in the photo agreed to appear.
+ * confirms the people in the photos agreed to appear.
  */
 export const FieldMoments: CollectionConfig = {
   slug: 'field-moments',
   hooks: revalidateCollection('fieldMoments'),
-  labels: { singular: 'Field photo', plural: 'From the field' },
+  labels: { singular: 'Field visit', plural: 'From the field' },
   admin: {
-    useAsTitle: 'caption',
-    defaultColumns: ['caption', 'kind', 'takenAt', 'showOnHome', 'consentConfirmed'],
+    useAsTitle: 'title',
+    defaultColumns: ['title', 'kind', 'takenAt', 'showOnHome', 'consentConfirmed'],
     group: 'Content',
     description:
       'Real photos from meetings, fairs and factory visits. Never name a guest or show a contract, licence, price or screen without their permission.',
@@ -32,16 +33,27 @@ export const FieldMoments: CollectionConfig = {
   },
   defaultSort: '-takenAt',
   fields: [
-    { name: 'image', type: 'upload', relationTo: 'media', required: true },
     {
-      name: 'caption',
+      name: 'title',
       type: 'text',
       required: true,
       localized: true,
       maxLength: 140,
       admin: {
         description:
-          'One line: what happened and where. e.g. "Receiving a trader from Sudan at our Shenzhen office".',
+          'One line: who and where. e.g. "Receiving an investor from South Sudan at our Shenzhen office".',
+      },
+    },
+    {
+      name: 'photos',
+      type: 'upload',
+      relationTo: 'media',
+      hasMany: true,
+      required: true,
+      minRows: 1,
+      maxRows: 12,
+      admin: {
+        description: 'The first photo is the cover. They rotate on the site in this order.',
       },
     },
     {
