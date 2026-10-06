@@ -87,7 +87,7 @@
     "statsEyebrow": "Numbers, not promises",
     "categoriesEyebrow": "One partner",
     "categoriesTitle": "Whatever you need in China, in one place",
-    "categoriesLead": "From the first product search to a registered company, a bank account and a work visa. Pick the area you need.",
+    "categoriesLead": "From the first product search to a registered company, a bank account and a work permit. Pick the area you need.",
     "journeyEyebrow": "The journey",
     "journeyLead": "Tap any step to see what happens there and which service covers it. Start anywhere; most clients do not begin at step one.",
     "journeyStep": "Step",
@@ -198,7 +198,7 @@
       "visas": {
         "title": "Visas & travel",
         "short": "Visas",
-        "lead": "Business invitation letters, business and work visas, and family reunion visas."
+        "lead": "Business invitation letters, business visas, work permits, and family reunion visas."
       },
       "consulting": {
         "title": "Consulting",
@@ -498,7 +498,7 @@
       "registeredCapitalHint": "Not paid up front — it can be deposited within five years. Above 15,000 USD is recommended if you want a residence permit.",
       "addressOption": "Registered address",
       "addressOptionHint": "A physical office is required if you will live in China. Otherwise a virtual address with a formal lease works.",
-      "needResidence": "Do you want a work visa and residence permit?",
+      "needResidence": "Do you want a work permit and residence permit?",
       "needResidenceHint": "Affects the address type and the recommended capital.",
       "ownership": "Ownership",
       "shareholders": "Shareholders",
@@ -532,7 +532,7 @@
       "stayLength": "Intended length of stay",
       "plannedArrival": "Planned arrival",
       "hasChineseCompany": "Do you have a company in China?",
-      "hasChineseCompanyHint": "A work visa needs an employer in China. If you have none, we can register one for you.",
+      "hasChineseCompanyHint": "A work permit needs an employer in China. If you have none, we can register one for you.",
       "companyName": "Company name",
       "education": "Highest qualification",
       "educationHint": "The higher the qualification, the stronger the application.",
@@ -661,8 +661,8 @@
       },
       "addressOption": {
         "own-office": "I will rent a physical office",
-        "virtual-work-visa": "Virtual address that allows a work visa",
-        "virtual-basic": "Virtual address, no work visa needed",
+        "virtual-work-visa": "Virtual address that allows a work permit",
+        "virtual-basic": "Virtual address, no work permit needed",
         "need-advice": "Not sure — advise me"
       },
       "ownership": {
@@ -675,7 +675,7 @@
         "accounting": "Accounting and tax filing",
         "financial-officer": "Appointed financial officer",
         "trademark": "Trademark registration",
-        "work-visa": "Work visa and residence permit",
+        "work-visa": "Work permit and residence permit",
         "bank-registrant": "Chinese-citizen registrant for the bank account"
       },
       "purpose": {
@@ -690,7 +690,7 @@
       },
       "visaType": {
         "business": "Business visa",
-        "work": "Work visa and residence permit",
+        "work": "Work permit and residence permit",
         "family": "Family reunion visa"
       },
       "stayLength": {
@@ -800,8 +800,8 @@
         "remote": "Remote (documents legalised in your country)"
       },
       "address": {
-        "basic": "Virtual address — no work visa",
-        "residence": "Virtual address — work-visa eligible",
+        "basic": "Virtual address — no work permit",
+        "residence": "Virtual address — work-permit eligible",
         "physical": "Physical office"
       },
       "bank": {

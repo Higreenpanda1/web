@@ -498,7 +498,7 @@ export const CATALOGUE_SERVICES: SeedService[] = [
     priceFrom: 7600,
     applicationType: 'visa',
     ar: {
-      title: 'تأشيرة العمل والإقامة',
+      title: 'كرت العمل والإقامة',
       summary:
         'تصريح العمل وتأشيرة Z وبطاقة الإقامة لمالك الشركة أو موظفيها، من تقييم الأهلية حتى استلام بطاقة الإقامة في الصين.',
       body: 'الإقامة في الصين تمرّ عبر تصريح عمل: تحصل عليه شركتك لك بصفتك ممثلها القانوني أو موظفًا فيها، ثم تحصل على تأشيرة Z من بلدك، وبعد الدخول تُستبدل ببطاقة إقامة لسنة أو أكثر. كل مرحلة لها شروطها ومستنداتها، وبعضها يحتاج تصديقًا من الخارجية والسفارة في بلدك قبل أن تسافر.\n\nنبدأ بتقييم صادق لأهليتك — الشهادة، سنوات الخبرة، العمر، رأس مال الشركة — ونخبرك بفرصك قبل أن تدفع. ثم ندير الملف كاملًا حتى بطاقة الإقامة.\n\n## المراحل\n\n- تقييم الأهلية وتحديد الفئة\n- إشعار تصريح العمل من مكتب العمل\n- تأشيرة Z من السفارة الصينية في بلدك\n- الفحص الطبي والتسجيل بعد الوصول\n- تصريح العمل وبطاقة الإقامة\n\nليس لديك شركة بعد؟ الإقامة تشترطها، ونؤسّسها لك ضمن الخطة نفسها بالعنوان ورأس المال المناسبين.',
@@ -525,7 +525,7 @@ export const CATALOGUE_SERVICES: SeedService[] = [
       ],
     },
     en: {
-      title: 'Work visa and residence permit',
+      title: 'Work permit and residence permit',
       summary:
         'The work permit, the Z visa and the residence card for a company owner or staff, from eligibility assessment to holding the residence card in China.',
       body: 'Living in China goes through a work permit: your company obtains it for you as its legal representative or an employee, you then get a Z visa from your country, and after entry it is exchanged for a residence card of a year or more. Each stage has its conditions and documents, and some need legalisation by your foreign ministry and the Chinese embassy before you travel.\n\nWe start with an honest assessment of your eligibility — degree, years of experience, age, the company’s capital — and tell you your chances before you pay. Then we run the whole file through to the residence card.\n\n## The stages\n\n- Eligibility assessment and category\n- Work permit notification from the labour bureau\n- Z visa from the Chinese embassy in your country\n- Medical check and registration after arrival\n- Work permit and residence card\n\nNo company yet? Residence requires one, and we register it within the same plan, with the right address and capital.',

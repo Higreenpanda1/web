@@ -33,7 +33,7 @@ const ZH_LABELS: Record<string, string> = {
   'Registered capital': '注册资本',
   'Currency of the capital': '资本币种',
   'Registered address': '注册地址',
-  'Do you want a work visa and residence permit?': '是否需要工作签证和居留许可',
+  'Do you want a work permit and residence permit?': '是否需要工作许可和居留许可',
   Ownership: '股权结构',
   Shareholders: '股东',
   'Who makes the major decisions?': '重大事项决策人',
