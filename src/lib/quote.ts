@@ -1,7 +1,7 @@
 /**
  * The company-registration price table behind the instant estimate on the
- * company-formation page. Whole yuan, from the owner's "Company Registration
- * Quotation System" sheet (Google Drive, 23 September 2026). `null` means
+ * company-formation page. Whole yuan, from the owner's price list (edition
+ * October 2026). `null` means
  * "quoted separately" — a physical office depends on the space.
  *
  * Numbers only; every label comes from `estimator.*` in the message
@@ -11,10 +11,10 @@
  */
 export const QUOTE = {
   cities: ['shenzhen', 'guangzhou', 'shanghai', 'yiwu', 'hongkong'] as const,
-  registration: { inPerson: 7000, remote: 6000 } as const,
+  registration: { inPerson: 7200, remote: 8200 } as const,
   address: { basic: 3200, residence: 12000, physical: null } as const,
-  bank: { none: 0, inPerson: 1200, remote: 1700 } as const,
-  extras: { accounting: 3200, workPermit: 4600 } as const,
+  bank: { none: 0, inPerson: 1400, remote: 1400 } as const,
+  extras: { accounting: 3800, workPermit: 7600 } as const,
   /** Yearly items, for the "per year" tag. */
   yearly: ['address', 'accounting'] as const,
 }

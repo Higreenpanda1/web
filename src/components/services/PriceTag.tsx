@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server'
 
 import { cn } from '@/lib/cn'
+import { PriceCountDown } from '@/components/services/PriceCountDown'
 import { formatYuan, hasPrice } from '@/lib/price'
 
 import type { Locale } from '@/i18n/routing'
@@ -17,12 +18,15 @@ export async function PriceTag({
   locale,
   size = 'md',
   inverse = false,
+  countFrom,
   className,
 }: {
   service: Pick<Service, 'priceFrom' | 'priceUnit'>
   locale: Locale
   size?: 'sm' | 'md' | 'lg'
   inverse?: boolean
+  /** Count down from this figure to the real price when first seen. */
+  countFrom?: number
   className?: string
 }) {
   if (!hasPrice(service)) return null
@@ -47,7 +51,11 @@ export async function PriceTag({
           inverse ? 'text-white' : 'text-heading',
         )}
       >
-        {formatYuan(service.priceFrom, locale)}
+        {countFrom ? (
+          <PriceCountDown amount={service.priceFrom} from={countFrom} locale={locale} />
+        ) : (
+          formatYuan(service.priceFrom, locale)
+        )}
       </strong>
       {unit ? <span>{unit}</span> : null}
     </span>
