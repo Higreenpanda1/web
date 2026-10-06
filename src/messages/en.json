@@ -169,7 +169,7 @@
       "month": "/ month",
       "class": "/ class"
     },
-    "priceNote": "Starting price. Your quote confirms the final figure before you pay anything.",
+    "priceNote": "Standard starting price. Your quote confirms the final figure before you pay anything. Premium clients have separate pricing that includes a year of consultation, contracts and ready-made legal contract templates, invoicing, hiring and faster service.",
     "pricingTitle": "Pricing",
     "noPrice": "Quoted per case",
     "categoriesTitle": "Browse by area",
@@ -786,7 +786,7 @@
     "onceOff": "one-off",
     "quoted": "quoted separately",
     "cta": "Start the application with these options",
-    "note": "Official fees, translations and the annual address renewal are itemised in the quote. Prices last reviewed October 2026.",
+    "note": "Official fees, translations and the annual address renewal are itemised in the quote. Prices last reviewed October 2026. These are standard prices; premium clients have separate pricing and services.",
     "options": {
       "city": {
         "shenzhen": "Shenzhen",
