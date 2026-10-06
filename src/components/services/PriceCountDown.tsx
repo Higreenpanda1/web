@@ -29,28 +29,35 @@ export function PriceCountDown({
     const el = ref.current
     if (!el || !animate) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    setShown(from)
     let frame = 0
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry?.isIntersecting) return
         observer.disconnect()
+        // The large figure appears only once the count has started, and the
+        // last frame hands back to the real price, so it can never stick.
+        setShown(from)
         const start = performance.now()
-        const duration = 1600
+        const duration = 900
         const tick = (now: number) => {
           const p = Math.min((now - start) / duration, 1)
           const eased = 1 - Math.pow(1 - p, 3)
-          setShown(Math.round(from - (from - amount) * eased))
-          if (p < 1) frame = requestAnimationFrame(tick)
+          if (p < 1) {
+            setShown(Math.round(from - (from - amount) * eased))
+            frame = requestAnimationFrame(tick)
+          } else {
+            setShown(null)
+          }
         }
         frame = requestAnimationFrame(tick)
       },
-      { threshold: 0.6 },
+      { threshold: 0.1 },
     )
     observer.observe(el)
     return () => {
       observer.disconnect()
       cancelAnimationFrame(frame)
+      setShown(null)
     }
   }, [amount, from, animate])
 
