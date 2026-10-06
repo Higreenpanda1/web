@@ -26,6 +26,9 @@ import type { Locale } from '@/i18n/routing'
 import type { Media } from '@/payload-types'
 import type { Metadata } from 'next'
 
+/** The owner's request: the starting price counts down from this figure. */
+const PRICE_COUNT_FROM = 15000
+
 export async function generateMetadata({
   params,
 }: {
@@ -126,7 +129,7 @@ export default async function ServicePage({
               {t('cta.whatsapp')}
             </ButtonLink>
           </div>
-          <PriceTag service={service} locale={locale} />
+          <PriceTag service={service} locale={locale} countFrom={PRICE_COUNT_FROM} />
         </div>
       </PageHero>
 
@@ -215,7 +218,13 @@ export default async function ServicePage({
                   aria-hidden="true"
                 />
                 {hasPrice(service) ? (
-                  <PriceTag service={service} locale={locale} size="lg" inverse />
+                  <PriceTag
+                    service={service}
+                    locale={locale}
+                    size="lg"
+                    inverse
+                    countFrom={PRICE_COUNT_FROM}
+                  />
                 ) : (
                   <p className="text-h3 text-white">{t('services.noPrice')}</p>
                 )}
