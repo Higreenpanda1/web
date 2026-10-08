@@ -229,6 +229,7 @@
     "founderTitle": "The founder",
     "founderName": "Sami Al-Hajri",
     "founderRole": "Founder",
+    "licencesTitle": "Our licences",
     "storyTitle": "Our story",
     "valuesTitle": "How we work",
     "teamTitle": "The team",
@@ -894,6 +895,10 @@
       "businessLicence": "Business licence (营业执照)",
       "accounting": "Accounting Professional Qualification (会计专业技术资格) · Amber",
       "taxAdvisor": "Tax Advisor certificate (税务师) · Lucy"
+    },
+    "docsShort": {
+      "accounting": "Accounting certificate · Amber",
+      "taxAdvisor": "Tax advisor certificate · Lucy"
     }
   }
 }

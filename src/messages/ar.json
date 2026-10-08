@@ -229,6 +229,7 @@
     "founderTitle": "المؤسس",
     "founderName": "سامي الحجري",
     "founderRole": "المؤسس",
+    "licencesTitle": "رخصنا الرسمية",
     "storyTitle": "قصتنا",
     "valuesTitle": "كيف نعمل",
     "teamTitle": "الفريق",
@@ -894,6 +895,10 @@
       "businessLicence": "الرخصة التجارية (营业执照)",
       "accounting": "شهادة التأهيل المهني في المحاسبة (会计专业技术资格) · آمبر",
       "taxAdvisor": "شهادة مستشار ضريبي (税务师) · لوسي"
+    },
+    "docsShort": {
+      "accounting": "شهادة المحاسبة · آمبر",
+      "taxAdvisor": "شهادة مستشار ضريبي · لوسي"
     }
   }
 }
