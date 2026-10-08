@@ -6,6 +6,7 @@ import { ContactPanel } from '@/components/home/ContactPanel'
 import { FounderCard } from '@/components/home/FounderCard'
 import { Hero } from '@/components/home/Hero'
 import { Journey, type JourneyStep } from '@/components/home/Journey'
+import { WorldClocks } from '@/components/home/WorldClocks'
 import { PostCard } from '@/components/PostCard'
 import { CategoryTiles } from '@/components/services/CategoryTiles'
 import { ButtonLink } from '@/components/ui/Button'
@@ -68,6 +69,19 @@ export async function DefaultHome({ locale }: { locale: Locale }) {
     <>
       <ScrollReveal />
       <Hero locale={locale} settings={settings} />
+      <WorldClocks
+        locale={locale}
+        labels={{
+          heading: t('home.clocks.heading'),
+          open: t('home.clocks.open'),
+          closed: t('home.clocks.closed'),
+          cities: [
+            { name: t('home.clocks.shenzhen'), timeZone: 'Asia/Shanghai', office: true },
+            { name: t('home.clocks.dubai'), timeZone: 'Asia/Dubai' },
+            { name: t('home.clocks.geneva'), timeZone: 'Europe/Zurich' },
+          ],
+        }}
+      />
 
       <Section id="journey" labelledBy="home-journey-heading" className="scroll-mt-20">
         <SectionHeading

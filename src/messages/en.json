@@ -40,10 +40,18 @@
     "seeService": "See this service"
   },
   "home": {
-    "heroEyebrow": "Shanghai · Shenzhen (Head office) · Guangzhou",
-    "heroCity1": "Shanghai",
-    "heroCity2": "Shenzhen · Head office",
+    "heroEyebrow": "Shenzhen (Head office) · Shanghai · Guangzhou",
+    "heroCity1": "Shenzhen · Head office",
+    "heroCity2": "Shanghai",
     "heroCity3": "Guangzhou",
+    "clocks": {
+      "heading": "The time now at our office and where our clients are",
+      "shenzhen": "Shenzhen · Our office",
+      "dubai": "Dubai",
+      "geneva": "Geneva",
+      "open": "Our office is open now",
+      "closed": "Our office is closed now"
+    },
     "heroTitle": "From idea to your warehouse",
     "heroLead": "One partner on the ground in China for the whole road: the company, the supplier, the factory, the shipment — and everything in between.",
     "heroPromise": "One accountable partner. Twelve steps. No surprises.",
