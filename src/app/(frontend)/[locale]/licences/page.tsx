@@ -79,43 +79,55 @@ export default async function LicencesPage({ params }: { params: Promise<{ local
           title={t('licences.hq.title')}
           lead={t('licences.hq.lead')}
         />
-        <Card className="max-w-2xl">
-          <div className="flex items-start gap-4">
-            <span className="inline-flex size-12 shrink-0 items-center justify-center rounded-lg bg-surface-tint text-text-brand">
-              <MapPin size={24} strokeWidth={1.75} aria-hidden="true" />
-            </span>
-            <div className="min-w-0">
-              <h3>{t('licences.hq.city')}</h3>
-              {HEADQUARTERS.addressEn ? (
-                <address className="mt-2 not-italic" lang="en">
-                  {HEADQUARTERS.addressEn.map((line) => (
-                    <bdi key={line} className="block">
-                      {line}
-                    </bdi>
-                  ))}
-                </address>
-              ) : (
-                <p className="mt-2 text-text-muted">{t('licences.hq.onRequest')}</p>
-              )}
-              {HEADQUARTERS.addressZh ? (
-                <p className="mt-2 text-text-muted" lang="zh">
-                  {HEADQUARTERS.addressZh}
-                </p>
-              ) : null}
-              {HEADQUARTERS.mapUrl ? (
-                <a
-                  href={HEADQUARTERS.mapUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-4 inline-flex items-center gap-2 font-semibold"
-                >
-                  <MapPin size={18} strokeWidth={1.75} aria-hidden="true" />
-                  {t('licences.hq.openMap')}
-                </a>
-              ) : null}
+        <div className="grid items-start gap-8 lg:grid-cols-2">
+          <Card>
+            <div className="flex items-start gap-4">
+              <span className="inline-flex size-12 shrink-0 items-center justify-center rounded-lg bg-surface-tint text-text-brand">
+                <MapPin size={24} strokeWidth={1.75} aria-hidden="true" />
+              </span>
+              <div className="min-w-0">
+                <h3>{t('licences.hq.city')}</h3>
+                {HEADQUARTERS.addressEn ? (
+                  <address className="mt-2 not-italic" lang="en">
+                    {HEADQUARTERS.addressEn.map((line) => (
+                      <bdi key={line} className="block">
+                        {line}
+                      </bdi>
+                    ))}
+                  </address>
+                ) : (
+                  <p className="mt-2 text-text-muted">{t('licences.hq.onRequest')}</p>
+                )}
+                {HEADQUARTERS.addressZh ? (
+                  <p className="mt-2 text-text-muted" lang="zh">
+                    {HEADQUARTERS.addressZh}
+                  </p>
+                ) : null}
+                {HEADQUARTERS.mapUrl ? (
+                  <a
+                    href={HEADQUARTERS.mapUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 inline-flex items-center gap-2 font-semibold"
+                  >
+                    <MapPin size={18} strokeWidth={1.75} aria-hidden="true" />
+                    {t('licences.hq.openMap')}
+                  </a>
+                ) : null}
+              </div>
             </div>
-          </div>
-        </Card>
+          </Card>
+          {HEADQUARTERS.photo ? (
+            <Image
+              src={HEADQUARTERS.photo}
+              alt={t('licences.hq.photoAlt')}
+              width={1200}
+              height={1500}
+              sizes="(min-width: 1024px) 40vw, 100vw"
+              className="h-auto w-full rounded-lg border border-border-soft object-cover shadow-card"
+            />
+          ) : null}
+        </div>
       </Section>
     </>
   )

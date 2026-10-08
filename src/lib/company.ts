@@ -55,6 +55,8 @@ export const HEADQUARTERS = {
   ] as string[] | null,
   /** The same address in Chinese, for taxi drivers and couriers. */
   addressZh: '深圳市罗湖区深南东路5016号京基一百大厦A座41楼35' as string | null,
+  /** A photo of the KK100 tower, path under /public. Use our own photo, never one off the web. */
+  photo: null as string | null,
   /** A map link (Amap, Baidu or Google). */
   mapUrl:
     'https://www.google.com/maps/search/?api=1&query=KK100+Tower+A+5016+Shennan+East+Road+Shenzhen' as

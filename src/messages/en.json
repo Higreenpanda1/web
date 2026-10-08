@@ -875,7 +875,8 @@
       "lead": "Both companies are run from here. You are welcome to visit by appointment.",
       "city": "Shenzhen, China",
       "onRequest": "We send the address and map pin on WhatsApp.",
-      "openMap": "Open in maps"
+      "openMap": "Open in maps",
+      "photoAlt": "The KK100 tower in Shenzhen, home of our office on the 41st floor"
     },
     "holder": "Licence holder"
   }
