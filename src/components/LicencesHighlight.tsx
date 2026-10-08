@@ -1,4 +1,3 @@
-import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 import Image from 'next/image'
 
@@ -11,8 +10,9 @@ import type { Locale } from '@/i18n/routing'
 
 /**
  * The licence scans as a row of thumbnails, each linking to its section on
- * /licences. Shown on About at the owner's request; the facts and scans come
- * from src/lib/company.ts, the same as the licences page.
+ * /licences. Shown on About at the owner's request, in place of the
+ * text-only licences teaser; the facts and scans come from
+ * src/lib/company.ts, the same as the licences page.
  */
 export async function LicencesHighlight({
   locale,
@@ -26,15 +26,19 @@ export async function LicencesHighlight({
   )
   if (scans.length === 0) return null
   const t = await getTranslations({ locale })
-  const Arrow = locale === 'ar' ? ArrowLeft : ArrowRight
 
   return (
     <Section tone={tone} labelledBy="licences-heading">
       <SectionHeading
         id="licences-heading"
         eyebrow={t('licences.eyebrow')}
-        title={t('about.licencesTitle')}
+        title={t('licences.title')}
         lead={t('licences.lead')}
+        action={
+          <ButtonLink href="/licences" variant="secondary">
+            {t('cta.learnMore')}
+          </ButtonLink>
+        }
       />
       <ul data-reveal className="grid list-none grid-cols-2 gap-4 p-0 sm:gap-5 lg:grid-cols-4">
         {scans.map((scan) => {
@@ -61,12 +65,6 @@ export async function LicencesHighlight({
           )
         })}
       </ul>
-      <div className="mt-8">
-        <ButtonLink href="/licences" variant="secondary">
-          {t('footer.licences')}
-          <Arrow size={18} strokeWidth={2} aria-hidden="true" />
-        </ButtonLink>
-      </div>
     </Section>
   )
 }

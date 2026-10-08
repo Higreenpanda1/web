@@ -7,7 +7,6 @@ import { FounderCard } from '@/components/home/FounderCard'
 import { StatsBand } from '@/components/home/StatsBand'
 import { JsonLd } from '@/components/JsonLd'
 import { LicencesHighlight } from '@/components/LicencesHighlight'
-import { OfficeHighlight } from '@/components/OfficeHighlight'
 import { Breadcrumb } from '@/components/ui/Breadcrumb'
 import { Card } from '@/components/ui/Card'
 import { Container } from '@/components/ui/Container'
@@ -166,9 +165,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         </Section>
       ) : null}
 
-      <LicencesHighlight locale={locale} tone="tint" />
-
-      <OfficeHighlight locale={locale} />
+      <LicencesHighlight locale={locale} />
 
       <Section className="pt-0 md:pt-0">
         <ContactPanel
