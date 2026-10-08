@@ -75,6 +75,7 @@ export interface Config {
     topics: Topic;
     'research-runs': ResearchRun;
     testimonials: Testimonial;
+    'field-moments': FieldMoment;
     'team-members': TeamMember;
     media: Media;
     enquiries: Enquiry;
@@ -97,6 +98,7 @@ export interface Config {
     topics: TopicsSelect<false> | TopicsSelect<true>;
     'research-runs': ResearchRunsSelect<false> | ResearchRunsSelect<true>;
     testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
+    'field-moments': FieldMomentsSelect<false> | FieldMomentsSelect<true>;
     'team-members': TeamMembersSelect<false> | TeamMembersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     enquiries: EnquiriesSelect<false> | EnquiriesSelect<true>;
@@ -898,6 +900,36 @@ export interface ResearchRun {
   createdAt: string;
 }
 /**
+ * Real photos from meetings, fairs and factory visits. Never name a guest or show a contract, licence, price or screen without their permission.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "field-moments".
+ */
+export interface FieldMoment {
+  id: number;
+  /**
+   * One line: who and where. e.g. "Receiving an investor from South Sudan at our Shenzhen office".
+   */
+  title: string;
+  /**
+   * The first photo is the cover. They rotate on the site in this order.
+   */
+  photos: (number | Media)[];
+  kind: 'office' | 'business' | 'fair' | 'factory' | 'market';
+  takenAt?: string | null;
+  /**
+   * Tick only once the people in the photo agreed to appear on the website. Unticked photos are not shown.
+   */
+  consentConfirmed?: boolean | null;
+  /**
+   * Comes first in its group’s rotating photo, on the homepage and the field page.
+   */
+  showOnHome?: boolean | null;
+  order?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Every submission from the website form. Nothing here is public.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1200,6 +1232,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'testimonials';
         value: number | Testimonial;
+      } | null)
+    | ({
+        relationTo: 'field-moments';
+        value: number | FieldMoment;
       } | null)
     | ({
         relationTo: 'team-members';
@@ -1624,6 +1660,21 @@ export interface TestimonialsSelect<T extends boolean = true> {
   avatar?: T;
   serviceUsed?: T;
   featured?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "field-moments_select".
+ */
+export interface FieldMomentsSelect<T extends boolean = true> {
+  title?: T;
+  photos?: T;
+  kind?: T;
+  takenAt?: T;
+  consentConfirmed?: T;
+  showOnHome?: T;
   order?: T;
   updatedAt?: T;
   createdAt?: T;

@@ -1,6 +1,7 @@
 import { ArrowLeft, ArrowRight, Clock } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 
+import { FieldGroups } from '@/components/FieldGallery'
 import { ContactPanel } from '@/components/home/ContactPanel'
 import { FounderCard } from '@/components/home/FounderCard'
 import { Hero } from '@/components/home/Hero'
@@ -10,7 +11,7 @@ import { CategoryTiles } from '@/components/services/CategoryTiles'
 import { ButtonLink } from '@/components/ui/Button'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { Section, SectionHeading } from '@/components/ui/Section'
-import { getFounder, getPosts, getServices, getSiteSettings } from '@/lib/queries'
+import { getFieldMoments, getFounder, getPosts, getServices, getSiteSettings } from '@/lib/queries'
 import { groupServices } from '@/lib/services'
 
 import type { Locale } from '@/i18n/routing'
@@ -45,12 +46,13 @@ const JOURNEY_LINKS = [
  * message catalogues; a CMS `home` Page still replaces all of this.
  */
 export async function DefaultHome({ locale }: { locale: Locale }) {
-  const [t, settings, services, { docs: posts }, founder] = await Promise.all([
+  const [t, settings, services, { docs: posts }, founder, fieldMoments] = await Promise.all([
     getTranslations({ locale }),
     getSiteSettings(locale),
     getServices(locale, { limit: 60 }),
     getPosts(locale, { limit: 3 }),
     getFounder(locale),
+    getFieldMoments(locale),
   ])
 
   const Arrow = locale === 'ar' ? ArrowLeft : ArrowRight
@@ -143,6 +145,29 @@ export async function DefaultHome({ locale }: { locale: Locale }) {
             }
           />
           <CategoryTiles groups={groups} locale={locale} />
+        </Section>
+      ) : null}
+
+      {fieldMoments.length > 0 ? (
+        <Section tone="tint" labelledBy="home-field-heading">
+          <SectionHeading
+            id="home-field-heading"
+            eyebrow={t('field.eyebrow')}
+            title={t('field.title')}
+            lead={t('field.homeLead')}
+            action={
+              <ButtonLink href="/field" variant="secondary">
+                {t('field.seeMore')}
+                <Arrow size={18} strokeWidth={2} aria-hidden="true" />
+              </ButtonLink>
+            }
+          />
+          <FieldGroups
+            moments={fieldMoments}
+            locale={locale}
+            kindLabel={(kind) => t(`field.kinds.${kind}`)}
+            countLabel={(count) => t('field.count', { count })}
+          />
         </Section>
       ) : null}
 

@@ -12,6 +12,7 @@ import { Applications } from '@/collections/Applications'
 import { Categories } from '@/collections/Categories'
 import { Customers } from '@/collections/Customers'
 import { Enquiries } from '@/collections/Enquiries'
+import { FieldMoments } from '@/collections/FieldMoments'
 import { Media } from '@/collections/Media'
 import { Pages } from '@/collections/Pages'
 import { Posts } from '@/collections/Posts'
@@ -97,6 +98,7 @@ export default buildConfig({
     Topics,
     ResearchRuns,
     Testimonials,
+    FieldMoments,
     TeamMembers,
     Media,
     Enquiries,

@@ -5,6 +5,7 @@ import { getPayloadClient } from './payload'
 import type { Locale } from '@/i18n/routing'
 import type {
   Category,
+  FieldMoment,
   Page,
   Post,
   Service,
@@ -29,6 +30,7 @@ export const CACHE_TAGS = {
   posts: 'posts',
   categories: 'categories',
   testimonials: 'testimonials',
+  fieldMoments: 'field-moments',
   team: 'team-members',
   settings: 'site-settings',
   redirects: 'redirects',
@@ -199,6 +201,27 @@ export const getTestimonials = (locale: Locale, featuredOnly = true) =>
     },
     ['testimonials', locale, String(featuredOnly)],
     { tags: [CACHE_TAGS.testimonials], revalidate: ONE_HOUR },
+  )()
+
+/** Field visits cleared for the site, in the editor's order, then newest first. */
+export const getFieldMoments = (locale: Locale, options: { limit?: number } = {}) =>
+  unstable_cache(
+    async (): Promise<FieldMoment[]> => {
+      const payload = await getPayloadClient()
+      const result = await payload.find({
+        collection: 'field-moments',
+        where: {
+          consentConfirmed: { equals: true },
+        },
+        locale,
+        sort: ['order', '-takenAt'],
+        limit: options.limit ?? 200,
+        depth: 1,
+      })
+      return result.docs
+    },
+    ['field-moments', locale, String(options.limit ?? 200)],
+    { tags: [CACHE_TAGS.fieldMoments], revalidate: ONE_HOUR },
   )()
 
 export const getTeam = (locale: Locale) =>

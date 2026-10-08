@@ -23,6 +23,14 @@ export function formatDate(value: string | Date, locale: Locale): string {
   }).format(date)
 }
 
+/** Month and year only, for photos whose exact day does not matter. */
+export function formatMonth(value: string | Date, locale: Locale): string {
+  const date = typeof value === 'string' ? new Date(value) : value
+  return new Intl.DateTimeFormat(intlLocale(locale), { month: 'long', year: 'numeric' }).format(
+    date,
+  )
+}
+
 /** ISO date for <time datetime> and structured data. */
 export function isoDate(value: string | Date): string {
   const date = typeof value === 'string' ? new Date(value) : value

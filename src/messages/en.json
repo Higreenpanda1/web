@@ -17,7 +17,8 @@
     "skipToContent": "Skip to content",
     "primary": "Primary navigation",
     "footer": "Footer links",
-    "consultation": "Consultation"
+    "consultation": "Consultation",
+    "field": "From the field"
   },
   "locale": {
     "switchTo": "العربية",
@@ -823,5 +824,22 @@
     "next": "Our team will review your request and contact you on WhatsApp within one working day.",
     "questions": "If you have any questions, simply reply to this email.",
     "signoff": "The HiGreenPanda team"
+  },
+  "field": {
+    "title": "From the field",
+    "eyebrow": "Real photos from our work",
+    "lead": "Meeting our clients at our Shenzhen office, and visiting trade fairs, factories and markets. Real photos, as it happened.",
+    "homeLead": "Our clients at our Shenzhen office, at the Canton Fair and inside factories. This is what we do every week.",
+    "seeMore": "See more from the field",
+    "empty": "Photos from our meetings and visits are coming here soon.",
+    "kinds": {
+      "office": "At our office",
+      "business": "Meetings and deals with companies",
+      "fair": "At trade fairs",
+      "factory": "Factory visits",
+      "market": "In the markets"
+    },
+    "contactTitle": "Want the next visit to be yours?",
+    "count": "{count, plural, one {# visit} other {# visits}}"
   }
 }
