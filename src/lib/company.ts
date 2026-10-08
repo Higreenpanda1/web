@@ -33,13 +33,13 @@ export const LICENCES: Licence[] = [
   {
     id: 'nasher',
     legalName: 'Nasher',
-    chineseName: null,
-    number: null,
+    chineseName: '那社尔电子商贸（上海）有限公司',
+    number: '91310120MADC3UP68E',
     image: null,
   },
   {
     id: 'accounting',
-    legalName: 'Guangzhou HIGP International Business Services Co., Ltd',
+    legalName: 'Amber',
     chineseName: null,
     number: null,
     image: null,
@@ -48,9 +48,16 @@ export const LICENCES: Licence[] = [
 
 export const HEADQUARTERS = {
   /** Street address in English, one line per array entry. Null until confirmed. */
-  addressEn: null as string[] | null,
+  addressEn: [
+    '41F-35, Tower A, KK100',
+    '5016 Shennan East Road, Luohu District',
+    'Shenzhen, China',
+  ] as string[] | null,
   /** The same address in Chinese, for taxi drivers and couriers. */
-  addressZh: null as string | null,
+  addressZh: '深圳市罗湖区深南东路5016号京基一百大厦A座41楼35' as string | null,
   /** A map link (Amap, Baidu or Google). */
-  mapUrl: null as string | null,
+  mapUrl:
+    'https://www.google.com/maps/search/?api=1&query=KK100+Tower+A+5016+Shennan+East+Road+Shenzhen' as
+      | string
+      | null,
 }

@@ -865,8 +865,8 @@
       },
       "accounting": {
         "title": "Accounting licence",
-        "body": "We keep the books and file tax returns for our clients' companies under an official accounting licence.",
-        "city": "Guangzhou, China"
+        "body": "Our accountant Amber holds an official accounting licence in China. She keeps the books and files the tax returns for our clients' companies.",
+        "city": "China"
       }
     },
     "hq": {
@@ -876,6 +876,7 @@
       "city": "Shenzhen, China",
       "onRequest": "We send the address and map pin on WhatsApp.",
       "openMap": "Open in maps"
-    }
+    },
+    "holder": "Licence holder"
   }
 }

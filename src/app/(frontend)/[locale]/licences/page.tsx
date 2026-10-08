@@ -87,11 +87,11 @@ export default async function LicencesPage({ params }: { params: Promise<{ local
             <div className="min-w-0">
               <h3>{t('licences.hq.city')}</h3>
               {HEADQUARTERS.addressEn ? (
-                <address className="mt-2 not-italic" dir="ltr" lang="en">
+                <address className="mt-2 not-italic" lang="en">
                   {HEADQUARTERS.addressEn.map((line) => (
-                    <span key={line} className="block">
+                    <bdi key={line} className="block">
                       {line}
-                    </span>
+                    </bdi>
                   ))}
                 </address>
               ) : (
@@ -147,7 +147,9 @@ function LicenceSection({
           </p>
           <dl className="mt-6 space-y-3">
             <div>
-              <dt className="text-caption text-text-muted">{t('licences.legalName')}</dt>
+              <dt className="text-caption text-text-muted">
+                {t(licence.id === 'accounting' ? 'licences.holder' : 'licences.legalName')}
+              </dt>
               <dd className="font-semibold">
                 <bdi lang="en">{licence.legalName}</bdi>
               </dd>
