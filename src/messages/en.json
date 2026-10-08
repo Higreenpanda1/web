@@ -60,7 +60,8 @@
       "cities": "Chinese cities visited",
       "fairs": "trade fairs attended",
       "followers": "Instagram followers",
-      "subscribers": "YouTube subscribers"
+      "subscribers": "YouTube subscribers",
+      "companies": "foreign companies whose accounts we manage"
     },
     "servicesTitle": "Everything on the road, as a service",
     "servicesLead": "Twenty services in six areas. Take one, or hand us the whole journey.",
@@ -161,7 +162,11 @@
     "consultPrice30": "$135",
     "consultPrice60": "$225",
     "consultNote": "The fee is credited against any service you go on to book with us.",
-    "heroCardTitle": "Your import journey"
+    "heroCardTitle": "Your import journey",
+    "teamEyebrow": "Our team",
+    "teamTitle": "The team that works for you in China",
+    "teamLead": "Sami and a team in Shenzhen who follow your request step by step: company formation, accounting, shipping and legal work.",
+    "founderSummary": "He worked at China Baowu, the world’s largest steel group, has visited more than 235 Chinese cities and attended more than 100 trade fairs."
   },
   "services": {
     "title": "Our services",

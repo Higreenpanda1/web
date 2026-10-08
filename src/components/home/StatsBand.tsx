@@ -44,8 +44,8 @@ export function StatsBand({
       >
         {items.map((item) => (
           <div key={item.label} className="border-s-2 border-brand-500/60 ps-5">
-            <dt className="ltr-nums text-display leading-none font-bold text-white">
-              {item.value}
+            <dt className="text-display leading-none font-bold text-white">
+              <span className="ltr-nums">{item.value}</span>
             </dt>
             <dd className="mt-3 text-body-lg text-brand-200">{item.label}</dd>
           </div>

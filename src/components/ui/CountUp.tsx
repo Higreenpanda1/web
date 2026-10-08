@@ -24,7 +24,8 @@ export function CountUp({ value, className }: { value: string; className?: strin
         if (!entry?.isIntersecting) return
         observer.disconnect()
         const start = performance.now()
-        const duration = 1400
+        // Slow enough to watch the numbers climb (the owner found 1.4s too fast).
+        const duration = 3800
         const tick = (now: number) => {
           const p = Math.min((now - start) / duration, 1)
           const eased = 1 - Math.pow(1 - p, 3)

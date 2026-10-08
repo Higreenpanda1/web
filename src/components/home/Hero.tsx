@@ -110,17 +110,18 @@ export async function Hero({ locale, settings }: { locale: Locale; settings: Sit
             </ButtonLink>
           </div>
 
-          <dl className="reveal reveal-4 mt-12 grid grid-cols-3 gap-4 border-t border-border-soft pt-8 sm:gap-8">
+          <dl className="reveal reveal-4 mt-12 grid grid-cols-2 gap-4 sm:grid-cols-4 border-t border-border-soft pt-8 sm:gap-8">
             {(
               [
                 ['235+', t('home.stats.cities')],
                 ['100+', t('home.stats.fairs')],
                 ['75K+', t('home.stats.followers')],
+                ['63+', t('home.stats.companies')],
               ] as const
             ).map(([value, label]) => (
               <div key={label}>
-                <dt className="ltr-nums text-h2 font-bold text-heading">
-                  <CountUp value={value} />
+                <dt className="text-h2 font-bold text-heading">
+                  <CountUp value={value} className="ltr-nums" />
                 </dt>
                 <dd className="mt-0.5 text-caption text-text-muted">{label}</dd>
               </div>
