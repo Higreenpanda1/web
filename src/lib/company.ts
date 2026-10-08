@@ -5,7 +5,8 @@
  * Kept in code rather than the CMS because these change once in years and
  * must never be edited by accident. Licence scans live in public/brand/licences/;
  * an entry with no `images` shows "available on request" instead. Personal
- * ID numbers and birth dates are blurred in the scans before they are added.
+ * ID numbers, birth dates, licence codes and QR codes are blurred in the
+ * scans before they are added, at the owner's request.
  * Fields left null are simply not rendered — fill them from the documents,
  * never from guesswork.
  */
@@ -28,7 +29,7 @@ export const LICENCES: Licence[] = [
     id: 'guangzhou',
     legalName: 'Guangzhou HIGP International Business Services Co., Ltd',
     chineseName: '广州海吉鹏国际商务服务有限公司',
-    number: '91440106MAK38EQ97M',
+    number: null,
     images: [
       {
         src: '/brand/licences/guangzhou.webp',
@@ -42,15 +43,15 @@ export const LICENCES: Licence[] = [
     id: 'nasher',
     legalName: 'Nasher',
     chineseName: '那社尔电子商贸（上海）有限公司',
-    number: '91310120MADC3UP68E',
+    number: null,
     images: [
       { src: '/brand/licences/nasher.webp', width: 1535, height: 1082, label: 'businessLicence' },
     ],
   },
   {
     id: 'accounting',
-    legalName: 'Amber',
-    chineseName: '吴薇',
+    legalName: 'Amber · Lucy',
+    chineseName: null,
     number: null,
     images: [
       { src: '/brand/licences/accounting.webp', width: 1600, height: 1156, label: 'accounting' },
