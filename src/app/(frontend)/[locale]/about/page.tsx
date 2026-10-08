@@ -6,8 +6,8 @@ import { ContactPanel } from '@/components/home/ContactPanel'
 import { FounderCard } from '@/components/home/FounderCard'
 import { StatsBand } from '@/components/home/StatsBand'
 import { JsonLd } from '@/components/JsonLd'
+import { OfficeHighlight } from '@/components/OfficeHighlight'
 import { Breadcrumb } from '@/components/ui/Breadcrumb'
-import { ButtonLink } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Container } from '@/components/ui/Container'
 import { PageHero } from '@/components/ui/PageHero'
@@ -165,19 +165,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         </Section>
       ) : null}
 
-      <Section labelledBy="licences-heading">
-        <SectionHeading
-          id="licences-heading"
-          eyebrow={t('licences.eyebrow')}
-          title={t('licences.title')}
-          lead={t('licences.lead')}
-          action={
-            <ButtonLink href="/licences" variant="secondary">
-              {t('cta.learnMore')}
-            </ButtonLink>
-          }
-        />
-      </Section>
+      <OfficeHighlight locale={locale} />
 
       <Section className="pt-0 md:pt-0">
         <ContactPanel
