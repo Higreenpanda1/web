@@ -5,7 +5,7 @@ import { FOUNDER } from '../seed/content'
 /**
  * Data only, no schema change. Brings the founder record the owner edits in
  * the CMS up to the wording he approved on 8 October 2026: the bachelor's and
- * master's as two lines, China Baowu and the Baowu–Aramco project, the
+ * master's as two lines, the title Founder & CEO, China Baowu and the Baowu–Aramco project, the
  * Harvard Kennedy School course, the Al Jazeera course and his languages.
  *
  * The Baowu sentence goes into the bio after the Belt and Road sentence; the
@@ -51,7 +51,9 @@ export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
     const done = (text: string) => text.includes('Baowu') || text.includes('باوو')
     const bioDone = done(bio)
     const credentialsDone = (current.credentials ?? []).some((item) => done(item.text))
-    if (bioDone && credentialsDone) continue
+    // Only the untouched default title is replaced.
+    const roleDone = current.role !== (locale === 'ar' ? 'المؤسس' : 'Founder')
+    if (bioDone && credentialsDone && roleDone) continue
 
     await payload.update({
       collection: 'team-members',
@@ -60,6 +62,7 @@ export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
       depth: 0,
       req,
       data: {
+        ...(roleDone ? {} : { role: FOUNDER[locale].role }),
         ...(bioDone ? {} : { bio: bio ? insertSentence(bio, locale) : FOUNDER[locale].bio }),
         ...(credentialsDone
           ? {}

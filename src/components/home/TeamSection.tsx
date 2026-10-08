@@ -23,7 +23,6 @@ export function TeamSection({
   eyebrow,
   heading,
   lead,
-  founderLabel,
   founderSummary,
   founderActions,
 }: {
@@ -32,7 +31,6 @@ export function TeamSection({
   eyebrow: string
   heading: string
   lead: string
-  founderLabel: string
   /** One line for the homepage; the full bio and credentials live on About. */
   founderSummary: string
   founderActions?: ReactNode
@@ -73,10 +71,7 @@ export function TeamSection({
             </div>
           )}
           <div>
-            <span className="inline-block rounded-full bg-surface-tint px-3 py-1 text-caption font-semibold text-text-brand">
-              {founderLabel}
-            </span>
-            <h3 className="mt-3">{founder.name}</h3>
+            <h3>{founder.name}</h3>
             <p className="text-text-muted">{founder.role}</p>
             <p className="mt-4 max-w-[var(--measure)]">{founderSummary}</p>
             {founderActions ? (

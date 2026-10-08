@@ -321,7 +321,7 @@ export const FOUNDER = {
   slug: 'sami-al-hajri',
   ar: {
     name: 'سامي الحجري',
-    role: 'المؤسس',
+    role: 'المؤسس والمدير التنفيذي',
     bio: 'يمني مقيم في الصين. حاصل على البكالوريوس والماجستير في إدارة الأعمال من الصين، وفاز بجائزة جيانغسو البحثية عن عمله حول أثر مبادرة الحزام والطريق على المنطقة العربية. عمل في مجموعة الصين باوو، أكبر مجموعة للحديد والصلب في العالم وإحدى شركات فورتشن غلوبال 500، وشارك في إدارة مشروع صيني سعودي مشترك بين باوو وأرامكو. زار أكثر من 235 مدينة صينية وحضر أكثر من 100 معرض تجاري — وهذه ليست أرقامًا للعرض، بل هي سبب معرفته أين يُصنع كل شيء وبكم.',
     credentials: [
       'بكالوريوس إدارة الأعمال، جامعة جيانغسو للعلوم والتكنولوجيا',
@@ -337,7 +337,7 @@ export const FOUNDER = {
   },
   en: {
     name: 'Sami Al-Hajri',
-    role: 'Founder',
+    role: 'Founder & CEO',
     bio: 'Yemeni, based in China. He holds a Bachelor’s and a Master’s in Business Administration earned in China, and won the Jiangsu Research Award for his work on the impact of the Belt and Road Initiative on the Arab region. He worked at China Baowu Group, the world’s largest steel group and a Fortune Global 500 company, and helped manage a Chinese-Saudi joint project between Baowu and Aramco. He has travelled to more than 235 Chinese cities and attended more than 100 trade fairs — not as a statistic, but as the reason he knows where things are made and what they should cost.',
     credentials: [
       'Bachelor of Business Administration, Jiangsu University of Science and Technology',

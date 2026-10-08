@@ -218,7 +218,6 @@ export async function DefaultHome({ locale }: { locale: Locale }) {
             eyebrow={t('home.teamEyebrow')}
             heading={t('home.teamTitle')}
             lead={t('home.teamLead')}
-            founderLabel={t('home.founderEyebrow')}
             founderSummary={t('home.founderSummary')}
             founderActions={
               <ButtonLink href="/about" variant="secondary">
