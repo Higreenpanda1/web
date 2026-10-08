@@ -1,5 +1,6 @@
 import { Facebook, Instagram, Linkedin, Mail, MapPin, Youtube } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
+import Image from 'next/image'
 
 import { TikTokIcon } from '@/components/icons/TikTokIcon'
 import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon'
@@ -87,15 +88,29 @@ export async function Footer({ locale, settings }: { locale: Locale; settings: S
               </p>
             ) : null}
             {HEADQUARTERS.addressEn ? (
-              <p className="mt-2 text-caption text-brand-300">
-                <Link
-                  href="/licences#headquarters"
-                  className="text-brand-300 no-underline hover:text-white hover:underline"
-                >
-                  {t('licences.hq.eyebrow')}:{' '}
-                  <span dir="ltr">{HEADQUARTERS.addressEn.join(', ')}</span>
-                </Link>
-              </p>
+              <Link
+                href="/licences#headquarters"
+                className="group mt-5 flex max-w-[26rem] items-center gap-4 text-caption text-brand-300 no-underline hover:text-white"
+              >
+                {HEADQUARTERS.photo ? (
+                  <Image
+                    src={HEADQUARTERS.photo}
+                    alt={t('licences.hq.photoAlt')}
+                    width={989}
+                    height={1318}
+                    sizes="96px"
+                    className="aspect-[4/5] h-auto w-24 shrink-0 rounded-lg border border-white/15 object-cover"
+                  />
+                ) : null}
+                <span>
+                  <span className="block font-semibold text-brand-100 group-hover:text-white">
+                    {t('licences.hq.eyebrow')}
+                  </span>
+                  <span dir="ltr" className="mt-1 block group-hover:underline">
+                    {HEADQUARTERS.addressEn.join(', ')}
+                  </span>
+                </span>
+              </Link>
             ) : null}
             {socials.length > 0 ? (
               <ul className="mt-6 flex gap-2">

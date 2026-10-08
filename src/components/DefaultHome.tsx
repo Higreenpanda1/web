@@ -7,7 +7,6 @@ import { FounderCard } from '@/components/home/FounderCard'
 import { Hero } from '@/components/home/Hero'
 import { Journey, type JourneyStep } from '@/components/home/Journey'
 import { WorldClocks } from '@/components/home/WorldClocks'
-import { OfficeHighlight } from '@/components/OfficeHighlight'
 import { PostCard } from '@/components/PostCard'
 import { CategoryTiles } from '@/components/services/CategoryTiles'
 import { ButtonLink } from '@/components/ui/Button'
@@ -207,8 +206,6 @@ export async function DefaultHome({ locale }: { locale: Locale }) {
           </ul>
         </Section>
       ) : null}
-
-      <OfficeHighlight locale={locale} tone="tint" />
 
       {founder ? (
         <Section labelledBy="home-founder-heading">
