@@ -894,6 +894,10 @@
       "businessLicence": "Business licence (营业执照)",
       "accounting": "Accounting Professional Qualification (会计专业技术资格) · Amber",
       "taxAdvisor": "Tax Advisor certificate (税务师) · Lucy"
+    },
+    "docsShort": {
+      "accounting": "Accounting certificate · Amber",
+      "taxAdvisor": "Tax advisor certificate · Lucy"
     }
   }
 }
