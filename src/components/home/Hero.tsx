@@ -13,6 +13,7 @@ import { getTranslations } from 'next-intl/server'
 import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon'
 import { PlayMark } from '@/components/layout/Logo'
 import { ButtonLink } from '@/components/ui/Button'
+import { CityRotator } from '@/components/ui/CityRotator'
 import { CountUp } from '@/components/ui/CountUp'
 import { Container } from '@/components/ui/Container'
 import { cn } from '@/lib/cn'
@@ -58,7 +59,10 @@ export async function Hero({ locale, settings }: { locale: Locale; settings: Sit
         <div className="max-w-[40rem]">
           <p className="reveal inline-flex items-center gap-2 rounded-full border border-brand-200 bg-surface px-3.5 py-1.5 text-caption font-semibold text-heading shadow-sm">
             <MapPin size={16} strokeWidth={2} aria-hidden="true" className="text-brand-600" />
-            {t('home.heroEyebrow')}
+            <CityRotator
+              cities={[t('home.heroCity1'), t('home.heroCity2'), t('home.heroCity3')]}
+              fullList={t('home.heroEyebrow')}
+            />
           </p>
 
           <h1 className="word-reveal mt-6 text-display">
