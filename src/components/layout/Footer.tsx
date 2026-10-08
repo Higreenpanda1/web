@@ -5,6 +5,7 @@ import { TikTokIcon } from '@/components/icons/TikTokIcon'
 import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon'
 import { Link } from '@/i18n/navigation'
 import { SERVICE_CATEGORIES } from '@/lib/catalogue'
+import { HEADQUARTERS } from '@/lib/company'
 import { whatsappLink } from '@/lib/url'
 import { Wordmark } from './Logo'
 
@@ -50,6 +51,7 @@ export async function Footer({ locale, settings }: { locale: Locale; settings: S
             links: [
               { id: 'c1', label: t('nav.about'), href: '/about' },
               { id: 'c4', label: t('nav.field'), href: '/field' },
+              { id: 'c5', label: t('footer.licences'), href: '/licences' },
               { id: 'c2', label: t('nav.blog'), href: '/blog' },
               { id: 'c3', label: t('nav.contact'), href: '/contact' },
             ],
@@ -82,6 +84,17 @@ export async function Footer({ locale, settings }: { locale: Locale; settings: S
               <p className="mt-4 inline-flex items-center gap-2 text-caption text-brand-300">
                 <MapPin size={16} strokeWidth={1.75} aria-hidden="true" />
                 {offices.join(' · ')}
+              </p>
+            ) : null}
+            {HEADQUARTERS.addressEn ? (
+              <p className="mt-2 text-caption text-brand-300">
+                <Link
+                  href="/licences#headquarters"
+                  className="text-brand-300 no-underline hover:text-white hover:underline"
+                >
+                  {t('licences.hq.eyebrow')}:{' '}
+                  <span dir="ltr">{HEADQUARTERS.addressEn.join(', ')}</span>
+                </Link>
               </p>
             ) : null}
             {socials.length > 0 ? (
@@ -162,7 +175,15 @@ export async function Footer({ locale, settings }: { locale: Locale; settings: S
               <span className="ltr-nums"> · {settings.companyRegistration}</span>
             ) : null}
           </p>
-          <ul className="flex gap-5">
+          <ul className="flex flex-wrap gap-5">
+            <li>
+              <Link
+                href="/licences"
+                className="text-brand-300 no-underline hover:text-white hover:underline"
+              >
+                {t('footer.licences')}
+              </Link>
+            </li>
             <li>
               <Link
                 href="/privacy"

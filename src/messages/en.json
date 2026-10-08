@@ -331,7 +331,8 @@
     "terms": "Terms and conditions",
     "builtNote": "Built securely and backed up daily.",
     "tagline": "Your partner on the ground in China",
-    "areasTitle": "What we do"
+    "areasTitle": "What we do",
+    "licences": "Licences and address"
   },
   "legal": {
     "privacyTitle": "Privacy policy",
@@ -841,5 +842,40 @@
     },
     "contactTitle": "Want the next visit to be yours?",
     "count": "{count, plural, one {# visit} other {# visits}}"
+  },
+  "licences": {
+    "title": "Licences and address",
+    "eyebrow": "Licensed in China",
+    "lead": "We work through two companies licensed in China, with our head office in Shenzhen. Here are the licences and the address, so you can check for yourself.",
+    "legalName": "Registered name",
+    "issuedIn": "Issued in",
+    "number": "Licence number",
+    "onRequest": "We send a copy of the licence on WhatsApp on request.",
+    "viewFull": "Tap to view the full licence",
+    "items": {
+      "guangzhou": {
+        "title": "Guangzhou company licence",
+        "body": "Our corporate services company: company formation, registered address, accounting, bank accounts and work permits.",
+        "city": "Guangzhou, China"
+      },
+      "nasher": {
+        "title": "Nasher Trading licence",
+        "body": "Our sourcing and import company: finding factories, manufacturing, inspection, shipping and trade-fair accompaniment.",
+        "city": "Shanghai, China"
+      },
+      "accounting": {
+        "title": "Accounting licence",
+        "body": "We keep the books and file tax returns for our clients' companies under an official accounting licence.",
+        "city": "Guangzhou, China"
+      }
+    },
+    "hq": {
+      "eyebrow": "Head office",
+      "title": "Our Shenzhen address",
+      "lead": "Both companies are run from here. You are welcome to visit by appointment.",
+      "city": "Shenzhen, China",
+      "onRequest": "We send the address and map pin on WhatsApp.",
+      "openMap": "Open in maps"
+    }
   }
 }
