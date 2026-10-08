@@ -78,6 +78,8 @@ const ROUTES = [
   ['/about', 200],
   ['/en/about', 200],
   ['/field', 200],
+  ['/offices', 200],
+  ['/en/offices', 200],
   ['/en/field', 200],
   ['/contact', 200],
   ['/privacy', 200],
