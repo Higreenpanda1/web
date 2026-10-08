@@ -122,8 +122,8 @@ export default async function LicencesPage({ params }: { params: Promise<{ local
               <Image
                 src={HEADQUARTERS.photo}
                 alt={t('licences.hq.photoAlt')}
-                width={1200}
-                height={1500}
+                width={989}
+                height={1318}
                 sizes="(min-width: 1024px) 40vw, 100vw"
                 className="h-auto w-full rounded-lg border border-border-soft object-cover shadow-card"
               />
