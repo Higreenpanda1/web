@@ -1,40 +1,31 @@
 import type { MigrateDownArgs, MigrateUpArgs } from '@payloadcms/db-postgres'
 
+import { FOUNDER } from '../seed/content'
+
 /**
- * Data only, no schema change. Adds the founder's Baowu years, the Baowu and
- * Aramco project, the Harvard leadership certificate and his other awards to
- * the founder record the owner already edits in the CMS. It appends rather
- * than replaces, and skips any line already there, so CMS edits survive and
- * running it twice changes nothing.
+ * Data only, no schema change. Brings the founder record the owner edits in
+ * the CMS up to the wording he approved on 8 October 2026: the bachelor's and
+ * master's as two lines, China Baowu and the Baowu–Aramco project, the
+ * Harvard Kennedy School course, the Al Jazeera course and his languages.
+ *
+ * The Baowu sentence goes into the bio after the Belt and Road sentence; the
+ * rest of the bio stays as it is in the CMS. A record that already mentions
+ * Baowu is left alone, so running this twice changes nothing.
  */
-const ADDITIONS = {
-  ar: {
-    bio: 'عمل في شركة باوستيل التابعة لمجموعة الصين باوو، أكبر مجموعة للحديد والصلب في العالم، وشارك في مشروع مشترك بين باوو وأرامكو السعودية.',
-    credentials: [
-      'عمل في باوستيل (Baosteel) التابعة لمجموعة الصين باوو، أكبر مجموعة للحديد والصلب في العالم وإحدى شركات فورتشن غلوبال 500',
-      'شارك في مشروع مشترك بين مجموعة باوو وأرامكو السعودية',
-      'شهادة في القيادة من جامعة هارفارد (HarvardX)',
-      'منحة حكومة جيانغسو، المركز الأول (2020)',
-      'المركز الأول في اللغة الصينية وجائزة التميّز الأكاديمي، جامعة وسط الصين للمعلمين (2016)',
-      'شهادة تدريس اللغة الإنجليزية TESOL (120 ساعة)',
-      'دورة صناعة المحتوى من Nas Academy (2021)',
-      'يتحدث العربية والصينية والإنجليزية',
-    ],
-  },
-  en: {
-    bio: 'He worked at Baosteel, part of China Baowu Group, the world’s largest steel group, and on a joint project between Baowu and Saudi Aramco.',
-    credentials: [
-      'Worked at Baosteel, part of China Baowu Group: the world’s largest steel group and a Fortune Global 500 company',
-      'Worked on a joint project between China Baowu and Saudi Aramco',
-      'Leadership certificate from Harvard University (HarvardX)',
-      'Jiangsu Government Scholarship, first prize (2020)',
-      'First prize in Chinese and Academic Diligence Award, Central China Normal University (2016)',
-      '120-hour TESOL certificate',
-      'Creator Mastercourse, Nas Academy (2021)',
-      'Speaks Arabic, Chinese and English',
-    ],
-  },
+const BIO_SENTENCE = {
+  ar: 'عمل في مجموعة الصين باوو، أكبر مجموعة للحديد والصلب في العالم وإحدى شركات فورتشن غلوبال 500، وشارك في إدارة مشروع صيني سعودي مشترك بين باوو وأرامكو.',
+  en: 'He worked at China Baowu Group, the world’s largest steel group and a Fortune Global 500 company, and helped manage a Chinese-Saudi joint project between Baowu and Aramco.',
 } as const
+
+/** The sentence the Baowu line follows. */
+const AFTER = { ar: 'المنطقة العربية.', en: 'Arab region.' } as const
+
+const insertSentence = (bio: string, locale: 'ar' | 'en') => {
+  const at = bio.indexOf(AFTER[locale])
+  if (at === -1) return `${bio} ${BIO_SENTENCE[locale]}`.trim()
+  const end = at + AFTER[locale].length
+  return `${bio.slice(0, end)} ${BIO_SENTENCE[locale]}${bio.slice(end)}`
+}
 
 export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
   const { docs } = await payload.find({
@@ -56,12 +47,11 @@ export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
       depth: 0,
       req,
     })
-    const existing = current.credentials ?? []
-    const have = new Set(existing.map((item) => item.text.trim()))
-    const added = ADDITIONS[locale].credentials.filter((text) => !have.has(text))
     const bio = current.bio ?? ''
-    const bioHasIt = bio.includes('Baowu') || bio.includes('باوو')
-    if (added.length === 0 && bioHasIt) continue
+    const done = (text: string) => text.includes('Baowu') || text.includes('باوو')
+    const bioDone = done(bio)
+    const credentialsDone = (current.credentials ?? []).some((item) => done(item.text))
+    if (bioDone && credentialsDone) continue
 
     await payload.update({
       collection: 'team-members',
@@ -70,13 +60,15 @@ export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
       depth: 0,
       req,
       data: {
-        bio: bioHasIt || !bio ? bio : `${bio} ${ADDITIONS[locale].bio}`,
-        credentials: [...existing, ...added.map((text) => ({ text }))],
+        ...(bioDone ? {} : { bio: bio ? insertSentence(bio, locale) : FOUNDER[locale].bio }),
+        ...(credentialsDone
+          ? {}
+          : { credentials: FOUNDER[locale].credentials.map((text) => ({ text })) }),
       },
     })
   }
 }
 
-export async function down(): Promise<void> {
-  // Content, not schema: the owner removes lines in the CMS if needed.
+export async function down(_args: MigrateDownArgs): Promise<void> {
+  // Content, not schema: the owner edits these lines in the CMS if needed.
 }
