@@ -73,67 +73,69 @@ export default async function LicencesPage({ params }: { params: Promise<{ local
       ))}
 
       <Section id="headquarters" tone="sunken" labelledBy="hq-heading">
-        <SectionHeading
-          id="hq-heading"
-          eyebrow={t('licences.hq.eyebrow')}
-          title={t('licences.hq.title')}
-          lead={t('licences.hq.lead')}
-        />
-        <div className="grid items-start gap-8 lg:grid-cols-2">
-          <Card>
-            <div className="flex items-start gap-4">
-              <span className="inline-flex size-12 shrink-0 items-center justify-center rounded-lg bg-surface-tint text-text-brand">
-                <MapPin size={24} strokeWidth={1.75} aria-hidden="true" />
-              </span>
-              <div className="min-w-0">
-                <h3>{t('licences.hq.city')}</h3>
-                {HEADQUARTERS.addressEn ? (
-                  <address className="mt-2 not-italic" lang="en">
-                    {HEADQUARTERS.addressEn.map((line) => (
-                      <bdi key={line} className="block">
-                        {line}
-                      </bdi>
-                    ))}
-                  </address>
-                ) : (
-                  <p className="mt-2 text-text-muted">{t('licences.hq.onRequest')}</p>
-                )}
-                {HEADQUARTERS.addressZh ? (
-                  <p className="mt-2 text-text-muted" lang="zh">
-                    {HEADQUARTERS.addressZh}
-                  </p>
+        <div className="grid items-start gap-10 lg:grid-cols-2">
+          <SectionHeading
+            id="hq-heading"
+            eyebrow={t('licences.hq.eyebrow')}
+            title={t('licences.hq.title')}
+            lead={t('licences.hq.lead')}
+          />
+          <div className="w-full max-w-md space-y-6">
+            {HEADQUARTERS.photo ? (
+              <figure>
+                <Image
+                  src={HEADQUARTERS.photo}
+                  alt={t('licences.hq.photoAlt')}
+                  width={989}
+                  height={1318}
+                  sizes="448px"
+                  className="aspect-[4/5] h-auto w-full rounded-lg border border-border-soft object-cover shadow-card"
+                />
+                {HEADQUARTERS.photoCredit ? (
+                  <figcaption className="mt-2 text-caption text-text-muted" dir="ltr">
+                    {HEADQUARTERS.photoCredit}
+                  </figcaption>
                 ) : null}
-                {HEADQUARTERS.mapUrl ? (
-                  <a
-                    href={HEADQUARTERS.mapUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-4 inline-flex items-center gap-2 font-semibold"
-                  >
-                    <MapPin size={18} strokeWidth={1.75} aria-hidden="true" />
-                    {t('licences.hq.openMap')}
-                  </a>
-                ) : null}
+              </figure>
+            ) : null}
+            <Card>
+              <div className="flex items-start gap-4">
+                <span className="inline-flex size-12 shrink-0 items-center justify-center rounded-lg bg-surface-tint text-text-brand">
+                  <MapPin size={24} strokeWidth={1.75} aria-hidden="true" />
+                </span>
+                <div className="min-w-0">
+                  <h3>{t('licences.hq.city')}</h3>
+                  {HEADQUARTERS.addressEn ? (
+                    <address className="mt-2 not-italic" lang="en">
+                      {HEADQUARTERS.addressEn.map((line) => (
+                        <bdi key={line} className="block">
+                          {line}
+                        </bdi>
+                      ))}
+                    </address>
+                  ) : (
+                    <p className="mt-2 text-text-muted">{t('licences.hq.onRequest')}</p>
+                  )}
+                  {HEADQUARTERS.addressZh ? (
+                    <p className="mt-2 text-text-muted" lang="zh">
+                      {HEADQUARTERS.addressZh}
+                    </p>
+                  ) : null}
+                  {HEADQUARTERS.mapUrl ? (
+                    <a
+                      href={HEADQUARTERS.mapUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-4 inline-flex items-center gap-2 font-semibold"
+                    >
+                      <MapPin size={18} strokeWidth={1.75} aria-hidden="true" />
+                      {t('licences.hq.openMap')}
+                    </a>
+                  ) : null}
+                </div>
               </div>
-            </div>
-          </Card>
-          {HEADQUARTERS.photo ? (
-            <figure>
-              <Image
-                src={HEADQUARTERS.photo}
-                alt={t('licences.hq.photoAlt')}
-                width={989}
-                height={1318}
-                sizes="(min-width: 1024px) 40vw, 100vw"
-                className="h-auto w-full rounded-lg border border-border-soft object-cover shadow-card"
-              />
-              {HEADQUARTERS.photoCredit ? (
-                <figcaption className="mt-2 text-caption text-text-muted" dir="ltr">
-                  {HEADQUARTERS.photoCredit}
-                </figcaption>
-              ) : null}
-            </figure>
-          ) : null}
+            </Card>
+          </div>
         </div>
       </Section>
     </>
