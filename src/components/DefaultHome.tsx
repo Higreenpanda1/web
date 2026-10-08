@@ -3,16 +3,16 @@ import { getTranslations } from 'next-intl/server'
 
 import { FieldGroups } from '@/components/FieldGallery'
 import { ContactPanel } from '@/components/home/ContactPanel'
-import { FounderCard } from '@/components/home/FounderCard'
 import { Hero } from '@/components/home/Hero'
 import { Journey, type JourneyStep } from '@/components/home/Journey'
+import { TeamSection } from '@/components/home/TeamSection'
 import { WorldClocks } from '@/components/home/WorldClocks'
 import { PostCard } from '@/components/PostCard'
 import { CategoryTiles } from '@/components/services/CategoryTiles'
 import { ButtonLink } from '@/components/ui/Button'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { Section, SectionHeading } from '@/components/ui/Section'
-import { getFieldMoments, getFounder, getPosts, getServices, getSiteSettings } from '@/lib/queries'
+import { getFieldMoments, getPosts, getServices, getSiteSettings, getTeam } from '@/lib/queries'
 import { groupServices } from '@/lib/services'
 
 import type { Locale } from '@/i18n/routing'
@@ -42,21 +42,24 @@ const JOURNEY_LINKS = [
  *
  * Rebuilt on 23 September 2026 around the owner's structure document: a
  * quieter hero, the twelve-step journey as the centrepiece, the consultation
- * offer, then the service areas, the blog and the founder. One accent colour,
+ * offer, then the service areas, the blog and the team (founder first; his
+ * full story lives on About). One accent colour,
  * white surfaces, and motion only on entrance. Every word comes from the
  * message catalogues; a CMS `home` Page still replaces all of this.
  */
 export async function DefaultHome({ locale }: { locale: Locale }) {
-  const [t, settings, services, { docs: posts }, founder, fieldMoments] = await Promise.all([
+  const [t, settings, services, { docs: posts }, team, fieldMoments] = await Promise.all([
     getTranslations({ locale }),
     getSiteSettings(locale),
     getServices(locale, { limit: 60 }),
     getPosts(locale, { limit: 3 }),
-    getFounder(locale),
+    getTeam(locale),
     getFieldMoments(locale),
   ])
 
   const Arrow = locale === 'ar' ? ArrowLeft : ArrowRight
+  const founder = team.find((member) => member.isFounder) ?? team[0] ?? null
+  const others = team.filter((member) => member.id !== founder?.id)
   const groups = groupServices(services)
   const steps: JourneyStep[] = JOURNEY_LINKS.map((href, index) => ({
     href,
@@ -207,24 +210,23 @@ export async function DefaultHome({ locale }: { locale: Locale }) {
         </Section>
       ) : null}
 
-      {founder ? (
-        <Section labelledBy="home-founder-heading">
-          <div data-reveal>
-            <FounderCard
-              member={founder}
-              eyebrow={t('home.founderEyebrow')}
-              heading={t('home.founderTitle')}
-              actions={
-                <ButtonLink href="/about" variant="secondary">
-                  {t('home.founderCta')}
-                  <Arrow size={18} strokeWidth={2} aria-hidden="true" />
-                </ButtonLink>
-              }
-            />
-          </div>
-          <h2 id="home-founder-heading" className="sr-only">
-            {t('home.founderTitle')}
-          </h2>
+      {team.length > 0 ? (
+        <Section labelledBy="home-team-heading">
+          <TeamSection
+            founder={founder}
+            others={others}
+            eyebrow={t('home.teamEyebrow')}
+            heading={t('home.teamTitle')}
+            lead={t('home.teamLead')}
+            founderLabel={t('home.founderEyebrow')}
+            founderSummary={t('home.founderSummary')}
+            founderActions={
+              <ButtonLink href="/about" variant="secondary">
+                {t('home.founderCta')}
+                <Arrow size={18} strokeWidth={2} aria-hidden="true" />
+              </ButtonLink>
+            }
+          />
         </Section>
       ) : null}
 
