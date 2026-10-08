@@ -115,7 +115,7 @@ export async function Hero({ locale, settings }: { locale: Locale; settings: Sit
               [
                 ['235+', t('home.stats.cities')],
                 ['100+', t('home.stats.fairs')],
-                ['75K+', t('home.stats.followers')],
+                ['120K+', t('home.stats.followers')],
                 ['63+', t('home.stats.companies')],
               ] as const
             ).map(([value, label]) => (

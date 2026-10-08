@@ -96,8 +96,8 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
             items={[
               { value: '235+', label: t('home.stats.cities') },
               { value: '100+', label: t('home.stats.fairs') },
-              { value: '46,000', label: t('home.stats.followers') },
-              { value: '29,000', label: t('home.stats.subscribers') },
+              { value: '120K+', label: t('home.stats.followers') },
+              { value: '63+', label: t('home.stats.companies') },
             ]}
           />
         </Container>
