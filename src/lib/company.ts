@@ -6,7 +6,8 @@
  * must never be edited by accident. Licence scans live in public/brand/licences/;
  * an entry with no `images` shows "available on request" instead. Personal
  * ID numbers, birth dates, licence codes and QR codes are blurred in the
- * scans before they are added, at the owner's request.
+ * scans before they are added, at the owner's request, and every scan carries
+ * a tiled "for higreenpanda.com use only" watermark burned into the image.
  * Fields left null are simply not rendered — fill them from the documents,
  * never from guesswork.
  */
