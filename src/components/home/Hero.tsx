@@ -120,8 +120,8 @@ export async function Hero({ locale, settings }: { locale: Locale; settings: Sit
               ] as const
             ).map(([value, label]) => (
               <div key={label}>
-                <dt className="ltr-nums text-h2 font-bold text-heading">
-                  <CountUp value={value} />
+                <dt className="text-h2 font-bold text-heading">
+                  <CountUp value={value} className="ltr-nums" />
                 </dt>
                 <dd className="mt-0.5 text-caption text-text-muted">{label}</dd>
               </div>
