@@ -3,8 +3,9 @@
  * companies, the accounting licence and the Shenzhen headquarters.
  *
  * Kept in code rather than the CMS because these change once in years and
- * must never be edited by accident. Licence scans live in public/licences/;
- * an entry whose `image` is null shows "available on request" instead.
+ * must never be edited by accident. Licence scans live in public/brand/licences/;
+ * an entry with no `images` shows "available on request" instead. Personal
+ * ID numbers and birth dates are blurred in the scans before they are added.
  * Fields left null are simply not rendered — fill them from the documents,
  * never from guesswork.
  */
@@ -18,31 +19,43 @@ export type Licence = {
   chineseName: string | null
   /** Unified social credit code (统一社会信用代码) or licence number. */
   number: string | null
-  /** Path under /public, e.g. '/licences/guangzhou.webp'. */
-  image: string | null
+  /** Scans under /public, in display order. `label` is a key under `licences.docs`. */
+  images: Array<{ src: string; width: number; height: number; label: string }>
 }
 
 export const LICENCES: Licence[] = [
   {
     id: 'guangzhou',
     legalName: 'Guangzhou HIGP International Business Services Co., Ltd',
-    chineseName: null,
-    number: null,
-    image: null,
+    chineseName: '广州海吉鹏国际商务服务有限公司',
+    number: '91440106MAK38EQ97M',
+    images: [
+      {
+        src: '/brand/licences/guangzhou.webp',
+        width: 1600,
+        height: 1126,
+        label: 'businessLicence',
+      },
+    ],
   },
   {
     id: 'nasher',
     legalName: 'Nasher',
     chineseName: '那社尔电子商贸（上海）有限公司',
     number: '91310120MADC3UP68E',
-    image: null,
+    images: [
+      { src: '/brand/licences/nasher.webp', width: 1535, height: 1082, label: 'businessLicence' },
+    ],
   },
   {
     id: 'accounting',
     legalName: 'Amber',
-    chineseName: null,
+    chineseName: '吴薇',
     number: null,
-    image: null,
+    images: [
+      { src: '/brand/licences/accounting.webp', width: 1600, height: 1156, label: 'accounting' },
+      { src: '/brand/licences/tax-advisor.webp', width: 1600, height: 1200, label: 'taxAdvisor' },
+    ],
   },
 ]
 

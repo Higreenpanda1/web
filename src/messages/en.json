@@ -864,8 +864,8 @@
         "city": "Shanghai, China"
       },
       "accounting": {
-        "title": "Accounting licence",
-        "body": "Our accountant Amber holds an official accounting licence in China. She keeps the books and files the tax returns for our clients' companies.",
+        "title": "Accounting and tax licences",
+        "body": "Our accounting team holds official certificates issued by the Chinese government: the Accounting Professional Qualification held by our accountant Amber, and a Tax Advisor certificate. With them we keep the books and file tax returns for our clients' companies.",
         "city": "China"
       }
     },
@@ -878,6 +878,11 @@
       "openMap": "Open in maps",
       "photoAlt": "The KK100 tower in Shenzhen, home of our office on the 41st floor"
     },
-    "holder": "Licence holder"
+    "holder": "Licence holder",
+    "docs": {
+      "businessLicence": "Business licence (营业执照)",
+      "accounting": "Accounting Professional Qualification (会计专业技术资格)",
+      "taxAdvisor": "Tax Advisor certificate (税务师)"
+    }
   }
 }

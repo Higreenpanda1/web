@@ -182,20 +182,26 @@ function LicenceSection({
           </dl>
         </div>
 
-        {licence.image ? (
-          <a href={licence.image} target="_blank" rel="noopener noreferrer" className="block">
-            <Image
-              src={licence.image}
-              alt={t(`licences.items.${licence.id}.title`)}
-              width={900}
-              height={1200}
-              sizes="(min-width: 1024px) 40vw, 100vw"
-              className="h-auto w-full rounded-lg border border-border-soft shadow-card"
-            />
-            <span className="mt-2 block text-caption text-text-muted">
-              {t('licences.viewFull')}
-            </span>
-          </a>
+        {licence.images.length > 0 ? (
+          <div className="space-y-6">
+            {licence.images.map((image) => (
+              <figure key={image.src}>
+                <a href={image.src} target="_blank" rel="noopener noreferrer" className="block">
+                  <Image
+                    src={image.src}
+                    alt={t(`licences.docs.${image.label}`)}
+                    width={image.width}
+                    height={image.height}
+                    sizes="(min-width: 1024px) 40vw, 100vw"
+                    className="h-auto w-full rounded-lg border border-border-soft shadow-card"
+                  />
+                </a>
+                <figcaption className="mt-2 text-caption text-text-muted">
+                  {t(`licences.docs.${image.label}`)} · {t('licences.viewFull')}
+                </figcaption>
+              </figure>
+            ))}
+          </div>
         ) : (
           <Card className="flex items-center gap-3">
             <BadgeCheck
