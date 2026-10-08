@@ -71,6 +71,8 @@ export const HEADQUARTERS = {
   addressZh: '深圳市罗湖区深南东路5016号京基一百大厦A座41楼35' as string | null,
   /** A photo of the KK100 tower, path under /public. Use our own photo, never one off the web. */
   photo: null as string | null,
+  /** Credit line the photo's licence requires, e.g. 'Photo: Name, CC BY-SA 4.0, Wikimedia Commons'. */
+  photoCredit: null as string | null,
   /** A map link (Amap, Baidu or Google). */
   mapUrl:
     'https://www.google.com/maps/search/?api=1&query=KK100+Tower+A+5016+Shennan+East+Road+Shenzhen' as

@@ -118,14 +118,21 @@ export default async function LicencesPage({ params }: { params: Promise<{ local
             </div>
           </Card>
           {HEADQUARTERS.photo ? (
-            <Image
-              src={HEADQUARTERS.photo}
-              alt={t('licences.hq.photoAlt')}
-              width={1200}
-              height={1500}
-              sizes="(min-width: 1024px) 40vw, 100vw"
-              className="h-auto w-full rounded-lg border border-border-soft object-cover shadow-card"
-            />
+            <figure>
+              <Image
+                src={HEADQUARTERS.photo}
+                alt={t('licences.hq.photoAlt')}
+                width={1200}
+                height={1500}
+                sizes="(min-width: 1024px) 40vw, 100vw"
+                className="h-auto w-full rounded-lg border border-border-soft object-cover shadow-card"
+              />
+              {HEADQUARTERS.photoCredit ? (
+                <figcaption className="mt-2 text-caption text-text-muted" dir="ltr">
+                  {HEADQUARTERS.photoCredit}
+                </figcaption>
+              ) : null}
+            </figure>
           ) : null}
         </div>
       </Section>
