@@ -505,6 +505,8 @@
       "nationality": "الجنسية",
       "residenceCountry": "بلد الإقامة",
       "chinesePhone": "هل لديك رقم هاتف صيني؟",
+      "chinesePhoneNumber": "رقمك الصيني",
+      "chinesePhoneNumberHint": "مع رمز الدولة، مثل 8613812345678+",
       "inChinaNow": "هل أنت في الصين الآن؟",
       "city": "مدينة التسجيل",
       "cityOther": "أي مدينة؟",
