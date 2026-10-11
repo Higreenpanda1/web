@@ -94,3 +94,11 @@ test('asks a too-fast visitor to try again instead of dropping them', () => {
 test('the hidden field name is not one browsers autofill', () => {
   assert.doesNotMatch(HONEYPOT_FIELD, /company|website|url|name|mail|phone|address/i)
 })
+
+test('asks a visitor whose page went stale to resend, even with the hidden field filled', () => {
+  const data = form({ [TIMESTAMP_FIELD]: issueFormToken(NOW), [HONEYPOT_FIELD]: 'acme.com' })
+  assert.deepEqual(checkFormGuard('test', data, NOW + MAX_FORM_AGE_MS + 1), {
+    drop: false,
+    errorKey: 'generic',
+  })
+})

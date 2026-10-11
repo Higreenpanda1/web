@@ -90,7 +90,7 @@ export type FormGuardOutcome =
  * managers autofill hidden fields, and on 11 October 2026 that cost a real
  * company-registration client their application: they saw a success page,
  * and nothing was stored or emailed. So the honeypot only drops a submission
- * whose timing token is ALSO bad; one with a valid token (the form was
+ * whose timing token is ALSO forged or too fast; one with a valid token (the form was
  * rendered by our page and filled at human speed) is kept and logged.
  */
 export function checkFormGuard(
@@ -108,6 +108,11 @@ export function checkFormGuard(
     if (tokenOnly.ok) {
       console.warn(`[${form}] hidden field was filled but the token is valid — kept`)
       return { drop: false }
+    }
+    // A page left open for hours is a person, not a bot: ask them to resend.
+    if (tokenOnly.reason === 'stale') {
+      console.warn(`[${form}] refused: stale (hidden field also filled)`)
+      return { drop: false, errorKey: 'generic' }
     }
     console.warn(`[${form}] dropped as a bot: hidden field filled and token ${tokenOnly.reason}`)
     return { drop: true }
