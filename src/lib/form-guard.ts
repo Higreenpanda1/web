@@ -1,5 +1,7 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 
+import { HONEYPOT_FIELD, TIMESTAMP_FIELD } from './form-fields.ts'
+
 /**
  * Bot defences for the enquiry form. No third-party CAPTCHA: this audience is
  * on mid-range Androids over slow 4G in the Gulf and Yemen, and a CAPTCHA costs
@@ -70,6 +72,54 @@ export function verifyFormToken(
   if (age > MAX_FORM_AGE_MS) return { ok: false, reason: 'stale' }
 
   return { ok: true }
+}
+
+export type FormGuardOutcome =
+  /** Pass: store the submission. */
+  | { drop: false; errorKey?: undefined }
+  /** A bot: answer with a fake success and store nothing. */
+  | { drop: true; errorKey?: undefined }
+  /** Tell the visitor to try again (too fast, stale page, bad token). */
+  | { drop: false; errorKey: 'tooFast' | 'generic' }
+
+/**
+ * What a form action does with a submission, and a log line for every
+ * refusal, so a client who says "the site told me it arrived" can be traced.
+ *
+ * A filled honeypot alone no longer drops a submission. Browsers and password
+ * managers autofill hidden fields, and on 11 October 2026 that cost a real
+ * company-registration client their application: they saw a success page,
+ * and nothing was stored or emailed. So the honeypot only drops a submission
+ * whose timing token is ALSO forged or too fast; one with a valid token (the form was
+ * rendered by our page and filled at human speed) is kept and logged.
+ */
+export function checkFormGuard(
+  form: string,
+  data: { get(name: string): unknown },
+  now = Date.now(),
+): FormGuardOutcome {
+  const token = data.get(TIMESTAMP_FIELD)
+  const honeypot = data.get(HONEYPOT_FIELD)
+  const verdict = verifyFormToken(token, honeypot, now)
+  if (verdict.ok) return { drop: false }
+
+  if (verdict.reason === 'honeypot') {
+    const tokenOnly = verifyFormToken(token, '', now)
+    if (tokenOnly.ok) {
+      console.warn(`[${form}] hidden field was filled but the token is valid — kept`)
+      return { drop: false }
+    }
+    // A page left open for hours is a person, not a bot: ask them to resend.
+    if (tokenOnly.reason === 'stale') {
+      console.warn(`[${form}] refused: stale (hidden field also filled)`)
+      return { drop: false, errorKey: 'generic' }
+    }
+    console.warn(`[${form}] dropped as a bot: hidden field filled and token ${tokenOnly.reason}`)
+    return { drop: true }
+  }
+
+  console.warn(`[${form}] refused: ${verdict.reason}`)
+  return { drop: false, errorKey: verdict.reason === 'too-fast' ? 'tooFast' : 'generic' }
 }
 
 function sign(payload: string): string {

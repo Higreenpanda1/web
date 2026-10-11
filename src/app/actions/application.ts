@@ -15,8 +15,7 @@ import {
 } from '@/lib/email'
 import { syncApplicationToHubSpot } from '@/lib/hubspot'
 import { isApplicationType } from '@/lib/catalogue'
-import { HONEYPOT_FIELD, TIMESTAMP_FIELD } from '@/lib/form-fields'
-import { verifyFormToken } from '@/lib/form-guard'
+import { checkFormGuard } from '@/lib/form-guard'
 import { getPayloadClient } from '@/lib/payload'
 import { consume, networkPrefix } from '@/lib/rate-limit'
 
@@ -50,13 +49,9 @@ export async function submitApplication(
   if (!isApplicationType(type)) return { status: 'error', errorKey: 'generic' }
   const def = FORMS[type]
 
-  const guard = verifyFormToken(formData.get(TIMESTAMP_FIELD), formData.get(HONEYPOT_FIELD))
-  if (!guard.ok) {
-    if (guard.reason === 'honeypot') {
-      return { status: 'success', reference: generateReference() }
-    }
-    return { status: 'error', errorKey: guard.reason === 'too-fast' ? 'tooFast' : 'generic' }
-  }
+  const guard = checkFormGuard('application', formData)
+  if (guard.drop) return { status: 'success', reference: generateReference() }
+  if (guard.errorKey) return { status: 'error', errorKey: guard.errorKey }
 
   const prefix = networkPrefix(headerList.get('x-real-ip') ?? headerList.get('x-forwarded-for'))
   if (!consume(`application:${prefix}`, RATE_LIMIT, RATE_WINDOW_MS).allowed) {
