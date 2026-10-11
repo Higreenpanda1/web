@@ -55,6 +55,11 @@ export type FieldDef = {
    */
   showIf?: { field: string; in: readonly string[] }
   /**
+   * For `tel` fields that only take one country's numbers: the visitor types
+   * the national number and the server adds the country code.
+   */
+  country?: 'CN'
+  /**
    * For `file` fields: accepted MIME types. Files are checked again on the
    * server by their first bytes, never trusted from the browser, and kept in
    * a private folder — see src/lib/documents.ts.
@@ -247,6 +252,7 @@ export const FORMS: Record<ApplicationType, FormDef> = {
           {
             name: 'chinesePhoneNumber',
             kind: 'tel',
+            country: 'CN',
             required: true,
             width: 'half',
             hint: true,
@@ -541,6 +547,7 @@ export const FORMS: Record<ApplicationType, FormDef> = {
           {
             name: 'chinesePhoneNumber',
             kind: 'tel',
+            country: 'CN',
             required: true,
             width: 'half',
             hint: true,
