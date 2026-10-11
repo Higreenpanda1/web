@@ -103,8 +103,15 @@ export function ApplicationForm({
     )
   }
 
-  const isVisible = (field: FieldDef) =>
-    !field.showIf || field.showIf.in.includes(controls[field.showIf.field] ?? '')
+  // A field shown by a field that is itself hidden stays hidden: a hidden
+  // control is disabled, so its old answer is never sent to the server.
+  const fieldsByName = new Map(def.steps.flatMap((s) => s.fields.map((f) => [f.name, f] as const)))
+  const isVisible = (field: FieldDef): boolean => {
+    if (!field.showIf) return true
+    const controller = fieldsByName.get(field.showIf.field)
+    if (controller && !isVisible(controller)) return false
+    return field.showIf.in.includes(controls[field.showIf.field] ?? '')
+  }
 
   const controllers = new Set(
     def.steps.flatMap((s) => s.fields.flatMap((f) => (f.showIf ? [f.showIf.field] : []))),

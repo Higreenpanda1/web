@@ -20,7 +20,6 @@ import type { ApplicationType } from '@/lib/catalogue'
  * A test (src/forms/definitions.test.ts) walks every form and fails if a key
  * is missing from either language, so a form cannot ship half-translated.
  *
- * There are no file fields on purpose — see src/collections/Applications.ts.
  */
 
 export type FieldKind =
@@ -93,6 +92,62 @@ export const CONTACT_STEP: StepDef = {
 
 /** Photos of an ID page or a stamp: what phones produce, plus PDF scans. */
 export const DOCUMENT_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'] as const
+
+/** A portrait photo: images only, never a PDF. */
+export const PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const
+
+const WORK = { field: 'visaType', in: ['work'] } as const
+
+const WORK_PERMIT_DOCUMENTS: readonly FieldDef[] = [
+  {
+    name: 'passport',
+    kind: 'file',
+    required: true,
+    hint: true,
+    accept: DOCUMENT_TYPES,
+    showIf: WORK,
+  },
+  {
+    name: 'personalPhoto',
+    kind: 'file',
+    required: true,
+    hint: true,
+    accept: PHOTO_TYPES,
+    showIf: WORK,
+  },
+  {
+    name: 'degreeCertificate',
+    kind: 'file',
+    required: true,
+    hint: true,
+    accept: DOCUMENT_TYPES,
+    showIf: WORK,
+  },
+  {
+    name: 'experienceCertificate',
+    kind: 'file',
+    required: true,
+    hint: true,
+    accept: DOCUMENT_TYPES,
+    showIf: WORK,
+  },
+  {
+    name: 'policeClearance',
+    kind: 'file',
+    required: true,
+    hint: true,
+    accept: DOCUMENT_TYPES,
+    showIf: WORK,
+  },
+  { name: 'medicalCertificate', kind: 'file', hint: true, accept: DOCUMENT_TYPES, showIf: WORK },
+  {
+    name: 'companyLicence',
+    kind: 'file',
+    hint: true,
+    accept: DOCUMENT_TYPES,
+    showIf: { field: 'hasChineseCompany', in: ['yes'] },
+  },
+]
 
 const NOTES: FieldDef = { name: 'notes', kind: 'textarea', rows: 4, max: 4000 }
 
@@ -424,6 +479,9 @@ export const FORMS: Record<ApplicationType, FormDef> = {
             required: true,
             width: 'half',
             options: ['under-1m', '1-3m', '3-12m', 'over-1y'],
+            // The authorities set how long a residence permit lasts, not us,
+            // so the work permit does not ask.
+            showIf: { field: 'visaType', in: ['business', 'family'] },
           },
           { name: 'nationality', kind: 'country', required: true, width: 'half' },
           { name: 'residenceCountry', kind: 'country', required: true, width: 'half' },
@@ -478,6 +536,26 @@ export const FORMS: Record<ApplicationType, FormDef> = {
             max: 60,
             showIf: { field: 'visaType', in: ['work'] },
           },
+          {
+            name: 'chinesePhone',
+            kind: 'select',
+            required: true,
+            width: 'half',
+            options: YES_NO,
+            showIf: { field: 'visaType', in: ['work'] },
+          },
+          {
+            name: 'chinesePhoneNumber',
+            kind: 'tel',
+            country: 'CN',
+            required: true,
+            width: 'half',
+            hint: true,
+            showIf: { field: 'chinesePhone', in: ['yes'] },
+          },
+          // The work permit file, uploaded by the client. Required ones follow
+          // the price list's "Required Documents for the Work Permit".
+          ...WORK_PERMIT_DOCUMENTS,
           {
             name: 'familyMember',
             kind: 'text',

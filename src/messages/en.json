@@ -622,7 +622,19 @@
       "passport": "Passport photo page",
       "passportHint": "A clear photo or scan of the page with your photo. JPG, PNG or PDF, up to 10 MB.",
       "entryStamp": "China entry stamp",
-      "entryStampHint": "If you have already entered China, a photo of the entry stamp in your passport. JPG, PNG or PDF, up to 10 MB."
+      "entryStampHint": "If you have already entered China, a photo of the entry stamp in your passport. JPG, PNG or PDF, up to 10 MB.",
+      "personalPhoto": "Personal photo",
+      "personalPhotoHint": "Taken in the last six months, white background, JPG, 40–120 KB, 354 × 472 to 420 × 560 pixels.",
+      "degreeCertificate": "Highest academic qualification",
+      "degreeCertificateHint": "Authenticated by the Ministry of Foreign Affairs and legalised by the Chinese Embassy. JPG, PNG or PDF, up to 10 MB.",
+      "experienceCertificate": "Employment reference",
+      "experienceCertificateHint": "At least two years of full-time experience, stating the job title and employment period, with the employer's stamp or an authorised signature. JPG, PNG or PDF, up to 10 MB.",
+      "policeClearance": "Police clearance certificate",
+      "policeClearanceHint": "Issued within the last six months, authenticated by the Ministry of Foreign Affairs and legalised by the Chinese Embassy. JPG, PNG or PDF, up to 10 MB.",
+      "medicalCertificate": "Medical examination certificate",
+      "medicalCertificateHint": "Done at an approved clinic after entering China. Leave it empty if you have not done it yet. JPG, PNG or PDF, up to 10 MB.",
+      "companyLicence": "Company business licence",
+      "companyLicenceHint": "A clear photo or scan of your Chinese company's business licence. JPG, PNG or PDF, up to 10 MB."
     },
     "options": {
       "common": {

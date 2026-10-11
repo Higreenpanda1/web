@@ -1,4 +1,5 @@
 import { email as emailConfig } from './env'
+import { withinEmailBudget } from './documents'
 import { getPayloadClient } from './payload'
 
 import type { Enquiry } from '@/payload-types'
@@ -55,7 +56,7 @@ export type ApplicationNotification = {
   locale: string
   sourcePath: string | null
   rows: NotificationRow[]
-  /** Passport and entry stamp, attached as they were uploaded. */
+  /** The uploaded documents, attached as they were uploaded. */
   attachments?: { filename: string; content: Uint8Array }[]
 }
 
@@ -75,6 +76,7 @@ export async function sendApplicationNotification(app: ApplicationNotification) 
   }
 
   const payload = await getPayloadClient()
+  const { attached, skipped } = withinEmailBudget(app.attachments ?? [])
   const summary = [app.typeLabel, app.headline].filter(Boolean).join(' — ')
   const head: NotificationRow[] = [
     { label: 'Reference', value: app.reference },
@@ -94,7 +96,7 @@ export async function sendApplicationNotification(app: ApplicationNotification) 
       replyTo: app.email || undefined,
       // Base64 text rather than raw bytes: the Resend adapter passes content
       // through to a JSON body, where a Buffer would not survive.
-      attachments: (app.attachments ?? []).map((file) => ({
+      attachments: attached.map((file) => ({
         filename: file.filename,
         content: Buffer.from(file.content).toString('base64'),
       })),
@@ -107,6 +109,9 @@ export async function sendApplicationNotification(app: ApplicationNotification) 
         `Answers:`,
         ...app.rows.map((row) => `${row.label}: ${row.value}`),
         ``,
+        ...(skipped.length
+          ? [`Too large to attach, kept on the server: ${skipped.join(', ')}`, ``]
+          : []),
         `Reply on WhatsApp: https://wa.me/${app.whatsapp.replace(/[^\d]/g, '')}`,
       ].join('\n'),
       html: `<!doctype html><html><body style="font-family:system-ui,sans-serif;color:#111;line-height:1.6">
@@ -115,6 +120,7 @@ export async function sendApplicationNotification(app: ApplicationNotification) 
 ${table(head)}
 <p style="color:#4C574F;margin:0 0 4px"><strong>Answers</strong></p>
 ${table(app.rows)}
+${skipped.length ? `<p style="color:#4C574F">Too large to attach, kept on the server: ${escapeHtml(skipped.join(', '))}</p>` : ''}
 <p><a href="https://wa.me/${app.whatsapp.replace(/[^\d]/g, '')}" style="background:#276B34;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;display:inline-block">Reply on WhatsApp</a></p>
 </body></html>`,
     })

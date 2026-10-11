@@ -32,7 +32,7 @@ goes to `sami@higreenpanda.com` (`APPLICATION_NOTIFY_TO`) with the files
 attached, and the client gets a confirmation in their language with the
 reference — nothing about price or payment, by the owner's rule. Email is
 required on every form so that confirmation can be sent. Server action and
-middleware body limits are 22 MB (`next.config.ts`).
+middleware body limits are 75 MB (`next.config.ts`), for the work-permit form's seven documents.
 
 ## HubSpot (4 October 2026) — code pushed, token not yet set
 
