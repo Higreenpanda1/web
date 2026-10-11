@@ -35,8 +35,11 @@ const nextConfig: NextConfig = {
     deviceSizes: [360, 414, 640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     // Uploads are validated on the way in (see Media collection) and served
-    // from /api/media/file/* on this origin. No remotePatterns by design.
-    remotePatterns: [],
+    // from /api/media/file/* on this origin. The one remote host is YouTube's
+    // thumbnail server, for the homepage "Explore China" videos; those are
+    // fetched and re-served by /_next/image, so the browser still only talks
+    // to this origin and the CSP img-src stays 'self'.
+    remotePatterns: [{ protocol: 'https', hostname: 'i.ytimg.com', pathname: '/vi/**' }],
     dangerouslyAllowSVG: false,
     minimumCacheTTL: 60 * 60 * 24 * 30,
   },
