@@ -123,7 +123,7 @@ function checkField(field: FieldDef, read: Reader): Outcome {
         const mobile = chinaMobile(raw)
         return mobile ? { value: mobile } : { error: 'chinaPhone' }
       }
-      const compact = raw.replace(/[\s()-]/g, '')
+      const compact = asciiDigits(raw).replace(/[\s().-]/g, '')
       if (!E164.test(compact)) return { error: 'whatsapp' }
       return { value: `+${compact.replace(/[^\d]/g, '')}` }
     }
@@ -159,7 +159,19 @@ const DEFAULT_MAX: Partial<Record<FieldDef['kind'], number>> = {
  * types: the bare 11 digits, or with +86, 86 or 0086 in front.
  */
 export function chinaMobile(raw: string): string | null {
-  const digits = raw.replace(/[\s()+-]/g, '')
+  const digits = asciiDigits(raw).replace(/[\s().+-]/g, '')
   const national = digits.replace(/^(0086|86)(?=1\d{10}$)/, '')
   return /^1[3-9]\d{9}$/.test(national) ? `+86${national}` : null
+}
+
+/**
+ * Phone keyboards in Arabic and Persian type ١٣٨ or ۱۳۸, and Chinese ones can
+ * type full-width １３８; read them all as 138.
+ */
+export function asciiDigits(raw: string): string {
+  return raw
+    .replace(/[\u0660-\u0669]/g, (d) => String(d.charCodeAt(0) - 0x0660))
+    .replace(/[\u06f0-\u06f9]/g, (d) => String(d.charCodeAt(0) - 0x06f0))
+    .replace(/[\uff10-\uff19]/g, (d) => String(d.charCodeAt(0) - 0xff10))
+    .replace(/\uff0b/g, '+')
 }

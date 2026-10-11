@@ -173,4 +173,8 @@ test('a Chinese mobile is taken bare or with the country code, and stored with +
   assert.equal(chinaMobile('1381234567'), null)
   assert.equal(chinaMobile('+966501234567'), null)
   assert.equal(chinaMobile('23812345678'), null)
+  assert.equal(chinaMobile('١٣٨١٢٣٤٥٦٧٨'), '+8613812345678')
+  assert.equal(chinaMobile('۱۳۸ ۱۲۳۴ ۵۶۷۸'), '+8613812345678')
+  assert.equal(chinaMobile('１３８１２３４５６７８'), '+8613812345678')
+  assert.equal(chinaMobile('138.1234.5678'), '+8613812345678')
 })
