@@ -119,6 +119,10 @@ function checkField(field: FieldDef, read: Reader): Outcome {
       return { value: raw }
     }
     case 'tel': {
+      if (field.country === 'CN') {
+        const mobile = chinaMobile(raw)
+        return mobile ? { value: mobile } : { error: 'chinaPhone' }
+      }
       const compact = raw.replace(/[\s()-]/g, '')
       if (!E164.test(compact)) return { error: 'whatsapp' }
       return { value: `+${compact.replace(/[^\d]/g, '')}` }
@@ -148,4 +152,14 @@ const DEFAULT_MAX: Partial<Record<FieldDef['kind'], number>> = {
   url: 500,
   select: 60,
   date: 10,
+}
+
+/**
+ * A mainland Chinese mobile number as +86 and 11 digits, from what a visitor
+ * types: the bare 11 digits, or with +86, 86 or 0086 in front.
+ */
+export function chinaMobile(raw: string): string | null {
+  const digits = raw.replace(/[\s()+-]/g, '')
+  const national = digits.replace(/^(0086|86)(?=1\d{10}$)/, '')
+  return /^1[3-9]\d{9}$/.test(national) ? `+86${national}` : null
 }
