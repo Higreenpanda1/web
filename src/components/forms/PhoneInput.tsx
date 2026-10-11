@@ -140,7 +140,7 @@ export function PhoneInput({
         aria-invalid={invalid}
         className={cn(
           box(Boolean(invalid)),
-          'min-w-0 flex-1 px-3.5 py-3 placeholder:text-[var(--text-muted)]',
+          'w-full min-w-0 flex-1 px-3.5 py-3 placeholder:text-[var(--text-muted)]',
         )}
       />
     </div>
