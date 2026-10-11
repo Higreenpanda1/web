@@ -122,3 +122,27 @@ export function formatSize(bytes: number): string {
     ? `${(bytes / 1024 / 1024).toFixed(1)} MB`
     : `${Math.max(1, Math.round(bytes / 1024))} KB`
 }
+
+/**
+ * Resend refuses an email over 40 MB, and base64 makes attachments a third
+ * larger. Attach files in order while they fit in 25 MB; the rest are named in
+ * the email and stay in the private folder on the server.
+ */
+export const EMAIL_ATTACHMENT_BUDGET = 25 * 1024 * 1024
+
+export function withinEmailBudget<T extends { filename: string; content: Uint8Array }>(
+  files: readonly T[],
+): { attached: T[]; skipped: string[] } {
+  const attached: T[] = []
+  const skipped: string[] = []
+  let total = 0
+  for (const file of files) {
+    if (total + file.content.byteLength > EMAIL_ATTACHMENT_BUDGET) {
+      skipped.push(file.filename)
+      continue
+    }
+    total += file.content.byteLength
+    attached.push(file)
+  }
+  return { attached, skipped }
+}

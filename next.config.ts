@@ -35,8 +35,11 @@ const nextConfig: NextConfig = {
     deviceSizes: [360, 414, 640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     // Uploads are validated on the way in (see Media collection) and served
-    // from /api/media/file/* on this origin. No remotePatterns by design.
-    remotePatterns: [],
+    // from /api/media/file/* on this origin. The one remote host is YouTube's
+    // thumbnail server, for the homepage "Explore China" videos; those are
+    // fetched and re-served by /_next/image, so the browser still only talks
+    // to this origin and the CSP img-src stays 'self'.
+    remotePatterns: [{ protocol: 'https', hostname: 'i.ytimg.com', pathname: '/vi/**' }],
     dangerouslyAllowSVG: false,
     minimumCacheTTL: 60 * 60 * 24 * 30,
   },
@@ -56,15 +59,15 @@ const nextConfig: NextConfig = {
 
   experimental: {
     optimizePackageImports: ['lucide-react'],
-    // The company-registration form carries a passport photo and an entry
-    // stamp, up to 10 MB each (src/lib/documents.ts). The default 1 MB would
-    // reject the request before the action could say why. The browser shrinks
-    // large photos first, so real requests are far smaller than this.
-    serverActions: { bodySizeLimit: '22mb' },
+    // The work-permit form carries up to seven documents, up to 10 MB each
+    // (src/lib/documents.ts). The default 1 MB would reject the request
+    // before the action could say why. The browser shrinks large photos
+    // first, so real requests are far smaller than this.
+    serverActions: { bodySizeLimit: '75mb' },
     // Middleware runs on the form's page too, and Next truncates any body it
     // has to clone for middleware at 10 MB by default — a truncated upload
     // arrives as a broken request. Same ceiling as the action.
-    middlewareClientMaxBodySize: '22mb',
+    middlewareClientMaxBodySize: '75mb',
     // The stylesheet is small and every page needs all of it, so a separate
     // request just delays first paint on a slow connection.
     inlineCss: true,

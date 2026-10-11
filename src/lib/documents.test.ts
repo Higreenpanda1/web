@@ -1,7 +1,13 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 
-import { checkDocuments, MAX_DOCUMENT_BYTES, sniffMime } from './documents.ts'
+import {
+  checkDocuments,
+  EMAIL_ATTACHMENT_BUDGET,
+  MAX_DOCUMENT_BYTES,
+  sniffMime,
+  withinEmailBudget,
+} from './documents.ts'
 
 import type { FieldDef } from '../forms/definitions.ts'
 
@@ -68,4 +74,23 @@ test('good files come back with a safe extension', async () => {
       ['entryStamp', 'jpg', 'image/jpeg'],
     ],
   )
+})
+
+test('the email attaches files while they fit and names the rest', () => {
+  const file = (filename: string, mb: number) => ({
+    filename,
+    content: new Uint8Array(mb * 1024 * 1024),
+  })
+  const { attached, skipped } = withinEmailBudget([
+    file('passport.pdf', 9),
+    file('degree.pdf', 10),
+    file('police.pdf', 10),
+    file('photo.jpg', 1),
+  ])
+  assert.deepEqual(
+    attached.map((f) => f.filename),
+    ['passport.pdf', 'degree.pdf', 'photo.jpg'],
+  )
+  assert.deepEqual(skipped, ['police.pdf'])
+  assert.ok(EMAIL_ATTACHMENT_BUDGET < 30 * 1024 * 1024)
 })
