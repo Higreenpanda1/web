@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { JsonLd } from '@/components/JsonLd'
 import { RenderBlocks } from '@/components/blocks/RenderBlocks'
 import { DefaultHome } from '@/components/DefaultHome'
+import { ExploreChina } from '@/components/home/ExploreChina'
 import { organisationJsonLd } from '@/lib/jsonld'
 import { getPageBySlug, getSiteSettings } from '@/lib/queries'
 import { buildMetadata } from '@/lib/seo'
@@ -46,6 +47,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: L
         // homepage rather than a blank screen.
         <DefaultHome locale={locale} />
       )}
+      <ExploreChina locale={locale} channelUrl={settings?.social?.youtube} />
     </>
   )
 }
