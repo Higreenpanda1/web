@@ -7,6 +7,7 @@ import { useActionState, useId, useRef } from 'react'
 import { submitEnquiry, type EnquiryState } from '@/app/actions/enquiry'
 import { Button } from '@/components/ui/Button'
 import { CountrySelect } from './CountrySelect'
+import { PhoneInput } from './PhoneInput'
 import { FieldError, FormAlert, Hint, inputClass, Label, SubmitButton } from './fields'
 import { HONEYPOT_FIELD, TIMESTAMP_FIELD } from '@/lib/form-fields'
 
@@ -135,19 +136,26 @@ export function EnquiryForm({
         </div>
       </div>
 
-      <Field
-        id={fieldId('whatsapp')}
-        name="whatsapp"
-        label={t('whatsapp')}
-        hint={t('whatsappHint')}
-        type="tel"
-        inputMode="tel"
-        autoComplete="tel"
-        dir="ltr"
-        required
-        error={errorMessage(fieldError('whatsapp'))}
-        errorId={errorId('whatsapp')}
-      />
+      <div>
+        <Label htmlFor={fieldId('whatsapp')} required>
+          {t('whatsapp')}
+        </Label>
+        <Hint id={`${fieldId('whatsapp')}-hint`}>{t('whatsappHint')}</Hint>
+        <PhoneInput
+          id={fieldId('whatsapp')}
+          name="whatsapp"
+          locale={locale}
+          required
+          invalid={fieldError('whatsapp') ? true : undefined}
+          describedBy={[
+            `${fieldId('whatsapp')}-hint`,
+            fieldError('whatsapp') ? errorId('whatsapp') : null,
+          ]
+            .filter(Boolean)
+            .join(' ')}
+        />
+        <FieldError id={errorId('whatsapp')} message={errorMessage(fieldError('whatsapp'))} />
+      </div>
 
       <div>
         <Label htmlFor={fieldId('service')}>{t('service')}</Label>

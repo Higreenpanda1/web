@@ -306,7 +306,7 @@
       "country": "Country",
       "countryPlaceholder": "Select your country",
       "whatsapp": "WhatsApp number",
-      "whatsappHint": "With country code, e.g. +966501234567",
+      "whatsappHint": "Choose your country code, then type your number without the first 0",
       "service": "Service you're interested in",
       "servicePlaceholder": "Select a service",
       "serviceOther": "Something else / not sure",
@@ -327,7 +327,7 @@
         "nameTooLong": "That name is too long.",
         "countryRequired": "Please select your country.",
         "whatsappRequired": "Please enter a WhatsApp number.",
-        "whatsappInvalid": "Enter a valid number with country code, e.g. +966501234567.",
+        "whatsappInvalid": "This number doesn't look right. Check the country code and number.",
         "messageRequired": "Please describe your enquiry.",
         "messageTooShort": "Add a little more detail so we can help.",
         "messageTooLong": "That message is too long.",
@@ -405,7 +405,7 @@
       "tooLong": "This is too long.",
       "number": "Enter a valid number.",
       "date": "Enter a valid date.",
-      "whatsapp": "Enter a valid number with country code, e.g. +966501234567.",
+      "whatsapp": "This number doesn't look right. Check the country code and number.",
       "chinaPhone": "Enter a valid 11-digit Chinese mobile number starting with 1.",
       "email": "Enter a valid email address.",
       "url": "Enter a valid link.",
@@ -487,7 +487,7 @@
       "name": "Full name",
       "country": "Country",
       "whatsapp": "WhatsApp number",
-      "whatsappHint": "With country code, e.g. +966501234567",
+      "whatsappHint": "Choose your country code, then type your number without the first 0",
       "email": "Email",
       "emailHint": "We send your confirmation and reference number here",
       "topic": "Topic",
@@ -926,5 +926,11 @@
   "countrySelect": {
     "placeholder": "Type to search for a country",
     "noResults": "No country found. Choose \"Another country\""
+  },
+  "phoneInput": {
+    "codeLabel": "Country code",
+    "search": "Type to search for a country",
+    "noResults": "No country found",
+    "example": "501234567"
   }
 }

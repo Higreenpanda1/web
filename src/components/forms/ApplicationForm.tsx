@@ -10,6 +10,7 @@ import { FORMS } from '@/forms/definitions'
 import { cn } from '@/lib/cn'
 import { HONEYPOT_FIELD, TIMESTAMP_FIELD } from '@/lib/form-fields'
 import { CountrySelect } from './CountrySelect'
+import { PhoneInput } from './PhoneInput'
 import { FieldError, FormAlert, Hint, inputClass, Label, SubmitButton } from './fields'
 
 import type { FieldDef, StepDef } from '@/forms/definitions'
@@ -359,6 +360,34 @@ function FieldControl({
         />
       )
       break
+    case 'tel':
+      // A Chinese number has a fixed +86; every other number gets a code box.
+      if (field.country) {
+        control = (
+          <input
+            {...common}
+            type="tel"
+            dir="ltr"
+            inputMode="tel"
+            autoComplete={AUTOCOMPLETE[field.name]}
+            maxLength={field.max}
+          />
+        )
+      } else {
+        control = (
+          <PhoneInput
+            id={id}
+            name={field.name}
+            locale={locale}
+            required={field.required}
+            disabled={disabled}
+            defaultValue={typeof defaultValue === 'string' ? defaultValue : undefined}
+            invalid={error ? true : undefined}
+            describedBy={describedBy}
+          />
+        )
+      }
+      break
     case 'file':
       control = (
         <input
@@ -416,7 +445,7 @@ function FieldControl({
       )
     default: {
       const type =
-        field.kind === 'tel' || field.kind === 'email' || field.kind === 'url'
+        field.kind === 'email' || field.kind === 'url'
           ? field.kind
           : field.kind === 'number'
             ? 'number'
@@ -429,7 +458,7 @@ function FieldControl({
           {...common}
           type={type}
           dir={ltr ? 'ltr' : undefined}
-          inputMode={field.kind === 'tel' ? 'tel' : field.kind === 'number' ? 'decimal' : undefined}
+          inputMode={field.kind === 'number' ? 'decimal' : undefined}
           autoComplete={AUTOCOMPLETE[field.name]}
           maxLength={field.kind === 'number' ? undefined : field.max}
           min={field.kind === 'number' ? field.min : undefined}
