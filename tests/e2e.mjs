@@ -182,7 +182,7 @@ await page.goto(`${BASE}/contact`, { waitUntil: 'networkidle' })
 
 // Inspect the honeypot before submitting — afterwards the form is gone.
 const honeypot = await page.evaluate(() => {
-  const field = document.querySelector('input[name="company_website"]')
+  const field = document.querySelector('input[name="hgp_extra"]')
   if (!field) return 'missing'
   const box = field.getBoundingClientRect()
   const onScreen = box.width > 1 && box.height > 1 && box.right > 0 && box.bottom > 0
