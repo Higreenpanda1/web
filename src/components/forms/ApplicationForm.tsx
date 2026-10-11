@@ -8,8 +8,8 @@ import { submitApplication, type ApplicationState } from '@/app/actions/applicat
 import { Button, ButtonLink } from '@/components/ui/Button'
 import { FORMS } from '@/forms/definitions'
 import { cn } from '@/lib/cn'
-import { countryName, OTHER_COUNTRIES, PRIORITY_COUNTRIES } from '@/lib/countries'
 import { HONEYPOT_FIELD, TIMESTAMP_FIELD } from '@/lib/form-fields'
+import { CountrySelect } from './CountrySelect'
 import { FieldError, FormAlert, Hint, inputClass, Label, SubmitButton } from './fields'
 
 import type { FieldDef, StepDef } from '@/forms/definitions'
@@ -351,22 +351,12 @@ function FieldControl({
       break
     case 'country':
       control = (
-        <select {...common} defaultValue="">
-          <option value="" disabled={field.required}>
-            {t('selectPlaceholder')}
-          </option>
-          {PRIORITY_COUNTRIES.map((country) => (
-            <option key={country.code} value={countryName(country, locale)}>
-              {countryName(country, locale)}
-            </option>
-          ))}
-          <option disabled>──────────</option>
-          {OTHER_COUNTRIES.map((country) => (
-            <option key={country.code} value={countryName(country, locale)}>
-              {countryName(country, locale)}
-            </option>
-          ))}
-        </select>
+        <CountrySelect
+          {...common}
+          locale={locale}
+          placeholder={t('selectPlaceholder')}
+          defaultValue={typeof defaultValue === 'string' ? defaultValue : undefined}
+        />
       )
       break
     case 'file':

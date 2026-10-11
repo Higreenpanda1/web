@@ -196,7 +196,9 @@ note(`form token ${formToken ? 'issued' : 'MISSING'}`)
 if (!formToken) fail('The form carries no signed timing token')
 
 await page.locator('input[name="name"]').fill('سامي التجريبي')
-await page.locator('select[name="country"]').selectOption({ label: 'السعودية' })
+// The country field is a type-to-search box once the page is hydrated.
+await page.locator('input[role="combobox"]').first().fill('سعود')
+await page.locator('[role="option"]', { hasText: 'السعودية' }).first().click()
 await page.locator('input[name="whatsapp"]').fill('+966501234567')
 await page.locator('select[name="service"]').selectOption({ index: 1 })
 await page

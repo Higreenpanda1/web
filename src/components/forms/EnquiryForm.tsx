@@ -6,9 +6,9 @@ import { useActionState, useId, useRef } from 'react'
 
 import { submitEnquiry, type EnquiryState } from '@/app/actions/enquiry'
 import { Button } from '@/components/ui/Button'
+import { CountrySelect } from './CountrySelect'
 import { FieldError, FormAlert, Hint, inputClass, Label, SubmitButton } from './fields'
 import { HONEYPOT_FIELD, TIMESTAMP_FIELD } from '@/lib/form-fields'
-import { countryName, OTHER_COUNTRIES, PRIORITY_COUNTRIES } from '@/lib/countries'
 
 import type { Locale } from '@/i18n/routing'
 
@@ -121,30 +121,16 @@ export function EnquiryForm({
           <Label htmlFor={fieldId('country')} required>
             {t('country')}
           </Label>
-          <select
+          <CountrySelect
             id={fieldId('country')}
             name="country"
+            locale={locale}
+            placeholder={t('countryPlaceholder')}
             required
-            defaultValue=""
             aria-describedby={fieldError('country') ? errorId('country') : undefined}
             aria-invalid={fieldError('country') ? true : undefined}
             className={inputClass(Boolean(fieldError('country')))}
-          >
-            <option value="" disabled>
-              {t('countryPlaceholder')}
-            </option>
-            {PRIORITY_COUNTRIES.map((country) => (
-              <option key={country.code} value={countryName(country, locale)}>
-                {countryName(country, locale)}
-              </option>
-            ))}
-            <option disabled>──────────</option>
-            {OTHER_COUNTRIES.map((country) => (
-              <option key={country.code} value={countryName(country, locale)}>
-                {countryName(country, locale)}
-              </option>
-            ))}
-          </select>
+          />
           <FieldError id={errorId('country')} message={errorMessage(fieldError('country'))} />
         </div>
       </div>
