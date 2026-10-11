@@ -136,3 +136,15 @@ test('over-long text is refused', () => {
   assert.ok(!result.ok)
   assert.equal(result.errors.goals, 'tooLong')
 })
+
+test('a Chinese mobile is taken bare or with the country code, and stored with +86', async () => {
+  const { chinaMobile } = await import('./schema.ts')
+  assert.equal(chinaMobile('13812345678'), '+8613812345678')
+  assert.equal(chinaMobile('138 1234 5678'), '+8613812345678')
+  assert.equal(chinaMobile('+86 138-1234-5678'), '+8613812345678')
+  assert.equal(chinaMobile('008613812345678'), '+8613812345678')
+  assert.equal(chinaMobile('8613812345678'), '+8613812345678')
+  assert.equal(chinaMobile('1381234567'), null)
+  assert.equal(chinaMobile('+966501234567'), null)
+  assert.equal(chinaMobile('23812345678'), null)
+})
