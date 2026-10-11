@@ -3,7 +3,7 @@
 import { randomBytes } from 'node:crypto'
 import { headers } from 'next/headers'
 
-import { collectErrors, enquirySchema, toE164 } from '@/lib/enquiry-schema'
+import { collectErrors, enquirySchema } from '@/lib/enquiry-schema'
 import { sendEnquiryNotification } from '@/lib/email'
 import { checkFormGuard } from '@/lib/form-guard'
 import { getPayloadClient } from '@/lib/payload'
@@ -57,6 +57,7 @@ export async function submitEnquiry(
     name: formData.get('name'),
     country: formData.get('country'),
     whatsapp: formData.get('whatsapp'),
+    whatsappCode: formData.get('whatsappCode'),
     email: formData.get('email') ?? '',
     service: formData.get('service') ?? '',
     message: formData.get('message'),
@@ -88,7 +89,7 @@ export async function submitEnquiry(
         status: 'new',
         name: input.name,
         country: input.country,
-        whatsapp: toE164(input.whatsapp),
+        whatsapp: input.whatsapp,
         email: input.email || undefined,
         service: serviceId,
         // Only set when the visitor explicitly picked "something else"; a blank

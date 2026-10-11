@@ -178,3 +178,22 @@ test('a Chinese mobile is taken bare or with the country code, and stored with +
   assert.equal(chinaMobile('１３８１２３４５６７８'), '+8613812345678')
   assert.equal(chinaMobile('138.1234.5678'), '+8613812345678')
 })
+
+test('the WhatsApp code box is joined to the number', () => {
+  const result = validateApplication(
+    FORMS['product-search'],
+    reader({
+      ...contact,
+      whatsapp: '0771234567',
+      whatsappCode: 'YE',
+      productName: 'Lamp',
+      specs: 'White',
+      quantity: '10',
+      destinationCountry: 'Yemen',
+      timeline: 'asap',
+    }),
+  )
+  assert.ok(result.ok)
+  assert.equal(result.details.whatsapp, '+967771234567')
+  assert.equal('whatsappCode' in result.details, false)
+})

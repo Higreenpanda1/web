@@ -14,6 +14,8 @@ import {
   type Country,
 } from '@/lib/countries'
 
+import { COUNTRY_CHOSEN_EVENT, type CountryChosenDetail } from './PhoneInput'
+
 import type { Locale } from '@/i18n/routing'
 
 /**
@@ -160,11 +162,22 @@ function CountryCombobox({
       ?.scrollIntoView({ block: 'nearest' })
   }, [active, open])
 
+  // Tells the WhatsApp code box in the same form which country this is.
+  const announce = (country: Country) => {
+    inputRef.current?.dispatchEvent(
+      new CustomEvent<CountryChosenDetail>(COUNTRY_CHOSEN_EVENT, {
+        bubbles: true,
+        detail: { name, code: country.code },
+      }),
+    )
+  }
+
   const choose = (country: Country) => {
     const label = countryName(country, locale)
     setValue(label)
     setQuery(label)
     setOpen(false)
+    announce(country)
   }
 
   const optionId = (index: number) => `${listId}-${index}`
@@ -206,6 +219,7 @@ function CountryCombobox({
             (country) => countryName(country, locale) === next.trim(),
           )
           setValue(exact ? countryName(exact, locale) : '')
+          if (exact) announce(exact)
           setActive(0)
           setOpen(true)
         }}
