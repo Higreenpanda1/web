@@ -907,5 +907,9 @@
       "accounting": "Accounting certificate · Amber",
       "taxAdvisor": "Tax advisor certificate · Lucy"
     }
+  },
+  "countrySelect": {
+    "placeholder": "Type to search for a country",
+    "noResults": "No country found. Choose \"Another country\""
   }
 }

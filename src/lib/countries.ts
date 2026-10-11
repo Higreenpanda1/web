@@ -61,3 +61,56 @@ export const OTHER_COUNTRIES: Country[] = [
 export function countryName(country: Country, locale: 'ar' | 'en'): string {
   return locale === 'ar' ? country.ar : country.en
 }
+
+/** The "another country" choice, offered whenever a search finds nothing better. */
+export const ANOTHER_COUNTRY = OTHER_COUNTRIES.find((country) => country.code === 'OTHER')!
+
+/** Other names people type for a country, beyond its Arabic and English names. */
+const ALIASES: Record<string, string[]> = {
+  SA: ['KSA', 'المملكة'],
+  AE: ['UAE', 'Emirates', 'دبي', 'Dubai'],
+  US: ['USA', 'America', 'أمريكا'],
+  GB: ['UK', 'Britain', 'England', 'بريطانيا'],
+  TR: ['Turkey'],
+  PS: ['Palestinian'],
+}
+
+/**
+ * Folds the differences people do not type: case, Latin accents (Türkiye),
+ * Arabic diacritics and tatweel, the hamza forms of alif, taa marbuta and
+ * alif maqsura. So "اليمن", "يمن" and "Yemen" all find Yemen.
+ */
+export function normalizeCountryText(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[ً-ٰٟـ]/g, '')
+    .replace(/[أإآٱ]/g, 'ا')
+    .replace(/ة/g, 'ه')
+    .replace(/ى/g, 'ي')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+/**
+ * Countries whose Arabic name, English name or a common alias contains the
+ * query, in either language whatever the page language. Names that start
+ * with the query come first; otherwise the list keeps its usual order.
+ */
+export function searchCountries(query: string): Country[] {
+  const q = normalizeCountryText(query)
+  if (!q) return [...PRIORITY_COUNTRIES, ...OTHER_COUNTRIES]
+  const ranked: Array<{ country: Country; rank: number }> = []
+  for (const country of [...PRIORITY_COUNTRIES, ...OTHER_COUNTRIES]) {
+    const names = [country.ar, country.en, ...(ALIASES[country.code] ?? [])].map(
+      normalizeCountryText,
+    )
+    const starts = names.some(
+      (name) => name.startsWith(q) || name.startsWith(`ال${q}`) || name.includes(` ${q}`),
+    )
+    if (starts) ranked.push({ country, rank: 0 })
+    else if (names.some((name) => name.includes(q))) ranked.push({ country, rank: 1 })
+  }
+  return ranked.sort((a, b) => a.rank - b.rank).map((entry) => entry.country)
+}
