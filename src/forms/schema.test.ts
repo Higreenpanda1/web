@@ -136,3 +136,29 @@ test('over-long text is refused', () => {
   assert.ok(!result.ok)
   assert.equal(result.errors.goals, 'tooLong')
 })
+
+test('the work permit does not ask for a length of stay; the other visas do', () => {
+  const visa = (visaType: string) =>
+    validateApplication(
+      FORMS.visa,
+      reader({
+        ...contact,
+        visaType,
+        nationality: 'Yemen',
+        residenceCountry: 'Saudi Arabia',
+        passportExpiry: '2030-01-01',
+        hasChineseCompany: 'no',
+        education: 'bachelor',
+        experienceYears: '3',
+        chinesePhone: 'no',
+        purpose: 'Canton Fair',
+        familyMember: 'My husband',
+      }),
+    )
+  const work = visa('work')
+  assert.ok(work.ok)
+  assert.equal('stayLength' in work.details, false)
+  const business = visa('business')
+  assert.ok(!business.ok)
+  assert.equal(business.errors.stayLength, 'required')
+})
