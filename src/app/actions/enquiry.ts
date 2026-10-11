@@ -5,8 +5,7 @@ import { headers } from 'next/headers'
 
 import { collectErrors, enquirySchema, toE164 } from '@/lib/enquiry-schema'
 import { sendEnquiryNotification } from '@/lib/email'
-import { HONEYPOT_FIELD, TIMESTAMP_FIELD } from '@/lib/form-fields'
-import { verifyFormToken } from '@/lib/form-guard'
+import { checkFormGuard } from '@/lib/form-guard'
 import { getPayloadClient } from '@/lib/payload'
 import { consume, networkPrefix } from '@/lib/rate-limit'
 
@@ -41,14 +40,10 @@ export async function submitEnquiry(
   const locale = (formData.get('locale') === 'en' ? 'en' : 'ar') as Locale
 
   // --- Bot defences (honeypot + signed timing token) ------------------------
-  const guard = verifyFormToken(formData.get(TIMESTAMP_FIELD), formData.get(HONEYPOT_FIELD))
-  if (!guard.ok) {
-    if (guard.reason === 'honeypot') {
-      // Do not tell a bot it was caught. Report success and store nothing.
-      return { status: 'success', reference: syntheticReference() }
-    }
-    return { status: 'error', errorKey: guard.reason === 'too-fast' ? 'tooFast' : 'generic' }
-  }
+  const guard = checkFormGuard('enquiry', formData)
+  // Do not tell a bot it was caught. Report success and store nothing.
+  if (guard.drop) return { status: 'success', reference: syntheticReference() }
+  if (guard.errorKey) return { status: 'error', errorKey: guard.errorKey }
 
   // --- Rate limit, keyed by network prefix rather than exact address --------
   const prefix = networkPrefix(headerList.get('x-real-ip') ?? headerList.get('x-forwarded-for'))

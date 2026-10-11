@@ -63,3 +63,34 @@ test('refuses non-string tokens without throwing', () => {
     assert.equal(verifyFormToken(bad, '', NOW).ok, false)
   }
 })
+
+const { checkFormGuard } = await import('./form-guard.ts')
+const { HONEYPOT_FIELD, TIMESTAMP_FIELD } = await import('./form-fields.ts')
+
+function form(fields: Record<string, string>) {
+  return { get: (name: string) => fields[name] ?? null }
+}
+
+test('keeps a real visitor whose browser autofilled the hidden field', () => {
+  const data = form({ [TIMESTAMP_FIELD]: issueFormToken(NOW), [HONEYPOT_FIELD]: 'acme.com' })
+  assert.deepEqual(checkFormGuard('test', data, NOW + 60_000), { drop: false })
+})
+
+test('drops a filled hidden field when the token is bad too', () => {
+  const data = form({ [TIMESTAMP_FIELD]: 'forged', [HONEYPOT_FIELD]: 'http://spam.example' })
+  assert.deepEqual(checkFormGuard('test', data, NOW), { drop: true })
+})
+
+test('drops a filled hidden field submitted faster than a person types', () => {
+  const data = form({ [TIMESTAMP_FIELD]: issueFormToken(NOW), [HONEYPOT_FIELD]: 'x' })
+  assert.deepEqual(checkFormGuard('test', data, NOW + 500), { drop: true })
+})
+
+test('asks a too-fast visitor to try again instead of dropping them', () => {
+  const data = form({ [TIMESTAMP_FIELD]: issueFormToken(NOW) })
+  assert.deepEqual(checkFormGuard('test', data, NOW + 500), { drop: false, errorKey: 'tooFast' })
+})
+
+test('the hidden field name is not one browsers autofill', () => {
+  assert.doesNotMatch(HONEYPOT_FIELD, /company|website|url|name|mail|phone|address/i)
+})
