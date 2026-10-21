@@ -875,7 +875,9 @@
       "market": "In the markets"
     },
     "contactTitle": "Want the next visit to be yours?",
-    "count": "{count, plural, one {# visit} other {# visits}}"
+    "count": "{count, plural, one {# visit} other {# visits}}",
+    "back": "All visits",
+    "photos": "Photos from the visit"
   },
   "licences": {
     "title": "Licences and address",
