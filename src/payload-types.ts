@@ -912,6 +912,10 @@ export interface FieldMoment {
    */
   title: string;
   /**
+   * Optional. What the visit was about, in a few short paragraphs. A visit with a story gets its own page, with the story above all its photos.
+   */
+  story?: string | null;
+  /**
    * The first photo is the cover. They rotate on the site in this order.
    */
   photos: (number | Media)[];
@@ -1670,6 +1674,7 @@ export interface TestimonialsSelect<T extends boolean = true> {
  */
 export interface FieldMomentsSelect<T extends boolean = true> {
   title?: T;
+  story?: T;
   photos?: T;
   kind?: T;
   takenAt?: T;

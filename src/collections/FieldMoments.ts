@@ -45,6 +45,16 @@ export const FieldMoments: CollectionConfig = {
       },
     },
     {
+      name: 'story',
+      type: 'textarea',
+      localized: true,
+      maxLength: 2000,
+      admin: {
+        description:
+          'Optional. What the visit was about, in a few short paragraphs. A visit with a story gets its own page, with the story above all its photos.',
+      },
+    },
+    {
       name: 'photos',
       type: 'upload',
       relationTo: 'media',
