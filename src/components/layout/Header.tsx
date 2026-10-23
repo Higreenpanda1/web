@@ -23,10 +23,16 @@ export async function Header({ locale, settings }: { locale: Locale; settings: S
       : [
           { label: t('nav.services'), href: '/services' },
           { label: t('nav.consultation'), href: '/apply/consultation' },
+          { label: t('nav.academy'), href: '/academy' },
           { label: t('nav.about'), href: '/about' },
           { label: t('nav.blog'), href: '/blog' },
           { label: t('nav.contact'), href: '/contact' },
         ]
+  // The course page always has a way in, even from a menu edited in Site
+  // settings before it existed: it goes just before the last item (Contact).
+  if (!items.some((item) => item.href === '/academy')) {
+    items.splice(Math.max(items.length - 1, 0), 0, { label: t('nav.academy'), href: '/academy' })
+  }
 
   const whatsapp = whatsappLink(settings.whatsappNumber, settings.whatsappPrefill ?? undefined)
 
