@@ -4,6 +4,7 @@ import { headers } from 'next/headers'
 import { notFound } from 'next/navigation'
 
 import { Analytics } from '@/components/Analytics'
+import { CourseStrip } from '@/components/academy/CourseStrip'
 import { Footer } from '@/components/layout/Footer'
 import { Header } from '@/components/layout/Header'
 import { WhatsAppButton } from '@/components/layout/WhatsAppButton'
@@ -142,6 +143,7 @@ export default async function LocaleLayout({
             {t('nav.skipToContent')}
           </a>
 
+          <CourseStrip locale={typedLocale} />
           <Header locale={typedLocale} settings={settings} />
 
           <main id="main" className="flex-1">
