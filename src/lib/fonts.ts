@@ -82,15 +82,16 @@ export const plexArabic = localFont({
 })
 
 /**
- * The heading face, El Messiri: a modern Arabic display face with a trace of
- * calligraphy, chosen so headings read apart from the IBM Plex text (owner,
- * 23 October 2026). Small files (about 13 KB each), same split and no preload
- * as above.
+ * The heading face, Markazi Text: a classical Arabic text face with a matching
+ * Latin, chosen by the owner (23 October 2026) so headings read apart from the
+ * IBM Plex text. Its small x-height is evened out with `font-size-adjust` in
+ * globals.css. Small files (10 to 20 KB each), same split and no preload as
+ * above.
  */
 export const displayLatin = localFont({
   src: [
-    { path: '../fonts/messiri-latin-600.woff2', weight: '600', style: 'normal' },
-    { path: '../fonts/messiri-latin-700.woff2', weight: '700', style: 'normal' },
+    { path: '../fonts/markazi-latin-600.woff2', weight: '600', style: 'normal' },
+    { path: '../fonts/markazi-latin-700.woff2', weight: '700', style: 'normal' },
   ],
   variable: '--font-display-latin',
   display: 'swap',
@@ -108,8 +109,8 @@ export const displayLatin = localFont({
 
 export const displayArabic = localFont({
   src: [
-    { path: '../fonts/messiri-arabic-600.woff2', weight: '600', style: 'normal' },
-    { path: '../fonts/messiri-arabic-700.woff2', weight: '700', style: 'normal' },
+    { path: '../fonts/markazi-arabic-600.woff2', weight: '600', style: 'normal' },
+    { path: '../fonts/markazi-arabic-700.woff2', weight: '700', style: 'normal' },
   ],
   variable: '--font-display-arabic',
   display: 'swap',
