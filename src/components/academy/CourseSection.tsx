@@ -1,107 +1,100 @@
-import { ArrowLeft, ArrowRight } from 'lucide-react'
-import Image from 'next/image'
 import { getTranslations } from 'next-intl/server'
 
 import { Link } from '@/i18n/navigation'
 
 import type { Locale } from '@/i18n/routing'
 
+import './academy.css'
+
 const PRICES = { master: '1,500', premium: '2,900' } as const
 
 /**
- * The course, announced on the homepage right under the hero. A dark panel in
- * the course page's own palette (deep green, gold for numbers only), carrying
- * the page's opening line, the programme in four numbers, the two prices and
- * one way in. Everything else lives on /academy.
+ * The course, announced on the homepage right under the hero, as a piece of
+ * the course page itself: its palette, faces, gold button and paper dossier
+ * (here holding Sami's photo). It carries the page's opening line, the
+ * programme in four numbers, the two prices and one way in; everything else
+ * lives on /academy.
  */
 export async function CourseSection({ locale }: { locale: Locale }) {
   const t = await getTranslations({ locale, namespace: 'academy' })
-  const Arrow = locale === 'ar' ? ArrowLeft : ArrowRight
-  const stats = [
+  const facts = [
     { value: '6', label: t('stages') },
     { value: '44', label: t('lessons') },
     { value: '5.5', label: t('hours') },
-    { value: '∞', label: t('lifetime') },
   ]
 
   return (
-    <section aria-labelledby="home-academy-heading" className="py-12 md:py-16">
-      <div className="container-page">
-        <div className="relative isolate overflow-hidden rounded-xl bg-[#062414] text-[#EAF2EC] shadow-[0_30px_60px_-30px_rgb(6_36_20/0.6)]">
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 -z-10 bg-[radial-gradient(120%_80%_at_85%_0%,#0f4a2a_0%,transparent_60%)]"
-          />
-          <div className="grid gap-8 p-6 sm:p-8 md:grid-cols-[minmax(0,1fr)_15rem] md:gap-10 md:p-12 lg:grid-cols-[minmax(0,1fr)_17rem]">
-            <div className="min-w-0">
-              <p className="mb-4 text-caption font-semibold tracking-wide text-[#F0C56A]">
-                {t('eyebrow')}
-              </p>
-              <h2 id="home-academy-heading" className="text-white">
-                {t('title')}
+    <section aria-labelledby="home-academy-heading" className="ac ac-wrap" lang={locale}>
+      {/* The whole card is the link: anywhere a visitor taps opens the course. */}
+      <Link href="/academy" className="container-page block no-underline">
+        <div className="ac-card">
+          <div className="ac-grid">
+            <div>
+              <p className="ac-kick">{t('eyebrow')}</p>
+              <p className="ac-name">{t('title')}</p>
+              <h2 id="home-academy-heading" className="ac-h">
+                {t.rich('quote', { em: (chunks) => <em>{chunks}</em> })}
               </h2>
-              <p className="mt-5 border-s-2 border-[#E0A32E] ps-4 text-h3 leading-snug font-semibold text-white">
-                {t('quote')}
-              </p>
-              <p className="mt-5 max-w-[var(--measure)] text-body-lg text-[#A9BFAF]">{t('lead')}</p>
+              <p className="ac-lede">{t('lead')}</p>
 
-              <dl
-                aria-label={t('statsLabel')}
-                className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-white/10 bg-white/10 sm:grid-cols-4"
-              >
-                {stats.map((stat) => (
-                  <div key={stat.label} className="flex flex-col gap-1 bg-[#062414] px-4 py-3">
-                    <dt className="order-2 text-caption text-[#A9BFAF]">{stat.label}</dt>
-                    <dd className="ltr-nums order-1 m-0 text-h3 font-bold text-[#F0C56A]">
-                      {stat.value}
-                    </dd>
+              <dl className="ac-facts" aria-label={t('statsLabel')}>
+                {facts.map((fact) => (
+                  <div key={fact.label} className="ac-fact">
+                    <dt>{fact.label}</dt>
+                    <dd className="ac-num">{fact.value}</dd>
                   </div>
                 ))}
+                <div className="ac-fact">
+                  <dt>{t('lifetime')}</dt>
+                  <dd className="ac-inf">∞</dd>
+                </div>
               </dl>
 
-              <div className="mt-8 flex flex-col gap-5 sm:flex-row sm:flex-wrap sm:items-center">
-                <Link
-                  href="/academy"
-                  className="inline-flex min-h-13 items-center justify-center gap-2 rounded-full bg-[#E0A32E] px-7 py-3.5 text-body-lg font-semibold text-[#062414] no-underline transition-colors hover:bg-[#F0C56A]"
-                >
-                  {t('cta')}
-                  <Arrow size={18} strokeWidth={2} aria-hidden="true" />
-                </Link>
-                <ul
-                  aria-label={t('pricesLabel')}
-                  className="flex list-none flex-wrap gap-x-6 gap-y-2 p-0"
-                >
+              <div className="ac-cta">
+                <span className="ac-btn">{t('cta')}</span>
+                <ul className="ac-prices" aria-label={t('pricesLabel')}>
                   <li>
-                    <span className="text-[#A9BFAF]">{t('master')} · </span>
-                    <span className="ltr-nums font-bold text-white">{PRICES.master}</span>{' '}
-                    <span className="text-[#A9BFAF]">{t('currency')}</span>
+                    <span className="ac-plan">{t('master')}</span>
+                    <span className="ac-price">
+                      <span className="ac-num">{PRICES.master}</span>
+                      <small>{t('currency')}</small>
+                    </span>
                   </li>
                   <li>
-                    <span className="text-[#A9BFAF]">{t('premium')} · </span>
-                    <span className="ltr-nums font-bold text-white">{PRICES.premium}</span>{' '}
-                    <span className="text-[#A9BFAF]">{t('currency')}</span>
-                    <span className="block text-caption text-[#A9BFAF]">{t('premiumNote')}</span>
+                    <span className="ac-plan">{t('premium')}</span>
+                    <span className="ac-price">
+                      <span className="ac-num">{PRICES.premium}</span>
+                      <small>{t('currency')}</small>
+                    </span>
+                    <span className="ac-note">{t('premiumNote')}</span>
                   </li>
                 </ul>
               </div>
             </div>
 
-            <figure className="m-0 max-w-[14rem] md:max-w-none">
-              <Image
-                src="/offers/academy/sami.jpg"
-                alt={t('photoAlt')}
-                width={480}
-                height={599}
-                sizes="(min-width: 1024px) 17rem, 15rem"
-                className="h-auto w-full rounded-lg border border-[#E0A32E]/30 object-cover"
-              />
-              <figcaption className="mt-3 text-caption text-[#A9BFAF]">
-                {t('photoCaption')}
-              </figcaption>
-            </figure>
+            <div className="ac-file">
+              <div className="ac-paper p1" aria-hidden="true" />
+              <div className="ac-paper p2" aria-hidden="true" />
+              <figure className="ac-dos m-0">
+                <span className="ac-clip" aria-hidden="true" />
+                <div className="ac-dos-h" aria-hidden="true">
+                  <b>{t('fileLabel')}</b>
+                  <span>{t('fileStamp')}</span>
+                </div>
+                {/* eslint-disable-next-line @next/next/no-img-element -- a 480px photo the course page already serves as-is */}
+                <img
+                  src="/offers/academy/sami.jpg"
+                  alt={t('photoAlt')}
+                  width={480}
+                  height={599}
+                  loading="lazy"
+                />
+                <figcaption>{t('photoCaption')}</figcaption>
+              </figure>
+            </div>
           </div>
         </div>
-      </div>
+      </Link>
     </section>
   )
 }

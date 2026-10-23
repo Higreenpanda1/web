@@ -1,0 +1,540 @@
+/*
+ * The course's own look, for the two places the site announces it (the strip
+ * above every page and the homepage section). Same palette, faces and gold as
+ * /academy, so the announcement reads as a piece of that page. The faces are
+ * the files /academy already serves; a browser only downloads one when text
+ * on the page uses it.
+ */
+@font-face {
+  font-family: 'Reem Kufi';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(/offers/academy/fonts/reem-kufi-arabic-wght-normal.woff2) format('woff2');
+  unicode-range:
+    U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E,
+    U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+@font-face {
+  font-family: 'Reem Kufi';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(/offers/academy/fonts/reem-kufi-latin-wght-normal.woff2) format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Amiri';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/offers/academy/fonts/amiri-arabic-400-normal.woff2) format('woff2');
+  unicode-range:
+    U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E,
+    U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+@font-face {
+  font-family: 'Amiri';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/offers/academy/fonts/amiri-latin-400-normal.woff2) format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Amiri';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/offers/academy/fonts/amiri-arabic-700-normal.woff2) format('woff2');
+  unicode-range:
+    U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E,
+    U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+@font-face {
+  font-family: 'Amiri';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/offers/academy/fonts/amiri-latin-700-normal.woff2) format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Bodoni Moda';
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url(/offers/academy/fonts/bodoni-moda-latin-opsz-normal.woff2) format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/offers/academy/fonts/ibm-plex-mono-latin-400-normal.woff2) format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+.ac {
+  --ac-bg: #062414;
+  --ac-em: #0f4a2a;
+  --ac-gold: #e0a32e;
+  --ac-gold2: #f0c56a;
+  --ac-iv: #f4efe3;
+  --ac-ink: #eaf2ec;
+  --ac-mut: #a9bfaf;
+  --ac-hair: rgb(234 242 236 / 0.1);
+  --ac-fh: 'Reem Kufi', var(--font-sans), sans-serif;
+  --ac-fq: 'Amiri', serif;
+  --ac-fn: 'Bodoni Moda', Georgia, serif;
+  --ac-fm: 'IBM Plex Mono', ui-monospace, monospace;
+  color: var(--ac-ink);
+}
+/* Spaced letters break Arabic joining; only Latin labels are tracked. */
+.ac:lang(ar) .ac-kick,
+.ac:lang(ar) .ac-plan,
+.ac-strip:lang(ar) .ac-strip-kick {
+  letter-spacing: 0;
+  font-family: var(--ac-fh);
+  font-size: 13px;
+}
+.ac:lang(en) {
+  --ac-fh: 'Bodoni Moda', Georgia, serif;
+}
+.ac-num {
+  font-family: var(--ac-fn);
+  font-variant-numeric: lining-nums;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* strip */
+.ac-strip {
+  display: block;
+  background: linear-gradient(90deg, #04190d, #0a2f1b 50%, #04190d);
+  border-bottom: 1px solid rgb(224 163 46 / 0.28);
+  text-decoration: none;
+}
+.ac-strip-in {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 42px;
+  padding-block: 7px;
+}
+.ac-strip-kick {
+  font-family: var(--ac-fm);
+  font-size: 10.5px;
+  letter-spacing: 0.24em;
+  color: var(--ac-gold);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+.ac-strip-kick::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ac-gold);
+  box-shadow: 0 0 10px var(--ac-gold);
+}
+.ac-strip-name {
+  font-family: var(--ac-fq);
+  font-size: 17px;
+  color: var(--ac-iv);
+  line-height: 1.4;
+  min-width: 0;
+}
+.ac-strip-cta {
+  font-family: var(--ac-fh);
+  font-size: 13.5px;
+  color: var(--ac-gold2);
+  border-bottom: 1px solid rgb(240 197 106 / 0.45);
+  white-space: nowrap;
+  transition: border-color 0.3s;
+}
+.ac-strip:hover .ac-strip-cta {
+  border-color: var(--ac-gold2);
+}
+.ac-strip-sep {
+  width: 28px;
+  height: 1px;
+  background: rgb(224 163 46 / 0.45);
+}
+@media (max-width: 640px) {
+  .ac-strip-in {
+    gap: 10px;
+  }
+  .ac-strip-sep {
+    display: none;
+  }
+  .ac-strip-name {
+    font-size: 15px;
+  }
+}
+@media (max-width: 420px) {
+  .ac-strip-kick {
+    display: none;
+  }
+}
+
+/* homepage section: one clickable card, a piece of the course page set
+   into the white homepage rather than a band that takes it over */
+.ac-wrap {
+  padding-block: 56px;
+}
+.ac-card {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  isolation: isolate;
+  padding: 52px 56px;
+  border-radius: 4px;
+  border: 1px solid rgb(224 163 46 / 0.22);
+  text-decoration: none;
+  background:
+    radial-gradient(700px 420px at 15% 30%, rgb(55 141 66 / 0.3), transparent 60%),
+    radial-gradient(600px 400px at 95% 0%, rgb(224 163 46 / 0.1), transparent 60%),
+    linear-gradient(180deg, #05200f, var(--ac-bg));
+  box-shadow: 0 40px 80px -40px rgb(6 36 20 / 0.7);
+  transition:
+    transform 0.4s cubic-bezier(0.2, 0.7, 0.1, 1),
+    box-shadow 0.4s,
+    border-color 0.4s;
+}
+.ac-card:hover {
+  transform: translateY(-3px);
+  border-color: rgb(224 163 46 / 0.5);
+  box-shadow: 0 50px 90px -40px rgb(6 36 20 / 0.85);
+}
+.ac-card:focus-visible {
+  outline: 2px solid var(--ac-gold);
+  outline-offset: 4px;
+}
+.ac-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+.ac-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 250px;
+  gap: 64px;
+  align-items: center;
+}
+.ac-grid > * {
+  min-width: 0;
+}
+@media (max-width: 860px) {
+  .ac-wrap {
+    padding-block: 40px;
+  }
+  .ac-card {
+    padding: 36px 22px 40px;
+  }
+  .ac-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 48px;
+  }
+}
+.ac-kick {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--ac-fm);
+  font-size: 11.5px;
+  letter-spacing: 0.22em;
+  color: var(--ac-gold);
+  margin-bottom: 20px;
+}
+.ac-kick::before {
+  content: '';
+  width: 34px;
+  height: 1px;
+  background: var(--ac-gold);
+}
+.ac-name {
+  font-family: var(--ac-fq);
+  font-size: clamp(21px, 2.1vw, 26px);
+  color: var(--ac-gold2);
+  margin: 0 0 14px;
+}
+.ac-h {
+  font-family: var(--ac-fh);
+  font-weight: 600;
+  font-size: clamp(28px, 3.4vw, 46px);
+  line-height: 1.22;
+  color: var(--ac-iv);
+  margin: 0;
+  text-wrap: balance;
+}
+.ac-h em {
+  font-style: normal;
+  background: linear-gradient(90deg, #f0c56a, #e0a32e);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.ac-lede {
+  margin-top: 18px;
+  font-size: clamp(17px, 1.5vw, 19px);
+  line-height: 1.8;
+  color: #c9d8cd;
+  max-width: 54ch;
+}
+.ac-facts {
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  justify-content: start;
+  margin: 30px 0 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--ac-hair);
+}
+.ac-fact {
+  padding-inline-end: 28px;
+  margin-inline-end: 28px;
+  border-inline-end: 1px solid var(--ac-hair);
+  display: flex;
+  flex-direction: column;
+}
+.ac-fact:last-child {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+.ac-fact dd {
+  order: 1;
+  margin: 0;
+  font-size: clamp(28px, 2.8vw, 36px);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--ac-iv);
+  text-align: start;
+}
+.ac-fact dt {
+  order: 2;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--ac-mut);
+}
+.ac-fact .ac-inf {
+  font-family: var(--ac-fh);
+  font-size: clamp(22px, 2.2vw, 28px);
+  line-height: 1;
+  direction: inherit;
+}
+@media (max-width: 560px) {
+  .ac-facts {
+    grid-template-columns: 1fr 1fr;
+    row-gap: 24px;
+  }
+  .ac-fact {
+    border: 0;
+    margin: 0;
+    padding: 0;
+  }
+}
+.ac-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px 30px;
+  margin-top: 30px;
+}
+.ac-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 14px 30px;
+  border-radius: 2px;
+  font-family: var(--ac-fh);
+  font-weight: 600;
+  font-size: 16px;
+  text-decoration: none;
+  color: #10220f;
+  background: linear-gradient(135deg, #f0c56a, #e0a32e 55%, #b9821f);
+  box-shadow: 0 10px 30px -12px rgb(224 163 46 / 0.7);
+  transition:
+    transform 0.3s cubic-bezier(0.2, 0.7, 0.1, 1),
+    box-shadow 0.3s;
+}
+.ac-card:hover .ac-btn {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px -14px rgb(224 163 46 / 0.85);
+}
+.ac-prices {
+  display: flex;
+  gap: 28px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.ac-prices li {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ac-plan {
+  font-family: var(--ac-fm);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--ac-mut);
+}
+.ac-price {
+  font-size: 26px;
+  line-height: 1;
+  color: var(--ac-iv);
+}
+.ac-price small {
+  font-family: var(--ac-fh);
+  font-size: 13px;
+  color: var(--ac-gold2);
+  margin-inline-start: 6px;
+}
+.ac-note {
+  font-size: 12.5px;
+  color: var(--ac-mut);
+}
+
+/* the file: Sami's photo clipped to a dossier */
+.ac-file {
+  position: relative;
+  max-width: 250px;
+  width: 100%;
+  margin-inline: auto;
+  animation: ac-float 9s ease-in-out infinite;
+}
+@keyframes ac-float {
+  50% {
+    transform: translateY(-8px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ac-file {
+    animation: none;
+  }
+}
+.ac-paper {
+  position: absolute;
+  inset: 0;
+  border-radius: 3px;
+  box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.8);
+}
+.ac-paper.p1 {
+  transform: rotate(-4deg) translate(-14px, 10px);
+  background: #d9cfb7;
+}
+.ac-paper.p2 {
+  transform: rotate(2.5deg) translate(10px, 6px);
+  background: #e1d8c2;
+}
+.ac-dos {
+  position: relative;
+  background: linear-gradient(170deg, #f7f2e7, #ece4d1);
+  color: #1f2a21;
+  border-radius: 3px;
+  padding: 16px 16px 14px;
+  box-shadow:
+    0 40px 80px -30px rgb(0 0 0 / 0.85),
+    inset 0 0 0 1px rgb(0 0 0 / 0.04);
+}
+.ac-dos::before {
+  content: '';
+  position: absolute;
+  top: -16px;
+  inset-inline-end: 34px;
+  width: 90px;
+  height: 16px;
+  background: #ece4d1;
+  border-radius: 6px 6px 0 0;
+}
+.ac-clip {
+  position: absolute;
+  top: -22px;
+  inset-inline-start: 46px;
+  width: 22px;
+  height: 62px;
+  border: 3px solid #9aa39b;
+  border-bottom-color: transparent;
+  border-radius: 12px;
+  transform: rotate(8deg);
+  z-index: 2;
+}
+.ac-dos-h {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1.5px solid #1f2a21;
+  padding-bottom: 10px;
+  margin-bottom: 14px;
+}
+.ac-dos-h b {
+  font-family: var(--ac-fh);
+  font-size: 17px;
+  font-weight: 600;
+}
+.ac-dos-h span {
+  font-family: var(--ac-fm);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: #8f2f22;
+  border: 1.5px solid #8f2f22;
+  padding: 2px 8px;
+}
+.ac-dos img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 480 / 560;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 2px;
+  filter: saturate(0.92) contrast(1.03);
+}
+.ac-dos figcaption {
+  margin-top: 10px;
+  font-family: var(--ac-fq);
+  font-size: 15px;
+  color: #1f2a21;
+  text-align: center;
+}
+@media (max-width: 860px) {
+  .ac-file {
+    max-width: 230px;
+  }
+}
+
+/* Numbers are set left-to-right for their digits; in Arabic they still sit at
+   the right edge of their cell, above their label. */
+.ac:lang(ar) .ac-fact dd {
+  text-align: right;
+}
+@media (max-width: 560px) {
+  .ac-lede {
+    display: none;
+  }
+  .ac-file {
+    max-width: 190px;
+  }
+}
