@@ -80,3 +80,45 @@ export const plexArabic = localFont({
     },
   ],
 })
+
+/**
+ * The heading face, El Messiri: a modern Arabic display face with a trace of
+ * calligraphy, chosen so headings read apart from the IBM Plex text (owner,
+ * 23 October 2026). Small files (about 13 KB each), same split and no preload
+ * as above.
+ */
+export const displayLatin = localFont({
+  src: [
+    { path: '../fonts/messiri-latin-600.woff2', weight: '600', style: 'normal' },
+    { path: '../fonts/messiri-latin-700.woff2', weight: '700', style: 'normal' },
+  ],
+  variable: '--font-display-latin',
+  display: 'swap',
+  preload: false,
+  fallback: [],
+  adjustFontFallback: false,
+  declarations: [
+    {
+      prop: 'unicode-range',
+      value:
+        'U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD',
+    },
+  ],
+})
+
+export const displayArabic = localFont({
+  src: [
+    { path: '../fonts/messiri-arabic-600.woff2', weight: '600', style: 'normal' },
+    { path: '../fonts/messiri-arabic-700.woff2', weight: '700', style: 'normal' },
+  ],
+  variable: '--font-display-arabic',
+  display: 'swap',
+  preload: false,
+  fallback: [],
+  declarations: [
+    {
+      prop: 'unicode-range',
+      value: 'U+0600-06FF,U+0750-077F,U+0870-088E,U+08A0-08FF,U+FB50-FDFF,U+FE70-FEFF',
+    },
+  ],
+})

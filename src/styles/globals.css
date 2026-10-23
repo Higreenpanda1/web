@@ -168,6 +168,7 @@
   h3,
   h4 {
     color: var(--heading);
+    font-family: var(--font-display);
     line-height: var(--leading-heading);
     font-weight: 700;
     letter-spacing: -0.01em;
@@ -259,6 +260,11 @@
     .container-page {
       padding-inline: 2rem;
     }
+  }
+
+  /* Tracking suits Latin labels; spaced Arabic letters lose their joins. */
+  :root:lang(en) .eyebrow {
+    letter-spacing: 0.16em;
   }
 
   .prose-hgp {

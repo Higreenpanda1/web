@@ -29,8 +29,8 @@ type StepState = 'done' | 'now' | 'next'
 const STEP_STATE: StepState[] = ['done', 'done', 'now', 'next']
 
 /**
- * The homepage hero. Light, not a dark box: the brand wash and dot grid carry
- * the colour, the wordmark in the header carries the identity, and the
+ * The homepage hero, on the course page's deep green (owner, 23 October
+ * 2026): gold for the one action, ivory for the words, and the
  * "journey card" on the trailing side shows the four-step process as a live
  * thing rather than a paragraph. There is no photography yet (brief section
  * 15 asks for real photos of the founder on the ground); the card is built to
@@ -42,23 +42,20 @@ export async function Hero({ locale, settings }: { locale: Locale; settings: Sit
   const steps = [1, 2, 3, 4] as const
 
   return (
-    <section className="relative isolate overflow-hidden bg-surface bg-gradient-hero">
+    <section className="theme-deep relative isolate overflow-hidden bg-gradient-deep">
       <div className="absolute inset-0 -z-10 bg-dots opacity-30" aria-hidden="true" />
       {/* Two soft orbs drifting behind the card — depth without colour blocks. */}
+      <div aria-hidden="true" className="orb -top-24 end-[8%] -z-10 size-[28rem] bg-brand-600/20" />
       <div
         aria-hidden="true"
-        className="orb -top-24 end-[8%] -z-10 size-[28rem] bg-brand-200/60 dark:bg-brand-700/25"
-      />
-      <div
-        aria-hidden="true"
-        className="orb bottom-0 start-[30%] -z-10 size-[22rem] bg-[#e9e6dc]/70 dark:bg-white/5"
+        className="orb bottom-0 start-[30%] -z-10 size-[22rem] bg-[#e0a32e]/10"
         style={{ animationDelay: '-9s', animationDuration: '24s' }}
       />
 
       <Container className="grid items-center gap-14 py-14 md:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12 lg:py-28">
         <div className="max-w-[40rem]">
-          <p className="reveal inline-flex items-center gap-2 rounded-full border border-brand-200 bg-surface px-3.5 py-1.5 text-caption font-semibold text-heading shadow-sm">
-            <MapPin size={16} strokeWidth={2} aria-hidden="true" className="text-brand-600" />
+          <p className="reveal inline-flex items-center gap-2 rounded-full border border-border-strong bg-surface px-3.5 py-1.5 text-caption font-semibold text-heading shadow-sm">
+            <MapPin size={16} strokeWidth={2} aria-hidden="true" className="text-accent" />
             <CityRotator
               cities={[t('home.heroCity1'), t('home.heroCity2'), t('home.heroCity3')]}
               fullList={t('home.heroEyebrow')}
@@ -86,7 +83,7 @@ export async function Hero({ locale, settings }: { locale: Locale; settings: Sit
               size={22}
               strokeWidth={2}
               aria-hidden="true"
-              className="mt-1 shrink-0 text-brand-600"
+              className="mt-1 shrink-0 text-accent"
             />
             <span>{t('home.heroPromise')}</span>
           </p>
@@ -165,7 +162,7 @@ export async function Hero({ locale, settings }: { locale: Locale; settings: Sit
                       className={cn(
                         'relative z-10 inline-flex size-10 shrink-0 items-center justify-center rounded-full',
                         state === 'done' && 'bg-brand-700 text-white',
-                        state === 'now' && 'bg-surface-tint text-text-brand ring-2 ring-brand-500',
+                        state === 'now' && 'bg-surface-tint text-text-brand ring-2 ring-accent',
                         state === 'next' &&
                           'border border-border bg-surface-sunken text-text-muted',
                       )}
@@ -190,7 +187,7 @@ export async function Hero({ locale, settings }: { locale: Locale; settings: Sit
                           className={cn(
                             'shrink-0 rounded-full px-2 py-0.5 text-eyebrow font-bold',
                             state === 'done' && 'bg-surface-tint text-text-brand',
-                            state === 'now' && 'bg-brand-700 text-white',
+                            state === 'now' && 'bg-accent text-[#10220f]',
                             state === 'next' && 'bg-surface-sunken text-text-muted',
                           )}
                         >
@@ -214,7 +211,7 @@ export async function Hero({ locale, settings }: { locale: Locale; settings: Sit
           </div>
 
           <p className="absolute -top-4 -end-3 hidden items-center gap-2 rounded-full border border-border-soft bg-surface px-4 py-2 text-caption font-semibold text-heading shadow-card sm:inline-flex">
-            <Globe2 size={17} strokeWidth={1.75} aria-hidden="true" className="text-brand-600" />
+            <Globe2 size={17} strokeWidth={1.75} aria-hidden="true" className="text-accent" />
             <span className="ltr-nums">{t('home.heroChipCities')}</span>
           </p>
           <p className="absolute -bottom-5 -start-3 hidden items-center gap-2 rounded-full border border-border-soft bg-surface px-4 py-2 text-caption font-semibold text-heading shadow-card motion-safe:animate-float sm:inline-flex">

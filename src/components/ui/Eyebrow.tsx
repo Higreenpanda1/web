@@ -17,15 +17,12 @@ export function Eyebrow({
   return (
     <Tag
       className={cn(
-        'inline-flex items-center gap-2 text-eyebrow font-bold tracking-[0.14em] uppercase',
-        inverse ? 'text-brand-300' : 'text-text-brand',
+        'eyebrow inline-flex items-center gap-3 text-eyebrow font-bold uppercase',
+        inverse ? 'text-[#f0c56a]' : 'text-accent-text',
         className,
       )}
     >
-      <span
-        aria-hidden="true"
-        className={cn('size-1.5 rounded-full', inverse ? 'bg-brand-400' : 'bg-brand-600')}
-      />
+      <span aria-hidden="true" className={cn('h-px w-7', inverse ? 'bg-[#e0a32e]' : 'bg-accent')} />
       {children}
     </Tag>
   )

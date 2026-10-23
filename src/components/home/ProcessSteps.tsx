@@ -44,7 +44,7 @@ export function ProcessSteps({
               <span className="relative z-10 inline-flex size-14 shrink-0 items-center justify-center rounded-full bg-brand-700 text-white shadow-glow">
                 <Icon size={24} strokeWidth={1.75} aria-hidden="true" />
               </span>
-              <span className="ltr-nums text-eyebrow font-bold tracking-[0.14em] text-text-brand">
+              <span className="ltr-nums text-eyebrow font-bold ltr:tracking-[0.14em] text-text-brand">
                 0{index + 1}
               </span>
             </div>

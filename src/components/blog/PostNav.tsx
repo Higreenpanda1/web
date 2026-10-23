@@ -27,7 +27,7 @@ export function PostNav({
     <nav className="grid gap-4 sm:grid-cols-2">
       {previous ? (
         <Link href={`/blog/${previous.slug}`} rel="prev" className={linkClass}>
-          <span className="inline-flex items-center gap-1 text-eyebrow font-bold tracking-[0.14em] text-text-muted uppercase">
+          <span className="inline-flex items-center gap-1 text-eyebrow font-bold ltr:tracking-[0.14em] text-text-muted uppercase">
             <ChevronLeft
               size={14}
               strokeWidth={2}
@@ -45,7 +45,7 @@ export function PostNav({
       )}
       {next ? (
         <Link href={`/blog/${next.slug}`} rel="next" className={`${linkClass} sm:text-end`}>
-          <span className="inline-flex items-center gap-1 text-eyebrow font-bold tracking-[0.14em] text-text-muted uppercase sm:justify-end">
+          <span className="inline-flex items-center gap-1 text-eyebrow font-bold ltr:tracking-[0.14em] text-text-muted uppercase sm:justify-end">
             {labels.next}
             <ChevronRight
               size={14}

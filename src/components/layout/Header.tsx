@@ -37,7 +37,7 @@ export async function Header({ locale, settings }: { locale: Locale; settings: S
   const whatsapp = whatsappLink(settings.whatsappNumber, settings.whatsappPrefill ?? undefined)
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border-soft bg-surface/85 backdrop-blur-md">
+    <header className="theme-deep sticky top-0 z-40 border-b border-[rgb(224_163_46/0.18)] bg-[rgb(6_36_20/0.9)] backdrop-blur-md">
       <div className="container-page flex h-[var(--header-height)] items-center justify-between gap-3">
         <Link href="/" className="shrink-0 rounded-sm no-underline" aria-label={t('site.name')}>
           <Wordmark height={48} className="h-10 w-auto md:h-12" />

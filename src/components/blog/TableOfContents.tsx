@@ -18,7 +18,7 @@ export function TableOfContents({ headings, title }: { headings: Heading[]; titl
     >
       <p
         id="toc-heading"
-        className="flex items-center gap-2 text-eyebrow font-bold tracking-[0.14em] text-text-brand uppercase"
+        className="flex items-center gap-2 text-eyebrow font-bold ltr:tracking-[0.14em] text-text-brand uppercase"
       >
         <List size={16} strokeWidth={2} aria-hidden="true" />
         {title}

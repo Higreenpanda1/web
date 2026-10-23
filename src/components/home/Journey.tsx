@@ -188,7 +188,7 @@ export function Journey({
                       : 'border-border-soft hover:border-brand-300 hover:shadow-card',
                   )}
                 >
-                  <span className="ltr-nums text-eyebrow font-bold tracking-[0.14em] text-text-brand uppercase">
+                  <span className="ltr-nums text-eyebrow font-bold ltr:tracking-[0.14em] text-text-brand uppercase">
                     {stepLabel} {number}
                   </span>
                   <span className="mt-1.5 block text-h3 font-bold text-heading">{step.title}</span>

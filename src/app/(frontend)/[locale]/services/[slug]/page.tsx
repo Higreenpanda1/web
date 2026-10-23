@@ -264,7 +264,7 @@ export default async function ServicePage({
               >
                 <h2
                   id="other-services-heading"
-                  className="text-caption font-bold tracking-[0.14em] text-text-brand uppercase"
+                  className="text-caption font-bold ltr:tracking-[0.14em] text-text-brand uppercase"
                 >
                   {t('services.otherServices')}
                 </h2>

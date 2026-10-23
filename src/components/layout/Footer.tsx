@@ -72,7 +72,7 @@ export async function Footer({ locale, settings }: { locale: Locale; settings: S
   const offices = (settings.offices ?? []).map((office) => office.city).filter(Boolean)
 
   return (
-    <footer className="relative isolate overflow-hidden bg-gradient-deep text-brand-100">
+    <footer className="theme-deep relative isolate overflow-hidden border-t border-[rgb(224_163_46/0.22)] bg-gradient-deep text-brand-100">
       <div className="absolute inset-0 -z-10 bg-dots-inverse opacity-60" aria-hidden="true" />
       <div className="container-page pt-16 pb-10">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-12">
@@ -135,7 +135,7 @@ export async function Footer({ locale, settings }: { locale: Locale; settings: S
           <div className="grid grid-cols-2 gap-8 lg:col-span-4">
             {columns.map((column) => (
               <nav key={column.id ?? column.title} aria-label={column.title}>
-                <h2 className="mb-4 text-eyebrow font-bold tracking-[0.14em] text-white uppercase">
+                <h2 className="mb-4 text-eyebrow font-bold ltr:tracking-[0.14em] text-white uppercase">
                   {column.title}
                 </h2>
                 <ul className="space-y-2.5">
@@ -155,7 +155,7 @@ export async function Footer({ locale, settings }: { locale: Locale; settings: S
           </div>
 
           <div className="lg:col-span-3">
-            <h2 className="mb-4 text-eyebrow font-bold tracking-[0.14em] text-white uppercase">
+            <h2 className="mb-4 text-eyebrow font-bold ltr:tracking-[0.14em] text-white uppercase">
               {t('footer.contactTitle')}
             </h2>
             <a

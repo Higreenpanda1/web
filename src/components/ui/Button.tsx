@@ -7,18 +7,16 @@ type Variant = 'primary' | 'secondary' | 'ghost' | 'inverse' | 'outline-inverse'
 type Size = 'sm' | 'md' | 'lg'
 
 /**
- * WCAG note (brief section 12): white text on --brand-600 is 4.16:1, which
- * fails AA at normal size. The primary button therefore uses --brand-700
- * (6.48:1) for its fill, not the logo green.
- *
- * Buttons are pills: the rounded "i" stem in the wordmark is the one soft
- * shape in an otherwise hard-edged mark, and the controls echo it.
+ * Since 23 October 2026 the buttons follow the course page: the primary is
+ * its gold with deep green text (well above AA), and corners are near-square,
+ * as on that page.
  */
 const VARIANT_CLASS: Record<Variant, string> = {
+  // The course page's gold, on light and dark grounds alike.
   primary:
-    'bg-brand-700 text-white shadow-[0_1px_2px_rgb(18_52_27/0.2),0_10px_24px_-12px_rgb(39_107_52/0.8)] hover:bg-brand-800 active:bg-brand-900',
+    'bg-[linear-gradient(135deg,#f0c56a,#e0a32e_55%,#b9821f)] text-[#10220f] shadow-[0_10px_30px_-12px_rgb(224_163_46/0.7)] hover:shadow-[0_16px_40px_-14px_rgb(224_163_46/0.85)] hover:-translate-y-0.5',
   secondary:
-    'bg-surface text-heading border border-border-strong hover:border-brand-400 hover:bg-surface-tint-soft',
+    'bg-transparent text-heading border border-border-strong hover:border-accent hover:text-text-brand',
   soft: 'bg-surface-tint text-heading hover:bg-brand-200 hover:text-brand-900',
   ghost: 'bg-transparent text-text-brand hover:bg-surface-tint-soft',
   inverse: 'bg-white text-brand-900 shadow-[0_10px_24px_-12px_rgb(0_0_0/0.5)] hover:bg-brand-50',
@@ -33,7 +31,7 @@ const SIZE_CLASS: Record<Size, string> = {
 }
 
 const BASE =
-  'inline-flex items-center justify-center gap-2 rounded-full font-semibold no-underline transition-[background-color,border-color,color,box-shadow,transform] duration-200 active:scale-[0.98]'
+  'inline-flex items-center justify-center gap-2 rounded-[3px] font-semibold no-underline transition-[background-color,border-color,color,box-shadow,transform] duration-200 active:scale-[0.98]'
 
 type CommonProps = {
   variant?: Variant
