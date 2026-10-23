@@ -168,6 +168,7 @@ docker compose -f docker-compose.prod.yml up -d --build db
 # 2. Schema, then content. Both exit when done; neither stays running.
 docker compose -f docker-compose.prod.yml run --rm tools npm run migrate
 docker compose -f docker-compose.prod.yml run --rm tools npm run seed
+docker compose -f docker-compose.prod.yml run --rm tools npm run seed:zh
 
 # 3. Now bring up the site, the proxy and the backup job.
 docker compose -f docker-compose.prod.yml up -d --build
