@@ -2,7 +2,7 @@ import { defaultLocale, type Locale } from '@/i18n/routing'
 import { serverURL } from './env'
 
 /**
- * Path helpers. Arabic carries no prefix and English carries `/en`, so every
+ * Path helpers. Arabic carries no prefix, English `/en` and Chinese `/zh`, so every
  * URL the site emits — canonical, hreflang, sitemap, OG — goes through here
  * rather than through string concatenation at the call site.
  */
@@ -10,7 +10,7 @@ import { serverURL } from './env'
 export function localePath(locale: Locale, path = '/'): string {
   const clean = path === '/' ? '' : `/${path.replace(/^\/+|\/+$/g, '')}`
   if (locale === defaultLocale) return clean || '/'
-  return `/en${clean}`
+  return `/${locale}${clean}`
 }
 
 export function absoluteUrl(locale: Locale, path = '/'): string {
@@ -19,7 +19,7 @@ export function absoluteUrl(locale: Locale, path = '/'): string {
 
 /** Strip the locale prefix from a pathname, e.g. /en/services → /services. */
 export function stripLocale(pathname: string): string {
-  const withoutPrefix = pathname.replace(/^\/en(?=\/|$)/, '')
+  const withoutPrefix = pathname.replace(/^\/(en|zh)(?=\/|$)/, '')
   return withoutPrefix === '' ? '/' : withoutPrefix
 }
 

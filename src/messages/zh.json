@@ -1,0 +1,963 @@
+{
+  "site": {
+    "name": "HiGreenPanda",
+    "legalName": "HiGreen Panda Marketing",
+    "tagline": "您在中国获取各类商务服务的首选",
+    "description": "您在深圳和上海的本地合作伙伴：在中国为您提供采购、生产、验货、物流及公司注册服务。"
+  },
+  "nav": {
+    "home": "首页",
+    "services": "服务",
+    "about": "关于我们",
+    "blog": "博客",
+    "contact": "联系我们",
+    "menu": "菜单",
+    "openMenu": "打开菜单",
+    "closeMenu": "关闭菜单",
+    "skipToContent": "跳至正文",
+    "primary": "主导航",
+    "footer": "页脚链接",
+    "consultation": "咨询",
+    "academy": "学院",
+    "field": "现场实录"
+  },
+  "locale": {
+    "switchTo": "العربية",
+    "label": "切换语言",
+    "current": "中文"
+  },
+  "cta": {
+    "whatsapp": "通过 WhatsApp 联系我们",
+    "whatsappAria": "通过 WhatsApp 联系我们：{number}",
+    "enquire": "获取报价",
+    "allServices": "全部服务",
+    "readMore": "阅读更多",
+    "contactUs": "联系我们",
+    "learnMore": "详情",
+    "startNow": "立即开始",
+    "startCompany": "注册公司",
+    "bookConsultation": "预约咨询",
+    "exploreJourney": "了解全流程",
+    "seeService": "查看该服务"
+  },
+  "home": {
+    "heroEyebrow": "深圳（总部）· 上海 · 广州",
+    "heroCity1": "深圳 · 总部",
+    "heroCity2": "上海",
+    "heroCity3": "广州",
+    "clocks": {
+      "heading": "我们办公室与客户所在地的当前时间",
+      "shenzhen": "深圳 · 我们的办公室",
+      "dubai": "迪拜",
+      "geneva": "日内瓦",
+      "open": "办公室当前营业中",
+      "closed": "办公室当前已下班"
+    },
+    "heroTitle": "从创意到您的仓库",
+    "heroLead": "在中国，一个本地合作伙伴陪您走完全程：公司、供应商、工厂、货运，以及其间的每一个环节。",
+    "heroPromise": "一个负责到底的合作伙伴。十二个步骤。没有意外。",
+    "statsTitle": "实地经验，而非纸上谈兵",
+    "stats": {
+      "cities": "走访过的中国城市",
+      "fairs": "参加过的展会",
+      "followers": "社交媒体粉丝",
+      "subscribers": "YouTube 订阅者",
+      "companies": "由我们代理记账的外资企业"
+    },
+    "servicesTitle": "全程每一步，都有对应服务",
+    "servicesLead": "六大领域，二十项服务。可单选一项，也可将全程交给我们。",
+    "processTitle": "合作流程",
+    "processLead": "没有意外。每个阶段，您都清楚货物在哪里、已经付了多少钱。",
+    "process": {
+      "step1Title": "您告诉我们需求",
+      "step1Body": "产品、数量、预算和目的国。我们会在一个工作日内通过 WhatsApp 回复。",
+      "step2Title": "我们寻源并报价",
+      "step2Body": "我们寻找合适的工厂、议价，并向您发送包含完整到岸成本的详细报价。",
+      "step3Title": "付款前先验货",
+      "step3Body": "实地考察工厂，并在发货前检验样品和大货。您将收到照片和验货报告。",
+      "step4Title": "我们发货并全程跟进",
+      "step4Body": "海运或空运、清关，并送达您的仓库。直到您收到货物，我们都全程跟进。"
+    },
+    "founderTitle": "HiGreenPanda 背后的人",
+    "founderCta": "认识 Sami",
+    "blogTitle": "博客精选",
+    "blogLead": "关于从中国进口的实用文章，以阿拉伯语撰写。",
+    "testimonialsTitle": "客户评价",
+    "contactTitle": "告诉我们您的需求",
+    "contactLead": "填写表单，或直接通过 WhatsApp 联系我们。我们会在一个工作日内回复。",
+    "heroChipReply": "一个工作日内回复",
+    "heroChipCities": "235+ 座中国城市",
+    "journeyTitle": "十二个步骤，一条连贯的路",
+    "journeyStatus": "一个合作伙伴，从头到尾",
+    "journeyDone": "已完成",
+    "journeyNow": "进行中",
+    "journeyNext": "下一步",
+    "servicesEyebrow": "我们的服务",
+    "processEyebrow": "合作流程",
+    "founderEyebrow": "创始人",
+    "blogEyebrow": "博客精选",
+    "contactEyebrow": "立即开始",
+    "contactOr": "或在此留言，我们会尽快回复您",
+    "statsEyebrow": "用数字说话，而非空口承诺",
+    "categoriesEyebrow": "一个合作伙伴",
+    "categoriesTitle": "您在中国的所有需求，一站解决",
+    "categoriesLead": "从最初的产品搜索，到公司注册、银行账户和工作许可。请选择您需要的领域。",
+    "journeyEyebrow": "全流程",
+    "journeyLead": "点击任一步骤，查看该环节的内容及对应服务。可从任一步开始；大多数客户并不是从第一步开始的。",
+    "journeyStep": "步骤",
+    "journeySteps": {
+      "1": {
+        "title": "想法",
+        "body": "您带来一个产品或一个计划。我们会坦诚地与您沟通：成本多少、需要多长时间，以及中国是否是合适的选择。"
+      },
+      "2": {
+        "title": "市场与产品调研",
+        "body": "在投入任何资金之前，先了解需求、竞争对手、价格区间以及已经在生产该产品的工厂。"
+      },
+      "3": {
+        "title": "商标",
+        "body": "中国实行申请在先原则。抢在工厂或竞争对手之前注册您的品牌，是您能买到的最便宜的保护。"
+      },
+      "4": {
+        "title": "公司注册",
+        "body": "在适合您业务的城市注册公司，取得营业执照、注册地址和银行账户。"
+      },
+      "5": {
+        "title": "架构与居留",
+        "body": "谁签字、谁持有哪些股份；如果您或您的员工将在中国生活，还需办理工作许可和居留许可。"
+      },
+      "6": {
+        "title": "会计与合规",
+        "body": "由持证会计师负责每月记账、纳税申报和年报，确保公司保持良好的合规状态。"
+      },
+      "7": {
+        "title": "寻找供应商",
+        "body": "经过核实的工厂，而不是冒充工厂的贸易公司。提供样品、比价，并用中文进行谈判。"
+      },
+      "8": {
+        "title": "生产与质量",
+        "body": "实地跟进生产，在付款前和发货前验货，并提供照片和报告。"
+      },
+      "9": {
+        "title": "运输",
+        "body": "根据您的时间和预算选择海运、空运或铁路，一个到岸总价，而不是五张发票。"
+      },
+      "10": {
+        "title": "清关",
+        "body": "在中国办理出口单证，在您那一端办理进口清关，提前准备妥当，货物不会滞留港口。"
+      },
+      "11": {
+        "title": "本地派送",
+        "body": "从港口送到您门口，全程安排和跟踪，直至签收。"
+      },
+      "12": {
+        "title": "您的仓库",
+        "body": "货物到手，公司运转，下一单比第一单更轻松。流程回到第七步，循环往复。"
+      }
+    },
+    "consultEyebrow": "不知从何开始？",
+    "consultTitle": "从一次沟通开始",
+    "consultLead": "与身在中国、已经做过数百次的专业人士进行视频或 WhatsApp 通话。结束时，您将获得一份计划和真实的数字。",
+    "consult30": "30 分钟",
+    "consult60": "60 分钟",
+    "consultPrice30": "$135",
+    "consultPrice60": "$225",
+    "consultNote": "咨询费可抵扣您之后在我们这里预订的任何服务。",
+    "heroCardTitle": "您的进口之旅",
+    "teamEyebrow": "我们的团队",
+    "teamTitle": "在中国为您服务的团队",
+    "teamLead": "Sami 和深圳团队一步步跟进您的需求：公司注册、会计、物流和法务工作。",
+    "founderSummary": "他曾就职于全球最大的钢铁集团中国宝武，走访过 235 多座中国城市，参加过 100 多场展会。",
+    "exploreTitle": "探索中国",
+    "exploreLead": "中国是全球最大的出口国，也是一个变化迅速的国家。从内部了解它：它的文化、经济和市场。",
+    "exploreCta": "观看更多"
+  },
+  "services": {
+    "title": "我们的服务",
+    "lead": "从寻找产品到送达您所在的国家，从验厂到在中国注册公司。",
+    "featured": "旗舰服务",
+    "otherServices": "其他服务",
+    "enquireAbout": "咨询{service}",
+    "empty": "暂未发布任何服务。",
+    "eyebrow": "服务",
+    "detailEyebrow": "服务",
+    "highlightsTitle": "您将获得",
+    "faqTitle": "常见问题",
+    "priceFrom": "起价",
+    "priceUnit": {
+      "once": "",
+      "year": "/ 年",
+      "month": "/ 月",
+      "class": "/ 类"
+    },
+    "priceNote": "标准起步价。在您付款之前，报价单会确认最终金额。高级客户另有专属定价，包含一年的咨询、合同及现成的法律合同模板、开票、招聘和更快捷的服务。",
+    "pricingTitle": "价格",
+    "noPrice": "按具体情况报价",
+    "categoriesTitle": "按领域浏览",
+    "categoryCount": "{count, plural, one {# 项服务} other {# 项服务}}",
+    "categories": {
+      "import": {
+        "title": "进口与采购",
+        "short": "进口",
+        "lead": "寻找产品、核查工厂、运送回国——从想法到货物到手，一个负责到底的合作伙伴。"
+      },
+      "company": {
+        "title": "公司与合规",
+        "short": "公司",
+        "lead": "在中国注册公司，保持合规经营，并保护您的品牌。"
+      },
+      "banking": {
+        "title": "银行与支付",
+        "short": "银行",
+        "lead": "中国内地和香港的对公银行账户，以及企业支付宝和微信支付。"
+      },
+      "ecommerce": {
+        "title": "电子商务",
+        "short": "电商",
+        "lead": "通过中国公司在 TEMU、亚马逊、速卖通和阿里巴巴开设并运营网店。"
+      },
+      "visas": {
+        "title": "签证与出行",
+        "short": "签证",
+        "lead": "商务邀请函、商务签证、工作许可和家庭团聚签证。"
+      },
+      "consulting": {
+        "title": "咨询",
+        "short": "咨询",
+        "lead": "在投入任何资金之前，先与身在当地的专业人士聊一聊。"
+      }
+    },
+    "requirementsTitle": "您需要准备的材料",
+    "documentsNote": "审核您的申请后，我们会通过电子邮件或 WhatsApp 向您索取文件。本网站不上传任何文件。",
+    "startApplication": "开始申请",
+    "applicationLead": "简短的表单，只需几分钟。我们会在一个工作日内通过 WhatsApp 回复。"
+  },
+  "about": {
+    "title": "关于我们",
+    "lead": "一家立足中国、服务阿拉伯语商人和创业者的贸易服务公司。",
+    "founderTitle": "创始人",
+    "founderName": "Sami Al-Hajri",
+    "founderRole": "创始人",
+    "storyTitle": "我们的故事",
+    "valuesTitle": "我们的工作方式",
+    "teamTitle": "团队",
+    "contactTitle": "直接与我们沟通",
+    "eyebrow": "关于 HiGreenPanda",
+    "valuesLead": "扎根当地，坦诚直言，成本和流程公开透明。"
+  },
+  "blog": {
+    "title": "博客",
+    "lead": "关于从中国进口、公司注册、展会、物流以及投资中国市场的实用指南。",
+    "readingTime": "阅读约需 {minutes} 分钟",
+    "publishedOn": "发布于 {date}",
+    "updatedOn": "更新于 {date}",
+    "by": "作者：{author}",
+    "categories": "分类",
+    "allCategories": "全部",
+    "empty": "暂无已发布的文章。",
+    "relatedTitle": "相关文章",
+    "backToBlog": "返回博客",
+    "pagination": {
+      "previous": "上一页",
+      "next": "下一页",
+      "page": "第 {current} 页，共 {total} 页",
+      "label": "文章分页"
+    },
+    "eyebrow": "博客",
+    "noCover": "文章",
+    "contents": "本文目录",
+    "keyTakeaways": "要点",
+    "faqTitle": "本文解答的问题",
+    "share": "分享本文",
+    "shareWhatsApp": "分享到 WhatsApp",
+    "shareX": "分享到 X",
+    "shareLinkedIn": "分享到 LinkedIn",
+    "copyLink": "复制链接",
+    "copied": "链接已复制",
+    "aboutAuthor": "关于作者",
+    "previousPost": "上一篇",
+    "nextPost": "下一篇",
+    "inCategory": "{category}相关文章",
+    "categoryLead": "我们撰写的所有关于{category}的文章，按时间由新到旧排列。",
+    "articleCount": "{count} 篇文章",
+    "allArticles": "全部文章",
+    "rss": "通过 RSS 订阅",
+    "onlyInArabic": "本文仅提供阿拉伯语版本。",
+    "ctaTitle": "想将这些付诸实践吗？",
+    "ctaLead": "通过 WhatsApp 告诉我们您的产品和所在国家，我们会回复您一份计划和明确的费用。",
+    "nextStepEyebrow": "下一步",
+    "nextStepLead": "在中国当地，帮您落实本文所述内容的服务。",
+    "whatsappPrefill": "您好，我读了你们的文章，想咨询一下{service}。",
+    "sourcesTitle": "资料来源",
+    "sourcesLead": "本文数据的出处。"
+  },
+  "contact": {
+    "title": "联系我们",
+    "lead": "告诉我们您的需求，我们会在一个工作日内回复。",
+    "directTitle": "直接联系",
+    "whatsappNote": "WhatsApp 是联系我们最快的方式。",
+    "emailLabel": "电子邮件",
+    "phoneLabel": "电话 / WhatsApp",
+    "officesLabel": "办公室",
+    "hoursLabel": "工作时间",
+    "form": {
+      "title": "咨询表单",
+      "name": "姓名",
+      "namePlaceholder": "您的全名",
+      "country": "国家",
+      "countryPlaceholder": "请选择您的国家",
+      "whatsapp": "WhatsApp 号码",
+      "whatsappHint": "请选择国家区号，然后输入号码（去掉开头的 0）",
+      "service": "您感兴趣的服务",
+      "servicePlaceholder": "请选择服务",
+      "serviceOther": "其他 / 不确定",
+      "message": "咨询详情",
+      "messagePlaceholder": "什么产品？数量多少？运往哪个国家？",
+      "submit": "发送咨询",
+      "submitting": "正在发送…",
+      "required": "必填",
+      "optional": "选填",
+      "successTitle": "我们已收到您的咨询",
+      "successBody": "谢谢。我们会在一个工作日内通过 WhatsApp 与您联系。您的参考编号是 {reference}。",
+      "successAgain": "再发送一条咨询",
+      "errorTitle": "咨询发送失败",
+      "errorBody": "出现了问题。请重试，或直接通过 WhatsApp 联系我们。",
+      "consent": "提交此表单即表示您同意我们就您的咨询与您联系。",
+      "errors": {
+        "nameRequired": "请输入您的姓名。",
+        "nameTooLong": "姓名过长。",
+        "countryRequired": "请选择您的国家。",
+        "whatsappRequired": "请输入 WhatsApp 号码。",
+        "whatsappInvalid": "该号码似乎不正确，请检查国家区号和号码。",
+        "messageRequired": "请描述您的咨询内容。",
+        "messageTooShort": "请再补充一些细节，以便我们为您提供帮助。",
+        "messageTooLong": "留言过长。",
+        "rateLimited": "您在短时间内发送了多条咨询，请稍候再试。",
+        "tooFast": "无法验证表单，请重试。",
+        "generic": "咨询发送失败，请重试。"
+      }
+    },
+    "eyebrow": "联系我们",
+    "formLead": "只需两分钟。我们会在一个工作日内通过 WhatsApp 回复。"
+  },
+  "footer": {
+    "aboutBlurb": "一家位于中国、服务阿拉伯语商人和创业者的贸易服务公司。",
+    "servicesTitle": "服务",
+    "companyTitle": "公司",
+    "contactTitle": "联系方式",
+    "followTitle": "关注我们",
+    "rights": "版权所有。",
+    "privacy": "隐私政策",
+    "terms": "条款与条件",
+    "builtNote": "安全构建，每日备份。",
+    "tagline": "您在中国的本地合作伙伴",
+    "areasTitle": "业务范围",
+    "licences": "资质与地址"
+  },
+  "legal": {
+    "privacyTitle": "隐私政策",
+    "termsTitle": "条款与条件",
+    "lastUpdated": "最后更新：{date}"
+  },
+  "error": {
+    "notFoundTitle": "页面未找到",
+    "notFoundBody": "您打开的链接已不存在。网站改版时，该地址可能已发生变化。",
+    "goneTitle": "此页面已被永久删除",
+    "goneBody": "此网址从未属于我们的网站。它是在之前一次安全事件中被植入的，现已被永久删除。",
+    "genericTitle": "出现了问题",
+    "genericBody": "请尝试刷新页面。如果问题持续出现，请通过 WhatsApp 联系我们。",
+    "backHome": "返回首页",
+    "retry": "重试"
+  },
+  "a11y": {
+    "breadcrumb": "面包屑导航",
+    "loading": "加载中",
+    "externalLink": "在新窗口中打开",
+    "requiredField": "必填字段"
+  },
+  "apply": {
+    "eyebrow": "申请",
+    "forService": "服务：{service}",
+    "stepOf": "第 {current} 步，共 {total} 步",
+    "next": "继续",
+    "back": "返回",
+    "submit": "提交申请",
+    "submitting": "正在发送…",
+    "optional": "选填",
+    "selectPlaceholder": "请选择…",
+    "consent": "提交此表单即表示您同意我们就您的申请与您联系。我们绝不会分享您的信息。",
+    "documentsNote": "您上传的文件仅供我们的团队查看。如需其他材料，我们会在审核您的回答后通过电子邮件或 WhatsApp 向您索取。",
+    "successTitle": "我们已收到您的申请",
+    "successBody": "谢谢。您的参考编号是 {reference}。我们会在一个工作日内通过 WhatsApp 与您联系。",
+    "successAgain": "再提交一份申请",
+    "backToServices": "返回服务列表",
+    "aside": {
+      "nextTitle": "接下来的流程",
+      "step1": "我们会在一个工作日内审核您的回答。",
+      "step2": "我们会通过 WhatsApp 联系您，沟通问题并提供明确的报价。",
+      "step3": "我们会通过电子邮件或 WhatsApp 索取所需文件，然后开始办理。",
+      "helpTitle": "更想直接沟通？",
+      "helpBody": "通过 WhatsApp 联系我们，我们会和您一起填写表单。",
+      "requirementsTitle": "请提前准备"
+    },
+    "errors": {
+      "required": "此项为必填项。",
+      "invalid": "请从选项中选择一项。",
+      "tooLong": "内容过长。",
+      "number": "请输入有效的数字。",
+      "date": "请输入有效的日期。",
+      "whatsapp": "该号码似乎不正确，请检查国家区号和号码。",
+      "chinaPhone": "请输入以 1 开头的 11 位有效中国手机号码。",
+      "email": "请输入有效的电子邮件地址。",
+      "url": "请输入有效的链接。",
+      "stepIncomplete": "请先填写标出的字段，然后再继续。",
+      "rateLimited": "您在短时间内发送了多次请求，请稍候再试。",
+      "tooFast": "无法验证表单，请重试。",
+      "generic": "申请发送失败。请重试，或通过 WhatsApp 联系我们。",
+      "fileTooBig": "文件超过 10 MB，请发送较小的照片。",
+      "fileType": "请上传 JPG、PNG 或 PDF 文件。"
+    },
+    "types": {
+      "consultation": {
+        "title": "申请咨询",
+        "lead": "告诉我们您的计划和方便的时间。我们会通过 WhatsApp 确认具体时间。",
+        "cta": "申请咨询"
+      },
+      "company-registration": {
+        "title": "公司注册申请",
+        "lead": "在中国注册公司所需的信息。约需十分钟；不确定的内容可以留空，我们会与您商讨。",
+        "cta": "开始公司注册"
+      },
+      "visa-invitation": {
+        "title": "商务邀请函（M 签证）",
+        "lead": "用于参观工厂和参加展会的正式邀请函，适用于所有国籍。请严格按照护照上的信息填写。",
+        "cta": "申请邀请函"
+      },
+      "visa": {
+        "title": "签证申请",
+        "lead": "商务、工作或家庭团聚签证。告诉我们您的情况，我们会确认可行方案及费用。",
+        "cta": "开始签证申请"
+      },
+      "product-search": {
+        "title": "寻找产品",
+        "lead": "描述产品和数量。我们会为您提供供应商、价格和交期。",
+        "cta": "发送产品需求"
+      },
+      "shipping-quote": {
+        "title": "运费报价",
+        "lead": "告诉我们运送什么货物、从哪里运到哪里。我们会提供海运、空运或快递报价。",
+        "cta": "获取运费报价"
+      },
+      "account-opening": {
+        "title": "开立银行或支付账户",
+        "lead": "中国内地或香港的对公银行账户，或企业支付宝、微信支付账户。",
+        "cta": "开始开户"
+      },
+      "store-setup": {
+        "title": "电商平台开店",
+        "lead": "TEMU、亚马逊、速卖通或阿里巴巴。告诉我们您想开设的店铺，我们会确认相关要求。",
+        "cta": "开始开店"
+      },
+      "trademark": {
+        "title": "商标注册",
+        "lead": "在中国保护您的品牌。告诉我们商标信息及其涵盖的商品。",
+        "cta": "开始商标注册"
+      }
+    },
+    "steps": {
+      "contact": "您的联系方式",
+      "topic": "您的需求",
+      "schedule": "方便的时间",
+      "legalRep": "法定代表人",
+      "company": "公司",
+      "shareholders": "股权结构",
+      "extras": "附加服务",
+      "applicant": "申请人",
+      "trip": "行程",
+      "visa": "签证",
+      "background": "您的情况",
+      "product": "产品",
+      "cargo": "货物",
+      "service": "服务",
+      "account": "账户",
+      "store": "店铺",
+      "brand": "商标",
+      "documents": "护照及入境章"
+    },
+    "fields": {
+      "name": "全名",
+      "country": "国家",
+      "whatsapp": "WhatsApp 号码",
+      "whatsappHint": "请选择国家区号，然后输入号码（去掉开头的 0）",
+      "email": "电子邮件",
+      "emailHint": "我们会将确认信息和参考编号发送到此邮箱",
+      "topic": "主题",
+      "stage": "您目前所处阶段",
+      "goals": "您希望实现什么目标？",
+      "goalsHint": "产品、市场、预算、时间——您已知道的任何信息。",
+      "preferredDays": "首选日期",
+      "preferredTime": "首选时间",
+      "preferredTimeHint": "中国时间（GMT+8）。上午 9–12 点，下午 2–6 点，晚上 7–10 点。",
+      "timezone": "您的时区或城市",
+      "timezoneHint": "以便我们提议双方都方便的时间。",
+      "channel": "您希望以何种方式沟通？",
+      "language": "语言",
+      "notes": "其他需要告知我们的信息",
+      "fullName": "法定代表人全名",
+      "fullNameHint": "须与护照上的写法完全一致。",
+      "gender": "性别",
+      "dateOfBirth": "出生日期",
+      "nationality": "国籍",
+      "residenceCountry": "居住国",
+      "chinesePhone": "您有中国手机号码吗？",
+      "chinesePhoneNumber": "您的中国手机号码",
+      "chinesePhoneNumberHint": "11 位数字，例如 13812345678",
+      "inChinaNow": "您目前在中国吗？",
+      "city": "注册城市",
+      "cityOther": "哪个城市？",
+      "companyNames": "拟用公司名称",
+      "companyNamesHint": "请提供三个备选名称，如有请同时提供英文和中文。避免使用国家、海洋或名人的名称。",
+      "businessScope": "经营范围",
+      "businessScopeHint": "请具体填写：如“服装——女装和童装”，而不是“贸易”。食品和医疗用品需要额外的许可证。",
+      "registeredCapital": "注册资本",
+      "registeredCapitalHint": "无需预先实缴，可在五年内缴足。如需办理居留许可，建议高于 15,000 美元。",
+      "addressOption": "注册地址",
+      "addressOptionHint": "如果您将在中国居住，需要实体办公室。否则可使用附正式租赁合同的虚拟地址。",
+      "needResidence": "您是否需要办理工作许可和居留许可？",
+      "needResidenceHint": "这会影响地址类型和建议的注册资本。",
+      "ownership": "股权",
+      "shareholders": "股东",
+      "shareholdersHint": "每行一位：全名 — 国籍 — 持股比例。",
+      "decisionMaker": "谁负责重大决策？",
+      "decisionMakerHint": "有权代表公司签字的人。",
+      "extras": "您是否还需要我们安排……",
+      "extrasHint": "选填。每项单独报价。",
+      "familyName": "姓",
+      "familyNameHint": "与护照一致。",
+      "givenNames": "名",
+      "passportNumber": "护照号码",
+      "passportNumberHint": "仅限字母和数字，与护照上印刷的一致。",
+      "passportExpiry": "护照有效期至",
+      "passportExpiryHint": "抵达后至少须有六个月的有效期。",
+      "applyCity": "您将在哪里申请签证？",
+      "applyCityHint": "中国使馆或签证中心所在的城市和国家。",
+      "occupation": "职业",
+      "employer": "雇主或公司",
+      "purpose": "出行目的",
+      "purposeHint": "会议、参观工厂、展会——一两句话即可。",
+      "speed": "办理速度",
+      "speedHint": "普通办理最长需 29 个工作日。",
+      "arrivalDate": "计划抵达日期",
+      "departureDate": "计划离开日期",
+      "cities": "您将访问的城市",
+      "citiesHint": "广州、义乌、深圳……",
+      "visitedChina": "您以前来过中国吗？",
+      "previousVisa": "您以前持有过中国签证吗？",
+      "visaType": "签证类型",
+      "stayLength": "计划停留时间",
+      "plannedArrival": "计划抵达日期",
+      "hasChineseCompany": "您在中国有公司吗？",
+      "hasChineseCompanyHint": "工作许可需要在中国有雇主。如果您还没有，我们可以为您注册一家公司。",
+      "companyName": "公司名称",
+      "education": "最高学历",
+      "educationHint": "学历越高，申请越有优势。",
+      "experienceYears": "工作年限",
+      "experienceYearsHint": "毕业后在本专业领域的工作年限。",
+      "familyMember": "在中国的家庭成员",
+      "familyMemberHint": "与您的关系及其在中国的身份（工作许可、居留、公民）。",
+      "productName": "产品",
+      "productNameHint": "尽量使用英文，并附上阿拉伯语名称。",
+      "productLink": "参考链接",
+      "productLinkHint": "阿里巴巴、亚马逊或其他平台上能说明您需求的商品链接。",
+      "specs": "规格",
+      "specsHint": "颜色、尺寸、材质、认证、包装——工厂会问到的所有信息。",
+      "quantity": "数量",
+      "targetPrice": "目标单价",
+      "targetPriceHint": "选填，任何币种均可。",
+      "destinationCountry": "目的国",
+      "timeline": "您什么时候需要？",
+      "productType": "货物类型",
+      "originCity": "中国提货城市",
+      "originCityHint": "供应商所在地。",
+      "destinationCity": "目的城市",
+      "cartons": "箱数",
+      "weightKg": "总重量（kg）",
+      "weightKgHint": "估算即可。",
+      "volumeCbm": "总体积（m³）",
+      "volumeCbmHint": "如已知请填写；否则请在备注中注明纸箱尺寸。",
+      "packaging": "包装",
+      "readyDate": "可发货日期",
+      "readyDateHint": "货物在供应商处备妥的时间。",
+      "mode": "运输方式",
+      "delivery": "派送",
+      "customs": "目的地清关",
+      "accountType": "账户类型",
+      "legalRepInChina": "法定代表人能否来中国？",
+      "legalRepInChinaHint": "大多数银行要求法定代表人亲自到场，部分银行接受远程开户。",
+      "companyCity": "公司所在城市",
+      "mainProducts": "主要产品或服务",
+      "tradingCountries": "主要贸易国家",
+      "tradingCountriesHint": "您出口到或进口自哪些国家。",
+      "monthlyVolume": "预计每月交易额（美元）",
+      "monthlyVolumeHint": "银行会询问，估算即可。",
+      "platform": "平台",
+      "hasAlipayBusiness": "您有企业支付宝账户吗？",
+      "hasAlipayBusinessHint": "速卖通要求企业支付宝账户，我们可以为您开立。",
+      "category": "产品类目",
+      "categoryHint": "电子产品、家居用品、时尚……",
+      "targetMarkets": "目标市场",
+      "targetMarketsHint": "海湾地区、欧洲、美国……",
+      "firstProducts": "您想首批上架的产品",
+      "firstProductsHint": "名称及大致价格。",
+      "brandName": "商标名称",
+      "brandNameChinese": "中文名称",
+      "brandNameChineseHint": "如有请填写。强烈建议同时注册中文商标。",
+      "hasLogo": "是否有标志（Logo）？",
+      "applicantType": "申请人",
+      "applicantCountry": "申请人所在国家",
+      "classes": "类别数量",
+      "classesHint": "商标按商品类别注册。不确定？请留空，我们会为您提供建议。",
+      "products": "涵盖的商品或服务",
+      "productsHint": "品牌销售的商品，例如“香水和化妆品”。",
+      "existingRegistration": "是否已在其他地方注册？",
+      "existingRegistrationHint": "在您本国或国际上。",
+      "capitalCurrency": "注册资本币种",
+      "duration": "咨询时长",
+      "passport": "护照照片页",
+      "passportHint": "带有您照片的那一页的清晰照片或扫描件。JPG、PNG 或 PDF，最大 10 MB。",
+      "entryStamp": "中国入境章",
+      "entryStampHint": "如果您已入境中国，请提供护照上入境章的照片。JPG、PNG 或 PDF，最大 10 MB。",
+      "personalPhoto": "个人照片",
+      "personalPhotoHint": "近六个月内拍摄，白色背景，JPG 格式，40–120 KB，354 × 472 至 420 × 560 像素。",
+      "degreeCertificate": "最高学历证书",
+      "degreeCertificateHint": "须经外交部认证并经中国驻外使馆认证。JPG、PNG 或 PDF，最大 10 MB。",
+      "experienceCertificate": "工作证明",
+      "experienceCertificateHint": "至少两年全职工作经验，注明职位和任职期间，并加盖雇主公章或由授权人签字。JPG、PNG 或 PDF，最大 10 MB。",
+      "policeClearance": "无犯罪记录证明",
+      "policeClearanceHint": "近六个月内开具，须经外交部认证并经中国驻外使馆认证。JPG、PNG 或 PDF，最大 10 MB。",
+      "medicalCertificate": "体检证明",
+      "medicalCertificateHint": "入境中国后在指定机构完成。如尚未体检，请留空。JPG、PNG 或 PDF，最大 10 MB。",
+      "companyLicence": "公司营业执照",
+      "companyLicenceHint": "您的中国公司营业执照的清晰照片或扫描件。JPG、PNG 或 PDF，最大 10 MB。"
+    },
+    "options": {
+      "common": {
+        "yes": "是",
+        "no": "否"
+      },
+      "topic": {
+        "import": "进口与采购",
+        "company": "公司注册",
+        "ecommerce": "电子商务",
+        "banking": "银行与支付账户",
+        "visas": "签证",
+        "trademark": "商标",
+        "other": "其他"
+      },
+      "stage": {
+        "idea": "只是一个想法",
+        "planning": "正在规划，尚未开始",
+        "started": "已经开始，需要帮助",
+        "operating": "已在运营"
+      },
+      "preferredDays": {
+        "sat": "周六",
+        "sun": "周日",
+        "mon": "周一",
+        "tue": "周二",
+        "wed": "周三",
+        "thu": "周四",
+        "fri": "周五"
+      },
+      "preferredTime": {
+        "morning": "上午",
+        "afternoon": "下午",
+        "evening": "晚上"
+      },
+      "channel": {
+        "whatsapp": "WhatsApp 通话",
+        "video": "视频通话",
+        "phone": "电话"
+      },
+      "language": {
+        "ar": "阿拉伯语",
+        "en": "英语"
+      },
+      "gender": {
+        "male": "男",
+        "female": "女"
+      },
+      "city": {
+        "shenzhen": "深圳",
+        "guangzhou": "广州",
+        "shanghai": "上海",
+        "yiwu": "义乌",
+        "hangzhou": "杭州",
+        "nanjing": "南京",
+        "other": "其他城市"
+      },
+      "addressOption": {
+        "own-office": "我将租用实体办公室",
+        "virtual-work-visa": "可办理工作许可的虚拟地址",
+        "virtual-basic": "虚拟地址，无需工作许可",
+        "need-advice": "不确定——请给我建议"
+      },
+      "ownership": {
+        "sole": "单一股东（本人）",
+        "partners": "两个或以上合伙人"
+      },
+      "extras": {
+        "bank-account": "对公银行账户",
+        "alipay-wechat": "企业支付宝和微信支付",
+        "accounting": "会计及纳税申报",
+        "financial-officer": "委派财务负责人",
+        "trademark": "商标注册",
+        "work-visa": "工作许可和居留许可",
+        "bank-registrant": "银行账户的中国籍登记人"
+      },
+      "purpose": {
+        "factory-visits": "参观工厂",
+        "trade-fair": "展会",
+        "both": "工厂和展会",
+        "other": "其他商务活动"
+      },
+      "speed": {
+        "normal": "普通",
+        "express": "加急"
+      },
+      "visaType": {
+        "business": "商务签证",
+        "work": "工作许可和居留许可",
+        "family": "家庭团聚签证"
+      },
+      "stayLength": {
+        "under-1m": "不到一个月",
+        "1-3m": "1–3 个月",
+        "3-12m": "3–12 个月",
+        "over-1y": "一年以上"
+      },
+      "hasChineseCompany": {
+        "yes": "有，在中国内地",
+        "hk-company": "有，在香港",
+        "no": "没有"
+      },
+      "education": {
+        "high-school": "高中",
+        "diploma": "大专",
+        "bachelor": "学士",
+        "master": "硕士",
+        "phd": "博士"
+      },
+      "timeline": {
+        "asap": "尽快",
+        "1-3m": "1–3 个月内",
+        "3-6m": "3–6 个月内",
+        "exploring": "只是了解一下"
+      },
+      "packaging": {
+        "cartons": "纸箱",
+        "pallets": "托盘",
+        "bags": "袋装",
+        "other": "其他"
+      },
+      "mode": {
+        "sea": "海运",
+        "air": "空运",
+        "express": "国际快递",
+        "unsure": "不确定——请推荐"
+      },
+      "delivery": {
+        "door-to-door": "门到门",
+        "port-to-port": "港到港",
+        "door-to-port": "门到港"
+      },
+      "customs": {
+        "include": "请包含清关",
+        "own-agent": "我有自己的代理",
+        "unsure": "不确定"
+      },
+      "accountType": {
+        "china-bank": "对公银行账户——中国内地",
+        "hk-bank": "对公银行账户——香港",
+        "alipay": "企业支付宝",
+        "wechat-pay": "企业微信支付"
+      },
+      "monthlyVolume": {
+        "under-10k": "10,000 以下",
+        "10k-50k": "10,000 – 50,000",
+        "50k-200k": "50,000 – 200,000",
+        "over-200k": "200,000 以上"
+      },
+      "platform": {
+        "temu": "TEMU",
+        "amazon": "亚马逊",
+        "aliexpress": "速卖通",
+        "alibaba": "阿里巴巴",
+        "other": "其他平台"
+      },
+      "applicantType": {
+        "individual": "个人",
+        "company": "公司"
+      },
+      "capitalCurrency": {
+        "usd": "美元",
+        "cny": "人民币"
+      },
+      "duration": {
+        "min30": "30 分钟 — $135",
+        "min60": "60 分钟 — $225"
+      }
+    }
+  },
+  "estimator": {
+    "eyebrow": "即时估价",
+    "title": "注册公司需要多少费用？",
+    "lead": "选择适合您的选项。总价为以人民币计的初步估算；在任何付款之前，书面报价会予以确认。",
+    "city": "城市",
+    "registration": "注册方式",
+    "address": "注册地址",
+    "bank": "银行账户",
+    "extras": "附加",
+    "total": "预估总价",
+    "perYear": "每年",
+    "onceOff": "一次性",
+    "quoted": "单独报价",
+    "cta": "按这些选项开始申请",
+    "note": "官方规费、翻译费和每年的地址续期费用会在报价中逐项列明。价格最近核对于 2026 年 10 月。以上为标准价格；高级客户另有专属定价和服务。",
+    "options": {
+      "city": {
+        "shenzhen": "深圳",
+        "guangzhou": "广州",
+        "shanghai": "上海",
+        "yiwu": "义乌",
+        "hongkong": "香港"
+      },
+      "registration": {
+        "inPerson": "现场办理（您需来中国）",
+        "remote": "远程办理（文件在您所在国认证）"
+      },
+      "address": {
+        "basic": "虚拟地址——不可办理工作许可",
+        "residence": "虚拟地址——可办理工作许可",
+        "physical": "实体办公室"
+      },
+      "bank": {
+        "none": "暂不需要",
+        "inPerson": "现场开户",
+        "remote": "远程开户"
+      },
+      "extras": {
+        "accounting": "一年会计及纳税申报",
+        "workPermit": "工作许可和居留许可"
+      }
+    }
+  },
+  "confirmationEmail": {
+    "subject": "我们已收到您的申请 {reference}",
+    "greeting": "{name}，您好：",
+    "received": "感谢您选择 HiGreenPanda。我们已收到您的申请：{type}。",
+    "reference": "您的参考编号是 {reference}，请妥善保存，以便后续跟进。",
+    "next": "我们的团队将审核您的申请，并在一个工作日内通过 WhatsApp 与您联系。",
+    "questions": "如有任何问题，直接回复此邮件即可。",
+    "signoff": "HiGreenPanda 团队"
+  },
+  "field": {
+    "title": "现场实录",
+    "eyebrow": "工作实拍",
+    "lead": "在深圳办公室接待客户，走访展会、工厂和市场。真实照片，如实记录。",
+    "homeLead": "我们的客户在深圳办公室、在广交会、在工厂里。这就是我们每周的工作。",
+    "seeMore": "查看更多现场实录",
+    "empty": "我们会面和走访的照片即将上线。",
+    "kinds": {
+      "office": "在我们的办公室",
+      "business": "与企业的会谈与合作",
+      "fair": "在展会现场",
+      "factory": "参观工厂",
+      "market": "在市场"
+    },
+    "contactTitle": "希望下一次走访是为您安排的吗？",
+    "count": "{count, plural, one {# 次走访} other {# 次走访}}",
+    "back": "全部走访",
+    "photos": "走访照片"
+  },
+  "licences": {
+    "title": "资质与地址",
+    "eyebrow": "中国持牌经营",
+    "lead": "我们通过两家在中国持牌经营的公司开展业务，总部位于深圳。以下是相关执照和地址，供您自行核实。",
+    "legalName": "注册名称",
+    "issuedIn": "签发地",
+    "number": "执照编号",
+    "onRequest": "如有需要，我们可通过 WhatsApp 发送执照副本。",
+    "viewFull": "点击查看完整执照",
+    "items": {
+      "guangzhou": {
+        "title": "广州公司营业执照",
+        "body": "我们的企业服务公司：公司注册、注册地址、会计、银行账户和工作许可。",
+        "city": "中国广州"
+      },
+      "nasher": {
+        "title": "Nasher Trading 营业执照",
+        "body": "我们的采购与进口公司：寻找工厂、生产、验货、物流及陪同参展。",
+        "city": "中国上海"
+      },
+      "accounting": {
+        "title": "会计与税务资质",
+        "body": "我们的会计团队持有中国政府颁发的官方证书：会计 Amber 持有会计专业技术资格，同事 Lucy 是持证税务师。我们依靠她们为客户的公司记账和办理纳税申报。",
+        "city": "中国"
+      }
+    },
+    "hq": {
+      "eyebrow": "总部",
+      "title": "我们的深圳地址",
+      "lead": "两家公司均在此运营。欢迎预约来访。",
+      "city": "中国深圳",
+      "onRequest": "我们会通过 WhatsApp 发送地址和地图定位。",
+      "openMap": "在地图中打开",
+      "photoAlt": "深圳京基100大厦，我们的办公室位于 41 楼"
+    },
+    "holder": "持证人",
+    "docs": {
+      "businessLicence": "营业执照",
+      "accounting": "会计专业技术资格 · Amber",
+      "taxAdvisor": "税务师证书 · Lucy"
+    },
+    "docsShort": {
+      "accounting": "会计证书 · Amber",
+      "taxAdvisor": "税务师证书 · Lucy"
+    }
+  },
+  "countrySelect": {
+    "placeholder": "输入国家名称进行搜索",
+    "noResults": "未找到该国家，请选择“其他国家”"
+  },
+  "phoneInput": {
+    "codeLabel": "国家区号",
+    "search": "输入国家名称进行搜索",
+    "noResults": "未找到该国家",
+    "example": "501234567"
+  },
+  "academy": {
+    "stripBadge": "新课",
+    "stripText": "国际贸易从A到Z",
+    "stripCta": "打开档案",
+    "eyebrow": "HIGREENPANDA ACADEMY · 录播课程",
+    "title": "国际贸易从A到Z",
+    "quote": "谈判桌上，一方在<em>解读</em>，另一方被解读。",
+    "lead": "从中国出口商自己的角度写成的课程：他如何定价、担心什么、如何解读坐在对面的人。适合进口商和出口商。",
+    "statsLabel": "课程数据",
+    "stages": "个阶段",
+    "lessons": "节录播课",
+    "hours": "小时",
+    "lifetime": "终身访问",
+    "pricesLabel": "报名",
+    "currency": "元",
+    "master": "大师版",
+    "premium": "尊享版",
+    "premiumNote": "另含与萨米的一对一会谈",
+    "cta": "打开档案",
+    "photoAlt": "萨米·哈吉里，HiGreenPanda 创始人",
+    "photoCaption": "萨米·哈吉里 · HiGreenPanda 创始人",
+    "fileLabel": "档案",
+    "fileStamp": "机密"
+  }
+}

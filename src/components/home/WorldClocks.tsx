@@ -122,7 +122,7 @@ export function WorldClocks({ locale, labels }: { locale: string; labels: Labels
     return () => window.clearInterval(timer)
   }, [])
 
-  const numberLocale = locale === 'ar' ? 'ar-u-nu-latn' : 'en-GB'
+  const numberLocale = locale === 'ar' ? 'ar-u-nu-latn' : locale === 'zh' ? 'zh-CN' : 'en-GB'
   const open = now ? officeIsOpen(now) : null
 
   return (

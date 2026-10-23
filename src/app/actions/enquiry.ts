@@ -37,7 +37,8 @@ export async function submitEnquiry(
   formData: FormData,
 ): Promise<EnquiryState> {
   const headerList = await headers()
-  const locale = (formData.get('locale') === 'en' ? 'en' : 'ar') as Locale
+  const rawLocale = formData.get('locale')
+  const locale = (rawLocale === 'en' || rawLocale === 'zh' ? rawLocale : 'ar') as Locale
 
   // --- Bot defences (honeypot + signed timing token) ------------------------
   const guard = checkFormGuard('enquiry', formData)

@@ -38,7 +38,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ loc
   const { locale: raw } = await params
   // The Chinese page is the Arabic route with ?lang=zh, as on /offices.
   const locale =
-    raw === 'en' ? 'en' : new URL(request.url).searchParams.get('lang') === 'zh' ? 'zh' : 'ar'
+    raw === 'en' || raw === 'zh'
+      ? raw
+      : new URL(request.url).searchParams.get('lang') === 'zh'
+        ? 'zh'
+        : 'ar'
   const headerList = await headers()
 
   let data: FormData
@@ -75,7 +79,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ loc
         serviceOther: 'Academy course',
         message: join.message,
         meta: {
-          locale: locale === 'en' ? 'en' : 'ar', // the field has no zh option; sourcePath says it
+          locale,
           sourcePath: { ar: '/academy', en: '/en/academy', zh: '/academy?lang=zh' }[locale],
           referrer: headerList.get('referer')?.slice(0, 500) ?? undefined,
           userAgent: headerList.get('user-agent')?.slice(0, 500) ?? undefined,

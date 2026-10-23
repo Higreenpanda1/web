@@ -33,7 +33,7 @@ export const Posts: CollectionConfig = {
     group: 'Content',
     livePreview: {
       url: ({ data, locale }) =>
-        `${process.env.NEXT_PUBLIC_SERVER_URL}${locale?.code === 'en' ? '/en' : ''}/blog/${data?.slug ?? ''}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}${locale?.code && locale.code !== 'ar' ? `/${locale.code}` : ''}/blog/${data?.slug ?? ''}`,
     },
   },
   versions: {

@@ -1,13 +1,13 @@
 import type { Locale } from './routing'
 
 /**
- * Western Arabic numerals in both locales (build prompt §1). The `-u-nu-latn`
+ * Western Arabic numerals in every locale (build prompt §1). The `-u-nu-latn`
  * extension is the only reliable way to stop the Arabic locale rendering
  * Arabic-Indic digits, and it has to be on every Intl call, not just some.
  * If the client ever asks for ١٢٣٤, change INTL_LOCALE and nothing else.
  */
 export function intlLocale(locale: Locale): string {
-  return locale === 'ar' ? 'ar-u-nu-latn' : 'en-GB'
+  return locale === 'ar' ? 'ar-u-nu-latn' : locale === 'zh' ? 'zh-CN' : 'en-GB'
 }
 
 export function formatNumber(value: number, locale: Locale): string {

@@ -115,14 +115,14 @@ export interface Config {
   db: {
     defaultIDType: number;
   };
-  fallbackLocale: ('false' | 'none' | 'null') | false | null | ('ar' | 'en') | ('ar' | 'en')[];
+  fallbackLocale: ('false' | 'none' | 'null') | false | null | ('ar' | 'en' | 'zh') | ('ar' | 'en' | 'zh')[];
   globals: {
     'site-settings': SiteSetting;
   };
   globalsSelect: {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
   };
-  locale: 'ar' | 'en';
+  locale: 'ar' | 'en' | 'zh';
   widgets: {
     collections: CollectionsWidget;
   };
@@ -972,7 +972,7 @@ export interface Enquiry {
    * Captured automatically. Useful when judging whether a lead is genuine.
    */
   meta?: {
-    locale?: ('ar' | 'en') | null;
+    locale?: ('ar' | 'en' | 'zh') | null;
     sourcePath?: string | null;
     referrer?: string | null;
     userAgent?: string | null;
@@ -1126,7 +1126,7 @@ export interface Application {
    * Captured automatically. Useful when judging whether a request is genuine.
    */
   meta?: {
-    locale?: ('ar' | 'en') | null;
+    locale?: ('ar' | 'en' | 'zh') | null;
     sourcePath?: string | null;
     referrer?: string | null;
     userAgent?: string | null;

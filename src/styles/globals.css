@@ -178,6 +178,19 @@
     margin-block: 0;
   }
 
+  :root:lang(zh) body {
+    font-family: var(--font-plex-latin), var(--font-zh-text), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  /* The x-height evening-out is for Markazi; Chinese faces have no x-height to match. */
+  :root:lang(zh) :is(h1, h2, h3, h4) {
+    font-size-adjust: none;
+  }
+
+  :root:lang(zh) h1,
+  :root:lang(zh) h2,
+  :root:lang(zh) h3,
+  :root:lang(zh) h4,
   :root:lang(ar) h1,
   :root:lang(ar) h2,
   :root:lang(ar) h3,

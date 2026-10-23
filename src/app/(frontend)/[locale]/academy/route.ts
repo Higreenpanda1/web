@@ -107,7 +107,11 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
   const { locale } = await params
   const nonce = (await headers()).get('x-nonce') ?? ''
   const lang =
-    locale === 'en' ? 'en' : new URL(request.url).searchParams.get('lang') === 'zh' ? 'zh' : 'ar'
+    locale === 'en' || locale === 'zh'
+      ? locale
+      : new URL(request.url).searchParams.get('lang') === 'zh'
+        ? 'zh'
+        : 'ar'
   const meta = META[lang]
   const zhUrl = `${absoluteUrl('ar', '/academy')}?lang=zh`
   const canonical = lang === 'zh' ? zhUrl : absoluteUrl(lang, '/academy')

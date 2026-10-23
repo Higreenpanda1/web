@@ -58,8 +58,20 @@ export const OTHER_COUNTRIES: Country[] = [
   { code: 'OTHER', ar: 'دولة أخرى', en: 'Another country' },
 ]
 
-export function countryName(country: Country, locale: 'ar' | 'en'): string {
-  return locale === 'ar' ? country.ar : country.en
+const ZH_NAMES = new Intl.DisplayNames(['zh-CN'], { type: 'region' })
+
+/** Chinese names come from the runtime's own region names, so the list stays two-language. */
+export function countryName(country: Country, locale: 'ar' | 'en' | 'zh'): string {
+  if (locale === 'ar') return country.ar
+  if (locale === 'zh') {
+    if (country.code === 'OTHER') return '其他国家'
+    try {
+      return ZH_NAMES.of(country.code) ?? country.en
+    } catch {
+      return country.en
+    }
+  }
+  return country.en
 }
 
 /** The "another country" choice, offered whenever a search finds nothing better. */

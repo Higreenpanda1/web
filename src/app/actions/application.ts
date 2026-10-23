@@ -43,7 +43,8 @@ export async function submitApplication(
   formData: FormData,
 ): Promise<ApplicationState> {
   const headerList = await headers()
-  const locale = (formData.get('locale') === 'en' ? 'en' : 'ar') as Locale
+  const rawLocale = formData.get('locale')
+  const locale = (rawLocale === 'en' || rawLocale === 'zh' ? rawLocale : 'ar') as Locale
 
   const type = formData.get('type')
   if (!isApplicationType(type)) return { status: 'error', errorKey: 'generic' }

@@ -101,10 +101,14 @@
   --ac-fm: 'IBM Plex Mono', ui-monospace, monospace;
   color: var(--ac-ink);
 }
-/* Spaced letters break Arabic joining; only Latin labels are tracked. */
+/* Spaced letters break Arabic joining and look loose in Chinese; only Latin
+   labels are tracked. */
 .ac:lang(ar) .ac-kick,
 .ac:lang(ar) .ac-plan,
-.ac-strip:lang(ar) .ac-strip-kick {
+.ac-strip:lang(ar) .ac-strip-kick,
+.ac:lang(zh) .ac-kick,
+.ac:lang(zh) .ac-plan,
+.ac-strip:lang(zh) .ac-strip-kick {
   letter-spacing: 0;
   font-family: var(--ac-fh);
   font-size: 13px;
@@ -537,4 +541,8 @@
   .ac-file {
     max-width: 190px;
   }
+}
+
+.ac:lang(zh) .ac-h {
+  font-size: clamp(26px, 2.8vw, 40px);
 }
