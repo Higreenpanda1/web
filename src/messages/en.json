@@ -935,5 +935,27 @@
     "search": "Type to search for a country",
     "noResults": "No country found",
     "example": "501234567"
+  },
+  "academy": {
+    "stripBadge": "New",
+    "stripText": "The course «International Trade from A to Z»",
+    "stripCta": "Discover the programme",
+    "eyebrow": "HiGreenPanda Academy · Recorded programme",
+    "title": "International Trade from A to Z",
+    "quote": "At every deal table, one side reads. The other is read.",
+    "lead": "A programme written from the Chinese exporter's own side: how he prices, what he fears, and how he reads the person across the table. For importers and exporters.",
+    "statsLabel": "The programme in numbers",
+    "stages": "stages",
+    "lessons": "recorded lessons",
+    "hours": "hours",
+    "lifetime": "Lifetime access",
+    "pricesLabel": "Enrolment",
+    "currency": "RMB",
+    "master": "Master",
+    "premium": "Premium",
+    "premiumNote": "plus a private session with Sami",
+    "cta": "Open the file",
+    "photoAlt": "Sami Al-Hajri, founder of HiGreenPanda",
+    "photoCaption": "Sami Al-Hajri · Founder of HiGreenPanda"
   }
 }

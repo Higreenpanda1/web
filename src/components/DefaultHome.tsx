@@ -1,6 +1,7 @@
 import { ArrowLeft, ArrowRight, Clock } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 
+import { CourseSection } from '@/components/academy/CourseSection'
 import { FieldGroups } from '@/components/FieldGallery'
 import { ContactPanel } from '@/components/home/ContactPanel'
 import { Hero } from '@/components/home/Hero'
@@ -72,6 +73,7 @@ export async function DefaultHome({ locale }: { locale: Locale }) {
     <>
       <ScrollReveal />
       <Hero locale={locale} settings={settings} />
+      <CourseSection locale={locale} />
       <WorldClocks
         locale={locale}
         labels={{
