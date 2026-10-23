@@ -168,6 +168,9 @@
   h3,
   h4 {
     color: var(--heading);
+    font-family: var(--font-display);
+    /* Markazi is set small on its body; this scales it to the text's size. */
+    font-size-adjust: ex-height 0.5;
     line-height: var(--leading-heading);
     font-weight: 700;
     letter-spacing: -0.01em;
@@ -259,6 +262,11 @@
     .container-page {
       padding-inline: 2rem;
     }
+  }
+
+  /* Tracking suits Latin labels; spaced Arabic letters lose their joins. */
+  :root:lang(en) .eyebrow {
+    letter-spacing: 0.16em;
   }
 
   .prose-hgp {

@@ -121,7 +121,7 @@ export function MobileNav({
                 <div className="mt-6 flex flex-col gap-3">
                   <Link
                     href={ctaHref}
-                    className="inline-flex min-h-12 items-center justify-center rounded-full bg-brand-700 px-6 text-body-lg font-semibold text-white no-underline"
+                    className="inline-flex min-h-12 items-center justify-center rounded-[3px] bg-[linear-gradient(135deg,#f0c56a,#e0a32e_55%,#b9821f)] px-6 text-body-lg font-semibold text-[#10220f] no-underline"
                   >
                     {ctaLabel}
                   </Link>
@@ -129,7 +129,7 @@ export function MobileNav({
                     href={whatsappHref}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-brand-300 bg-surface-tint-soft px-6 text-body-lg font-semibold text-heading no-underline"
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[3px] border border-border-strong bg-transparent px-6 text-body-lg font-semibold text-heading no-underline"
                   >
                     <WhatsAppIcon size={20} />
                     {whatsappLabel}

@@ -6,10 +6,9 @@ import { Eyebrow } from './Eyebrow'
 import type { ReactNode } from 'react'
 
 /**
- * The header band for inner pages. Light, not the dark box the site used to
- * open every page with: a soft brand wash, a faint dot grid, and a large,
- * very quiet play mark on the trailing side so the brand is present without
- * shouting. `children` is for anything below the lead — buttons, a form link.
+ * The header band for inner pages, on the course page's deep green (owner,
+ * 23 October 2026), with a large, very quiet play mark on the trailing side
+ * so the brand is present without shouting. The page below it stays light. `children` is for anything below the lead — buttons, a form link.
  */
 export function PageHero({
   eyebrow,
@@ -32,9 +31,9 @@ export function PageHero({
 }) {
   return (
     <section
-      className={cn('relative isolate overflow-hidden bg-surface bg-gradient-hero', className)}
+      className={cn('theme-deep relative isolate overflow-hidden bg-gradient-deep', className)}
     >
-      <div className="absolute inset-0 -z-10 bg-dots opacity-70" aria-hidden="true" />
+      <div className="absolute inset-0 -z-10 bg-dots opacity-40" aria-hidden="true" />
       <PlayMark
         size={520}
         className="pointer-events-none absolute -top-40 -end-40 -z-10 opacity-[0.07]"

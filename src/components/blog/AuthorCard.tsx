@@ -37,7 +37,7 @@ export function AuthorCard({
     >
       <p
         id="author-heading"
-        className="text-eyebrow font-bold tracking-[0.14em] text-text-brand uppercase"
+        className="text-eyebrow font-bold ltr:tracking-[0.14em] text-text-brand uppercase"
       >
         {title}
       </p>

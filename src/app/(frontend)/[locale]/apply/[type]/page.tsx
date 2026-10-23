@@ -157,7 +157,7 @@ export default async function ApplyPage({
             >
               <h2
                 id="apply-next-heading"
-                className="text-caption font-bold tracking-[0.14em] text-text-brand uppercase"
+                className="text-caption font-bold ltr:tracking-[0.14em] text-text-brand uppercase"
               >
                 {t('apply.aside.nextTitle')}
               </h2>
@@ -180,7 +180,7 @@ export default async function ApplyPage({
               >
                 <h2
                   id="apply-requirements-heading"
-                  className="text-caption font-bold tracking-[0.14em] text-text-brand uppercase"
+                  className="text-caption font-bold ltr:tracking-[0.14em] text-text-brand uppercase"
                 >
                   {t('apply.aside.requirementsTitle')}
                 </h2>

@@ -28,11 +28,11 @@
   --brand-50: #f3faf4; /* page wash */
 
   /* --- Neutrals ---------------------------------------------------------- */
-  --ink: #111111; /* body text, the wordmark — 18.9:1 */
-  --slate: #555b57; /* secondary text, captions — 7.2:1, near-neutral */
-  --mist: #e3e5e3; /* borders, dividers — neutral, not green */
-  --paper: #ffffff; /* surfaces */
-  --canvas: #f6f6f5; /* page background — warm off-white, no green cast */
+  --ink: #17221a; /* body text, the wordmark — green-black, 16:1 on ivory */
+  --slate: #56645a; /* secondary text, captions — 6.2:1 on ivory */
+  --mist: #e7dfcd; /* borders, dividers — warm, like the course page's paper */
+  --paper: #fffdf8; /* surfaces — warm white */
+  --canvas: #f7f3ea; /* page background — the course page's ivory */
 
   /* --- Accent (brief §12: one element per screen, no more) ---------------- */
   --accent: #e0a32e; /* warm gold — highlights, badges, large elements */
@@ -58,20 +58,23 @@
   --text-muted: var(--slate);
   --text-on-inverse: #ffffff;
   --text-brand: var(--brand-700); /* never --brand-600. See the rule above. */
-  --heading: #131513; /* headings are ink, not green — green is for accents only */
+  --heading: #062414; /* the course page's deep green */
   --border: var(--mist);
   --border-soft: color-mix(in srgb, var(--mist) 60%, transparent);
-  --border-strong: #c4c8c5;
+  --border-strong: #cfc4ab;
   --focus-ring: var(--brand-700);
   --overlay-photo: color-mix(in srgb, var(--brand-900) 55%, transparent);
 
   /* --- Gradients: the brand's "moments". Fixed greens, so they read the same
          in both colour schemes. ---------------------------------------------- */
   --gradient-brand: linear-gradient(135deg, var(--brand-800) 0%, var(--brand-600) 100%);
-  /* Dark panels (footer, contact) are charcoal with a green accent, not a
-     wall of green — the owner's verdict on the green-on-green version was
-     "I feel like I'm in a forest" (23 September 2026). */
-  --gradient-deep: linear-gradient(155deg, #1c1e1c 0%, #141614 60%, #0f110f 100%);
+  /* Dark panels (header, footer, hero, contact) take the course page's deep
+     green with its soft green and gold light (owner, 23 October 2026: the
+     site should carry the course's style). */
+  --gradient-deep:
+    radial-gradient(56rem 32rem at 15% 20%, rgb(55 141 66 / 0.22), transparent 60%),
+    radial-gradient(44rem 30rem at 92% 0%, rgb(224 163 46 / 0.08), transparent 60%),
+    linear-gradient(180deg, #05200f 0%, #062414 100%);
   --gradient-hero:
     radial-gradient(
       60rem 36rem at 85% -10%,
@@ -115,6 +118,42 @@
     0 0 0 1px color-mix(in srgb, var(--brand-300) 60%, transparent),
     0 18px 40px -16px rgb(39 107 52 / 0.35);
   --header-height: 4.75rem;
+
+  /* The heading face. Headings are set apart from the running text (owner,
+     23 October 2026); the body stays IBM Plex. */
+  --font-display: var(--font-display-latin), var(--font-display-arabic), var(--font-sans);
+}
+
+/* ---------------------------------------------------------------------------
+   A deep section: the course page's palette on a dark green ground. Any
+   section, header or footer carrying this class flips every role token, so
+   the components inside need no dark variants of their own.
+   --------------------------------------------------------------------------- */
+.theme-deep {
+  color-scheme: dark;
+
+  --ink: #f4efe3;
+  --slate: #a9bfaf;
+  --mist: rgb(234 242 236 / 0.12);
+
+  --surface: #0a2f1b;
+  --surface-sunken: #062414;
+  --surface-tint: #0f4a2a;
+  --surface-tint-soft: rgb(234 242 236 / 0.06);
+  --surface-inverse: #04190d;
+  --text: #eaf2ec;
+  --text-muted: #a9bfaf;
+  --text-brand: #f0c56a;
+  --heading: #f4efe3;
+  --border: rgb(234 242 236 / 0.12);
+  --border-soft: rgb(234 242 236 / 0.08);
+  --border-strong: rgb(234 242 236 / 0.24);
+  --focus-ring: #f0c56a;
+  --accent-text: #f0c56a;
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 10px 30px -14px rgb(0 0 0 / 0.6);
+  --shadow-float: 0 1px 2px rgb(0 0 0 / 0.4), 0 30px 60px -24px rgb(0 0 0 / 0.75);
+
+  color: var(--text);
 }
 
 /* ---------------------------------------------------------------------------
@@ -146,24 +185,24 @@
   :root:not([data-theme='light']) {
     color-scheme: dark;
 
-    --paper: #171817;
-    --canvas: #0f100f;
-    --ink: #ececea;
-    --slate: #a8aca9;
-    --mist: #2a2c2a;
+    --paper: #0a2f1b;
+    --canvas: #062414;
+    --ink: #eaf2ec;
+    --slate: #a9bfaf;
+    --mist: #1c4430;
 
     --surface: var(--paper);
     --surface-sunken: var(--canvas);
-    --surface-tint: #1d261f;
-    --surface-tint-soft: #151915;
-    --surface-inverse: #0a0b0a;
+    --surface-tint: #0f4a2a;
+    --surface-tint-soft: #0c3a21;
+    --surface-inverse: #04190d;
     --text: var(--ink);
     --text-muted: var(--slate);
-    --text-brand: var(--brand-400);
-    --heading: #f3f4f2;
+    --text-brand: #f0c56a;
+    --heading: #f4efe3;
     --border: var(--mist);
     --border-soft: color-mix(in srgb, var(--mist) 70%, transparent);
-    --border-strong: #454845;
+    --border-strong: #2e5a41;
     --focus-ring: var(--brand-400);
     --accent-text: #f0c874;
     --error: #f2b8b5;
@@ -179,24 +218,24 @@
 [data-theme='dark'] {
   color-scheme: dark;
 
-  --paper: #171817;
-  --canvas: #0f100f;
-  --ink: #ececea;
-  --slate: #a8aca9;
-  --mist: #2a2c2a;
+  --paper: #0a2f1b;
+  --canvas: #062414;
+  --ink: #eaf2ec;
+  --slate: #a9bfaf;
+  --mist: #1c4430;
 
   --surface: var(--paper);
   --surface-sunken: var(--canvas);
-  --surface-tint: #1d261f;
-  --surface-tint-soft: #151915;
-  --surface-inverse: #0a0b0a;
+  --surface-tint: #0f4a2a;
+  --surface-tint-soft: #0c3a21;
+  --surface-inverse: #04190d;
   --text: var(--ink);
   --text-muted: var(--slate);
-  --text-brand: var(--brand-400);
-  --heading: #f3f4f2;
+  --text-brand: #f0c56a;
+  --heading: #f4efe3;
   --border: var(--mist);
   --border-soft: color-mix(in srgb, var(--mist) 70%, transparent);
-  --border-strong: #454845;
+  --border-strong: #2e5a41;
   --focus-ring: var(--brand-400);
   --accent-text: #f0c874;
   --error: #f2b8b5;
