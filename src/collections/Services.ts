@@ -54,7 +54,7 @@ export const Services: CollectionConfig = {
     group: 'Content',
     livePreview: {
       url: ({ data, locale }) =>
-        `${process.env.NEXT_PUBLIC_SERVER_URL}${locale?.code === 'en' ? '/en' : ''}/services/${data?.slug ?? ''}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}${locale?.code && locale.code !== 'ar' ? `/${locale.code}` : ''}/services/${data?.slug ?? ''}`,
     },
   },
   versions: {

@@ -8,7 +8,7 @@ import { CourseStrip } from '@/components/academy/CourseStrip'
 import { Footer } from '@/components/layout/Footer'
 import { Header } from '@/components/layout/Header'
 import { WhatsAppButton } from '@/components/layout/WhatsAppButton'
-import { directionOf, routing, type Locale } from '@/i18n/routing'
+import { directionOf, htmlLangOf, routing, type Locale } from '@/i18n/routing'
 import { serverURL } from '@/lib/env'
 import { displayArabic, displayLatin, plexArabic, plexLatin } from '@/lib/fonts'
 import { getSiteSettings } from '@/lib/queries'
@@ -90,7 +90,7 @@ export async function generateMetadata({
     alternates: {
       ...alternatesFor('/'),
       types: {
-        'application/rss+xml': `${serverURL}${locale === 'en' ? '/en' : ''}/feed.xml`,
+        'application/rss+xml': `${serverURL}${locale === 'ar' ? '' : '/en'}/feed.xml`,
       },
     },
     manifest: '/manifest.webmanifest',
@@ -129,7 +129,7 @@ export default async function LocaleLayout({
 
   return (
     <html
-      lang={locale}
+      lang={htmlLangOf(typedLocale)}
       dir={directionOf(typedLocale)}
       className={`${plexLatin.variable} ${plexArabic.variable} ${displayLatin.variable} ${displayArabic.variable}`}
       suppressHydrationWarning

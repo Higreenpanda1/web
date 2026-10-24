@@ -125,6 +125,22 @@
 }
 
 /* ---------------------------------------------------------------------------
+   Chinese uses the reader's own system faces: Chinese web fonts run to
+   several megabytes. Headings take a Song (serif) face, the classical
+   counterpart of Markazi; the text takes the platform's Hei (sans) face.
+   --------------------------------------------------------------------------- */
+:root:lang(zh) {
+  --font-zh-text:
+    'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', 'Source Han Sans SC',
+    'Noto Sans CJK SC';
+  --font-display:
+    var(--font-display-latin), 'Songti SC', 'STSong', 'Noto Serif SC', 'Source Han Serif SC',
+    'Noto Serif CJK SC', 'SimSun', serif;
+  --leading-body: 1.85;
+  --leading-heading: 1.35;
+}
+
+/* ---------------------------------------------------------------------------
    A deep section: the course page's palette on a dark green ground. Any
    section, header or footer carrying this class flips every role token, so
    the components inside need no dark variants of their own.

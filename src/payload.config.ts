@@ -85,6 +85,10 @@ export default buildConfig({
     locales: [
       { label: 'العربية', code: 'ar', rtl: true },
       { label: 'English', code: 'en' },
+      // Chinese falls back to English, not Arabic: an untranslated field on the
+      // Chinese site should read in a language a Chinese visitor is likelier to
+      // read, and left to right.
+      { label: '中文', code: 'zh', fallbackLocale: 'en' },
     ],
     defaultLocale: 'ar',
     fallback: true,

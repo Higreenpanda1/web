@@ -58,7 +58,6 @@ export async function Header({ locale, settings }: { locale: Locale; settings: S
           <LocaleSwitcher
             locale={locale}
             label={t('locale.label')}
-            switchTo={t('locale.switchTo')}
             className="hidden sm:inline-flex"
           />
           <a
@@ -87,12 +86,7 @@ export async function Header({ locale, settings }: { locale: Locale; settings: S
             whatsappLabel={t('cta.whatsapp')}
             whatsappHref={whatsapp}
           >
-            <LocaleSwitcher
-              locale={locale}
-              label={t('locale.label')}
-              switchTo={t('locale.switchTo')}
-              className="sm:hidden"
-            />
+            <LocaleSwitcher locale={locale} label={t('locale.label')} className="sm:hidden" />
           </MobileNav>
         </div>
       </div>

@@ -5,6 +5,7 @@ import * as migration_20260925_134518_blog_research_automation from './20260925_
 import * as migration_20261005_172943_field_visits from './20261005_172943_field_visits'
 import * as migration_20261008_150000_founder_credentials from './20261008_150000_founder_credentials'
 import * as migration_20261021_080000_field_story from './20261021_080000_field_story'
+import * as migration_20261023_131921_chinese_locale from './20261023_131921_chinese_locale'
 
 export const migrations = [
   {
@@ -41,5 +42,10 @@ export const migrations = [
     up: migration_20261021_080000_field_story.up,
     down: migration_20261021_080000_field_story.down,
     name: '20261021_080000_field_story',
+  },
+  {
+    up: migration_20261023_131921_chinese_locale.up,
+    down: migration_20261023_131921_chinese_locale.down,
+    name: '20261023_131921_chinese_locale',
   },
 ]

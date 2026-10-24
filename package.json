@@ -21,6 +21,7 @@
     "migrate": "cross-env NODE_OPTIONS=--no-deprecation payload migrate",
     "migrate:create": "cross-env NODE_OPTIONS=--no-deprecation payload migrate:create",
     "seed": "cross-env NODE_OPTIONS=--no-deprecation tsx src/seed/run.ts",
+    "seed:zh": "cross-env NODE_OPTIONS=--no-deprecation tsx src/seed/zh.ts",
     "totp:enrol": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/enrol-totp.ts",
     "test": "node --test --experimental-strip-types \"src/**/*.test.ts\"",
     "test:e2e": "node tests/e2e.mjs",

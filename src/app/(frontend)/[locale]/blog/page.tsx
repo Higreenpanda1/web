@@ -124,7 +124,7 @@ export default async function BlogIndex({
         )}
         <p className="mt-10 text-caption text-text-muted">
           <a
-            href={locale === 'en' ? '/en/feed.xml' : '/feed.xml'}
+            href={locale === 'ar' ? '/feed.xml' : '/en/feed.xml'}
             className="inline-flex items-center gap-1.5 font-semibold text-text-brand"
           >
             <Rss size={14} strokeWidth={2} aria-hidden="true" />

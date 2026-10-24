@@ -136,7 +136,7 @@ export type ApplicationConfirmation = {
   name: string
   reference: string
   typeTitle: string
-  locale: 'ar' | 'en'
+  locale: 'ar' | 'en' | 'zh'
   /** Already-translated lines, from the `confirmationEmail` catalogue. */
   text: {
     subject: string
