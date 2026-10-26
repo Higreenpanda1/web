@@ -1,7 +1,7 @@
 /**
  * The in-process scheduler behind src/instrumentation.ts.
  *
- * Kept deliberately small: two intervals and a daily gate, no job table, no
+ * Kept deliberately small: a few intervals and daily gates, no job table, no
  * locking. There is exactly one app container, so there is nothing to lock
  * against. If the site ever runs on more than one instance, move these jobs
  * to Payload's job queue or a single cron container — the job functions are
@@ -16,8 +16,19 @@ const DISTRIBUTE_EVERY_MS = 10 * 60_000
  */
 const CONTENT_JOBS_AFTER_HOUR = 3
 
+/**
+ * HubSpot jobs (src/lib/hubspot-ops.ts) run at nine in the morning China time,
+ * when the team starts work: renewal reminders daily, the report on Mondays.
+ * Only inside a short window, so a restart in the afternoon does not send the
+ * report twice; a server that is down all morning skips a day, and the
+ * reminders catch up the next morning because a renewal stays due for weeks.
+ */
+const HUBSPOT_JOBS_HOUR = 9
+const HUBSPOT_JOBS_UNTIL_HOUR = 12
+
 let started = false
 let lastContentRunDay = ''
+let lastHubSpotRunDay = ''
 
 export function startScheduler(): void {
   if (started) return
@@ -31,6 +42,8 @@ export function startScheduler(): void {
 
   setTimeout(() => void tick('content', runDailyContentJobs), 5 * 60_000).unref()
   setInterval(() => void tick('content', runDailyContentJobs), 60 * 60_000).unref()
+
+  setInterval(() => void tick('hubspot', runHubSpotJobs), 15 * 60_000).unref()
 
   console.log('[automation] scheduler started')
 }
@@ -50,6 +63,20 @@ async function runDailyContentJobs(): Promise<void> {
 
   const { runContentJobs } = await import('./drafts')
   await runContentJobs()
+}
+
+async function runHubSpotJobs(): Promise<void> {
+  if (!process.env.HUBSPOT_TOKEN || process.env.HUBSPOT_AUTOMATION === 'off') return
+  const today = chinaDateKey()
+  if (lastHubSpotRunDay === today) return
+  const hour = chinaHour()
+  if (hour < HUBSPOT_JOBS_HOUR || hour >= HUBSPOT_JOBS_UNTIL_HOUR) return
+  lastHubSpotRunDay = today
+
+  const { runRenewalReminders, sendHubSpotWeeklyReport } = await import('@/lib/hubspot-ops')
+  const { done } = await runRenewalReminders({ today })
+  if (done.length > 0) console.log(`[automation] renewal reminders: ${done.join('; ')}`)
+  if (chinaWeekday() === 'Mon') await sendHubSpotWeeklyReport({ today })
 }
 
 async function tick(name: string, job: () => Promise<void>): Promise<void> {
@@ -72,4 +99,10 @@ function chinaHour(): number {
 
 function chinaDateKey(): string {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Shanghai' }).format(new Date())
+}
+
+function chinaWeekday(): string {
+  return new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Shanghai', weekday: 'short' }).format(
+    new Date(),
+  )
 }
