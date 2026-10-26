@@ -11,7 +11,15 @@ import type { MetadataRoute } from 'next'
  * crawler that finds no rule for itself may assume the cautious default. Each
  * gets the same rule as everyone else — the content, not the machinery.
  */
-const PRIVATE_PATHS = ['/hgp-studio', '/hgp-studio-gate', '/api/', '/gone']
+const PRIVATE_PATHS = [
+  '/hgp-studio',
+  '/hgp-studio-gate',
+  '/api/',
+  '/gone',
+  '/portal',
+  '/en/portal',
+  '/zh/portal',
+]
 
 const AI_CRAWLERS = [
   'GPTBot',

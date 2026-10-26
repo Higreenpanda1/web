@@ -7,7 +7,7 @@ import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon'
 import { Link } from '@/i18n/navigation'
 import { SERVICE_CATEGORIES } from '@/lib/catalogue'
 import { HEADQUARTERS } from '@/lib/company'
-import { whatsappLink } from '@/lib/url'
+import { localePath, whatsappLink } from '@/lib/url'
 import { Wordmark } from './Logo'
 
 import type { Locale } from '@/i18n/routing'
@@ -192,6 +192,14 @@ export async function Footer({ locale, settings }: { locale: Locale; settings: S
             ) : null}
           </p>
           <ul className="flex flex-wrap gap-5">
+            <li>
+              <a
+                href={localePath(locale === 'zh' ? 'en' : locale, '/portal/login')}
+                className="text-brand-300 no-underline hover:text-white hover:underline"
+              >
+                {t('nav.clientLogin')}
+              </a>
+            </li>
             <li>
               <Link
                 href="/licences"

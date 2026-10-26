@@ -6,9 +6,9 @@ import { verifyBackupCode } from '@/lib/backup-codes'
 import type { CollectionConfig } from 'payload'
 
 /**
- * Staff who run the site. Deliberately separate from `Customers`, which is the
- * auth collection the client portal will use in phase 2 — see that file for
- * why the two are not one table with a role flag.
+ * Staff who run the site, and the only auth collection. Client portal
+ * accounts are `Customers`, which sign in through the portal's own session
+ * (see that file), so a client can never hold a Payload session.
  *
  * Two-factor authentication is enforced here rather than in the admin UI. The
  * `beforeLogin` hook below refuses any login that has not already passed a TOTP

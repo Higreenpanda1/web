@@ -64,7 +64,6 @@ export type SupportedTimezones =
 export interface Config {
   auth: {
     users: UserAuthOperations;
-    customers: CustomerAuthOperations;
   };
   blocks: {};
   collections: {
@@ -126,31 +125,13 @@ export interface Config {
   widgets: {
     collections: CollectionsWidget;
   };
-  user: User | Customer;
+  user: User;
   jobs: {
     tasks: unknown;
     workflows: unknown;
   };
 }
 export interface UserAuthOperations {
-  forgotPassword: {
-    email: string;
-    password: string;
-  };
-  login: {
-    email: string;
-    password: string;
-  };
-  registerFirstUser: {
-    email: string;
-    password: string;
-  };
-  unlock: {
-    email: string;
-    password: string;
-  };
-}
-export interface CustomerAuthOperations {
   forgotPassword: {
     email: string;
     password: string;
@@ -1030,7 +1011,7 @@ export interface User {
   collection: 'users';
 }
 /**
- * Phase 2 — the client portal. No public sign-up or login route exists yet; these records are here so the schema does not have to change when it does.
+ * Client portal accounts (/portal). The client signs in with a code sent to this email, or with a WhatsApp sign-in link you copy from the account. Their requests are found by this email or WhatsApp number.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "customers".
@@ -1038,37 +1019,42 @@ export interface User {
 export interface Customer {
   id: number;
   fullName: string;
+  /**
+   * Sign-in codes are sent here. Leave empty for WhatsApp-only clients.
+   */
+  email?: string | null;
+  /**
+   * With the country code, e.g. +966501234567.
+   */
+  whatsapp?: string | null;
   company?: string | null;
   /**
    * ISO 3166-1 alpha-2, e.g. SA, YE, AE.
    */
   country?: string | null;
-  whatsapp?: string | null;
   role: 'owner' | 'member';
+  /**
+   * The owner who also sees this member’s requests.
+   */
+  owner?: (number | null) | Customer;
   preferredLocale?: ('ar' | 'en') | null;
   /**
-   * Internal. Never shown to the customer.
+   * Signs the client out at once and stops them signing in.
+   */
+  disabled?: boolean | null;
+  lastLoginAt?: string | null;
+  /**
+   * Internal. Never shown to the client.
    */
   notes?: string | null;
+  sessionVersion?: number | null;
+  loginCodeHash?: string | null;
+  loginCodeExpiresAt?: string | null;
+  loginCodeAttempts?: number | null;
+  loginLinkHash?: string | null;
+  loginLinkExpiresAt?: string | null;
   updatedAt: string;
   createdAt: string;
-  email: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  resetPasswordRequestedAt?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  sessions?:
-    | {
-        id: string;
-        createdAt?: string | null;
-        expiresAt: string;
-      }[]
-    | null;
-  password?: string | null;
-  collection: 'customers';
 }
 /**
  * Structured requests from the application forms — company registration, visas, accounts, store setup, quotes. Nothing here is public.
@@ -1356,15 +1342,10 @@ export interface PayloadLockedDocument {
         value: number | Customer;
       } | null);
   globalSlug?: string | null;
-  user:
-    | {
-        relationTo: 'users';
-        value: number | User;
-      }
-    | {
-        relationTo: 'customers';
-        value: number | Customer;
-      };
+  user: {
+    relationTo: 'users';
+    value: number | User;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -1374,15 +1355,10 @@ export interface PayloadLockedDocument {
  */
 export interface PayloadPreference {
   id: number;
-  user:
-    | {
-        relationTo: 'users';
-        value: number | User;
-      }
-    | {
-        relationTo: 'customers';
-        value: number | Customer;
-      };
+  user: {
+    relationTo: 'users';
+    value: number | User;
+  };
   key?: string | null;
   value?:
     | {
@@ -2033,29 +2009,24 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface CustomersSelect<T extends boolean = true> {
   fullName?: T;
+  email?: T;
+  whatsapp?: T;
   company?: T;
   country?: T;
-  whatsapp?: T;
   role?: T;
+  owner?: T;
   preferredLocale?: T;
+  disabled?: T;
+  lastLoginAt?: T;
   notes?: T;
+  sessionVersion?: T;
+  loginCodeHash?: T;
+  loginCodeExpiresAt?: T;
+  loginCodeAttempts?: T;
+  loginLinkHash?: T;
+  loginLinkExpiresAt?: T;
   updatedAt?: T;
   createdAt?: T;
-  email?: T;
-  resetPasswordToken?: T;
-  resetPasswordExpiration?: T;
-  salt?: T;
-  hash?: T;
-  resetPasswordRequestedAt?: T;
-  loginAttempts?: T;
-  lockUntil?: T;
-  sessions?:
-    | T
-    | {
-        id?: T;
-        createdAt?: T;
-        expiresAt?: T;
-      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

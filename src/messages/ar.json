@@ -19,7 +19,8 @@
     "footer": "روابط التذييل",
     "consultation": "استشارة",
     "academy": "الأكاديمية",
-    "field": "من الميدان"
+    "field": "من الميدان",
+    "clientLogin": "دخول العملاء"
   },
   "locale": {
     "switchTo": "English",
@@ -994,5 +995,125 @@
     "photoCaption": "سامي الحجري · مؤسس HiGreenPanda",
     "fileLabel": "ملف",
     "fileStamp": "سرّي"
+  },
+  "portal": {
+    "title": "بوابة العملاء",
+    "lead": "تابع طلباتك مع HiGreenPanda خطوة بخطوة.",
+    "login": {
+      "email": "البريد الإلكتروني",
+      "send": "أرسل رمز الدخول",
+      "sending": "جاري الإرسال…",
+      "sent": "أرسلنا رمزا من 6 أرقام إلى {email}. الرمز صالح 10 دقائق.",
+      "code": "رمز الدخول",
+      "signIn": "دخول",
+      "signingIn": "جاري الدخول…",
+      "resend": "ما وصلك الرمز؟ أعد الإرسال",
+      "resent": "أرسلنا رمزا جديدا.",
+      "otherEmail": "استخدم بريدا آخر",
+      "noAccount": "ما عندك حساب؟ الحساب يفتحه فريقنا بعد أول طلب. كلّمنا على واتساب.",
+      "whatsapp": "كلّمنا على واتساب",
+      "linkTitle": "الدخول إلى بوابة العملاء",
+      "linkLead": "اضغط دخول لفتح حسابك."
+    },
+    "errors": {
+      "wrong": "الرمز غير صحيح. تأكد منه وحاول مرة ثانية.",
+      "expired": "انتهت صلاحية الرمز. اطلب رمزا جديدا.",
+      "tooMany": "محاولات كثيرة. حاول بعد 10 دقائق.",
+      "link": "هذا الرابط مستخدم أو منتهي. اطلب رابطا جديدا من فريقنا على واتساب.",
+      "email": "اكتب بريدا إلكترونيا صحيحا."
+    },
+    "nav": {
+      "requests": "طلباتي",
+      "account": "حسابي",
+      "signOut": "تسجيل الخروج"
+    },
+    "list": {
+      "welcome": "أهلا {name}",
+      "title": "طلباتي",
+      "titleCompany": "طلبات {company}",
+      "reference": "رقم الطلب",
+      "service": "الخدمة",
+      "date": "التاريخ",
+      "status": "المرحلة",
+      "details": "التفاصيل",
+      "empty": "ما عندك طلبات للحين.",
+      "new": "طلب جديد",
+      "current": "الطلبات الحالية",
+      "completed": "المكتملة"
+    },
+    "request": {
+      "title": "طلب {reference}",
+      "updated": "آخر تحديث: {date}",
+      "documents": "الأوراق",
+      "download": "تحميل",
+      "noDocuments": "ما فيه أوراق للحين. نضيفها هنا أول ما تجهز.",
+      "yourRequest": "تفاصيل طلبك",
+      "help": "عندك سؤال عن هذا الطلب؟",
+      "ask": "اسألنا على واتساب",
+      "askText": "مرحبا، عندي سؤال عن طلب {reference}",
+      "askTextNoRef": "مرحبا، عندي سؤال عن طلبي: {service}",
+      "back": "طلباتي"
+    },
+    "steps": {
+      "received": "استلمنا طلبك",
+      "quote": "أرسلنا عرض السعر",
+      "payment": "استلمنا الدفعة",
+      "documents": "نجهّز الأوراق",
+      "submitted": "قدّمنا الطلب للجهات الحكومية",
+      "established": "تأسست الشركة، نكمل الضرائب والبنك",
+      "contract": "العقد",
+      "deposit": "استلمنا الدفعة الأولى",
+      "production": "قيد التصنيع",
+      "testing": "الفحص والتجربة",
+      "balance": "استلمنا الدفعة الأخيرة",
+      "shipped": "تم الشحن",
+      "completed": "مكتمل",
+      "active": "الخدمة سارية",
+      "due": "موعد التجديد قريب",
+      "dueOn": "موعد التجديد قريب: {date}",
+      "invoiced": "أرسلنا فاتورة التجديد",
+      "renewed": "تم التجديد",
+      "onHold": "متوقف",
+      "ended": "منتهية"
+    },
+    "renewal": {
+      "annual": "تجديد العنوان المسجل والمحاسبة",
+      "permit": "تجديد كرت العمل والإقامة"
+    },
+    "other": "خدمة",
+    "services": {
+      "company_registration": "تأسيس شركة",
+      "hk_company": "شركة في هونغ كونغ",
+      "registered_address": "العنوان المسجل",
+      "accounting": "المحاسبة والضرائب",
+      "licence_changes": "تعديل الرخصة",
+      "bank_account": "فتح حساب بنكي",
+      "alipay_wechat": "حساب Alipay وWeChat Pay",
+      "trademark": "تسجيل علامة تجارية",
+      "work_permit": "كرت العمل والإقامة",
+      "business_visa": "تأشيرة تجارية",
+      "invitation_letter": "خطاب دعوة",
+      "family_visa": "تأشيرة لمّ الشمل",
+      "store_setup": "فتح متجر إلكتروني",
+      "consultation": "استشارة",
+      "product_sourcing": "البحث عن منتج",
+      "manufacturing": "التصنيع",
+      "quality_inspection": "فحص البضاعة",
+      "shipping": "الشحن",
+      "trade_fair": "مرافقة في المعارض",
+      "full_import": "استيراد متكامل"
+    },
+    "account": {
+      "title": "حسابي",
+      "name": "الاسم",
+      "company": "الشركة",
+      "email": "الإيميل",
+      "whatsapp": "الواتساب",
+      "language": "اللغة",
+      "save": "حفظ",
+      "saved": "تم الحفظ.",
+      "note": "لتغيير الإيميل أو الواتساب، كلّمنا على واتساب.",
+      "members": "أعضاء الشركة"
+    }
   }
 }

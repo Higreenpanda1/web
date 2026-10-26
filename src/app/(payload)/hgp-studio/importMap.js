@@ -26,6 +26,7 @@ import { UploadFeatureClient as UploadFeatureClient_e70f5e05f09f93e00b997edb1ef0
 import { ProductOrder as ProductOrder_72d84293d9f39744899f99fea0bcb057 } from '@/components/admin/ProductOrder'
 import { BillingDocuments as BillingDocuments_a89cc0934eaa7d09e02c2ba765751777 } from '@/components/admin/BillingDocuments'
 import { HubSpotResend as HubSpotResend_e897c733d9c1fc3847f71e3310e8e55d } from '@/components/admin/HubSpotResend'
+import { PortalLoginLink as PortalLoginLink_04c2e2addcc7df5fe5de9d25d312c38d } from '@/components/admin/PortalLoginLink'
 import { LoginNotice as LoginNotice_fc85ab5396f462b20cb580778c477079 } from '@/components/admin/LoginNotice'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
@@ -59,6 +60,7 @@ export const importMap = {
   "@/components/admin/ProductOrder#ProductOrder": ProductOrder_72d84293d9f39744899f99fea0bcb057,
   "@/components/admin/BillingDocuments#BillingDocuments": BillingDocuments_a89cc0934eaa7d09e02c2ba765751777,
   "@/components/admin/HubSpotResend#HubSpotResend": HubSpotResend_e897c733d9c1fc3847f71e3310e8e55d,
+  "@/components/admin/PortalLoginLink#PortalLoginLink": PortalLoginLink_04c2e2addcc7df5fe5de9d25d312c38d,
   "@/components/admin/LoginNotice#LoginNotice": LoginNotice_fc85ab5396f462b20cb580778c477079,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

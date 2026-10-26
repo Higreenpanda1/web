@@ -22,8 +22,10 @@ const CONTACT_FIELDS = ['name', 'country', 'whatsapp', 'email'] as const
 export async function describeDetails(
   type: keyof typeof FORMS,
   details: Record<string, unknown>,
+  /** The client portal shows a client their own answers, in their language and without the files. */
+  { locale = 'en', files = true }: { locale?: 'ar' | 'en' | 'zh'; files?: boolean } = {},
 ): Promise<NotificationRow[]> {
-  const t = await getTranslations({ locale: 'en', namespace: 'apply' })
+  const t = await getTranslations({ locale, namespace: 'apply' })
   const rows: NotificationRow[] = []
 
   const describe = (
@@ -33,6 +35,7 @@ export async function describeDetails(
   ) => {
     for (const field of fields) {
       if ((CONTACT_FIELDS as readonly string[]).includes(field.name)) continue
+      if (!files && field.kind === 'file') continue
       const value = answers[field.name]
       if (value === undefined || value === null || value === '') continue
 
