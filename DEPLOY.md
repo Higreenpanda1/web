@@ -855,18 +855,29 @@ reported as down instead of looking healthy.
 
 ---
 
-## 10. Phase 2 — what is already in place
+## 10. Client portal and phase 2
 
-The client portal and subscriptions are not built, but nothing blocks them:
+**The client portal is live at `/portal` (and `/en/portal`) since 26 October
+2026.** Clients follow their requests there, with the stage read from the deal
+in HubSpot.
 
-- **`Customers`** is a separate auth collection with a `role` field, empty and
-  unreachable. Keeping portal accounts out of the staff `users` table from day
-  one is the one decision that could not have been retrofitted cheaply.
-- **`Enquiries`** already carries `status`, `assignedTo` and a `customer`
-  relation, so an enquiry can become a quote and then an order by adding
-  fields rather than rewriting the table.
-- Payload's access control is per-collection, so portal routes can reuse it.
+- **Accounts are opened by the team** in the admin: Leads → Customer accounts →
+  Create. There is no public sign-up. A client's requests are found by the
+  account's email or WhatsApp number, so old requests show up too.
+- **Signing in:** the client types their email and gets a six-digit code
+  (needs `RESEND_API_KEY`, like every other email). For a client without
+  email, open their account and press **Copy WhatsApp sign-in link**; the link
+  works once, within 24 hours.
+- **Owner and members:** an owner also sees the requests of every member whose
+  "Company owner" is set to them.
+- **Disable account** signs the client out at once.
+- Nothing new in `.env`: sessions are signed with `PAYLOAD_SECRET`, and the
+  stages come through the same `HUBSPOT_TOKEN` (contacts and deals read).
+  Without HubSpot the site's own status is shown instead.
+- The code is in `src/lib/portal/` (accounts, requests, stage mapping) and
+  `src/app/(frontend)/[locale]/portal/`. The migration
+  `20261026_135750_portal_accounts` turns `customers` from a Payload auth
+  collection into a plain one; it keeps any email already stored.
 
-When the portal is built it is new routes under `/portal`, a login that uses the
-`customers` collection, and `Plans` / `Subscriptions` collections. Keep payment
-logic out of the presentation layer.
+Still to come: subscriptions (`Plans` / `Subscriptions` collections). Keep
+payment logic out of the presentation layer.

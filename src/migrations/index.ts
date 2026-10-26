@@ -9,7 +9,7 @@ import * as migration_20261023_131921_chinese_locale from './20261023_131921_chi
 import * as migration_20261026_120000_hubspot_sync from './20261026_120000_hubspot_sync'
 import * as migration_20261026_130018_product_order from './20261026_130018_product_order'
 import * as migration_20261026_133122_billing from './20261026_133122_billing'
-import * as migration_20261026_140944_payment_terms from './20261026_140944_payment_terms'
+import * as migration_20261026_135750_portal_accounts from './20261026_135750_portal_accounts'
 
 export const migrations = [
   {
@@ -68,8 +68,8 @@ export const migrations = [
     name: '20261026_133122_billing',
   },
   {
-    up: migration_20261026_140944_payment_terms.up,
-    down: migration_20261026_140944_payment_terms.down,
-    name: '20261026_140944_payment_terms',
+    up: migration_20261026_135750_portal_accounts.up,
+    down: migration_20261026_135750_portal_accounts.down,
+    name: '20261026_135750_portal_accounts',
   },
 ]

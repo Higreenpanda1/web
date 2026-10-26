@@ -5,13 +5,11 @@ import type { User } from '@/payload-types'
 /**
  * Access control for the CMS.
  *
- * Two auth collections exist from day one (see src/collections/Users.ts and
- * Customers.ts): staff who run the site, and customers who will log into the
- * client portal in phase 2. They are deliberately separate tables rather than
- * one table with a role flag, because the portal will need different fields,
- * different sessions and different rate limits, and merging them later would
- * be a migration rewrite. Every check below therefore asserts the collection a
- * user came from, not just its role.
+ * Only staff (src/collections/Users.ts) sign in to Payload. Client portal
+ * accounts (Customers.ts) have their own signed session outside Payload, so
+ * they never reach these checks; every check below still asserts the
+ * collection a user came from, not just its role, so that stays true if
+ * another auth collection is ever added.
  */
 
 type StaffRole = NonNullable<User['role']>
