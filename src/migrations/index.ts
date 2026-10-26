@@ -8,6 +8,7 @@ import * as migration_20261021_080000_field_story from './20261021_080000_field_
 import * as migration_20261023_131921_chinese_locale from './20261023_131921_chinese_locale'
 import * as migration_20261026_120000_hubspot_sync from './20261026_120000_hubspot_sync'
 import * as migration_20261026_130018_product_order from './20261026_130018_product_order'
+import * as migration_20261026_133122_billing from './20261026_133122_billing'
 
 export const migrations = [
   {
@@ -59,5 +60,10 @@ export const migrations = [
     up: migration_20261026_130018_product_order.up,
     down: migration_20261026_130018_product_order.down,
     name: '20261026_130018_product_order',
+  },
+  {
+    up: migration_20261026_133122_billing.up,
+    down: migration_20261026_133122_billing.down,
+    name: '20261026_133122_billing',
   },
 ]

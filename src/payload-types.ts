@@ -1143,6 +1143,56 @@ export interface Application {
     total?: number | null;
   };
   /**
+   * Pick the services from the price list. Leave the price empty for the list price, or type another for a special client. Save, then use the buttons above.
+   */
+  billing?: {
+    /**
+     * Leave empty to use the company name from the request, if any.
+     */
+    clientCompany?: string | null;
+    items?:
+      | {
+          service:
+            | 'HGP-REG-INPERSON'
+            | 'HGP-REG-REMOTE'
+            | 'HGP-ADDR-BASIC'
+            | 'HGP-ADDR-WP'
+            | 'HGP-ACCT'
+            | 'HGP-WP'
+            | 'HGP-BANK-CN'
+            | 'HGP-BANK-HK'
+            | 'HGP-ALIPAY'
+            | 'HGP-WECHAT'
+            | 'HGP-LICENCE-CHG'
+            | 'HGP-HK-CO'
+            | 'HGP-TM'
+            | 'HGP-INVITE'
+            | 'HGP-VISA-M'
+            | 'HGP-VISA-FAMILY'
+            | 'HGP-STORE-TEMU'
+            | 'HGP-STORE-AMAZON'
+            | 'HGP-STORE-ALIEXPRESS'
+            | 'HGP-STORE-ALIBABA'
+            | 'other';
+          quantity?: number | null;
+          /**
+           * Empty = list price.
+           */
+          unitPrice?: number | null;
+          /**
+           * Only for "Other", or to rename a service.
+           */
+          name?: string | null;
+          nameZh?: string | null;
+          description?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    paidDeposit?: string | null;
+    paidBalance?: string | null;
+    paidFull?: string | null;
+  };
+  /**
    * Never leaves the CMS.
    */
   internalNotes?: string | null;
@@ -1882,6 +1932,25 @@ export interface ApplicationsSelect<T extends boolean = true> {
               id?: T;
             };
         total?: T;
+      };
+  billing?:
+    | T
+    | {
+        clientCompany?: T;
+        items?:
+          | T
+          | {
+              service?: T;
+              quantity?: T;
+              unitPrice?: T;
+              name?: T;
+              nameZh?: T;
+              description?: T;
+              id?: T;
+            };
+        paidDeposit?: T;
+        paidBalance?: T;
+        paidFull?: T;
       };
   internalNotes?: T;
   meta?:
