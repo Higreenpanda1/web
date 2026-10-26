@@ -1,5 +1,7 @@
 import { hasRole, isAdmin, isStaff, noone } from '@/access'
+import { INVOICE_STAGES, type BillingItem, type InvoiceStage } from '@/lib/billing'
 import { APPLICATION_TYPES } from '@/lib/catalogue'
+import { PRICE_LIST, priceListItem } from '@/lib/price-list'
 import {
   draftItems,
   orderProducts,
@@ -13,6 +15,30 @@ import type { Application } from '@/payload-types'
 import type { CollectionBeforeChangeHook, CollectionConfig, PayloadRequest } from 'payload'
 
 const isProductRequest = (data: Partial<Application> | undefined) => data?.type === 'product-search'
+
+/** HiGP services: every request that is not for products or shipping (those are Nasher's). */
+const isServiceRequest = (data: Partial<Application> | undefined) =>
+  !!data?.type && data.type !== 'product-search' && data.type !== 'shipping-quote'
+
+/**
+ * A service line takes the list price when the team leaves the price empty,
+ * so the saved quote shows what was charged even if the list changes later.
+ */
+const fillListPrices: CollectionBeforeChangeHook<Application> = ({ data }) => {
+  const items = data.billing?.items as BillingItem[] | undefined
+  if (!items?.length) return data
+  return {
+    ...data,
+    billing: {
+      ...data.billing,
+      items: items.map((item) => ({
+        ...item,
+        quantity: item.quantity ?? 1,
+        unitPrice: item.unitPrice ?? priceListItem(item.service)?.price ?? null,
+      })),
+    },
+  } as typeof data
+}
 
 /**
  * A product request gets its price lines drafted from what the client asked
@@ -101,7 +127,7 @@ export const Applications: CollectionConfig = {
   },
   defaultSort: '-createdAt',
   timestamps: true,
-  hooks: { beforeChange: [draftOrder] },
+  hooks: { beforeChange: [draftOrder, fillListPrices] },
   endpoints: [
     {
       // The "Resend to HubSpot" button: POST /api/applications/:id/hubspot.
@@ -172,6 +198,61 @@ export const Applications: CollectionConfig = {
             nonce: req.headers.get('x-nonce'),
           },
         )
+        return new Response(html, {
+          headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' },
+        })
+      },
+    },
+    {
+      // The printable quote and invoices of a HiGP service request:
+      // /api/applications/:id/document, or ?kind=invoice&stage=deposit|balance|full.
+      path: '/:id/document',
+      method: 'get',
+      handler: async (req) => {
+        const application = await staffApplication(req)
+        if (application instanceof Response) return application
+        if (!isServiceRequest(application)) {
+          return Response.json({ error: 'Only service requests have a quote.' }, { status: 400 })
+        }
+        const { billLines } = await import('@/lib/billing')
+        const lines = billLines((application.billing?.items ?? []) as BillingItem[])
+        if (lines.length === 0) {
+          return Response.json(
+            { error: 'Add the services under "Quote and invoice" and save first.' },
+            { status: 400 },
+          )
+        }
+        const kind = req.searchParams?.get('kind') === 'invoice' ? 'invoice' : 'quote'
+        const asked = req.searchParams?.get('stage') ?? ''
+        const stage: InvoiceStage = (INVOICE_STAGES as readonly string[]).includes(asked)
+          ? (asked as InvoiceStage)
+          : 'deposit'
+        const paidOn = {
+          deposit: application.billing?.paidDeposit,
+          balance: application.billing?.paidBalance,
+          full: application.billing?.paidFull,
+        }[stage]
+        const { renderBillingDocument, HIGP } = await import('@/lib/billing-document')
+        const details = (application.details ?? {}) as Record<string, unknown>
+        const html = renderBillingDocument({
+          issuer: HIGP,
+          kind,
+          stage,
+          reference: application.reference,
+          date: new Date().toISOString().slice(0, 10),
+          client: {
+            name: application.name,
+            company:
+              application.billing?.clientCompany ||
+              (typeof details.companyName === 'string' ? details.companyName : null),
+            country: application.country,
+            whatsapp: application.whatsapp,
+            email: application.email,
+          },
+          lines,
+          paidOn: kind === 'invoice' ? (paidOn?.slice(0, 10) ?? null) : null,
+          nonce: req.headers.get('x-nonce'),
+        })
         return new Response(html, {
           headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' },
         })
@@ -351,6 +432,113 @@ export const Applications: CollectionConfig = {
             description:
               'Quantity × unit price, all products. Filled on save once every product has a price.',
           },
+        },
+      ],
+    },
+
+    {
+      // The quote and invoice buttons for a HiGP service request.
+      name: 'billingDocuments',
+      type: 'ui',
+      admin: {
+        condition: isServiceRequest,
+        components: { Field: '@/components/admin/BillingDocuments#BillingDocuments' },
+      },
+    },
+    {
+      // What HiGP charges for this request, line by line, from the price
+      // list. The quote and the invoices are printed from these.
+      name: 'billing',
+      label: 'Quote and invoice',
+      type: 'group',
+      admin: {
+        condition: isServiceRequest,
+        description:
+          'Pick the services from the price list. Leave the price empty for the list price, or type another for a special client. Save, then use the buttons above.',
+      },
+      fields: [
+        {
+          name: 'clientCompany',
+          label: 'Client company on the quote',
+          type: 'text',
+          admin: { description: 'Leave empty to use the company name from the request, if any.' },
+        },
+        {
+          name: 'items',
+          label: 'Services',
+          labels: { singular: 'Service', plural: 'Services' },
+          type: 'array',
+          fields: [
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'service',
+                  type: 'select',
+                  required: true,
+                  options: [
+                    ...PRICE_LIST.map((entry) => ({
+                      label: `${entry.en} — ¥${entry.price.toLocaleString('en-US')}${entry.yearly ? ' / year' : ''}`,
+                      value: entry.sku,
+                    })),
+                    { label: 'Other (type the name below)', value: 'other' },
+                  ],
+                  admin: { width: '50%' },
+                },
+                {
+                  name: 'quantity',
+                  type: 'number',
+                  min: 1,
+                  defaultValue: 1,
+                  admin: { width: '20%' },
+                },
+                {
+                  name: 'unitPrice',
+                  label: 'Unit price (CNY)',
+                  type: 'number',
+                  min: 0,
+                  admin: { width: '30%', description: 'Empty = list price.' },
+                },
+              ],
+            },
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'name',
+                  label: 'Name in English',
+                  type: 'text',
+                  admin: { width: '50%', description: 'Only for "Other", or to rename a service.' },
+                },
+                { name: 'nameZh', label: 'Name in Chinese', type: 'text', admin: { width: '50%' } },
+              ],
+            },
+            { name: 'description', type: 'textarea', admin: { rows: 2 } },
+          ],
+        },
+        {
+          // A date here prints the green PAID stamp on that invoice.
+          type: 'row',
+          fields: [
+            {
+              name: 'paidDeposit',
+              label: '50% deposit paid on',
+              type: 'date',
+              admin: { width: '33%' },
+            },
+            {
+              name: 'paidBalance',
+              label: 'Balance paid on',
+              type: 'date',
+              admin: { width: '33%' },
+            },
+            {
+              name: 'paidFull',
+              label: 'Full amount paid on',
+              type: 'date',
+              admin: { width: '34%' },
+            },
+          ],
         },
       ],
     },

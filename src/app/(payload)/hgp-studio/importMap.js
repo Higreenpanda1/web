@@ -24,6 +24,7 @@ import { RelationshipFeatureClient as RelationshipFeatureClient_e70f5e05f09f93e0
 import { BlockquoteFeatureClient as BlockquoteFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { UploadFeatureClient as UploadFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ProductOrder as ProductOrder_72d84293d9f39744899f99fea0bcb057 } from '@/components/admin/ProductOrder'
+import { BillingDocuments as BillingDocuments_a89cc0934eaa7d09e02c2ba765751777 } from '@/components/admin/BillingDocuments'
 import { HubSpotResend as HubSpotResend_e897c733d9c1fc3847f71e3310e8e55d } from '@/components/admin/HubSpotResend'
 import { LoginNotice as LoginNotice_fc85ab5396f462b20cb580778c477079 } from '@/components/admin/LoginNotice'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
@@ -56,6 +57,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#BlockquoteFeatureClient": BlockquoteFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#UploadFeatureClient": UploadFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@/components/admin/ProductOrder#ProductOrder": ProductOrder_72d84293d9f39744899f99fea0bcb057,
+  "@/components/admin/BillingDocuments#BillingDocuments": BillingDocuments_a89cc0934eaa7d09e02c2ba765751777,
   "@/components/admin/HubSpotResend#HubSpotResend": HubSpotResend_e897c733d9c1fc3847f71e3310e8e55d,
   "@/components/admin/LoginNotice#LoginNotice": LoginNotice_fc85ab5396f462b20cb580778c477079,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
