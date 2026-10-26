@@ -1114,6 +1114,15 @@
       "saved": "Saved.",
       "note": "To change your email or WhatsApp, message us on WhatsApp.",
       "members": "Company members"
+    },
+    "docs": {
+      "quote": "Quote",
+      "invoice": "Invoice",
+      "deposit": "first payment",
+      "balance": "final payment",
+      "full": "full payment",
+      "paid": "Paid",
+      "unpaid": "Awaiting payment"
     }
   }
 }

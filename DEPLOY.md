@@ -876,7 +876,7 @@ in HubSpot.
   Without HubSpot the site's own status is shown instead.
 - The code is in `src/lib/portal/` (accounts, requests, stage mapping) and
   `src/app/(frontend)/[locale]/portal/`. The migration
-  `20261026_134336_portal_accounts` turns `customers` from a Payload auth
+  `20261026_135750_portal_accounts` turns `customers` from a Payload auth
   collection into a plain one; it keeps any email already stored.
 
 Still to come: subscriptions (`Plans` / `Subscriptions` collections). Keep
