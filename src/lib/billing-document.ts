@@ -1,4 +1,4 @@
-import { HEADQUARTERS } from './company'
+import { HEADQUARTERS, LICENCES } from './company'
 import { PRIORITY_COUNTRIES, OTHER_COUNTRIES, countryName } from './countries'
 import {
   addDays,
@@ -16,23 +16,34 @@ import {
  * The team prints them to PDF and sends them on WhatsApp.
  *
  * One template for every company we bill from: the issuer carries the name,
- * address, bank details and payment codes. HiGP bills services today; the
- * Nasher proforma for product orders is meant to reuse this with Nasher's
- * own details, read from the bank card image the owner sent, never retyped
- * from memory.
+ * address, bank details and payment codes. HiGP bills services; Nasher
+ * issues the proforma invoice of a product order (src/lib/proforma-document.ts)
+ * on the same page, with its own details read from the bank card image the
+ * owner sent, never retyped from memory.
  *
  * Wording approved by the owner on 26 Oct 2026. Chinese and English only:
  * the owner chose those two for every quote and invoice.
  */
 
+type Pair = readonly [string, string]
+
+/** One account to pay into; an issuer with two shows them as options. */
+export type BankAccount = {
+  title?: Pair
+  rows: Array<{ label: Pair; value: string }>
+  note?: Pair
+}
+
 export type Issuer = {
   en: string
   zh: string
+  /** A line under the name, as on the issuer's bank card. */
+  tagline?: string
   addressEn: string
   addressZh: string
   contact: string
-  /** Label pairs [English, 中文] and the value, in display order. */
-  bank: Array<{ label: readonly [string, string]; value: string }>
+  /** Label pairs [English, 中文] and the value, in display order. Values are HTML. */
+  banks: BankAccount[]
   /** Payment codes under /public, with the account name the payer will see. */
   codes: Array<{ src: string; label: readonly [string, string] }>
 }
@@ -49,21 +60,25 @@ export const HIGP: Issuer = {
   addressEn: (HEADQUARTERS.addressEn ?? []).join(', '),
   addressZh: HEADQUARTERS.addressZh ?? '',
   contact: 'WhatsApp +86 130 2344 0305 · contact@higreenpanda.com · higreenpanda.com',
-  bank: [
+  banks: [
     {
-      label: ['Account name', '户名'],
-      value:
-        'Guangzhou HIGP International Business Services Co., Ltd.<br>广州海吉鹏国际商务服务有限公司',
+      rows: [
+        {
+          label: ['Account name', '户名'],
+          value:
+            'Guangzhou HIGP International Business Services Co., Ltd.<br>广州海吉鹏国际商务服务有限公司',
+        },
+        {
+          label: ['Bank', '开户行'],
+          value:
+            "Agricultural Bank of China, Guangzhou Hai'an Road Sub-branch<br>中国农业银行股份有限公司广州海安路支行",
+        },
+        { label: ['Account number', '账号'], value: '44-060001040016797' },
+        { label: ['SWIFT / BIC', 'SWIFT / BIC'], value: 'ABOCCNBJ190' },
+        { label: ['CNAPS code', 'CNAPS 行号'], value: '103581006000' },
+        { label: ['Country', '国家'], value: 'China 中国' },
+      ],
     },
-    {
-      label: ['Bank', '开户行'],
-      value:
-        "Agricultural Bank of China, Guangzhou Hai'an Road Sub-branch<br>中国农业银行股份有限公司广州海安路支行",
-    },
-    { label: ['Account number', '账号'], value: '44-060001040016797' },
-    { label: ['SWIFT / BIC', 'SWIFT / BIC'], value: 'ABOCCNBJ190' },
-    { label: ['CNAPS code', 'CNAPS 行号'], value: '103581006000' },
-    { label: ['Country', '国家'], value: 'China 中国' },
   ],
   codes: [
     { src: '/brand/pay/wechat-higp.png', label: ['WeChat Pay · HiGreenPanda', '微信支付'] },
@@ -74,40 +89,61 @@ export const HIGP: Issuer = {
   ],
 }
 
+const NASHER_NAME = 'Nasher Electronic Commerce (Shanghai) Co., Ltd.'
+
 /**
- * Copied from the owner's bank card for Nasher
- * (/mnt/project-files/product-orders/nasher-bank-details.png, 26 Oct 2026).
- * The card gives no street address for Nasher, so its letters carry the
+ * Copied from the owner's bank card for Nasher, both accounts
+ * (/mnt/project-files/product-orders/nasher-bank-details.png, 26 Oct 2026):
+ * the name as the card prints it, and the Chinese name from the licence.
+ * The card gives no street address for Nasher, so its documents carry the
  * Shenzhen headquarters, where the group is run from. No payment codes:
- * goods are paid by bank transfer.
+ * goods are paid by bank transfer. Shared by the proforma invoice and the
+ * letter for the client's bank.
  */
 export const NASHER: Issuer = {
-  en: 'Nasher Electronic Commerce (Shanghai) Co., Ltd.',
-  zh: '那社尔电子商贸（上海）有限公司',
+  en: NASHER_NAME,
+  zh: LICENCES.find((licence) => licence.id === 'nasher')?.chineseName ?? '',
+  tagline: 'A HiGreenPanda group company',
   addressEn: (HEADQUARTERS.addressEn ?? []).join(', '),
   addressZh: HEADQUARTERS.addressZh ?? '',
   contact: HIGP.contact,
-  bank: [
-    { label: ['Account name', '户名'], value: 'Nasher Electronic Commerce (Shanghai) Co., Ltd.' },
+  banks: [
     {
-      label: ['Bank (China)', '开户行（中国）'],
-      value:
-        'Shanghai Rural Commercial Bank Co., Ltd.<br>No. 70, Zhongshan Road (East-2), Huangpu District, Shanghai, China',
+      title: ['Option 1 · China', '账户一 · 中国'],
+      rows: [
+        { label: ['Account name', '户名'], value: NASHER_NAME },
+        { label: ['Account number', '账号'], value: '6812000012131' },
+        { label: ['Bank', '开户行'], value: 'Shanghai Rural Commercial Bank Co., Ltd.' },
+        { label: ['SWIFT / BIC', 'SWIFT / BIC'], value: 'SHRCCNSHXXX' },
+        {
+          label: ['Bank address', '银行地址'],
+          value: 'No. 70, Zhongshan Road (East-2), Huangpu District, Shanghai, China',
+        },
+        { label: ['Country', '国家'], value: 'Mainland China 中国大陆' },
+      ],
     },
-    { label: ['Account number', '账号'], value: '6812000012131' },
-    { label: ['SWIFT / BIC', 'SWIFT / BIC'], value: 'SHRCCNSHXXX' },
     {
-      label: ['Bank (UAE)', '开户行（阿联酋）'],
-      value:
-        'Zand Bank<br>Al Hail Holding Building, Floor 1, Office 101, Mohammed Bin Rashid Boulevard, Dubai, United Arab Emirates',
+      title: ['Option 2 · UAE (IPP / FTS)', '账户二 · 阿联酋 (IPP / FTS)'],
+      rows: [
+        { label: ['Account name', '户名'], value: NASHER_NAME },
+        { label: ['IBAN', 'IBAN 账号'], value: 'AE44 0960 0006 9106 0019 813' },
+        { label: ['Bank', '开户行'], value: 'Zand Bank' },
+        { label: ['SWIFT / BIC', 'SWIFT / BIC'], value: 'ZANDAEAAXXX' },
+        {
+          label: ['Bank address', '银行地址'],
+          value:
+            'Al Hail Holding Building, Floor 1, Office 101, Mohammed Bin Rashid Boulevard, Dubai, United Arab Emirates',
+        },
+        { label: ['Country', '国家'], value: 'United Arab Emirates 阿联酋' },
+      ],
+      note: [
+        "Zand Bank accepts B2B trade payments only, from the buyer's company or its legal representative, shareholders, employees or affiliates.",
+        'Zand Bank 仅接受 B2B 贸易付款，付款方须为买方公司或其法定代表人、股东、员工或关联公司。',
+      ],
     },
-    { label: ['IBAN', 'IBAN'], value: 'AE44 0960 0006 9106 0019 813' },
-    { label: ['SWIFT / BIC', 'SWIFT / BIC'], value: 'ZANDAEAAXXX' },
   ],
   codes: [],
 }
-
-type Pair = readonly [string, string]
 
 const L = {
   quote: ['Quotation', '报价单'],
@@ -177,26 +213,122 @@ export function escapeHtml(value: string): string {
 }
 
 /** Chinese over English, as two lines of one label. */
-const both = ([english, chinese]: Pair) =>
+export const both = ([english, chinese]: Pair) =>
   `<span class="zh">${escapeHtml(chinese)}</span> <span class="en">${escapeHtml(english)}</span>`
 
-const inline = ([english, chinese]: Pair) =>
+export const inline = ([english, chinese]: Pair) =>
   english === chinese ? escapeHtml(english) : `${escapeHtml(chinese)} ${escapeHtml(english)}`
 
-function money(amount: number): string {
+export function money(amount: number, currency = 'CNY'): string {
   const whole = Number.isInteger(amount)
-  return `CNY ${amount.toLocaleString('en-US', {
+  return `${currency} ${amount.toLocaleString('en-US', {
     minimumFractionDigits: whole ? 0 : 2,
     maximumFractionDigits: 2,
   })}`
 }
 
-function country(value: string | null | undefined): string {
+export function country(value: string | null | undefined): string {
   if (!value) return ''
   const found = [...PRIORITY_COUNTRIES, ...OTHER_COUNTRIES].find((c) =>
     [c.ar, c.en, countryName(c, 'zh')].includes(value),
   )
   return found ? `${countryName(found, 'zh')} ${found.en}` : value
+}
+
+/** A total or subtotal row under a four-column table. */
+export const sumRow = (label: Pair, amount: number, strong = false, currency = 'CNY') =>
+  `<tr${strong ? ' class="strong"' : ''}><th colspan="3">${both(label)}</th><td class="num">${money(amount, currency)}</td></tr>`
+
+/** The page every document shares: issuer, title, the client, the body, how to pay. */
+export function documentPage(page: {
+  issuer: Issuer
+  title: Pair
+  number: string
+  meta: Array<readonly [Pair, string]>
+  partyLabel: Pair
+  /** HTML, one entry per line. */
+  party: string[]
+  /** Set the client's lines in two columns, to keep a long page on one A4 sheet. */
+  partyColumns?: boolean
+  /** HTML between the client and the payment details. */
+  body: string
+  /** Extra notes under the bank accounts. */
+  payNotes?: Pair[]
+  nonce: string | null
+}): string {
+  const { issuer } = page
+  const accounts = issuer.banks.map(
+    (account) =>
+      `${account.title ? `<h3>${both(account.title)}</h3>` : ''}<table class="bank">${account.rows
+        .map((row) => `<tr><th>${both(row.label)}</th><td>${row.value}</td></tr>`)
+        .join('')}</table>`,
+  )
+  const notes = [
+    ...issuer.banks.flatMap((account) => (account.note ? [account.note] : [])),
+    ...(page.payNotes ?? []),
+    L.beneficiary,
+  ]
+  const multi = issuer.banks.length > 1
+
+  const bank = `<section class="pay${multi ? ' multi' : ''}">
+      <div>
+        <h2>${both(L.bank)}</h2>
+        ${multi ? `<div class="banks">${accounts.map((a) => `<div>${a}</div>`).join('')}</div>` : accounts.join('')}
+        ${notes.map((note) => `<p class="note">${both(note)}</p>`).join('')}
+      </div>
+      ${
+        issuer.codes.length
+          ? `<div class="codes">
+        <h2>${both(L.scan)}</h2>
+        <div class="code-row">${issuer.codes
+          .map(
+            (code) =>
+              `<figure><img src="${escapeHtml(code.src)}" alt=""><figcaption>${inline(code.label)}</figcaption></figure>`,
+          )
+          .join('')}</div>
+      </div>`
+          : ''
+      }
+    </section>`
+
+  const printButton = page.nonce
+    ? `<button type="button" id="print">${inline(L.print)}</button>
+       <script nonce="${escapeHtml(page.nonce)}">document.getElementById('print').addEventListener('click',()=>window.print())</script>`
+    : ''
+
+  return `<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>${escapeHtml(page.number)} · ${inline(page.title)}</title>
+<style>${STYLE}</style>
+</head>
+<body>
+${printButton}
+<header>
+  <img src="/brand/web/logo-wordmark@2x.png" alt="HiGreenPanda" class="logo">
+  <div class="issuer">
+    <b>${escapeHtml(issuer.zh)}</b><br>${escapeHtml(issuer.en)}${issuer.tagline ? `<br><span class="en">${escapeHtml(issuer.tagline)}</span>` : ''}
+    <small>${escapeHtml(issuer.addressZh)}<br>${escapeHtml(issuer.addressEn)}<br>${escapeHtml(issuer.contact)}</small>
+  </div>
+</header>
+<div class="head">
+  <h1>${both(page.title)}</h1>
+  <table class="meta">${page.meta
+    .map(([label, value]) => `<tr><th>${both(label)}</th><td>${escapeHtml(value)}</td></tr>`)
+    .join('')}</table>
+</div>
+<section class="client${page.partyColumns ? ' columns' : ''}">
+  <h2>${both(page.partyLabel)}</h2>
+  <p>${page.party.join('<br>')}</p>
+</section>
+${page.body}
+${bank}
+<footer>${both(L.thanks)}</footer>
+</body>
+</html>`
 }
 
 export type BillingDocument = {
@@ -225,9 +357,8 @@ export function renderBillingDocument(doc: BillingDocument): string {
   const isQuote = doc.kind === 'quote'
   const stage = doc.stage ?? 'deposit'
   const number = documentNumber(doc.reference, isQuote ? 'quote' : stage)
-  const title = isQuote ? L.quote : L.invoice
 
-  const meta = isQuote
+  const meta: Array<readonly [Pair, string]> = isQuote
     ? [
         [L.quoteNo, number],
         [L.date, doc.date],
@@ -263,9 +394,6 @@ export function renderBillingDocument(doc: BillingDocument): string {
     )
     .join('')
 
-  const sumRow = (label: Pair, amount: number, strong = false) =>
-    `<tr${strong ? ' class="strong"' : ''}><th colspan="3">${both(label)}</th><td class="num">${money(amount)}</td></tr>`
-
   const hasPassThrough = sums.passThrough > 0
 
   const terms = isQuote
@@ -291,72 +419,22 @@ export function renderBillingDocument(doc: BillingDocument): string {
         ${doc.paidOn ? `<div class="stamp">${inline(L.paid)}<small>${inline(L.paidOn)} ${escapeHtml(doc.paidOn)}</small></div>` : ''}
       </section>`
 
-  const bank = `<section class="pay">
-      <div>
-        <h2>${both(L.bank)}</h2>
-        <table class="bank">${doc.issuer.bank
-          .map((row) => `<tr><th>${both(row.label)}</th><td>${row.value}</td></tr>`)
-          .join('')}</table>
-        <p class="note">${both(L.beneficiary)}</p>
-      </div>
-      <div class="codes">
-        <h2>${both(L.scan)}</h2>
-        <div class="code-row">${doc.issuer.codes
-          .map(
-            (code) =>
-              `<figure><img src="${escapeHtml(code.src)}" alt=""><figcaption>${inline(code.label)}</figcaption></figure>`,
-          )
-          .join('')}</div>
-      </div>
-    </section>`
-
-  const printButton = doc.nonce
-    ? `<button type="button" id="print">${inline(L.print)}</button>
-       <script nonce="${escapeHtml(doc.nonce)}">document.getElementById('print').addEventListener('click',()=>window.print())</script>`
-    : ''
-
-  return `<!doctype html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex">
-<title>${escapeHtml(number)} · ${inline(title)}</title>
-<style>${STYLE}</style>
-</head>
-<body>
-${printButton}
-<header>
-  <img src="/brand/web/logo-wordmark@2x.png" alt="HiGreenPanda" class="logo">
-  <div class="issuer">
-    <b>${escapeHtml(doc.issuer.zh)}</b><br>${escapeHtml(doc.issuer.en)}
-    <small>${escapeHtml(doc.issuer.addressZh)}<br>${escapeHtml(doc.issuer.addressEn)}<br>${escapeHtml(doc.issuer.contact)}</small>
-  </div>
-</header>
-<div class="head">
-  <h1>${both(title)}</h1>
-  <table class="meta">${meta
-    .map(
-      ([label, value]) =>
-        `<tr><th>${both(label as Pair)}</th><td>${escapeHtml(value as string)}</td></tr>`,
-    )
-    .join('')}</table>
-</div>
-<section class="client">
-  <h2>${both(isQuote ? L.preparedFor : L.billTo)}</h2>
-  <p>${client.join('<br>')}</p>
-</section>
-<table class="lines">
+  return documentPage({
+    issuer: doc.issuer,
+    title: isQuote ? L.quote : L.invoice,
+    number,
+    meta,
+    partyLabel: isQuote ? L.preparedFor : L.billTo,
+    party: client,
+    body: `<table class="lines">
   <thead><tr><th>${both(L.service)}</th><th class="num">${both(L.qty)}</th><th class="num">${both(L.unitPrice)}</th><th class="num">${both(L.amount)}</th></tr></thead>
   <tbody>${lineRows}</tbody>
   <tfoot>${sumRow(L.total, sums.total, true)}</tfoot>
 </table>
 ${terms}
-<p class="note">${both(L.prices)}</p>
-${bank}
-<footer>${both(L.thanks)}</footer>
-</body>
-</html>`
+<p class="note">${both(L.prices)}</p>`,
+    nonce: doc.nonce,
+  })
 }
 
 const STYLE = `
@@ -381,6 +459,10 @@ const STYLE = `
   .meta td { font-weight: 600; white-space: nowrap; }
   .client { margin-bottom: 14px; }
   .client p { margin: 0; }
+  .client.columns p { columns: 2; column-gap: 24px; }
+  .facts { display: grid; grid-template-columns: repeat(4, auto); gap: 4px 16px; }
+  .facts div { display: flex; flex-direction: column; }
+  .facts .strong { font-size: 14px; }
   .lines thead th { background: #12341b; color: #fff; font-weight: 600; }
   .lines thead .en { color: #cfe9d3; }
   .lines tbody td { border-bottom: 1px solid #e3eee6; }
@@ -397,12 +479,17 @@ const STYLE = `
   .pay { display: grid; grid-template-columns: 1fr auto; gap: 16px; margin-top: 16px; border-top: 1px solid #e3eee6; padding-top: 12px; break-inside: avoid; }
   .bank th { width: 34%; font-weight: 400; padding-left: 0; }
   .bank td { font-weight: 600; }
+  h3 { font-size: 12.5px; margin: 0 0 4px; color: #12341b; }
+  .banks { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+  .banks .bank th { width: 36%; }
+  .pay.multi .code-row { flex-direction: column; }
+  .pay:not(:has(.codes)) { grid-template-columns: 1fr; }
   .code-row { display: flex; gap: 12px; }
   figure { margin: 0; width: 128px; text-align: center; font-size: 10.5px; color: #445; }
   figure img { width: 128px; height: 128px; object-fit: contain; display: block; }
   footer { margin-top: 18px; font-size: 12px; border-top: 1px solid #e3eee6; padding-top: 8px; text-align: center; }
   #print { position: fixed; right: 16px; bottom: 16px; font: inherit; padding: 10px 18px; border-radius: 6px; border: 0; background: #276b34; color: #fff; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
-  @media (max-width: 640px) { .pay, .head, header { display: block; } .issuer { text-align: left; margin-top: 8px; } }
+  @media (max-width: 640px) { .pay, .head, header, .banks { display: block; } .facts { grid-template-columns: 1fr 1fr; } .client.columns p { columns: 1; } .issuer { text-align: left; margin-top: 8px; } }
   @media print {
     #print { display: none; }
     body { padding: 0; max-width: none; font-size: 11px; line-height: 1.35; }
@@ -416,6 +503,8 @@ const STYLE = `
     .pay { margin-top: 10px; padding-top: 8px; }
     figure, figure img { width: 104px; }
     figure img { height: 104px; }
+    .banks .bank th, .banks .bank td { padding: 2px 4px 2px 0; }
+    .banks .bank th { line-height: 1.2; }
     footer { margin-top: 10px; }
   }
 `

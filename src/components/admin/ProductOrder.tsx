@@ -9,7 +9,9 @@ import { orderProducts } from '@/lib/product-order'
  * A product request as the team reads it: each product with its photos and
  * answers, and the two printable briefs — the full one for the office, and
  * one without the client's details or prices that can go to a factory as
- * it is. The raw answers stay in "Details" below.
+ * it is — and the Nasher proforma invoice, printed from the prices under
+ * "Order and prices" once they are saved. The raw answers stay in "Details"
+ * below.
  */
 export function ProductOrder() {
   const { id } = useDocumentInfo()
@@ -40,6 +42,14 @@ export function ProductOrder() {
           rel="noopener"
         >
           Print brief for the factory
+        </a>
+        <a
+          className="btn btn--style-secondary btn--size-medium"
+          href={`${base}/proforma`}
+          target="_blank"
+          rel="noopener"
+        >
+          Proforma invoice (Nasher)
         </a>
       </div>
 

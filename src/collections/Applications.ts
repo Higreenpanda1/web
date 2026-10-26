@@ -204,6 +204,52 @@ export const Applications: CollectionConfig = {
       },
     },
     {
+      // The Nasher proforma invoice of a product order, from "Order and prices".
+      path: '/:id/proforma',
+      method: 'get',
+      handler: async (req) => {
+        const application = await staffApplication(req)
+        if (application instanceof Response) return application
+        if (!isProductRequest(application)) {
+          return Response.json(
+            { error: 'Only product requests have a proforma invoice.' },
+            { status: 400 },
+          )
+        }
+        const { renderProforma } = await import('@/lib/proforma-document')
+        const details = (application.details ?? {}) as Record<string, unknown>
+        const text = (value: unknown) => (typeof value === 'string' && value.trim()) || null
+        const html = renderProforma({
+          reference: application.reference,
+          date: new Date().toISOString().slice(0, 10),
+          currency: application.order?.currency ?? 'usd',
+          items: (application.order?.items ?? []) as OrderItem[],
+          buyer: {
+            name: application.name,
+            company: text(details.companyName),
+            address: text(details.companyAddress),
+            country: application.country,
+            whatsapp: application.whatsapp,
+            email: application.email,
+          },
+          destination: text(details.destinationCountry),
+          nonce: req.headers.get('x-nonce'),
+        })
+        if (!html) {
+          return Response.json(
+            {
+              error:
+                'Enter a quantity and a unit price for every product under "Order and prices" and save first.',
+            },
+            { status: 400 },
+          )
+        }
+        return new Response(html, {
+          headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' },
+        })
+      },
+    },
+    {
       // The printable quote and invoices of a HiGP service request:
       // /api/applications/:id/document, or ?kind=invoice&stage=deposit|balance|full.
       path: '/:id/document',
