@@ -1,0 +1,58 @@
+# WhatsApp bot → HubSpot
+
+The WhatsApp bot is not in this repository: it runs from `/opt/higreenpanda-bot`
+on the same VPS (pm2 name `higreenpanda-bot`), installed on 25 Sep 2026 from
+`higreenpanda-bot.zip` in the Drive folder "02 بوت الواتساب". This folder holds
+the bot files changed to connect it to HubSpot, and the script that installs
+them.
+
+## What it does
+
+- Every customer who writes to the bot becomes a HubSpot **contact**, matched by
+  WhatsApp number (`+<digits>` in `phone` or `mobilephone`). That is the same
+  rule the website uses, so someone who writes on WhatsApp and also fills a
+  form on the site stays one contact. Hidden WhatsApp ids (`@lid` with no real
+  number) are skipped.
+- Each conversation is one **note** on the contact (English/中文 labels, the
+  conversation as written): name, number, language, services detected, the
+  handoff reason, and every line from the customer, the bot and the team. It is
+  written when the chat has been quiet for 30 minutes (`hubspotIdleMinutes` in
+  `config.json`), or at once when the bot hands the chat to the team, and is
+  updated in place while the conversation goes on. After 24 hours of silence
+  the next message starts a new note.
+- A **deal** is opened only when the AI marks a lead ready for a quote (AI mode,
+  after a Gemini key is added): pipeline "Services & Trade", stage New Inquiry,
+  `hgp_service` from the service, `our_company` Nasher for trade services and
+  HiGP for the rest, `hgp_request_source` = "WhatsApp bot".
+- If HubSpot is down or the token is wrong, the customer still gets the reply;
+  the sync is retried every 15 minutes and after a restart.
+- Owner command in "Message yourself": `!hubspot` shows the state and the last
+  error. `"hubspot": false` in `config.json` switches the sync off.
+
+## Files
+
+| File                      | Change                                                            |
+| ------------------------- | ----------------------------------------------------------------- |
+| `files/src/hubspot.js`    | New: the sync.                                                    |
+| `files/src/engine.js`     | Records each line and each handoff for HubSpot; `!hubspot`.       |
+| `files/test.js`           | 7 new offline tests with a fake HubSpot (65 in total).            |
+| `files/scripts/chat.js`   | The terminal simulator never writes to the real HubSpot.          |
+
+The token is the website's (`HUBSPOT_TOKEN` in `/home/deploy/higreenpanda/.env`),
+copied by the script to `/opt/higreenpanda-bot/hubspot.env` (mode 600). It needs
+contacts read/write, and deals write for the AI deals. After rotating the token
+for the website, run the script again to copy the new one.
+
+## Install / undo
+
+Run in hPanel → VPS → Browser terminal, with the commit pinned (see HANDOVER.md):
+
+```
+curl -fsSL https://raw.githubusercontent.com/Higreenpanda1/web/<sha>/ops/whatsapp-bot/install-hubspot.sh | REF=<sha> bash
+```
+
+It stops without changing anything if the server's bot files are not the
+25 Sep version, or the website has no token yet. It backs the code up to
+`/opt/higreenpanda-bot-backups/<time>`, runs `node test.js`, puts the old code
+back if the test fails, and restarts the bot. Running it again only refreshes
+the token. Undo: the same command with `bash -s -- undo`.
