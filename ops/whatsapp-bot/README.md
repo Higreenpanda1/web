@@ -26,6 +26,12 @@ them.
   HiGP for the rest, `hgp_request_source` = "WhatsApp bot".
 - If HubSpot is down or the token is wrong, the customer still gets the reply;
   the sync is retried every 15 minutes and after a restart.
+- Each contact gets **WhatsApp interest / 兴趣** (`hgp_whatsapp_interest`): hot =
+  handed to the team or ready for a quote, warm = asked about a service or wrote
+  3+ messages, cold = the rest. It only goes up, and never below a value set by
+  hand. HubSpot list "Important WhatsApp customers" (id 11) shows hot + warm.
+  `"hubspotSkipCold": true` in `config.json` stops writing cold chats at all
+  (SAAM chose to keep them, 26 Oct 2026).
 - Owner command in "Message yourself": `!hubspot` shows the state and the last
   error. `"hubspot": false` in `config.json` switches the sync off.
 

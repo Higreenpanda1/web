@@ -320,7 +320,8 @@ const CLOSED = new Date('2026-09-26T14:00:00Z'); // Saturday 22:00 China time
     // the owner answers in the chat → same note is updated, no new contact
     e.onOwnerInChat({ chatId: id, text: 'هلا نايف، أنا سامي', now: OPEN.getTime() + 120000 });
     await e.hubspot.syncSoon(id);
-    const patch = hs.calls.find(c => c.method === 'PATCH');
+    const patch = hs.calls.find(c => c.method === 'PATCH' && c.p.startsWith('/crm/v3/objects/notes/'));
+    assert.ok(hs.calls.some(c => c.method === 'PATCH' && c.p.startsWith('/crm/v3/objects/contacts/') && c.body.properties.hgp_whatsapp_interest === 'hot'), 'marked hot');
     assert.ok(patch && patch.p.endsWith('/' + e.chat(id).hs.noteId));
     assert.ok(patch.body.properties.hs_note_body.includes('Team / 团队'));
     assert.strictEqual(hs.calls.filter(c => c.p === '/crm/v3/objects/contacts').length, 1);
@@ -357,6 +358,45 @@ const CLOSED = new Date('2026-09-26T14:00:00Z'); // Saturday 22:00 China time
     assert.strictEqual(deal.body.properties.our_company, 'nasher');
     assert.strictEqual(deal.body.properties.dealstage, '4392706760');
     assert.strictEqual(deal.body.properties.hgp_request_source, 'WhatsApp bot');
+  });
+  await test('interest level: "hello" only = cold, a service question = warm, never lowered', async () => {
+    const hs = fakeHubSpot();
+    const e = createEngine(hsCfg, { chatsFile: path.join(tmp, 'h6.json'), log: () => {}, hubspotFetch: hs.f, hubspotToken: 't' });
+    const id = '966500000006@c.us';
+    const lvl = () => hs.calls.filter(c => c.method === 'PATCH' && c.p.startsWith('/crm/v3/objects/contacts/')).map(c => c.body.properties.hgp_whatsapp_interest);
+    await e.onCustomer({ chatId: id, number: '966500000006', text: 'السلام عليكم', now: OPEN.getTime() });
+    await e.hubspot.syncSoon(id);
+    assert.deepStrictEqual(lvl(), ['cold']);
+    await e.onCustomer({ chatId: id, number: '966500000006', text: 'كم سعر فتح حساب بنكي؟', now: OPEN.getTime() + 60000 });
+    await e.hubspot.syncSoon(id);
+    assert.deepStrictEqual(lvl(), ['cold', 'warm']);
+    await e.onCustomer({ chatId: id, number: '966500000006', text: 'شكرا', now: OPEN.getTime() + 120000 });
+    await e.hubspot.syncSoon(id);
+    assert.deepStrictEqual(lvl(), ['cold', 'warm']);
+  });
+  await test('a level set by hand in HubSpot is not lowered by the bot', async () => {
+    const hs = fakeHubSpot({ '+966500000007': '777' });
+    const f = async (url, init) => {
+      const r = await hs.f(url, init);
+      if (url.endsWith('/contacts/search')) { const j = await r.json(); j.results.forEach(x => { x.properties = { hgp_whatsapp_interest: 'hot' }; }); return { ok: true, status: 200, json: async () => j }; }
+      return r;
+    };
+    const e = createEngine(hsCfg, { chatsFile: path.join(tmp, 'h7.json'), log: () => {}, hubspotFetch: f, hubspotToken: 't' });
+    await e.onCustomer({ chatId: '966500000007@c.us', number: '966500000007', text: 'كم سعر فتح حساب بنكي؟', now: OPEN.getTime() });
+    await e.hubspot.syncSoon('966500000007@c.us');
+    assert.strictEqual(hs.calls.filter(c => c.method === 'PATCH' && c.p.includes('/contacts/')).length, 0);
+  });
+  await test('hubspotSkipCold: "hello" and gone is not written; writing more later writes the whole chat', async () => {
+    const hs = fakeHubSpot();
+    const e = createEngine(Object.assign({}, hsCfg, { hubspotSkipCold: true }), { chatsFile: path.join(tmp, 'h8.json'), log: () => {}, hubspotFetch: hs.f, hubspotToken: 't' });
+    const id = '966500000008@c.us';
+    await e.onCustomer({ chatId: id, number: '966500000008', text: 'السلام عليكم', now: OPEN.getTime() });
+    await e.hubspot.syncSoon(id);
+    assert.strictEqual(hs.calls.length, 0);
+    await e.onCustomer({ chatId: id, number: '966500000008', text: 'ابي اسجل علامة تجارية', now: OPEN.getTime() + 60000 });
+    await e.hubspot.syncSoon(id);
+    const note = hs.calls.find(c => c.p === '/crm/v3/objects/notes');
+    assert.ok(note && note.body.properties.hs_note_body.includes('السلام عليكم'));
   });
   await test('HubSpot down → the customer still gets the reply, the sync waits for a retry', async () => {
     const down = async () => ({ ok: false, status: 503, text: async () => 'down', json: async () => ({}) });

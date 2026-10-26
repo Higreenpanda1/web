@@ -67,6 +67,12 @@ const SERVICE_LABEL = {
 // Trade services belong to Nasher, the rest to HiGP (deal property our_company).
 const NASHER = new Set(['full_import', 'product_sourcing', 'manufacturing', 'quality_inspection', 'shipping', 'trade_fair']);
 
+// How interested the customer is, kept on the contact as "WhatsApp interest / 兴趣"
+// (hgp_whatsapp_interest) so the team can list the ones worth a reply. It only
+// ever goes up, and never below what someone set by hand in HubSpot.
+const LEVELS = ['cold', 'warm', 'hot'];
+const rank = l => LEVELS.indexOf(l);
+
 const ROLE = { user: 'Customer / 客户', assistant: 'Bot / 机器人', team: 'Team / 团队' };
 
 function readToken(dir) {
@@ -141,14 +147,29 @@ function createHubSpot(o) {
         { filters: [{ propertyName: 'mobilephone', operator: 'EQ', value: phone }] },
       ],
       sorts: [{ propertyName: 'createdate', direction: 'ASCENDING' }],
-      properties: ['phone'],
+      properties: ['phone', 'hgp_whatsapp_interest'],
       limit: 1,
     });
-    if (found.results && found.results[0]) return found.results[0].id;
+    const hit = found.results && found.results[0];
+    if (hit) return { id: hit.id, level: hit.properties && hit.properties.hgp_whatsapp_interest || '' };
     const created = await call('POST', '/crm/v3/objects/contacts', {
       properties: Object.assign({ phone, lifecyclestage: 'lead' }, name ? splitName(name) : {}, owner()),
     });
-    return created.id;
+    return { id: created.id, level: '' };
+  }
+
+  function servicesIn(h) {
+    const slugs = new Set();
+    if (h.lead && h.lead.service) slugs.add(h.lead.service);
+    for (const s of o.detectServices ? o.detectServices(h.lines.filter(l => l.role === 'user').map(l => l.text).join('\n')) : []) slugs.add(s);
+    return [...slugs];
+  }
+
+  /** hot = handed to the team or ready for a quote; warm = asked about a service or wrote 3+ messages; cold = the rest. */
+  function levelOf(h) {
+    if (h.handoff || h.leadReady) return 'hot';
+    if (servicesIn(h).length || h.lines.filter(l => l.role === 'user').length >= 3) return 'warm';
+    return 'cold';
   }
 
   function hs(c) { return (c.hs = c.hs || { lines: [] }); }
@@ -158,10 +179,7 @@ function createHubSpot(o) {
     const lines = h.lines;
     const first = lines[0] ? lines[0].at : Date.now();
     const last = lines.length ? lines[lines.length - 1].at : first;
-    const slugs = new Set();
-    if (h.lead && h.lead.service) slugs.add(h.lead.service);
-    for (const s of o.detectServices ? o.detectServices(lines.filter(l => l.role === 'user').map(l => l.text).join('\n')) : []) slugs.add(s);
-    const services = [...slugs].map(s => SERVICE_LABEL[SERVICE[s]] || s).filter((v, i, a) => a.indexOf(v) === i).slice(0, 3);
+    const services = servicesIn(h).map(s => SERVICE_LABEL[SERVICE[s]] || s).filter((v, i, a) => a.indexOf(v) === i).slice(0, 3);
 
     const rows = [
       ['Name / 姓名', c.name || h.lead && h.lead.name || '—'],
@@ -194,8 +212,21 @@ function createHubSpot(o) {
     const h = hs(c);
     if (!h.dirty || !h.phone || !h.lines.length) return;
     const version = h.version || 0;
+    const level = levelOf(h);
+    // skipCold: a "hello" and gone is not written; if they write more it becomes warm and the whole chat is written then
+    if (o.skipCold && level === 'cold' && !h.contactId) { h.dirty = false; o.save(); return; }
     try {
-      if (!h.contactId) { h.contactId = await findOrCreateContact(h.phone, c.name); o.save(); }
+      if (!h.contactId) {
+        const found = await findOrCreateContact(h.phone, c.name);
+        h.contactId = found.id; h.levelSent = found.level; o.save();
+      }
+      if (rank(level) > rank(h.levelSent || '')) {
+        // the level is a nice-to-have: if it can't be written, the note still is
+        try {
+          await call('PATCH', `/crm/v3/objects/contacts/${h.contactId}`, { properties: { hgp_whatsapp_interest: level } });
+          h.levelSent = level;
+        } catch (e) { log('[hubspot] interest level not saved:', e.message); }
+      }
 
       const properties = Object.assign({ hs_timestamp: new Date(h.lines[0].at).toISOString(), hs_note_body: noteBody(c, h) }, owner());
       if (h.noteId) {

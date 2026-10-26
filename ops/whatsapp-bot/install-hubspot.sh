@@ -29,10 +29,17 @@ declare -A OLD=(
   [test.js]=0ade8bf9718eacf0a91b162836c9001cf8b6d1750c4848a254dbed286bba6cc1
   [scripts/chat.js]=d660d129ce41956bbffcdf9d742035595a388086c5e79740d2d74f84b709dfae
 )
-declare -A NEW=(
+# The first HubSpot version (installed 26 Oct 2026, commit 6793351a): updating from it is fine too.
+declare -A V1=(
   [src/hubspot.js]=9d5d008887bc6cf541ec3eb1c361a38b6b5b622f75e955bac41c2d2ad4263941
   [src/engine.js]=de789d31aebcbdfdf88bfb834d3e2efc8e44e7fe40b6320a02b9e9329f28efe5
   [test.js]=f66e1759c98a08b0af153152fcd681552d0bff2b51865dfa4865e35f61017774
+  [scripts/chat.js]=a83e1d195d00c92c85fb3c34d9cba43494ead5106df2f7fb3bbffcdc4fa0a645
+)
+declare -A NEW=(
+  [src/hubspot.js]=46cf0d7bc299a372b0c2bf45c74e4dc881015ec90e00a4df09f552913ae0d953
+  [src/engine.js]=31736039212925ae7dcc91898b25c1ba60e662f87f94243b435fe63f844aeb94
+  [test.js]=910ca206f41f0e1b0a120e00f9434d5c108d9040b023decf7e8c3ffe10158d94
   [scripts/chat.js]=a83e1d195d00c92c85fb3c34d9cba43494ead5106df2f7fb3bbffcdc4fa0a645
 )
 
@@ -48,7 +55,8 @@ restore() {
   for f in "${FILES[@]}"; do
     if [ -f "$from/$f" ]; then cp -p "$from/$f" "$f"; else rm -f "$f"; fi
   done
-  rm -f hubspot.env
+  # back to the bot from before HubSpot → the token goes too; back to an older HubSpot version → it stays
+  if [ ! -f "$from/src/hubspot.js" ]; then rm -f hubspot.env; fi
   pm2 restart "$BOT_NAME" >/dev/null
 }
 
@@ -56,7 +64,7 @@ if [ "${1:-}" = "undo" ]; then
   last="$(ls -1d "$BACKUPS"/* 2>/dev/null | tail -1 || true)"
   [ -n "$last" ] || die "No backup found in $BACKUPS."
   restore "$last"
-  echo "↩️  The bot is back to the code saved in $last, without HubSpot."
+  echo "↩️  The bot is back to the code saved in $last."
   exit 0
 fi
 
@@ -64,11 +72,17 @@ say "Checking the bot's code"
 installed=1
 for f in "${FILES[@]}"; do [ "$(sum "$f")" = "${NEW[$f]}" ] || installed=0; done
 if [ "$installed" = 0 ]; then
-  for f in "${!OLD[@]}"; do
-    [ "$(sum "$f")" = "${OLD[$f]}" ] || die "$f on the server is not the version this update was made for. Nothing changed. Send this message to Claude."
-  done
-  [ ! -e src/hubspot.js ] || die "src/hubspot.js already exists with other content. Nothing changed. Send this message to Claude."
-  echo "   OK (version of 25 Sep 2026)"
+  v1=1
+  for f in "${FILES[@]}"; do [ "$(sum "$f")" = "${V1[$f]}" ] || v1=0; done
+  if [ "$v1" = 1 ]; then
+    echo "   OK (first HubSpot version of 26 Oct 2026, updating it)"
+  else
+    for f in "${!OLD[@]}"; do
+      [ "$(sum "$f")" = "${OLD[$f]}" ] || die "$f on the server is not the version this update was made for. Nothing changed. Send this message to Claude."
+    done
+    [ ! -e src/hubspot.js ] || die "src/hubspot.js already exists with other content. Nothing changed. Send this message to Claude."
+    echo "   OK (version of 25 Sep 2026)"
+  fi
 else
   echo "   The HubSpot update is already installed; only the token and restart are refreshed."
 fi

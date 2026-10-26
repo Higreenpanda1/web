@@ -29,7 +29,7 @@ function createEngine(cfg, opts = {}) {
   const chat = id => (store.chats[id] = store.chats[id] || { history: [], pausedUntil: 0, sent: [] });
   const hubspot = createHubSpot({
     chat, store, save, log, fetch: opts.hubspotFetch || globalThis.fetch, token: opts.hubspotToken,
-    idleMinutes: cfg.hubspotIdleMinutes, enabled: cfg.hubspot !== false,
+    idleMinutes: cfg.hubspotIdleMinutes, enabled: cfg.hubspot !== false, skipCold: !!cfg.hubspotSkipCold,
     detectServices: t => D.searchServices(t, 2).map(s => s.slug),
   });
   hubspot.resume();
