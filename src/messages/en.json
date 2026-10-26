@@ -415,7 +415,9 @@
       "tooFast": "We could not verify the form. Please try again.",
       "generic": "Could not send your application. Please try again, or message us on WhatsApp.",
       "fileTooBig": "This file is larger than 10 MB. Please send a smaller photo.",
-      "fileType": "Please upload a JPG, PNG or PDF file."
+      "fileType": "Please upload a JPG, PNG or PDF file.",
+      "tooManyFiles": "Upload at most 5 photos per product.",
+      "photoType": "Please upload a JPG, PNG or WebP photo."
     },
     "types": {
       "consultation": {
@@ -440,7 +442,7 @@
       },
       "product-search": {
         "title": "Find a product",
-        "lead": "Describe the product and the quantity. We come back with suppliers, prices and lead times.",
+        "lead": "Add one product or more, with photos, quantity, sizes and colours. We come back with suppliers, prices and lead times.",
         "cta": "Send a product request"
       },
       "shipping-quote": {
@@ -476,7 +478,8 @@
       "trip": "The trip",
       "visa": "The visa",
       "background": "Your situation",
-      "product": "The product",
+      "products": "Your products",
+      "delivery": "Delivery and timing",
       "cargo": "The cargo",
       "service": "The service",
       "account": "The account",
@@ -567,13 +570,15 @@
       "familyMemberHint": "Their relationship to you and their status in China (work permit, residence, citizen).",
       "productName": "Product",
       "productNameHint": "In English if possible, plus the Arabic name.",
+      "photos": "Product photos",
+      "photosHint": "Up to 5 photos: the product itself, a screenshot or a catalogue page.",
       "productLink": "Reference link",
       "productLinkHint": "A listing on Alibaba, Amazon or anywhere else that shows what you mean.",
-      "specs": "Specifications",
-      "specsHint": "Colour, size, material, certification, packaging — everything the factory will ask.",
+      "specs": "Other details",
+      "specsHint": "Material, certification, packaging, your logo on the product — everything the factory will ask.",
       "quantity": "Quantity",
       "targetPrice": "Target price per unit",
-      "targetPriceHint": "Optional, in any currency.",
+      "targetPriceHint": "Optional. If you have a price in mind, it helps us pick the right factory.",
       "destinationCountry": "Destination country",
       "timeline": "When do you need it?",
       "productType": "Type of goods",
@@ -638,7 +643,13 @@
       "medicalCertificate": "Medical examination certificate",
       "medicalCertificateHint": "Done at an approved clinic after entering China. Leave it empty if you have not done it yet. JPG, PNG or PDF, up to 10 MB.",
       "companyLicence": "Company business licence",
-      "companyLicenceHint": "A clear photo or scan of your Chinese company's business licence. JPG, PNG or PDF, up to 10 MB."
+      "companyLicenceHint": "A clear photo or scan of your Chinese company's business licence. JPG, PNG or PDF, up to 10 MB.",
+      "unit": "Unit",
+      "priceCurrency": "Currency",
+      "sizes": "Sizes",
+      "sizesHint": "For example S, M, L, or 30×40 cm. If the quantity differs by size, write it here.",
+      "colours": "Colours",
+      "coloursHint": "For example black and white, or a colour code. If the quantity differs by colour, write it here."
     },
     "options": {
       "common": {
@@ -806,6 +817,28 @@
       "duration": {
         "min30": "30 minutes — $135",
         "min60": "60 minutes — $225"
+      },
+      "unit": {
+        "pieces": "Pieces",
+        "sets": "Sets",
+        "pairs": "Pairs",
+        "cartons": "Cartons",
+        "metres": "Metres",
+        "kg": "Kilograms"
+      },
+      "priceCurrency": {
+        "usd": "US dollar",
+        "cny": "Chinese yuan",
+        "sar": "Saudi riyal",
+        "aed": "UAE dirham"
+      }
+    },
+    "repeat": {
+      "products": {
+        "item": "Product {n}",
+        "add": "Add another product",
+        "remove": "Remove this product",
+        "note": "You can add up to 10 products in one request."
       }
     }
   },

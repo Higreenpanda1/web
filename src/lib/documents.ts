@@ -89,27 +89,59 @@ export async function checkDocuments(
       if (field.required) errors[field.name] = 'required'
       continue
     }
-    if (value.size > MAX_DOCUMENT_BYTES) {
-      errors[field.name] = 'fileTooBig'
-      continue
-    }
-    const bytes = new Uint8Array(await value.arrayBuffer())
-    const mime = sniffMime(bytes)
-    const allowed = field.accept ?? Object.keys(EXTENSIONS)
-    if (!mime || !allowed.includes(mime)) {
-      errors[field.name] = 'fileType'
-      continue
-    }
-    documents.push({
-      field: field.name,
-      extension: EXTENSIONS[mime],
-      mime,
-      bytes,
-      originalName: value.name.slice(0, 200),
-    })
+    const checked = await checkFile(field, value, field.name)
+    if (typeof checked === 'string') errors[field.name] = checked
+    else documents.push(checked)
   }
 
   return Object.keys(errors).length > 0 ? { ok: false, errors } : { ok: true, documents }
+}
+
+/**
+ * Reads a `file` field that takes several files, such as the photos of one
+ * product. The files are named `<stem>1`, `<stem>2`... in the order chosen.
+ * One error for the whole set, under the form name; null when all is well.
+ */
+export async function checkFileSet(
+  field: FieldDef,
+  values: readonly unknown[],
+  stem: string,
+): Promise<{ documents: CheckedDocument[]; error: string | null }> {
+  const given = values.filter(
+    (value): value is UploadedFile => isUploadedFile(value) && value.size > 0,
+  )
+  if (given.length === 0) return { documents: [], error: field.required ? 'required' : null }
+  if (given.length > (field.multiple ?? 1)) return { documents: [], error: 'tooManyFiles' }
+
+  const documents: CheckedDocument[] = []
+  for (const [index, value] of given.entries()) {
+    const checked = await checkFile(field, value, `${stem}${index + 1}`)
+    if (typeof checked === 'string') return { documents: [], error: checked }
+    documents.push(checked)
+  }
+  return { documents, error: null }
+}
+
+/** One file, checked by its size and its first bytes. A string is an error key. */
+async function checkFile(
+  field: FieldDef,
+  value: UploadedFile,
+  name: string,
+): Promise<CheckedDocument | string> {
+  if (value.size > MAX_DOCUMENT_BYTES) return 'fileTooBig'
+  const bytes = new Uint8Array(await value.arrayBuffer())
+  const mime = sniffMime(bytes)
+  const allowed = field.accept ?? Object.keys(EXTENSIONS)
+  if (!mime || !allowed.includes(mime)) {
+    return field.multiple ? 'photoType' : 'fileType'
+  }
+  return {
+    field: name,
+    extension: EXTENSIONS[mime],
+    mime,
+    bytes,
+    originalName: value.name.slice(0, 200),
+  }
 }
 
 export function documentFileName(reference: string, doc: CheckedDocument): string {
