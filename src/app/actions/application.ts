@@ -4,9 +4,15 @@ import { randomBytes } from 'node:crypto'
 import { headers } from 'next/headers'
 import { getTranslations } from 'next-intl/server'
 
-import { FORMS, allFields } from '@/forms/definitions'
-import { isVisible, reader, validateApplication } from '@/forms/schema'
-import { checkDocuments, documentFileName, formatSize } from '@/lib/documents'
+import { FORMS, itemFieldName, singleFields } from '@/forms/definitions'
+import { isVisible, itemKeys, reader, validateApplication } from '@/forms/schema'
+import {
+  checkDocuments,
+  checkFileSet,
+  documentFileName,
+  formatSize,
+  type CheckedDocument,
+} from '@/lib/documents'
 import { storeDocuments } from '@/lib/documents-store'
 import {
   sendApplicationConfirmation,
@@ -19,6 +25,7 @@ import { checkFormGuard } from '@/lib/form-guard'
 import { getPayloadClient } from '@/lib/payload'
 import { consume, networkPrefix } from '@/lib/rate-limit'
 
+import type { FieldDef, FormDef } from '@/forms/definitions'
 import type { Locale } from '@/i18n/routing'
 
 /**
@@ -64,17 +71,23 @@ export async function submitApplication(
   // Files are checked even when the text has errors, so the visitor hears
   // about a missing passport in the same round trip, not the next one.
   const files = await checkDocuments(
-    allFields(def),
+    singleFields(def),
     (name) => formData.get(name),
     (field) => isVisible(field, read),
   )
-  if (!result.ok || !files.ok) {
+  const itemFiles = await checkItemFiles(def, read, formData)
+  if (!result.ok || !files.ok || Object.keys(itemFiles.errors).length > 0) {
     return {
       status: 'error',
       errorKey: 'stepIncomplete',
-      fieldErrors: { ...(result.ok ? {} : result.errors), ...(files.ok ? {} : files.errors) },
+      fieldErrors: {
+        ...(result.ok ? {} : result.errors),
+        ...(files.ok ? {} : files.errors),
+        ...itemFiles.errors,
+      },
     }
   }
+  const documents = [...files.documents, ...itemFiles.sets.flatMap((set) => set.documents)]
 
   const { name, country, whatsapp, email, ...details } = result.details as Record<
     string,
@@ -91,12 +104,17 @@ export async function submitApplication(
 
   // The documents are written before the row so the row can say where they
   // are; storeDocuments never throws, and the email carries them regardless.
-  const stored = await storeDocuments(reference, files.documents)
-  for (const doc of files.documents) {
-    const kept = stored.find((item) => item.field === doc.field)
-    details[doc.field] =
-      `${documentFileName(reference, doc)} (${formatSize(doc.bytes.byteLength)})` +
-      (kept ? '' : ' — not saved on the server, see the email')
+  const stored = await storeDocuments(reference, documents)
+  const describe = (doc: CheckedDocument) =>
+    `${documentFileName(reference, doc)} (${formatSize(doc.bytes.byteLength)})` +
+    (stored.some((item) => item.field === doc.field)
+      ? ''
+      : ' — not saved on the server, see the email')
+  for (const doc of files.documents) details[doc.field] = describe(doc)
+  for (const set of itemFiles.sets) {
+    const items = details[set.repeat] as Record<string, unknown>[] | undefined
+    const item = items?.[set.position]
+    if (item) item[set.field] = set.documents.map(describe)
   }
 
   try {
@@ -131,7 +149,7 @@ export async function submitApplication(
         : null
     const label = await typeLabel(type)
     const rows = await describeDetails(type, details)
-    const attachments = files.documents.map((doc) => ({
+    const attachments = documents.map((doc) => ({
       filename: documentFileName(reference, doc),
       mime: doc.mime,
       content: doc.bytes,
@@ -188,6 +206,46 @@ export async function submitApplication(
   }
 }
 
+type FileSet = {
+  repeat: string
+  position: number
+  field: string
+  documents: CheckedDocument[]
+}
+
+/**
+ * The files of each item of a repeated step, such as each product's photos.
+ * Error keys are the item's form names, like the text errors.
+ */
+async function checkItemFiles(
+  def: FormDef,
+  read: ReturnType<typeof reader>,
+  formData: FormData,
+): Promise<{ sets: FileSet[]; errors: Record<string, string> }> {
+  const sets: FileSet[] = []
+  const errors: Record<string, string> = {}
+  for (const step of def.steps) {
+    const repeat = step.repeat
+    if (!repeat) continue
+    for (const [position, key] of itemKeys(repeat, read).entries()) {
+      for (const field of step.fields) {
+        if (field.kind !== 'file') continue
+        const name = itemFieldName(repeat, key, field.name)
+        const { documents, error } = await checkFileSet(
+          field,
+          formData.getAll(name),
+          `${repeat.item}${position + 1}-${field.name}-`,
+        )
+        if (error) errors[name] = error
+        else if (documents.length > 0) {
+          sets.push({ repeat: repeat.name, position, field: field.name, documents })
+        }
+      }
+    }
+  }
+  return { sets, errors }
+}
+
 /**
  * The answers as label/value pairs for the notification email, in English:
  * the team reads Arabic and Chinese, but the email is also what gets
@@ -201,25 +259,42 @@ async function describeDetails(
   const t = await getTranslations({ locale: 'en', namespace: 'apply' })
   const rows: NotificationRow[] = []
 
-  for (const field of allFields(FORMS[type])) {
-    if ((CONTACT_FIELDS as readonly string[]).includes(field.name)) continue
-    const value = details[field.name]
-    if (value === undefined || value === null || value === '') continue
+  const describe = (
+    fields: readonly FieldDef[],
+    answers: Record<string, unknown>,
+    prefix: string,
+  ) => {
+    for (const field of fields) {
+      if ((CONTACT_FIELDS as readonly string[]).includes(field.name)) continue
+      const value = answers[field.name]
+      if (value === undefined || value === null || value === '') continue
 
-    const option = (code: string) =>
-      t.has(`options.${field.name}.${code}`)
-        ? t(`options.${field.name}.${code}`)
-        : t.has(`options.common.${code}`)
-          ? t(`options.common.${code}`)
-          : code
+      const option = (code: string) =>
+        t.has(`options.${field.name}.${code}`)
+          ? t(`options.${field.name}.${code}`)
+          : t.has(`options.common.${code}`)
+            ? t(`options.common.${code}`)
+            : code
 
-    const rendered = Array.isArray(value)
-      ? value.map((v) => option(String(v))).join(', ')
-      : field.kind === 'select'
-        ? option(String(value))
-        : String(value)
+      const rendered = Array.isArray(value)
+        ? value.map((v) => (field.kind === 'file' ? String(v) : option(String(v)))).join(', ')
+        : field.kind === 'select'
+          ? option(String(value))
+          : String(value)
 
-    rows.push({ label: t(`fields.${field.name}`), value: rendered })
+      rows.push({ label: prefix + t(`fields.${field.name}`), value: rendered })
+    }
+  }
+
+  describe(singleFields(FORMS[type]), details, '')
+  // One block of rows per item: "Product 2 · Quantity".
+  for (const step of FORMS[type].steps) {
+    const repeat = step.repeat
+    if (!repeat || !Array.isArray(details[repeat.name])) continue
+    for (const [index, item] of (details[repeat.name] as Record<string, unknown>[]).entries()) {
+      const label = t(`repeat.${repeat.name}.item` as 'repeat.products.item', { n: index + 1 })
+      describe(step.fields, item, `${label} · `)
+    }
   }
   return rows
 }

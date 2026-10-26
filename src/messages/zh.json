@@ -415,7 +415,9 @@
       "tooFast": "无法验证表单，请重试。",
       "generic": "申请发送失败。请重试，或通过 WhatsApp 联系我们。",
       "fileTooBig": "文件超过 10 MB，请发送较小的照片。",
-      "fileType": "请上传 JPG、PNG 或 PDF 文件。"
+      "fileType": "请上传 JPG、PNG 或 PDF 文件。",
+      "tooManyFiles": "每个产品最多上传 5 张图片。",
+      "photoType": "请上传 JPG、PNG 或 WebP 格式的图片。"
     },
     "types": {
       "consultation": {
@@ -440,7 +442,7 @@
       },
       "product-search": {
         "title": "寻找产品",
-        "lead": "描述产品和数量。我们会为您提供供应商、价格和交期。",
+        "lead": "添加一个或多个产品，附上图片、数量、尺码和颜色。我们会回复供应商、价格和交期。",
         "cta": "发送产品需求"
       },
       "shipping-quote": {
@@ -476,7 +478,8 @@
       "trip": "行程",
       "visa": "签证",
       "background": "您的情况",
-      "product": "产品",
+      "products": "您的产品",
+      "delivery": "交付与时间",
       "cargo": "货物",
       "service": "服务",
       "account": "账户",
@@ -567,13 +570,15 @@
       "familyMemberHint": "与您的关系及其在中国的身份（工作许可、居留、公民）。",
       "productName": "产品",
       "productNameHint": "尽量使用英文，并附上阿拉伯语名称。",
+      "photos": "产品图片",
+      "photosHint": "最多 5 张：产品本身、截图或产品目录页。",
       "productLink": "参考链接",
       "productLinkHint": "阿里巴巴、亚马逊或其他平台上能说明您需求的商品链接。",
-      "specs": "规格",
-      "specsHint": "颜色、尺寸、材质、认证、包装——工厂会问到的所有信息。",
+      "specs": "其他细节",
+      "specsHint": "材质、认证、包装、产品上的标志——工厂会问到的一切。",
       "quantity": "数量",
       "targetPrice": "目标单价",
-      "targetPriceHint": "选填，任何币种均可。",
+      "targetPriceHint": "选填。如果您心里有价格，可以帮助我们挑选合适的工厂。",
       "destinationCountry": "目的国",
       "timeline": "您什么时候需要？",
       "productType": "货物类型",
@@ -638,7 +643,15 @@
       "medicalCertificate": "体检证明",
       "medicalCertificateHint": "入境中国后在指定机构完成。如尚未体检，请留空。JPG、PNG 或 PDF，最大 10 MB。",
       "companyLicence": "公司营业执照",
-      "companyLicenceHint": "您的中国公司营业执照的清晰照片或扫描件。JPG、PNG 或 PDF，最大 10 MB。"
+      "companyLicenceHint": "您的中国公司营业执照的清晰照片或扫描件。JPG、PNG 或 PDF，最大 10 MB。",
+      "unit": "单位",
+      "priceCurrency": "货币",
+      "sizes": "尺码",
+      "sizesHint": "例如 S、M、L，或 30×40 厘米。如果各尺码数量不同，请写在这里。",
+      "colours": "颜色",
+      "coloursHint": "例如黑色和白色，或色号。如果各颜色数量不同，请写在这里。",
+      "companyNameHint": "如果您将从公司账户付款，请按银行登记的名称填写。",
+      "companyAddress": "公司地址"
     },
     "options": {
       "common": {
@@ -806,6 +819,28 @@
       "duration": {
         "min30": "30 分钟 — $135",
         "min60": "60 分钟 — $225"
+      },
+      "unit": {
+        "pieces": "件",
+        "sets": "套",
+        "pairs": "双",
+        "cartons": "箱",
+        "metres": "米",
+        "kg": "千克"
+      },
+      "priceCurrency": {
+        "usd": "美元",
+        "cny": "人民币",
+        "sar": "沙特里亚尔",
+        "aed": "阿联酋迪拉姆"
+      }
+    },
+    "repeat": {
+      "products": {
+        "item": "产品 {n}",
+        "add": "添加另一个产品",
+        "remove": "删除此产品",
+        "note": "一次申请最多可添加 10 个产品。"
       }
     }
   },

@@ -11,15 +11,23 @@ const contact = {
   email: 'Sami@Example.com',
 }
 
-test('a complete product search passes and is normalised', () => {
+test('a complete product request passes and is normalised', () => {
   const result = validateApplication(
     FORMS['product-search'],
     reader({
       ...contact,
-      productName: 'LED desk lamp',
-      productLink: 'alibaba.com/product/123',
-      specs: 'White, 12W, CE certified',
-      quantity: '1,500',
+      'products.index': ['0', '3'],
+      'products.0.productName': 'LED desk lamp',
+      'products.0.productLink': 'alibaba.com/product/123',
+      'products.0.quantity': '1,500',
+      'products.0.unit': 'pieces',
+      'products.0.targetPrice': '4.5',
+      'products.0.priceCurrency': 'usd',
+      'products.0.colours': 'White, black',
+      'products.3.productName': 'Lamp shade',
+      'products.3.quantity': '200',
+      'products.3.unit': 'sets',
+      'products.3.sizes': '30×40 cm',
       destinationCountry: 'Saudi Arabia',
       timeline: 'asap',
     }),
@@ -27,20 +35,62 @@ test('a complete product search passes and is normalised', () => {
   assert.ok(result.ok)
   assert.equal(result.details.whatsapp, '+966501234567')
   assert.equal(result.details.email, 'sami@example.com')
-  assert.equal(result.details.quantity, 1500)
-  assert.equal(result.details.productLink, 'https://alibaba.com/product/123')
+  assert.equal(result.details.destinationCountry, 'Saudi Arabia')
+  assert.deepEqual(result.details.products, [
+    {
+      productName: 'LED desk lamp',
+      productLink: 'https://alibaba.com/product/123',
+      quantity: 1500,
+      unit: 'pieces',
+      targetPrice: 4.5,
+      priceCurrency: 'usd',
+      colours: 'White, black',
+    },
+    { productName: 'Lamp shade', quantity: 200, unit: 'sets', sizes: '30×40 cm' },
+  ])
   assert.equal('notes' in result.details, false)
+  assert.equal(FORMS['product-search'].headline(result.details), 'LED desk lamp × 1500 +1')
 })
 
 test('missing required fields are reported by name, with catalogue keys', () => {
-  const result = validateApplication(FORMS['product-search'], reader({ name: 'x' }))
+  const result = validateApplication(
+    FORMS['product-search'],
+    reader({ name: 'x', 'products.index': '7' }),
+  )
   assert.ok(!result.ok)
   assert.equal(result.errors.country, 'required')
   assert.equal(result.errors.whatsapp, 'required')
-  assert.equal(result.errors.productName, 'required')
-  assert.equal(result.errors.quantity, 'required')
+  assert.equal(result.errors['products.7.productName'], 'required')
+  assert.equal(result.errors['products.7.quantity'], 'required')
   // Required since the client is sent a written confirmation.
   assert.equal(result.errors.email, 'required')
+})
+
+test('a product request needs at least one product, and takes at most ten', () => {
+  const none = validateApplication(FORMS['product-search'], reader({ ...contact }))
+  assert.ok(!none.ok)
+  assert.equal(none.errors.products, 'required')
+
+  const keys = Array.from({ length: 14 }, (_, i) => String(i))
+  const items = Object.fromEntries(
+    keys.flatMap((k) => [
+      [`products.${k}.productName`, `Item ${k}`],
+      [`products.${k}.quantity`, '1'],
+      [`products.${k}.unit`, 'pieces'],
+    ]),
+  )
+  const many = validateApplication(
+    FORMS['product-search'],
+    reader({
+      ...contact,
+      ...items,
+      'products.index': [...keys, '0', '../x'],
+      destinationCountry: 'Oman',
+      timeline: 'exploring',
+    }),
+  )
+  assert.ok(many.ok)
+  assert.equal((many.details.products as unknown[]).length, 10)
 })
 
 test('a select only accepts its own options', () => {
@@ -186,9 +236,10 @@ test('the WhatsApp code box is joined to the number', () => {
       ...contact,
       whatsapp: '0771234567',
       whatsappCode: 'YE',
-      productName: 'Lamp',
-      specs: 'White',
-      quantity: '10',
+      'products.index': '0',
+      'products.0.productName': 'Lamp',
+      'products.0.quantity': '10',
+      'products.0.unit': 'pieces',
       destinationCountry: 'Yemen',
       timeline: 'asap',
     }),

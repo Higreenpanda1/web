@@ -1,19 +1,19 @@
 'use client'
 
-import { ArrowLeft, ArrowRight, Check, CheckCircle2 } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, CheckCircle2, Plus, Trash2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useActionState, useEffect, useId, useRef, useState } from 'react'
 
 import { submitApplication, type ApplicationState } from '@/app/actions/application'
 import { Button, ButtonLink } from '@/components/ui/Button'
-import { FORMS } from '@/forms/definitions'
+import { FORMS, itemFieldName } from '@/forms/definitions'
 import { cn } from '@/lib/cn'
 import { HONEYPOT_FIELD, TIMESTAMP_FIELD } from '@/lib/form-fields'
 import { CountrySelect } from './CountrySelect'
 import { PhoneInput } from './PhoneInput'
 import { FieldError, FormAlert, Hint, inputClass, Label, SubmitButton } from './fields'
 
-import type { FieldDef, StepDef } from '@/forms/definitions'
+import type { FieldDef, RepeatDef, StepDef } from '@/forms/definitions'
 import type { Locale } from '@/i18n/routing'
 import type { ApplicationType } from '@/lib/catalogue'
 
@@ -32,6 +32,10 @@ const initialState: ApplicationState = { status: 'idle' }
  *
  * Conditional fields (`showIf`) are disabled while hidden, which keeps them
  * out of both validation and the submitted data.
+ *
+ * A repeated step (`repeat`, the products of a product request) shows one
+ * card per item with add and remove buttons. Without JavaScript it shows the
+ * first item only, which is still a complete request.
  */
 export function ApplicationForm({
   locale,
@@ -72,7 +76,11 @@ export function ApplicationForm({
   const fieldErrors = state.status === 'error' ? (state.fieldErrors ?? {}) : {}
   useEffect(() => {
     if (state.status !== 'error') return
-    const index = def.steps.findIndex((s) => s.fields.some((f) => fieldErrors[f.name]))
+    const index = def.steps.findIndex((s) =>
+      s.repeat
+        ? Object.keys(fieldErrors).some((key) => key.startsWith(`${s.repeat?.name}.`))
+        : s.fields.some((f) => fieldErrors[f.name]),
+    )
     if (index >= 0) setStep(index)
     formRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' })
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -200,37 +208,49 @@ export function ApplicationForm({
             )}
             {t(`steps.${stepDef.key}`)}
           </legend>
-          <div className="grid gap-5 sm:grid-cols-2">
-            {stepDef.fields.map((field) => {
-              const visible = isVisible(field)
-              return (
-                <div
-                  key={field.name}
-                  hidden={!visible}
-                  className={cn(field.width !== 'half' && 'sm:col-span-2')}
-                >
-                  <FieldControl
-                    field={field}
-                    id={fieldId(field.name)}
-                    locale={locale}
-                    defaultValue={defaults[field.name]}
-                    disabled={!visible}
-                    error={
-                      fieldErrors[field.name]
-                        ? t(`errors.${fieldErrors[field.name]}` as 'errors.generic')
-                        : undefined
-                    }
-                    onControlChange={
-                      controllers.has(field.name)
-                        ? (value) => setControls((c) => ({ ...c, [field.name]: value }))
-                        : undefined
-                    }
-                    t={t}
-                  />
-                </div>
-              )
-            })}
-          </div>
+          {stepDef.repeat ? (
+            <RepeatedItems
+              repeat={stepDef.repeat}
+              fields={stepDef.fields}
+              enhanced={enhanced}
+              fieldId={fieldId}
+              locale={locale}
+              fieldErrors={fieldErrors}
+              t={t}
+            />
+          ) : (
+            <div className="grid gap-5 sm:grid-cols-2">
+              {stepDef.fields.map((field) => {
+                const visible = isVisible(field)
+                return (
+                  <div
+                    key={field.name}
+                    hidden={!visible}
+                    className={cn(field.width !== 'half' && 'sm:col-span-2')}
+                  >
+                    <FieldControl
+                      field={field}
+                      id={fieldId(field.name)}
+                      locale={locale}
+                      defaultValue={defaults[field.name]}
+                      disabled={!visible}
+                      error={
+                        fieldErrors[field.name]
+                          ? t(`errors.${fieldErrors[field.name]}` as 'errors.generic')
+                          : undefined
+                      }
+                      onControlChange={
+                        controllers.has(field.name)
+                          ? (value) => setControls((c) => ({ ...c, [field.name]: value }))
+                          : undefined
+                      }
+                      t={t}
+                    />
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </fieldset>
       ))}
 
@@ -264,6 +284,111 @@ export function ApplicationForm({
 
 type T = ReturnType<typeof useTranslations<'apply'>>
 
+/**
+ * The items of a repeated step. Each item has a key that never changes while
+ * the page is open, so removing product 2 of 3 does not shift the answers of
+ * product 3 into its place; the server reads the keys in page order.
+ */
+function RepeatedItems({
+  repeat,
+  fields,
+  enhanced,
+  fieldId,
+  locale,
+  fieldErrors,
+  t,
+}: {
+  repeat: RepeatDef
+  fields: readonly FieldDef[]
+  enhanced: boolean
+  fieldId: (name: string) => string
+  locale: Locale
+  fieldErrors: Record<string, string>
+  t: T
+}) {
+  const [keys, setKeys] = useState<number[]>([0])
+  const nextKey = useRef(1)
+  const listRef = useRef<HTMLOListElement>(null)
+  const text = (key: 'item' | 'add' | 'remove' | 'note', values?: { n: number }) =>
+    t(`repeat.${repeat.name}.${key}` as 'repeat.products.item', values ?? { n: 0 })
+
+  const add = () => {
+    const key = nextKey.current++
+    setKeys((current) => [...current, key])
+    // Land on the new item's first field, as a visitor expects after "add".
+    requestAnimationFrame(() => {
+      listRef.current?.querySelector<HTMLElement>(`[data-item="${key}"] input`)?.focus()
+    })
+  }
+
+  return (
+    <div className="space-y-5">
+      <ol ref={listRef} className="m-0 list-none space-y-5 p-0">
+        {keys.map((key, position) => {
+          const title = text('item', { n: position + 1 })
+          return (
+            <li
+              key={key}
+              data-item={key}
+              className="rounded-[var(--radius-lg)] border border-[var(--border-soft)] bg-[var(--surface)] p-4 sm:p-6"
+            >
+              <input type="hidden" name={`${repeat.name}.index`} value={key} />
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <h3 className="ltr-nums text-body font-semibold text-[var(--heading)]">{title}</h3>
+                {enhanced && keys.length > 1 ? (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    aria-label={`${text('remove')} (${title})`}
+                    onClick={() => setKeys((current) => current.filter((k) => k !== key))}
+                  >
+                    <Trash2 size={16} strokeWidth={1.75} aria-hidden="true" />
+                    {text('remove')}
+                  </Button>
+                ) : null}
+              </div>
+              <div className="grid gap-5 sm:grid-cols-2">
+                {fields.map((field) => {
+                  const name = itemFieldName(repeat, String(key), field.name)
+                  const error = fieldErrors[name]
+                  return (
+                    <div key={field.name} className={cn(field.width !== 'half' && 'sm:col-span-2')}>
+                      <FieldControl
+                        field={field}
+                        name={name}
+                        id={fieldId(name)}
+                        locale={locale}
+                        disabled={false}
+                        error={error ? t(`errors.${error}` as 'errors.generic') : undefined}
+                        t={t}
+                      />
+                    </div>
+                  )
+                })}
+              </div>
+            </li>
+          )
+        })}
+      </ol>
+      {enhanced ? (
+        <div className="flex flex-wrap items-center gap-3">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={add}
+            disabled={keys.length >= repeat.max}
+          >
+            <Plus size={18} strokeWidth={2} aria-hidden="true" />
+            {text('add')}
+          </Button>
+          <p className="text-caption text-[var(--text-muted)]">{text('note')}</p>
+        </div>
+      ) : null}
+    </div>
+  )
+}
+
 function Progress({ steps, current, t }: { steps: readonly StepDef[]; current: number; t: T }) {
   return (
     <div>
@@ -291,6 +416,7 @@ function Progress({ steps, current, t }: { steps: readonly StepDef[]; current: n
 
 function FieldControl({
   field,
+  name,
   id,
   locale,
   defaultValue,
@@ -300,6 +426,8 @@ function FieldControl({
   t,
 }: {
   field: FieldDef
+  /** The posted name, when it is not the field's own (a repeated item's). */
+  name?: string
   id: string
   locale: Locale
   defaultValue?: string | string[]
@@ -315,7 +443,7 @@ function FieldControl({
     [field.hint ? hintId : null, error ? errorId : null].filter(Boolean).join(' ') || undefined
   const common = {
     id,
-    name: field.name,
+    name: name ?? field.name,
     required: field.required,
     disabled,
     'aria-describedby': describedBy,
@@ -336,7 +464,7 @@ function FieldControl({
       control = (
         <select
           {...common}
-          defaultValue={typeof defaultValue === 'string' ? defaultValue : ''}
+          defaultValue={typeof defaultValue === 'string' ? defaultValue : (field.initial ?? '')}
           onChange={onControlChange ? (e) => onControlChange(e.target.value) : undefined}
         >
           <option value="" disabled={field.required}>
@@ -394,7 +522,17 @@ function FieldControl({
           {...common}
           type="file"
           accept={field.accept?.join(',')}
-          onChange={(event) => void shrinkPhoto(event.currentTarget)}
+          multiple={field.multiple ? true : undefined}
+          onChange={(event) => {
+            const input = event.currentTarget
+            // Too many photos is told at once, not after the upload.
+            input.setCustomValidity(
+              field.multiple && (input.files?.length ?? 0) > field.multiple
+                ? t('errors.tooManyFiles')
+                : '',
+            )
+            void shrinkPhotos(input)
+          }}
           className={cn(
             inputClass(Boolean(error)),
             'cursor-pointer file:me-3 file:rounded-full file:border-0 file:bg-[var(--surface-tint)] file:px-4 file:py-2 file:font-semibold file:text-[var(--text-brand)]',
@@ -502,11 +640,20 @@ function FieldControl({
 const SHRINK_ABOVE_BYTES = 1.5 * 1024 * 1024
 const MAX_EDGE = 2400
 
-async function shrinkPhoto(input: HTMLInputElement) {
-  const file = input.files?.[0]
-  if (!file || !/^image\/(jpeg|png|webp)$/.test(file.type) || file.size <= SHRINK_ABOVE_BYTES) {
-    return
-  }
+async function shrinkPhotos(input: HTMLInputElement) {
+  const files = Array.from(input.files ?? [])
+  if (!files.some(needsShrinking)) return
+  const transfer = new DataTransfer()
+  for (const file of files) transfer.items.add(await shrinkPhoto(file))
+  input.files = transfer.files
+}
+
+function needsShrinking(file: File): boolean {
+  return /^image\/(jpeg|png|webp)$/.test(file.type) && file.size > SHRINK_ABOVE_BYTES
+}
+
+async function shrinkPhoto(file: File): Promise<File> {
+  if (!needsShrinking(file)) return file
   try {
     const bitmap = await createImageBitmap(file)
     const scale = Math.min(1, MAX_EDGE / Math.max(bitmap.width, bitmap.height))
@@ -514,7 +661,7 @@ async function shrinkPhoto(input: HTMLInputElement) {
     canvas.width = Math.round(bitmap.width * scale)
     canvas.height = Math.round(bitmap.height * scale)
     const context = canvas.getContext('2d')
-    if (!context) return
+    if (!context) return file
     context.fillStyle = '#fff'
     context.fillRect(0, 0, canvas.width, canvas.height)
     context.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
@@ -522,15 +669,11 @@ async function shrinkPhoto(input: HTMLInputElement) {
     const blob = await new Promise<Blob | null>((resolve) =>
       canvas.toBlob(resolve, 'image/jpeg', 0.85),
     )
-    if (!blob || blob.size >= file.size) return
-    const smaller = new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', {
-      type: 'image/jpeg',
-    })
-    const transfer = new DataTransfer()
-    transfer.items.add(smaller)
-    input.files = transfer.files
+    if (!blob || blob.size >= file.size) return file
+    return new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' })
   } catch {
     // Older browsers: send the original; the server enforces the limit.
+    return file
   }
 }
 

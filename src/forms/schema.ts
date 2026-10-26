@@ -1,5 +1,11 @@
 import { asciiDigits, codeFieldName, whatsappNumber } from '../lib/phone.ts'
-import { allFields, type FieldDef, type FormDef } from './definitions.ts'
+import {
+  itemFieldName,
+  singleFields,
+  type FieldDef,
+  type FormDef,
+  type RepeatDef,
+} from './definitions.ts'
 
 export { asciiDigits }
 
@@ -61,23 +67,70 @@ export function isVisible(field: FieldDef, read: Reader): boolean {
   return field.showIf.in.includes(controller)
 }
 
+/**
+ * The keys of a repeated step's items, in the order the visitor left them.
+ * Anything that is not a short number, a repeat, or beyond the limit is
+ * ignored, so a crafted request cannot add items or reach other fields.
+ */
+export function itemKeys(repeat: RepeatDef, read: Reader): string[] {
+  const keys = read
+    .getAll(`${repeat.name}.index`)
+    .map((key) => key.trim())
+    .filter((key) => /^\d{1,3}$/.test(key))
+  return [...new Set(keys)].slice(0, repeat.max)
+}
+
+/** One item's answers, read as if they were a form of their own. */
+export function itemReader(read: Reader, repeat: RepeatDef, key: string): Reader {
+  return {
+    get: (name) => read.get(itemFieldName(repeat, key, name)),
+    getAll: (name) => read.getAll(itemFieldName(repeat, key, name)),
+  }
+}
+
 export function validateApplication(def: FormDef, source: Reader): ValidationResult {
   const details: Record<string, unknown> = {}
   const errors: Record<string, string> = {}
 
-  for (const field of allFields(def)) {
-    // A hidden field is neither required nor kept. The visitor never saw it.
-    if (!isVisible(field, source)) continue
-    // Files are not text; the action reads and checks them separately
-    // (src/lib/documents.ts) and adds the result to the details.
-    if (field.kind === 'file') continue
+  const answer = (
+    fields: readonly FieldDef[],
+    read: Reader,
+    into: Record<string, unknown>,
+    errorName: (name: string) => string,
+  ) => {
+    for (const field of fields) {
+      // A hidden field is neither required nor kept. The visitor never saw it.
+      if (!isVisible(field, read)) continue
+      // Files are not text; the action reads and checks them separately
+      // (src/lib/documents.ts) and adds the result to the details.
+      if (field.kind === 'file') continue
 
-    const outcome = checkField(field, source)
-    if (outcome.error) {
-      errors[field.name] = outcome.error
-    } else if (outcome.value !== undefined) {
-      details[field.name] = outcome.value
+      const outcome = checkField(field, read)
+      if (outcome.error) {
+        errors[errorName(field.name)] = outcome.error
+      } else if (outcome.value !== undefined) {
+        into[field.name] = outcome.value
+      }
     }
+  }
+
+  answer(singleFields(def), source, details, (name) => name)
+
+  for (const step of def.steps) {
+    const repeat = step.repeat
+    if (!repeat) continue
+    const keys = itemKeys(repeat, source)
+    if (keys.length === 0) {
+      errors[repeat.name] = 'required'
+      continue
+    }
+    details[repeat.name] = keys.map((key) => {
+      const item: Record<string, unknown> = {}
+      answer(step.fields, itemReader(source, repeat, key), item, (name) =>
+        itemFieldName(repeat, key, name),
+      )
+      return item
+    })
   }
 
   return Object.keys(errors).length > 0 ? { ok: false, errors } : { ok: true, details }

@@ -3,6 +3,7 @@ import { test } from 'node:test'
 
 import {
   checkDocuments,
+  checkFileSet,
   EMAIL_ATTACHMENT_BUDGET,
   MAX_DOCUMENT_BYTES,
   sniffMime,
@@ -74,6 +75,35 @@ test('good files come back with a safe extension', async () => {
       ['entryStamp', 'jpg', 'image/jpeg'],
     ],
   )
+})
+
+test('a product takes up to five photos, numbered in order, and nothing but photos', async () => {
+  const photos: FieldDef = {
+    name: 'photos',
+    kind: 'file',
+    accept: ['image/jpeg', 'image/png', 'image/webp'],
+    multiple: 5,
+  }
+  const empty = file(new Uint8Array(), '', 0)
+  assert.deepEqual(await checkFileSet(photos, [empty], 'product1-photos-'), {
+    documents: [],
+    error: null,
+  })
+
+  const two = await checkFileSet(photos, [file(JPEG), file(JPEG)], 'product2-photos-')
+  assert.equal(two.error, null)
+  assert.deepEqual(
+    two.documents.map((d) => d.field),
+    ['product2-photos-1', 'product2-photos-2'],
+  )
+
+  const six = await checkFileSet(
+    photos,
+    Array.from({ length: 6 }, () => file(JPEG)),
+    'p-',
+  )
+  assert.equal(six.error, 'tooManyFiles')
+  assert.equal((await checkFileSet(photos, [file(PDF, 'a.pdf')], 'p-')).error, 'photoType')
 })
 
 test('the email attaches files while they fit and names the rest', () => {
