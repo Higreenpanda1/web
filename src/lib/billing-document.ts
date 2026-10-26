@@ -240,15 +240,14 @@ export function renderBillingDocument(doc: BillingDocument): string {
         [L.dueDate, addDays(doc.date, INVOICE_DUE_DAYS)],
       ]
 
+  // Escaped before the empty lines drop out, so the WhatsApp markup stays put.
   const client = [
-    doc.client.name,
-    doc.client.company,
-    country(doc.client.country),
-    `WhatsApp <span dir="ltr">${escapeHtml(doc.client.whatsapp)}</span>`,
-    doc.client.email,
-  ]
-    .filter((line): line is string => Boolean(line))
-    .map((line, i) => (i === 3 ? line : escapeHtml(line)))
+    doc.client.name && escapeHtml(doc.client.name),
+    doc.client.company && escapeHtml(doc.client.company),
+    escapeHtml(country(doc.client.country)),
+    doc.client.whatsapp && `WhatsApp <span dir="ltr">${escapeHtml(doc.client.whatsapp)}</span>`,
+    doc.client.email && escapeHtml(doc.client.email),
+  ].filter((line): line is string => Boolean(line))
 
   const lineRows = doc.lines
     .map(
@@ -362,7 +361,7 @@ ${bank}
 const STYLE = `
   @page { size: A4; margin: 12mm; }
   * { box-sizing: border-box; }
-  body { font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", -apple-system, "Segoe UI", Arial, sans-serif;
+  body { font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", "Geeza Pro", "Noto Naskh Arabic", "Noto Sans Arabic", Tahoma, -apple-system, "Segoe UI", Arial, sans-serif;
     color: #17221a; background: #fff; margin: 0 auto; max-width: 820px; padding: 24px 16px; line-height: 1.45; font-size: 13px; }
   .zh { font-weight: 600; }
   .en { color: #4a5a4e; }
