@@ -4,21 +4,25 @@ import { randomBytes } from 'node:crypto'
 import { headers } from 'next/headers'
 import { getTranslations } from 'next-intl/server'
 
-import { FORMS, allFields } from '@/forms/definitions'
-import { isVisible, reader, validateApplication } from '@/forms/schema'
-import { checkDocuments, documentFileName, formatSize } from '@/lib/documents'
-import { storeDocuments } from '@/lib/documents-store'
+import { FORMS, itemFieldName, singleFields } from '@/forms/definitions'
+import { isVisible, itemKeys, reader, validateApplication } from '@/forms/schema'
 import {
-  sendApplicationConfirmation,
-  sendApplicationNotification,
-  type NotificationRow,
-} from '@/lib/email'
+  checkDocuments,
+  checkFileSet,
+  documentFileName,
+  formatSize,
+  type CheckedDocument,
+} from '@/lib/documents'
+import { storeDocuments } from '@/lib/documents-store'
+import { describeDetails, typeLabel } from '@/lib/application-rows'
+import { sendApplicationConfirmation, sendApplicationNotification } from '@/lib/email'
 import { syncApplicationToHubSpot } from '@/lib/hubspot'
 import { isApplicationType } from '@/lib/catalogue'
 import { checkFormGuard } from '@/lib/form-guard'
 import { getPayloadClient } from '@/lib/payload'
 import { consume, networkPrefix } from '@/lib/rate-limit'
 
+import type { FormDef } from '@/forms/definitions'
 import type { Locale } from '@/i18n/routing'
 
 /**
@@ -36,7 +40,6 @@ export type ApplicationState =
 
 const RATE_LIMIT = 5
 const RATE_WINDOW_MS = 10 * 60 * 1000
-const CONTACT_FIELDS = ['name', 'country', 'whatsapp', 'email'] as const
 
 export async function submitApplication(
   _previous: ApplicationState,
@@ -64,17 +67,23 @@ export async function submitApplication(
   // Files are checked even when the text has errors, so the visitor hears
   // about a missing passport in the same round trip, not the next one.
   const files = await checkDocuments(
-    allFields(def),
+    singleFields(def),
     (name) => formData.get(name),
     (field) => isVisible(field, read),
   )
-  if (!result.ok || !files.ok) {
+  const itemFiles = await checkItemFiles(def, read, formData)
+  if (!result.ok || !files.ok || Object.keys(itemFiles.errors).length > 0) {
     return {
       status: 'error',
       errorKey: 'stepIncomplete',
-      fieldErrors: { ...(result.ok ? {} : result.errors), ...(files.ok ? {} : files.errors) },
+      fieldErrors: {
+        ...(result.ok ? {} : result.errors),
+        ...(files.ok ? {} : files.errors),
+        ...itemFiles.errors,
+      },
     }
   }
+  const documents = [...files.documents, ...itemFiles.sets.flatMap((set) => set.documents)]
 
   const { name, country, whatsapp, email, ...details } = result.details as Record<
     string,
@@ -91,12 +100,17 @@ export async function submitApplication(
 
   // The documents are written before the row so the row can say where they
   // are; storeDocuments never throws, and the email carries them regardless.
-  const stored = await storeDocuments(reference, files.documents)
-  for (const doc of files.documents) {
-    const kept = stored.find((item) => item.field === doc.field)
-    details[doc.field] =
-      `${documentFileName(reference, doc)} (${formatSize(doc.bytes.byteLength)})` +
-      (kept ? '' : ' — not saved on the server, see the email')
+  const stored = await storeDocuments(reference, documents)
+  const describe = (doc: CheckedDocument) =>
+    `${documentFileName(reference, doc)} (${formatSize(doc.bytes.byteLength)})` +
+    (stored.some((item) => item.field === doc.field)
+      ? ''
+      : ' — not saved on the server, see the email')
+  for (const doc of files.documents) details[doc.field] = describe(doc)
+  for (const set of itemFiles.sets) {
+    const items = details[set.repeat] as Record<string, unknown>[] | undefined
+    const item = items?.[set.position]
+    if (item) item[set.field] = set.documents.map(describe)
   }
 
   try {
@@ -131,12 +145,13 @@ export async function submitApplication(
         : null
     const label = await typeLabel(type)
     const rows = await describeDetails(type, details)
-    const attachments = files.documents.map((doc) => ({
+    const attachments = documents.map((doc) => ({
       filename: documentFileName(reference, doc),
       mime: doc.mime,
       content: doc.bytes,
     }))
-    const [notified] = await Promise.all([
+    const sourcePath = headerList.get('x-pathname')
+    const [notified, synced] = await Promise.all([
       sendApplicationNotification({
         reference,
         typeLabel: label,
@@ -147,7 +162,7 @@ export async function submitApplication(
         serviceTitle,
         headline,
         locale,
-        sourcePath: headerList.get('x-pathname'),
+        sourcePath,
         rows,
         attachments,
       }),
@@ -162,6 +177,9 @@ export async function submitApplication(
           whatsapp,
           email: email || null,
           headline,
+          details,
+          sourcePath,
+          referrer: headerList.get('referer'),
           rows,
         },
         attachments,
@@ -169,12 +187,16 @@ export async function submitApplication(
       email ? sendConfirmation({ to: email, name, reference, type, locale }) : false,
     ])
 
-    if (notified) {
+    if (notified || synced) {
+      const now = new Date().toISOString()
       await payload
         .update({
           collection: 'applications',
           id: application.id,
-          data: { notifiedAt: new Date().toISOString() },
+          data: {
+            ...(notified ? { notifiedAt: now } : {}),
+            ...(synced ? { hubspotSyncedAt: now, hubspotDealId: synced.dealId } : {}),
+          },
         })
         .catch((error) => {
           console.error(`[application ${reference}] could not record notifiedAt`, error)
@@ -188,40 +210,44 @@ export async function submitApplication(
   }
 }
 
+type FileSet = {
+  repeat: string
+  position: number
+  field: string
+  documents: CheckedDocument[]
+}
+
 /**
- * The answers as label/value pairs for the notification email, in English:
- * the team reads Arabic and Chinese, but the email is also what gets
- * forwarded to a bank or a visa agent, and the option codes ("virtual-basic")
- * are meaningless to anyone.
+ * The files of each item of a repeated step, such as each product's photos.
+ * Error keys are the item's form names, like the text errors.
  */
-async function describeDetails(
-  type: keyof typeof FORMS,
-  details: Record<string, unknown>,
-): Promise<NotificationRow[]> {
-  const t = await getTranslations({ locale: 'en', namespace: 'apply' })
-  const rows: NotificationRow[] = []
-
-  for (const field of allFields(FORMS[type])) {
-    if ((CONTACT_FIELDS as readonly string[]).includes(field.name)) continue
-    const value = details[field.name]
-    if (value === undefined || value === null || value === '') continue
-
-    const option = (code: string) =>
-      t.has(`options.${field.name}.${code}`)
-        ? t(`options.${field.name}.${code}`)
-        : t.has(`options.common.${code}`)
-          ? t(`options.common.${code}`)
-          : code
-
-    const rendered = Array.isArray(value)
-      ? value.map((v) => option(String(v))).join(', ')
-      : field.kind === 'select'
-        ? option(String(value))
-        : String(value)
-
-    rows.push({ label: t(`fields.${field.name}`), value: rendered })
+async function checkItemFiles(
+  def: FormDef,
+  read: ReturnType<typeof reader>,
+  formData: FormData,
+): Promise<{ sets: FileSet[]; errors: Record<string, string> }> {
+  const sets: FileSet[] = []
+  const errors: Record<string, string> = {}
+  for (const step of def.steps) {
+    const repeat = step.repeat
+    if (!repeat) continue
+    for (const [position, key] of itemKeys(repeat, read).entries()) {
+      for (const field of step.fields) {
+        if (field.kind !== 'file') continue
+        const name = itemFieldName(repeat, key, field.name)
+        const { documents, error } = await checkFileSet(
+          field,
+          formData.getAll(name),
+          `${repeat.item}${position + 1}-${field.name}-`,
+        )
+        if (error) errors[name] = error
+        else if (documents.length > 0) {
+          sets.push({ repeat: repeat.name, position, field: field.name, documents })
+        }
+      }
+    }
   }
-  return rows
+  return { sets, errors }
 }
 
 /** The client's confirmation, in the language they filled the form in. */
@@ -252,11 +278,6 @@ async function sendConfirmation(args: {
       signoff: t('signoff', values),
     },
   })
-}
-
-async function typeLabel(type: keyof typeof FORMS): Promise<string> {
-  const t = await getTranslations({ locale: 'en', namespace: 'apply' })
-  return t(`types.${type}.title`)
 }
 
 /** Same shape as an enquiry reference, different prefix, so the two are never confused. */

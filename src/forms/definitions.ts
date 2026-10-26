@@ -65,9 +65,29 @@ export type FieldDef = {
    * a private folder — see src/lib/documents.ts.
    */
   accept?: readonly string[]
+  /**
+   * For `file` fields: how many files the one input takes. Without it the
+   * input takes a single file.
+   */
+  multiple?: number
+  /** For `select` fields: the option chosen before the visitor touches it. */
+  initial?: string
 }
 
-export type StepDef = { key: string; fields: readonly FieldDef[] }
+/**
+ * A step whose fields describe one item of a list the visitor can grow — the
+ * products of one product request. In the form each item's fields are posted
+ * as `<name>.<key>.<field>` plus one `<name>.index` entry per item, in order;
+ * in `details` the items become an array of objects under `<name>`.
+ */
+export type RepeatDef = {
+  name: string
+  max: number
+  /** Names an item's uploaded files: `<reference>-<item><n>-<field>-<k>.jpg`. */
+  item: string
+}
+
+export type StepDef = { key: string; fields: readonly FieldDef[]; repeat?: RepeatDef }
 
 export type FormDef = {
   type: ApplicationType
@@ -576,11 +596,21 @@ export const FORMS: Record<ApplicationType, FormDef> = {
     steps: [
       CONTACT_STEP,
       {
-        key: 'product',
+        // Until October 2026 this was one product per request, with its
+        // answers at the top level of `details` (productName, quantity...).
+        // Rows from then still look like that; newer ones carry `products`.
+        key: 'products',
+        repeat: { name: 'products', max: 10, item: 'product' },
         fields: [
           { name: 'productName', kind: 'text', required: true, hint: true, max: 160 },
+          {
+            name: 'photos',
+            kind: 'file',
+            hint: true,
+            accept: PHOTO_TYPES,
+            multiple: 5,
+          },
           { name: 'productLink', kind: 'url', hint: true, max: 500 },
-          { name: 'specs', kind: 'textarea', required: true, rows: 4, hint: true, max: 3000 },
           {
             name: 'quantity',
             kind: 'number',
@@ -589,7 +619,40 @@ export const FORMS: Record<ApplicationType, FormDef> = {
             min: 1,
             max: 10_000_000,
           },
-          { name: 'targetPrice', kind: 'text', width: 'half', hint: true, max: 80 },
+          {
+            name: 'unit',
+            kind: 'select',
+            required: true,
+            width: 'half',
+            options: ['pieces', 'sets', 'pairs', 'cartons', 'metres', 'kg'],
+            initial: 'pieces',
+          },
+          {
+            name: 'targetPrice',
+            kind: 'number',
+            width: 'half',
+            hint: true,
+            min: 0,
+            max: 10_000_000,
+          },
+          {
+            name: 'priceCurrency',
+            kind: 'select',
+            width: 'half',
+            options: ['usd', 'cny', 'sar', 'aed'],
+            initial: 'usd',
+          },
+          { name: 'sizes', kind: 'textarea', rows: 2, hint: true, max: 1000 },
+          { name: 'colours', kind: 'textarea', rows: 2, hint: true, max: 1000 },
+          { name: 'specs', kind: 'textarea', rows: 3, hint: true, max: 3000 },
+        ],
+      },
+      {
+        key: 'delivery',
+        fields: [
+          // For the proforma invoice: the bank matches the payer to its name.
+          { name: 'companyName', kind: 'text', width: 'half', hint: true, max: 160 },
+          { name: 'companyAddress', kind: 'text', width: 'half', max: 300 },
           { name: 'destinationCountry', kind: 'country', required: true, width: 'half' },
           {
             name: 'timeline',
@@ -602,10 +665,14 @@ export const FORMS: Record<ApplicationType, FormDef> = {
         ],
       },
     ],
-    headline: (d) =>
-      [str(d, 'productName'), d.quantity ? `× ${String(d.quantity)}` : '']
+    headline: (d) => {
+      const products = Array.isArray(d.products) ? (d.products as Record<string, unknown>[]) : []
+      const first = products[0] ?? d
+      const line = [str(first, 'productName'), first.quantity ? `× ${String(first.quantity)}` : '']
         .filter(Boolean)
-        .join(' '),
+        .join(' ')
+      return products.length > 1 ? `${line} +${products.length - 1}` : line
+    },
   },
 
   'shipping-quote': {
@@ -851,6 +918,17 @@ export const FORMS: Record<ApplicationType, FormDef> = {
 }
 
 /** Every field in a form, in order, contact step included. */
+/** Every field of the form, the fields of a repeated step included once. */
 export function allFields(def: FormDef): FieldDef[] {
   return def.steps.flatMap((step) => [...step.fields])
+}
+
+/** The fields answered once per form: everything outside a repeated step. */
+export function singleFields(def: FormDef): FieldDef[] {
+  return def.steps.flatMap((step) => (step.repeat ? [] : [...step.fields]))
+}
+
+/** How a repeated item's field is named in the form: `products.3.quantity`. */
+export function itemFieldName(repeat: RepeatDef, key: string, field: string): string {
+  return `${repeat.name}.${key}.${field}`
 }

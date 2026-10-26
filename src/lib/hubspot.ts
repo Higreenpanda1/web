@@ -1,9 +1,10 @@
 import { hubspot as hubspotConfig } from './env'
 import {
-  dealName,
+  dealProperties,
   followUpTask,
-  isCompanyRegistration,
+  needsPaymentCheck,
   noteBody,
+  replyTask,
   splitName,
   type HubSpotApplication,
 } from './hubspot-format'
@@ -19,12 +20,16 @@ export type { HubSpotApplication } from './hubspot-format'
  * still in the CMS and in the inbox; this only logs.
  *
  * What it creates, in English and Chinese because the team works in both:
- *   - every form: the contact (matched by email when there is one) and a note
- *     with all the answers;
- *   - company registration: a deal in the services pipeline at "New Inquiry",
- *     and a task seven days out to check whether the client has paid. The
- *     owner's rule is that formation work starts only after payment, and an
- *     unpaid request is closed as "Not Completed" after a week.
+ *   - the contact, matched by email, else by WhatsApp number, so a client
+ *     who writes twice (or first talked to the WhatsApp bot, which matches
+ *     the same way) stays one contact;
+ *   - for every form, a deal in the services pipeline at "New Inquiry", with
+ *     "Our company" (HiGP or Nasher), "Service" and "Request source" set;
+ *   - a note with all the answers and the uploaded files;
+ *   - a task to reply to the client within a day;
+ *   - for HiGP's priced services, a task seven days out to check whether the
+ *     client has paid. The owner's rule is that work starts only after
+ *     payment, and an unpaid request is closed as "Not Completed" after a week.
  *
  * Switched on by HUBSPOT_TOKEN (a HubSpot private app token with read and
  * write access to contacts and deals). Without it, it does nothing.
@@ -60,26 +65,55 @@ export async function call<T>(method: string, path: string, body?: unknown): Pro
 
 type Created = { id: string }
 
+type Found = { id: string; properties: Record<string, string | null> }
+
+/**
+ * The client's contact: the one with their email, else the one with their
+ * WhatsApp number in `phone` or `mobilephone`, else a new one. The number
+ * is already "+<digits>" (src/lib/phone.ts), the same form the WhatsApp bot
+ * writes, so the two never make two contacts for one person.
+ */
 async function upsertContact(app: HubSpotApplication): Promise<string> {
   const properties: Record<string, string> = {
     ...splitName(app.name),
     phone: app.whatsapp,
     country: app.country,
   }
-  if (app.email) {
-    const result = await call<{ results: Created[] }>(
-      'POST',
-      '/crm/v3/objects/contacts/batch/upsert',
-      {
-        inputs: [{ id: app.email.toLowerCase(), idProperty: 'email', properties }],
-      },
-    )
-    const id = result.results[0]?.id
-    if (!id) throw new Error('HubSpot upsert returned no contact')
-    return id
+  const email = app.email?.toLowerCase() ?? null
+  const filterGroups = [
+    ...(email ? [{ filters: [{ propertyName: 'email', operator: 'EQ', value: email }] }] : []),
+    { filters: [{ propertyName: 'phone', operator: 'EQ', value: app.whatsapp }] },
+    { filters: [{ propertyName: 'mobilephone', operator: 'EQ', value: app.whatsapp }] },
+  ]
+  const { results } = await call<{ results: Found[] }>('POST', '/crm/v3/objects/contacts/search', {
+    filterGroups,
+    properties: ['email'],
+    limit: 10,
+  })
+  const byEmail = email ? results.find((c) => c.properties.email?.toLowerCase() === email) : null
+  const found = byEmail ?? results[0]
+
+  if (found) {
+    // A contact found by number gets the email only when it has none, so
+    // one person's second address never overwrites the first.
+    const update = { ...properties, ...(email && !found.properties.email ? { email } : {}) }
+    await call('PATCH', `/crm/v3/objects/contacts/${found.id}`, { properties: update })
+    return found.id
   }
-  const created = await call<Created>('POST', '/crm/v3/objects/contacts', { properties })
+  const created = await call<Created>('POST', '/crm/v3/objects/contacts', {
+    properties: { ...properties, ...(email ? { email } : {}) },
+  })
   return created.id
+}
+
+/** A deal already made for this request, found by the reference in its name. */
+async function existingDeal(reference: string): Promise<string | null> {
+  const { results } = await call<{ results: Found[] }>('POST', '/crm/v3/objects/deals/search', {
+    query: reference,
+    properties: ['dealname'],
+    limit: 10,
+  })
+  return results.find((deal) => deal.properties.dealname?.includes(reference))?.id ?? null
 }
 
 export function assoc(id: string, typeId: number) {
@@ -125,29 +159,53 @@ async function uploadDocument(reference: string, doc: HubSpotDocument): Promise<
   }
 }
 
-/** Never throws. Returns true when everything was created. */
+async function createTask(
+  task: { subject: string; body: string; dueISO: string },
+  contactId: string,
+  dealId: string,
+) {
+  await call<Created>('POST', '/crm/v3/objects/tasks', {
+    properties: {
+      hs_task_subject: task.subject,
+      hs_task_body: task.body,
+      hs_timestamp: task.dueISO,
+      hs_task_status: 'NOT_STARTED',
+      hs_task_priority: 'MEDIUM',
+      ...owner(),
+    },
+    associations: [assoc(contactId, ASSOC.taskToContact), assoc(dealId, ASSOC.taskToDeal)],
+  })
+}
+
+/**
+ * Never throws. Returns the deal's id when everything was created, null
+ * otherwise. `resend` is the admin's "Resend to HubSpot": a deal a failed
+ * first attempt already made is reused rather than doubled.
+ */
 export async function syncApplicationToHubSpot(
   app: HubSpotApplication,
   documents: HubSpotDocument[] = [],
-): Promise<boolean> {
-  if (!hubspotConfig.configured) return false
+  { resend = false }: { resend?: boolean } = {},
+): Promise<{ dealId: string } | null> {
+  if (!hubspotConfig.configured) return null
 
   try {
     const contactId = await upsertContact(app)
 
-    let dealId: string | null = null
-    if (isCompanyRegistration(app)) {
-      const deal = await call<Created>('POST', '/crm/v3/objects/deals', {
-        properties: {
-          dealname: dealName(app),
-          pipeline: hubspotConfig.pipelineId,
-          dealstage: hubspotConfig.newStageId,
-          ...owner(),
-        },
-        associations: [assoc(contactId, ASSOC.dealToContact)],
-      })
-      dealId = deal.id
-    }
+    const reused = resend ? await existingDeal(app.reference) : null
+    const dealId =
+      reused ??
+      (
+        await call<Created>('POST', '/crm/v3/objects/deals', {
+          properties: {
+            ...dealProperties(app),
+            pipeline: hubspotConfig.pipelineId,
+            dealstage: hubspotConfig.newStageId,
+            ...owner(),
+          },
+          associations: [assoc(contactId, ASSOC.dealToContact)],
+        })
+      ).id
 
     const attachmentIds = (
       await Promise.all(documents.map((doc) => uploadDocument(app.reference, doc)))
@@ -160,30 +218,15 @@ export async function syncApplicationToHubSpot(
         ...(attachmentIds.length ? { hs_attachment_ids: attachmentIds.join(';') } : {}),
         ...owner(),
       },
-      associations: [
-        assoc(contactId, ASSOC.noteToContact),
-        ...(dealId ? [assoc(dealId, ASSOC.noteToDeal)] : []),
-      ],
+      associations: [assoc(contactId, ASSOC.noteToContact), assoc(dealId, ASSOC.noteToDeal)],
     })
 
-    if (dealId) {
-      const task = followUpTask(app)
-      await call<Created>('POST', '/crm/v3/objects/tasks', {
-        properties: {
-          hs_task_subject: task.subject,
-          hs_task_body: task.body,
-          hs_timestamp: task.dueISO,
-          hs_task_status: 'NOT_STARTED',
-          hs_task_priority: 'MEDIUM',
-          ...owner(),
-        },
-        associations: [assoc(contactId, ASSOC.taskToContact), assoc(dealId, ASSOC.taskToDeal)],
-      })
-    }
+    await createTask(replyTask(app), contactId, dealId)
+    if (needsPaymentCheck(app)) await createTask(followUpTask(app), contactId, dealId)
 
-    return true
+    return { dealId }
   } catch (error) {
     console.error(`[application ${app.reference}] HubSpot sync failed`, error)
-    return false
+    return null
   }
 }

@@ -1140,6 +1140,14 @@ export interface Application {
    * When the notification email was accepted by the provider. Empty means it failed — the request is still safe here.
    */
   notifiedAt?: string | null;
+  /**
+   * When the client, deal, note and tasks reached HubSpot. Empty means it failed or HubSpot is not connected — use the button below.
+   */
+  hubspotSyncedAt?: string | null;
+  /**
+   * The deal in HubSpot.
+   */
+  hubspotDealId?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1846,6 +1854,8 @@ export interface ApplicationsSelect<T extends boolean = true> {
         submittedAt?: T;
       };
   notifiedAt?: T;
+  hubspotSyncedAt?: T;
+  hubspotDealId?: T;
   updatedAt?: T;
   createdAt?: T;
 }
