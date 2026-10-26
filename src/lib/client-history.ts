@@ -30,7 +30,7 @@ export type HistorySource = {
   billing?: { items?: BillingItem[] | null } | null
 }
 
-export type Bilingual = { en: string; ar: string }
+export type Bilingual = { en: string; zh: string }
 
 export type HistoryRow = {
   id: number | string
@@ -49,15 +49,15 @@ export type HistoryRow = {
 export const isGoods = (type: string) => type === 'product-search' || type === 'shipping-quote'
 
 const WHAT: Record<string, Bilingual> = {
-  consultation: { en: 'Consultation', ar: 'استشارة' },
-  'company-registration': { en: 'Company registration in China', ar: 'تأسيس شركة في الصين' },
-  'visa-invitation': { en: 'Business invitation letter', ar: 'خطاب دعوة تجارية' },
-  visa: { en: 'Visa', ar: 'تأشيرة' },
-  'product-search': { en: 'Purchase of goods', ar: 'شراء بضائع' },
-  'shipping-quote': { en: 'Shipping of goods', ar: 'شحن بضائع' },
-  'account-opening': { en: 'Bank account opening', ar: 'فتح حساب بنكي' },
-  'store-setup': { en: 'Online store setup', ar: 'إنشاء متجر إلكتروني' },
-  trademark: { en: 'Trademark registration', ar: 'تسجيل علامة تجارية' },
+  consultation: { en: 'Consultation', zh: '咨询' },
+  'company-registration': { en: 'Company registration in China', zh: '在华公司注册' },
+  'visa-invitation': { en: 'Business invitation letter', zh: '商务邀请函' },
+  visa: { en: 'Visa', zh: '签证' },
+  'product-search': { en: 'Purchase of goods', zh: '采购货物' },
+  'shipping-quote': { en: 'Shipping of goods', zh: '货物运输' },
+  'account-opening': { en: 'Bank account opening', zh: '银行开户' },
+  'store-setup': { en: 'Online store setup', zh: '网店开设' },
+  trademark: { en: 'Trademark registration', zh: '商标注册' },
 }
 
 /**
@@ -65,10 +65,10 @@ const WHAT: Record<string, Bilingual> = {
  * is an enquiry; "lost" is shown the same way, since it is still contact.
  */
 const STATUS: Record<string, Bilingual> = {
-  'in-progress': { en: 'In progress', ar: 'قيد التنفيذ' },
-  completed: { en: 'Completed', ar: 'مكتمل' },
+  'in-progress': { en: 'In progress', zh: '进行中' },
+  completed: { en: 'Completed', zh: '已完成' },
 }
-const ENQUIRY: Bilingual = { en: 'Enquiry', ar: 'استفسار' }
+const ENQUIRY: Bilingual = { en: 'Enquiry', zh: '咨询中' }
 
 /** Digits only, so "+966 50 123 4567" and "+966501234567" are the same client. */
 export function sameNumber(a: string, b: string): boolean {
@@ -118,7 +118,7 @@ export function clientHistory(current: HistorySource, all: readonly HistorySourc
       id: source.id,
       reference: source.reference,
       date: source.createdAt.slice(0, 10),
-      what: WHAT[source.type] ?? { en: source.type, ar: source.type },
+      what: WHAT[source.type] ?? { en: source.type, zh: source.type },
       products: source.type === 'product-search' ? productNames(source) : [],
       amount: requestAmount(source),
       status: STATUS[source.status ?? ''] ?? ENQUIRY,

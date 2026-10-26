@@ -334,8 +334,8 @@ export const Applications: CollectionConfig = {
         const html = renderRelationshipLetter({
           issuer: goods ? NASHER : HIGP,
           purpose: goods
-            ? { en: 'purchase of goods', ar: 'شراء بضائع' }
-            : { en: 'business services in China', ar: 'خدمات أعمال في الصين' },
+            ? { en: 'purchase of goods', zh: '采购货物' }
+            : { en: 'business services in China', zh: '在华商务服务' },
           reference: application.reference,
           date: new Date().toISOString().slice(0, 10),
           client: {

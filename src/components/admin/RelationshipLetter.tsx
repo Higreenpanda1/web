@@ -6,7 +6,7 @@ import React from 'react'
 /**
  * The letter a client gives their bank to show we have dealt with them
  * before: every request from the same WhatsApp number, and what this payment
- * is for. Opens as a printable page (English and Arabic) to save as PDF,
+ * is for. Opens as a printable page (English and Chinese) to save as PDF,
  * sign and stamp.
  */
 export function RelationshipLetter() {
