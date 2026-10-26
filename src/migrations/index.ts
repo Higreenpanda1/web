@@ -10,6 +10,7 @@ import * as migration_20261026_120000_hubspot_sync from './20261026_120000_hubsp
 import * as migration_20261026_130018_product_order from './20261026_130018_product_order'
 import * as migration_20261026_133122_billing from './20261026_133122_billing'
 import * as migration_20261026_135750_portal_accounts from './20261026_135750_portal_accounts'
+import * as migration_20261026_141703_payment_terms from './20261026_141703_payment_terms'
 
 export const migrations = [
   {
@@ -71,5 +72,10 @@ export const migrations = [
     up: migration_20261026_135750_portal_accounts.up,
     down: migration_20261026_135750_portal_accounts.down,
     name: '20261026_135750_portal_accounts',
+  },
+  {
+    up: migration_20261026_141703_payment_terms.up,
+    down: migration_20261026_141703_payment_terms.down,
+    name: '20261026_141703_payment_terms',
   },
 ]
