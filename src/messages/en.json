@@ -19,7 +19,8 @@
     "footer": "Footer links",
     "consultation": "Consultation",
     "academy": "Academy",
-    "field": "From the field"
+    "field": "From the field",
+    "clientLogin": "Client login"
   },
   "locale": {
     "switchTo": "العربية",
@@ -994,5 +995,134 @@
     "photoCaption": "Sami Al-Hajri · Founder of HiGreenPanda",
     "fileLabel": "File",
     "fileStamp": "CONFIDENTIAL"
+  },
+  "portal": {
+    "title": "Client portal",
+    "lead": "Follow your requests with HiGreenPanda, step by step.",
+    "login": {
+      "email": "Email address",
+      "send": "Send me a sign-in code",
+      "sending": "Sending…",
+      "sent": "We sent a 6-digit code to {email}. It is valid for 10 minutes.",
+      "code": "Sign-in code",
+      "signIn": "Sign in",
+      "signingIn": "Signing in…",
+      "resend": "Didn't get it? Send again",
+      "resent": "We sent a new code.",
+      "otherEmail": "Use another email",
+      "noAccount": "No account yet? Our team opens one after your first request. Message us on WhatsApp.",
+      "whatsapp": "Message us on WhatsApp",
+      "linkTitle": "Sign in to the client portal",
+      "linkLead": "Press Sign in to open your account."
+    },
+    "errors": {
+      "wrong": "That code is not right. Check it and try again.",
+      "expired": "That code has expired. Ask for a new one.",
+      "tooMany": "Too many tries. Please wait 10 minutes.",
+      "link": "This link has been used or has expired. Ask our team on WhatsApp for a new one.",
+      "email": "Enter a valid email address."
+    },
+    "nav": {
+      "requests": "My requests",
+      "account": "My account",
+      "signOut": "Sign out"
+    },
+    "list": {
+      "welcome": "Welcome, {name}",
+      "title": "My requests",
+      "titleCompany": "Requests for {company}",
+      "reference": "Reference",
+      "service": "Service",
+      "date": "Date",
+      "status": "Status",
+      "details": "Details",
+      "empty": "You have no requests yet.",
+      "new": "New request",
+      "current": "Current",
+      "completed": "Completed"
+    },
+    "request": {
+      "title": "Request {reference}",
+      "updated": "Last updated: {date}",
+      "documents": "Documents",
+      "download": "Download",
+      "noDocuments": "No documents yet. We will add them here as soon as they are ready.",
+      "yourRequest": "Your request",
+      "help": "A question about this request?",
+      "ask": "Ask us on WhatsApp",
+      "askText": "Hello, I have a question about request {reference}",
+      "askTextNoRef": "Hello, I have a question about my request: {service}",
+      "back": "My requests"
+    },
+    "steps": {
+      "received": "Request received",
+      "quote": "Quote sent",
+      "payment": "Payment received",
+      "documents": "Preparing documents",
+      "submitted": "Submitted to the authorities",
+      "established": "Company registered, finishing tax and bank",
+      "contract": "Contract",
+      "deposit": "Deposit received",
+      "production": "In production",
+      "testing": "Inspection and testing",
+      "balance": "Balance received",
+      "shipped": "Shipped",
+      "completed": "Completed",
+      "active": "Active",
+      "due": "Renewal due",
+      "dueOn": "Renewal due: {date}",
+      "invoiced": "Renewal invoice sent",
+      "renewed": "Renewed",
+      "onHold": "On hold",
+      "ended": "Ended"
+    },
+    "renewal": {
+      "annual": "Registered address and accounting renewal",
+      "permit": "Work and residence permit renewal"
+    },
+    "other": "Service",
+    "services": {
+      "company_registration": "Company registration",
+      "hk_company": "Hong Kong company",
+      "registered_address": "Registered address",
+      "accounting": "Accounting and tax",
+      "licence_changes": "Licence changes",
+      "bank_account": "Bank account",
+      "alipay_wechat": "Alipay and WeChat Pay account",
+      "trademark": "Trademark registration",
+      "work_permit": "Work and residence permit",
+      "business_visa": "Business visa",
+      "invitation_letter": "Invitation letter",
+      "family_visa": "Family reunion visa",
+      "store_setup": "Online store setup",
+      "consultation": "Consultation",
+      "product_sourcing": "Product sourcing",
+      "manufacturing": "Manufacturing",
+      "quality_inspection": "Quality inspection",
+      "shipping": "Shipping",
+      "trade_fair": "Trade fair accompaniment",
+      "full_import": "Full import service"
+    },
+    "account": {
+      "title": "My account",
+      "name": "Name",
+      "company": "Company",
+      "email": "Email",
+      "whatsapp": "WhatsApp",
+      "language": "Language",
+      "save": "Save",
+      "saved": "Saved.",
+      "note": "To change your email or WhatsApp, message us on WhatsApp.",
+      "members": "Company members"
+    },
+    "docs": {
+      "quote": "Quote",
+      "invoice": "Invoice",
+      "deposit": "first payment",
+      "balance": "final payment",
+      "full": "full payment",
+      "paid": "Paid",
+      "unpaid": "Awaiting payment"
+    }
   }
 }

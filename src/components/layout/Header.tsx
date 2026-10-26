@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server'
 import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon'
 import { ButtonLink } from '@/components/ui/Button'
 import { Link } from '@/i18n/navigation'
-import { whatsappLink } from '@/lib/url'
+import { localePath, whatsappLink } from '@/lib/url'
 import { LocaleSwitcher } from './LocaleSwitcher'
 import { Wordmark } from './Logo'
 import { MobileNav } from './MobileNav'
@@ -35,6 +35,8 @@ export async function Header({ locale, settings }: { locale: Locale; settings: S
   }
 
   const whatsapp = whatsappLink(settings.whatsappNumber, settings.whatsappPrefill ?? undefined)
+  // The portal is in Arabic and English; the Chinese site's link opens the English one.
+  const portalHref = localePath(locale === 'zh' ? 'en' : locale, '/portal/login')
 
   return (
     <header className="theme-deep sticky top-0 z-40 border-b border-[rgb(224_163_46/0.18)] bg-[rgb(6_36_20/0.9)] backdrop-blur-md">
@@ -55,6 +57,12 @@ export async function Header({ locale, settings }: { locale: Locale; settings: S
         </nav>
 
         <div className="flex items-center gap-2">
+          <a
+            href={portalHref}
+            className="hidden rounded-[3px] px-3 py-2 text-caption font-semibold text-brand-100 no-underline transition-colors hover:bg-white/10 hover:text-white lg:inline-flex"
+          >
+            {t('nav.clientLogin')}
+          </a>
           <LocaleSwitcher
             locale={locale}
             label={t('locale.label')}
@@ -87,6 +95,12 @@ export async function Header({ locale, settings }: { locale: Locale; settings: S
             whatsappHref={whatsapp}
           >
             <LocaleSwitcher locale={locale} label={t('locale.label')} className="sm:hidden" />
+            <a
+              href={portalHref}
+              className="inline-flex min-h-11 items-center font-semibold text-text-brand no-underline"
+            >
+              {t('nav.clientLogin')}
+            </a>
           </MobileNav>
         </div>
       </div>
