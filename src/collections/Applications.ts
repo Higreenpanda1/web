@@ -223,6 +223,7 @@ export const Applications: CollectionConfig = {
           reference: application.reference,
           date: new Date().toISOString().slice(0, 10),
           currency: application.order?.currency ?? 'usd',
+          terms: application.order?.paymentTerms,
           items: (application.order?.items ?? []) as OrderItem[],
           buyer: {
             name: application.name,
@@ -467,6 +468,19 @@ export const Applications: CollectionConfig = {
           required: true,
           defaultValue: 'usd',
           options: ORDER_CURRENCIES.map((value) => ({ label: value.toUpperCase(), value })),
+        },
+        {
+          // As agreed with this client; printed on the proforma invoice.
+          name: 'paymentTerms',
+          label: 'Payment terms',
+          type: 'select',
+          required: true,
+          defaultValue: 'full',
+          options: [
+            { label: 'Full payment', value: 'full' },
+            { label: '50% deposit, 50% before shipment', value: '50-50' },
+            { label: '30% deposit, 70% before shipment', value: '30-70' },
+          ],
         },
         {
           name: 'items',

@@ -8,6 +8,7 @@ import {
   lineTotal,
   orderProducts,
   orderTotal,
+  paymentSplit,
   photoFileName,
 } from './product-order.ts'
 
@@ -106,4 +107,11 @@ test('files are looked for in the request month and the month before', () => {
   assert.deepEqual(documentMonths('2026-11-01T00:00:01.000Z'), ['2026-11', '2026-10'])
   assert.deepEqual(documentMonths('2026-01-15T10:00:00.000Z'), ['2026-01', '2025-12'])
   assert.deepEqual(documentMonths('nonsense'), [])
+})
+
+test('payment terms split the total into a deposit and a balance, to the cent', () => {
+  assert.deepEqual(paymentSplit(8900, 'full'), { share: 1, deposit: 8900, balance: 0 })
+  assert.deepEqual(paymentSplit(8900, '50-50'), { share: 0.5, deposit: 4450, balance: 4450 })
+  assert.deepEqual(paymentSplit(1234.57, '30-70'), { share: 0.3, deposit: 370.37, balance: 864.2 })
+  assert.deepEqual(paymentSplit(100, null), { share: 1, deposit: 100, balance: 0 })
 })

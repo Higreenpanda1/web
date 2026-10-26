@@ -96,9 +96,10 @@ const NASHER_NAME = 'Nasher Electronic Commerce (Shanghai) Co., Ltd.'
  * (/mnt/project-files/product-orders/nasher-bank-details.png, 26 Oct 2026):
  * the name as the card prints it, and the Chinese name from the licence.
  * The card gives no street address for Nasher, so its documents carry the
- * Shenzhen headquarters, where the group is run from. No payment codes:
- * goods are paid by bank transfer. Shared by the proforma invoice and the
- * letter for the client's bank.
+ * Shenzhen headquarters, where the group is run from (the owner confirmed
+ * this on 26 Oct 2026). The Alipay code is in Nasher's name; the owner wants
+ * it on the proforma for small orders. Shared by the proforma invoice and
+ * the letter for the client's bank.
  */
 export const NASHER: Issuer = {
   en: NASHER_NAME,
@@ -142,7 +143,12 @@ export const NASHER: Issuer = {
       ],
     },
   ],
-  codes: [],
+  codes: [
+    {
+      src: '/brand/pay/alipay-nasher.png',
+      label: ['Alipay · Nasher · credit cards accepted', '支付宝 · 那社尔 · 可用信用卡'],
+    },
+  ],
 }
 
 const L = {
