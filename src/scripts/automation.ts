@@ -11,6 +11,8 @@ import 'dotenv/config'
  *   npm run posts:research     weekly market research → new topics in the queue
  *   npm run posts:draft        one new bilingual article from the content queue
  *   npm run posts:digest       the weekly summary email to the owner
+ *   npm run automation -- hubspot-renewals   renewal deals + tasks due in 30 days
+ *   npm run automation -- hubspot-report     the weekly HubSpot email to the owner
  *   npm run posts:plan-pack    the research brief, for a session without the API
  *   npm run posts:write-packs  writing briefs from .plan/topics.json
  *   npm run posts:write-apply  validate .write/out/*.json into src/seed/wp/posts.json
@@ -18,7 +20,7 @@ import 'dotenv/config'
  *   npm run posts:rewrite-archive -- [n] [--slug=x] [--parallel=3] [--force]
  *                              rewrite the recovered archive (src/seed/wp/posts.json)
  *
- * Add `-- --dry-run` to distribute, research, draft or digest to see what
+ * Add `-- --dry-run` to distribute, research, draft, digest or the hubspot jobs to see what
  * would happen without writing anything.
  */
 async function main() {
@@ -111,6 +113,22 @@ async function main() {
     case 'digest': {
       const { sendWeeklyDigest } = await import('@/lib/automation/digest')
       console.log(await sendWeeklyDigest({ dryRun }))
+      break
+    }
+    case 'hubspot-renewals': {
+      const { runRenewalReminders } = await import('@/lib/hubspot-ops')
+      const { done, failed } = await runRenewalReminders({ dryRun })
+      console.log(
+        done.length
+          ? `${dryRun ? 'would do' : 'done'}:\n- ${done.join('\n- ')}`
+          : 'no renewals due',
+      )
+      if (failed.length) console.log(`failed:\n- ${failed.join('\n- ')}`)
+      break
+    }
+    case 'hubspot-report': {
+      const { sendHubSpotWeeklyReport } = await import('@/lib/hubspot-ops')
+      console.log(await sendHubSpotWeeklyReport({ dryRun }))
       break
     }
     case 'rewrite-archive': {
@@ -217,7 +235,7 @@ async function main() {
     }
     default:
       console.error(
-        'usage: npm run automation -- <distribute|enrich|translate|research|draft|digest|publish|indexnow|rewrite-archive|rewrite-packs|rewrite-apply|links-packs|links-apply|translate-packs> [--dry-run] [n]',
+        'usage: npm run automation -- <distribute|enrich|translate|research|draft|digest|hubspot-renewals|hubspot-report|publish|indexnow|rewrite-archive|rewrite-packs|rewrite-apply|links-packs|links-apply|translate-packs> [--dry-run] [n]',
       )
       process.exit(2)
   }

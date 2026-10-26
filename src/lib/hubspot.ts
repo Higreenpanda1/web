@@ -31,15 +31,17 @@ export type { HubSpotApplication } from './hubspot-format'
  */
 
 // HubSpot's fixed association type ids.
-const ASSOC = {
+export const ASSOC = {
   dealToContact: 3,
+  dealToCompany: 5,
   noteToContact: 202,
   noteToDeal: 214,
   taskToContact: 204,
   taskToDeal: 216,
+  taskToCompany: 192,
 } as const
 
-async function call<T>(method: string, path: string, body?: unknown): Promise<T> {
+export async function call<T>(method: string, path: string, body?: unknown): Promise<T> {
   const response = await fetch(`https://api.hubapi.com${path}`, {
     method,
     headers: {
@@ -80,14 +82,14 @@ async function upsertContact(app: HubSpotApplication): Promise<string> {
   return created.id
 }
 
-function assoc(id: string, typeId: number) {
+export function assoc(id: string, typeId: number) {
   return {
     to: { id },
     types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: typeId }],
   }
 }
 
-function owner(): Record<string, string> {
+export function owner(): Record<string, string> {
   return hubspotConfig.ownerId ? { hubspot_owner_id: hubspotConfig.ownerId } : {}
 }
 

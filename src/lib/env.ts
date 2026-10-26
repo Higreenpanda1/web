@@ -54,6 +54,12 @@ export const hubspot = {
   pipelineId: process.env.HUBSPOT_PIPELINE_ID || 'default',
   newStageId: process.env.HUBSPOT_NEW_STAGE_ID || '4392706760',
   ownerId: process.env.HUBSPOT_OWNER_ID ?? '99402659',
+  portalId: process.env.HUBSPOT_PORTAL_ID || '247444202',
+  /** Weekly HubSpot report recipients; empty = the ENQUIRY_NOTIFY_TO addresses. */
+  reportTo: (process.env.HUBSPOT_REPORT_TO ?? '')
+    .split(',')
+    .map((address) => address.trim())
+    .filter(Boolean),
   configured: Boolean(process.env.HUBSPOT_TOKEN),
 }
 
