@@ -1,7 +1,7 @@
-import { mkdir, writeFile } from 'node:fs/promises'
+import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
-import { documentFileName, type CheckedDocument } from './documents'
+import { documentFileName, sniffMime, type CheckedDocument } from './documents'
 
 /**
  * Where application documents are kept on the server.
@@ -54,4 +54,28 @@ export async function storeDocuments(
     console.error(`[application ${reference}] could not store documents`, error)
   }
   return stored
+}
+
+/**
+ * The documents stored for an application, read back for "Resend to
+ * HubSpot". They are in the folder of the month the request came in.
+ * Never throws: a missing folder means no documents.
+ */
+export async function loadDocuments(
+  reference: string,
+  submittedAt: string,
+): Promise<Array<{ filename: string; mime: string; content: Uint8Array }>> {
+  const dir = path.join(DOCUMENTS_DIR, submittedAt.slice(0, 7))
+  try {
+    const files = (await readdir(dir)).filter((file) => file.startsWith(`${reference}-`))
+    const loaded = []
+    for (const file of files) {
+      const content = new Uint8Array(await readFile(path.join(dir, file)))
+      const mime = sniffMime(content)
+      if (mime) loaded.push({ filename: file, mime, content })
+    }
+    return loaded
+  } catch {
+    return []
+  }
 }
