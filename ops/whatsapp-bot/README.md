@@ -53,6 +53,7 @@ curl -fsSL https://raw.githubusercontent.com/Higreenpanda1/web/<sha>/ops/whatsap
 
 It stops without changing anything if the server's bot files are not the
 25 Sep version, or the website has no token yet. It backs the code up to
-`/opt/higreenpanda-bot-backups/<time>`, runs `node test.js`, puts the old code
-back if the test fails, and restarts the bot. Running it again only refreshes
+`/opt/higreenpanda-bot-backups/<time>`, runs `node test.js` before and after,
+puts the old code back if the update adds a failing test (a test that already
+failed on the server before the update does not block it), and restarts the bot. Running it again only refreshes
 the token. Undo: the same command with `bash -s -- undo`.

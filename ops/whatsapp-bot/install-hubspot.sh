@@ -81,6 +81,15 @@ status="$(curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer $toke
 [ "$status" = "200" ] || die "HubSpot refused the token for contacts (HTTP $status). Nothing changed."
 echo "   Token accepted by HubSpot."
 
+# Failures the bot's self-test already has before this update (e.g. a part of
+# the bot edited on the server after 25 Sep) are not this update's fault and
+# must not block it; only a NEW failure does.
+failures() { { grep -E '^ *✗' "$1" || true; } | sed -E 's/^ *✗ *//' | sort -u; }
+say "Running the bot's self-test before the update"
+node test.js >/tmp/hgp-bot-test-before.log 2>&1 || true
+failures /tmp/hgp-bot-test-before.log >/tmp/hgp-bot-failing-before.txt
+grep -E 'passed' /tmp/hgp-bot-test-before.log | tail -1 || true
+
 if [ "$installed" = 0 ]; then
   say "Backing up the current code"
   backup="$BACKUPS/$(date +%Y%m%d-%H%M%S)"
@@ -103,13 +112,20 @@ umask 077
 printf 'HUBSPOT_TOKEN=%s\n' "$token" >hubspot.env
 chmod 600 hubspot.env
 
-say "Running the bot's self-test"
-if ! node test.js >/tmp/hgp-bot-test.log 2>&1; then
-  tail -20 /tmp/hgp-bot-test.log
-  [ "$installed" = 0 ] && restore "$backup"
+say "Running the bot's self-test after the update"
+node test.js >/tmp/hgp-bot-test.log 2>&1 || true
+grep -E 'passed' /tmp/hgp-bot-test.log | tail -1 || true
+new_failures="$(failures /tmp/hgp-bot-test.log | comm -23 - /tmp/hgp-bot-failing-before.txt)"
+if [ -n "$new_failures" ] || ! grep -qE '[0-9]+ passed' /tmp/hgp-bot-test.log; then
+  printf '%s\n' "$new_failures"
+  grep -A3 -E '^ *✗' /tmp/hgp-bot-test.log | tail -20 || tail -20 /tmp/hgp-bot-test.log
+  if [ "$installed" = 0 ]; then restore "$backup"; fi
   die "The self-test failed, so the old code was put back. Send this message to Claude."
 fi
-grep -E 'passed' /tmp/hgp-bot-test.log | tail -1
+if [ -s /tmp/hgp-bot-failing-before.txt ]; then
+  echo "   (Already failing before this update, not related to HubSpot:)"
+  sed 's/^/     - /' /tmp/hgp-bot-failing-before.txt
+fi
 
 say "Restarting the bot"
 pm2 restart "$BOT_NAME" >/dev/null
