@@ -7,6 +7,7 @@ import * as migration_20261008_150000_founder_credentials from './20261008_15000
 import * as migration_20261021_080000_field_story from './20261021_080000_field_story'
 import * as migration_20261023_131921_chinese_locale from './20261023_131921_chinese_locale'
 import * as migration_20261026_120000_hubspot_sync from './20261026_120000_hubspot_sync'
+import * as migration_20261026_130018_product_order from './20261026_130018_product_order'
 
 export const migrations = [
   {
@@ -53,5 +54,10 @@ export const migrations = [
     up: migration_20261026_120000_hubspot_sync.up,
     down: migration_20261026_120000_hubspot_sync.down,
     name: '20261026_120000_hubspot_sync',
+  },
+  {
+    up: migration_20261026_130018_product_order.up,
+    down: migration_20261026_130018_product_order.down,
+    name: '20261026_130018_product_order',
   },
 ]

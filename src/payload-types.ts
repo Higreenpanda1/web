@@ -1119,6 +1119,30 @@ export interface Application {
     | boolean
     | null;
   /**
+   * Filled from the request when it arrives. Enter the final unit price for each product; change the quantity or wording if the factory changed them.
+   */
+  order?: {
+    currency: 'usd' | 'cny' | 'aed' | 'sar';
+    items?:
+      | {
+          productName: string;
+          quantity?: number | null;
+          unit?: ('pieces' | 'sets' | 'pairs' | 'cartons' | 'metres' | 'kg') | null;
+          unitPrice?: number | null;
+          /**
+           * Sizes, colours, material — as the invoice should say it.
+           */
+          description?: string | null;
+          position?: number | null;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Quantity × unit price, all products. Filled on save once every product has a price.
+     */
+    total?: number | null;
+  };
+  /**
    * Never leaves the CMS.
    */
   internalNotes?: string | null;
@@ -1842,6 +1866,23 @@ export interface ApplicationsSelect<T extends boolean = true> {
   email?: T;
   headline?: T;
   details?: T;
+  order?:
+    | T
+    | {
+        currency?: T;
+        items?:
+          | T
+          | {
+              productName?: T;
+              quantity?: T;
+              unit?: T;
+              unitPrice?: T;
+              description?: T;
+              position?: T;
+              id?: T;
+            };
+        total?: T;
+      };
   internalNotes?: T;
   meta?:
     | T
