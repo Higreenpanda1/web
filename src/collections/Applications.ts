@@ -1,7 +1,55 @@
 import { hasRole, isAdmin, isStaff, noone } from '@/access'
 import { APPLICATION_TYPES } from '@/lib/catalogue'
+import {
+  draftItems,
+  orderProducts,
+  orderTotal,
+  ORDER_CURRENCIES,
+  ORDER_UNITS,
+  type OrderItem,
+} from '@/lib/product-order'
 
-import type { CollectionConfig } from 'payload'
+import type { Application } from '@/payload-types'
+import type { CollectionBeforeChangeHook, CollectionConfig, PayloadRequest } from 'payload'
+
+const isProductRequest = (data: Partial<Application> | undefined) => data?.type === 'product-search'
+
+/**
+ * A product request gets its price lines drafted from what the client asked
+ * for, the first time it is saved without any (on arrival, and for requests
+ * from before this existed, on the first save in the admin). The total is
+ * kept in step with the lines on every save.
+ */
+const draftOrder: CollectionBeforeChangeHook<Application> = ({ data, originalDoc }) => {
+  const type = data.type ?? originalDoc?.type
+  if (type !== 'product-search') return data
+  const items = (data.order?.items ?? originalDoc?.order?.items ?? []) as OrderItem[]
+  if (items.length === 0) {
+    const reference = data.reference ?? originalDoc?.reference ?? ''
+    const drafted = draftItems(orderProducts(data.details ?? originalDoc?.details, reference))
+    if (drafted.length === 0) return data
+    return {
+      ...data,
+      order: { ...originalDoc?.order, ...data.order, items: drafted, total: null },
+    }
+  }
+  if (!data.order?.items) return data
+  return { ...data, order: { ...data.order, total: orderTotal(data.order.items as OrderItem[]) } }
+}
+
+/** The request, for a signed-in staff member; a Response when it cannot be had. */
+async function staffApplication(req: PayloadRequest): Promise<Application | Response> {
+  if (!hasRole(req.user, 'admin', 'editor')) {
+    return Response.json({ error: 'Not allowed.' }, { status: 403 })
+  }
+  const id = Number(req.routeParams?.id)
+  const application = Number.isInteger(id)
+    ? await req.payload
+        .findByID({ collection: 'applications', id, depth: 0, req })
+        .catch(() => null)
+    : null
+  return application ?? Response.json({ error: 'Not found.' }, { status: 404 })
+}
 
 const TYPE_LABELS: Record<(typeof APPLICATION_TYPES)[number], string> = {
   consultation: 'Consultation request',
@@ -53,6 +101,7 @@ export const Applications: CollectionConfig = {
   },
   defaultSort: '-createdAt',
   timestamps: true,
+  hooks: { beforeChange: [draftOrder] },
   endpoints: [
     {
       // The "Resend to HubSpot" button: POST /api/applications/:id/hubspot.
@@ -73,6 +122,59 @@ export const Applications: CollectionConfig = {
         const { resendApplicationToHubSpot } = await import('@/lib/hubspot-resend')
         const result = await resendApplicationToHubSpot(req.payload, application)
         return Response.json(result, { status: result.ok ? 200 : 502 })
+      },
+    },
+    {
+      // A product photo, for the admin and the printable brief. The files sit
+      // in a private folder no other route serves; this hands them only to
+      // staff, and only the photos of this request.
+      path: '/:id/photo/:file',
+      method: 'get',
+      handler: async (req) => {
+        const application = await staffApplication(req)
+        if (application instanceof Response) return application
+        // Loaded here, not at the top: the CLI (migrations) reads this file too.
+        const { readOrderPhoto } = await import('@/lib/order-files')
+        const photo = await readOrderPhoto(
+          application.reference,
+          application.createdAt,
+          String(req.routeParams?.file ?? ''),
+        )
+        if (!photo) return Response.json({ error: 'Not found.' }, { status: 404 })
+        return new Response(photo.content as BodyInit, {
+          headers: {
+            'Content-Type': photo.mime,
+            'Cache-Control': 'private, max-age=3600',
+            'Content-Disposition': 'inline',
+          },
+        })
+      },
+    },
+    {
+      // The printable brief: /api/applications/:id/brief, or ?for=factory
+      // for the version without the client's details and our prices.
+      path: '/:id/brief',
+      method: 'get',
+      handler: async (req) => {
+        const application = await staffApplication(req)
+        if (application instanceof Response) return application
+        if (!isProductRequest(application)) {
+          return Response.json({ error: 'Only product requests have a brief.' }, { status: 400 })
+        }
+        const { renderBrief } = await import('@/lib/order-brief')
+        const api = req.payload.config.routes.api
+        const html = renderBrief(
+          application,
+          req.searchParams?.get('for') === 'factory' ? 'factory' : 'team',
+          {
+            photoUrl: (file) =>
+              `${api}/applications/${application.id}/photo/${encodeURIComponent(file)}`,
+            nonce: req.headers.get('x-nonce'),
+          },
+        )
+        return new Response(html, {
+          headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' },
+        })
       },
     },
   ],
@@ -146,6 +248,16 @@ export const Applications: CollectionConfig = {
       },
     },
     {
+      // The products with their photos and the print buttons; the raw
+      // answers stay below for anything this does not show.
+      name: 'productOrder',
+      type: 'ui',
+      admin: {
+        condition: isProductRequest,
+        components: { Field: '@/components/admin/ProductOrder#ProductOrder' },
+      },
+    },
+    {
       // The type-specific answers. Stored as submitted (after validation), keyed
       // by field name from src/forms/definitions.ts. JSON rather than one
       // group per type: nine forms of ten to twenty fields each would be a
@@ -157,6 +269,90 @@ export const Applications: CollectionConfig = {
         readOnly: true,
         description: 'The answers, exactly as validated. Field names match the form.',
       },
+    },
+
+    {
+      // What we charge, product by product. The Nasher proforma invoice and
+      // the client's order history read these, so they are real columns,
+      // not more JSON.
+      name: 'order',
+      label: 'Order and prices',
+      type: 'group',
+      admin: {
+        condition: isProductRequest,
+        description:
+          'Filled from the request when it arrives. Enter the final unit price for each product; change the quantity or wording if the factory changed them.',
+      },
+      fields: [
+        {
+          name: 'currency',
+          type: 'select',
+          required: true,
+          defaultValue: 'usd',
+          options: ORDER_CURRENCIES.map((value) => ({ label: value.toUpperCase(), value })),
+        },
+        {
+          name: 'items',
+          label: 'Products',
+          labels: { singular: 'Product', plural: 'Products' },
+          type: 'array',
+          fields: [
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'productName',
+                  label: 'Product',
+                  type: 'text',
+                  required: true,
+                  admin: { width: '40%' },
+                },
+                { name: 'quantity', type: 'number', min: 0, admin: { width: '20%' } },
+                {
+                  name: 'unit',
+                  type: 'select',
+                  defaultValue: 'pieces',
+                  options: ORDER_UNITS.map((value) => ({
+                    label: value[0]!.toUpperCase() + value.slice(1),
+                    value,
+                  })),
+                  admin: { width: '20%' },
+                },
+                {
+                  name: 'unitPrice',
+                  label: 'Unit price',
+                  type: 'number',
+                  min: 0,
+                  admin: { width: '20%', step: 0.01 },
+                },
+              ],
+            },
+            {
+              name: 'description',
+              type: 'textarea',
+              admin: {
+                rows: 2,
+                description: 'Sizes, colours, material — as the invoice should say it.',
+              },
+            },
+            {
+              // Which product of the request this line came from, for its photos.
+              name: 'position',
+              type: 'number',
+              admin: { hidden: true },
+            },
+          ],
+        },
+        {
+          name: 'total',
+          type: 'number',
+          admin: {
+            readOnly: true,
+            description:
+              'Quantity × unit price, all products. Filled on save once every product has a price.',
+          },
+        },
+      ],
     },
 
     {
