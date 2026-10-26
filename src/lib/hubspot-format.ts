@@ -14,8 +14,46 @@ export type HubSpotApplication = {
   whatsapp: string
   email: string | null
   headline: string
+  /** The stored answers, for the few that decide the deal's service. */
+  details: Record<string, unknown>
+  /** The page the form was sent from, and where the visitor came from before it. */
+  sourcePath: string | null
+  referrer: string | null
   rows: NotificationRow[]
 }
+
+/** The values of the deal property "Our company / 我方公司". */
+export type OurCompany = 'higp' | 'nasher'
+
+/**
+ * The values of the deal property "Service / 服务" (hgp_service), with the
+ * labels exactly as they are in HubSpot: the deal and task names reuse them,
+ * so a deal reads the same wherever the team looks.
+ */
+export const SERVICES = {
+  company_registration: 'Company Registration / 公司注册',
+  hk_company: 'Hong Kong Company / 香港公司注册',
+  registered_address: 'Registered Address / 注册地址',
+  accounting: 'Accounting & Tax / 会计及纳税申报',
+  licence_changes: 'Licence Changes / 营业执照变更',
+  bank_account: 'Bank Account / 银行开户',
+  alipay_wechat: 'Alipay & WeChat Pay / 支付宝和微信支付',
+  trademark: 'Trademark / 商标注册',
+  work_permit: 'Work & Residence Permit / 工作许可和居留许可',
+  business_visa: 'Business Visa / 商务签证',
+  invitation_letter: 'Invitation Letter / 商务邀请函',
+  family_visa: 'Family Reunion Visa / 家庭团聚签证',
+  store_setup: 'Store Setup / 店铺开设',
+  consultation: 'Consultation / 咨询',
+  product_sourcing: 'Product Sourcing / 产品采购',
+  manufacturing: 'Manufacturing / 生产制造',
+  quality_inspection: 'Quality Inspection / 质量检验',
+  shipping: 'Shipping & Freight / 运输与货运',
+  trade_fair: 'Trade Fair Support / 展会陪同',
+  full_import: 'Full Import Management / 全程进口管理',
+} as const
+
+export type Service = keyof typeof SERVICES
 
 /** Chinese labels for the company-registration questions; others stay in English. */
 const ZH_LABELS: Record<string, string> = {
@@ -44,6 +82,8 @@ const ZH_LABELS: Record<string, string> = {
 }
 
 const FOLLOW_UP_DAYS = 7
+const REPLY_DAYS = 1
+const DAY_MS = 24 * 60 * 60 * 1000
 
 function escapeHtml(value: string): string {
   return value
@@ -63,8 +103,103 @@ export function isCompanyRegistration(app: Pick<HubSpotApplication, 'type'>): bo
   return app.type === 'company-registration'
 }
 
+/**
+ * Which of our companies handles a form, and as which service. Nasher does
+ * the trade (products, shipping), HiGP everything else. A consultation can
+ * be about anything; the team changes the service once they know.
+ */
+export function dealCategory(app: Pick<HubSpotApplication, 'type' | 'details'>): {
+  company: OurCompany
+  service: Service
+} {
+  const answer = (key: string) =>
+    typeof app.details[key] === 'string' ? (app.details[key] as string) : ''
+  switch (app.type) {
+    case 'company-registration':
+      return { company: 'higp', service: 'company_registration' }
+    case 'account-opening':
+      return {
+        company: 'higp',
+        service: ['alipay', 'wechat-pay'].includes(answer('accountType'))
+          ? 'alipay_wechat'
+          : 'bank_account',
+      }
+    case 'trademark':
+      return { company: 'higp', service: 'trademark' }
+    case 'visa': {
+      const visaType = answer('visaType')
+      return {
+        company: 'higp',
+        service:
+          visaType === 'work'
+            ? 'work_permit'
+            : visaType === 'family'
+              ? 'family_visa'
+              : 'business_visa',
+      }
+    }
+    case 'visa-invitation':
+      return { company: 'higp', service: 'invitation_letter' }
+    case 'store-setup':
+      return { company: 'higp', service: 'store_setup' }
+    case 'product-search':
+      return { company: 'nasher', service: 'product_sourcing' }
+    case 'shipping-quote':
+      return { company: 'nasher', service: 'shipping' }
+    default:
+      return { company: 'higp', service: 'consultation' }
+  }
+}
+
+/** "Bank Account / 银行开户" → English and Chinese halves. */
+function serviceLabel(service: Service): { en: string; zh: string } {
+  const [en = '', zh = ''] = SERVICES[service].split(' / ')
+  return { en, zh }
+}
+
 export function dealName(app: HubSpotApplication): string {
-  return `Company Formation / 公司注册 – ${app.name} – ${app.reference}`
+  // Company formation keeps the name the team already uses for its deals.
+  if (isCompanyRegistration(app)) {
+    return `Company Formation / 公司注册 – ${app.name} – ${app.reference}`
+  }
+  return `${SERVICES[dealCategory(app).service]} – ${app.name} – ${app.reference}`
+}
+
+/**
+ * HiGP services have a fixed price and start after payment, so they get the
+ * week-later payment check. Nasher's are priced only once a factory is found,
+ * and a consultation is not yet a service, so those get only the reply task.
+ */
+export function needsPaymentCheck(app: Pick<HubSpotApplication, 'type' | 'details'>): boolean {
+  const { company, service } = dealCategory(app)
+  return company === 'higp' && service !== 'consultation'
+}
+
+/**
+ * "Request source / 来源": the page the form was sent from, and the site the
+ * visitor came from when it was not ours ("/apply/visa (from google.com)").
+ */
+export function requestSource(sourcePath: string | null, referrer: string | null): string {
+  const page = sourcePath || 'website'
+  let host = ''
+  try {
+    host = referrer ? new URL(referrer).hostname.replace(/^www\./, '') : ''
+  } catch {
+    host = ''
+  }
+  const ours = host === 'higreenpanda.com' || host.endsWith('.higreenpanda.com')
+  return host && !ours ? `${page} (from ${host})` : page
+}
+
+/** Everything the deal carries besides its stage and owner. */
+export function dealProperties(app: HubSpotApplication): Record<string, string> {
+  const { company, service } = dealCategory(app)
+  return {
+    dealname: dealName(app),
+    our_company: company,
+    hgp_service: service,
+    hgp_request_source: requestSource(app.sourcePath, app.referrer),
+  }
 }
 
 /** The note: every answer, labels in English with Chinese where we have it. */
@@ -82,14 +217,27 @@ export function noteBody(app: HubSpotApplication): string {
   })
   const list = (items: Array<[string, string]>) =>
     `<ul>${items.map(([k, v]) => `<li><b>${escapeHtml(k)}:</b> ${escapeHtml(v)}</li>`).join('')}</ul>`
-  const status = isCompanyRegistration(app)
+  const status = needsPaymentCheck(app)
     ? '<p><b>Status / 状态:</b> Not paid yet – work starts after payment / 尚未付款 – 付款后开始办理</p>'
     : ''
   return `${head}${list(contact)}<p><b>Answers / 申请内容</b></p>${list(answers)}${status}`
 }
 
+/** Every request: someone writes to the client within a day. */
+export function replyTask(app: HubSpotApplication, now = new Date()) {
+  const { en, zh } = serviceLabel(dealCategory(app).service)
+  return {
+    subject: `Reply to client: ${app.name} – ${en} / 回复客户：${app.name} – ${zh}`,
+    body:
+      `New website request ${app.reference}. Message the client on WhatsApp ${app.whatsapp} ` +
+      `within one day and confirm what they need. / ` +
+      `网站新请求 ${app.reference}。请在一天内通过WhatsApp ${app.whatsapp}联系客户，确认需求。`,
+    dueISO: new Date(now.getTime() + REPLY_DAYS * DAY_MS).toISOString(),
+  }
+}
+
 export function followUpTask(app: HubSpotApplication, now = new Date()) {
-  const due = new Date(now.getTime() + FOLLOW_UP_DAYS * 24 * 60 * 60 * 1000)
+  const due = new Date(now.getTime() + FOLLOW_UP_DAYS * DAY_MS)
   return {
     subject: `Payment check: ${app.name} / 付款确认：${app.name}`,
     body:

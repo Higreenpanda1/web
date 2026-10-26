@@ -1,4 +1,4 @@
-import { isAdmin, isStaff, noone } from '@/access'
+import { hasRole, isAdmin, isStaff, noone } from '@/access'
 import { APPLICATION_TYPES } from '@/lib/catalogue'
 
 import type { CollectionConfig } from 'payload'
@@ -53,6 +53,29 @@ export const Applications: CollectionConfig = {
   },
   defaultSort: '-createdAt',
   timestamps: true,
+  endpoints: [
+    {
+      // The "Resend to HubSpot" button: POST /api/applications/:id/hubspot.
+      path: '/:id/hubspot',
+      method: 'post',
+      handler: async (req) => {
+        if (!hasRole(req.user, 'admin', 'editor')) {
+          return Response.json({ ok: false, error: 'Not allowed.' }, { status: 403 })
+        }
+        const id = Number(req.routeParams?.id)
+        const application = await req.payload
+          .findByID({ collection: 'applications', id, depth: 0, req })
+          .catch(() => null)
+        if (!application) {
+          return Response.json({ ok: false, error: 'Not found.' }, { status: 404 })
+        }
+        // Loaded here, not at the top: the CLI (migrations) reads this file too.
+        const { resendApplicationToHubSpot } = await import('@/lib/hubspot-resend')
+        const result = await resendApplicationToHubSpot(req.payload, application)
+        return Response.json(result, { status: result.ok ? 200 : 502 })
+      },
+    },
+  ],
   fields: [
     {
       name: 'reference',
@@ -185,6 +208,32 @@ export const Applications: CollectionConfig = {
         position: 'sidebar',
         description:
           'When the notification email was accepted by the provider. Empty means it failed — the request is still safe here.',
+      },
+    },
+    {
+      name: 'hubspotSyncedAt',
+      label: 'Sent to HubSpot at',
+      type: 'date',
+      admin: {
+        readOnly: true,
+        position: 'sidebar',
+        date: { pickerAppearance: 'dayAndTime' },
+        description:
+          'When the client, deal, note and tasks reached HubSpot. Empty means it failed or HubSpot is not connected — use the button below.',
+      },
+    },
+    {
+      name: 'hubspotDealId',
+      label: 'HubSpot deal id',
+      type: 'text',
+      admin: { readOnly: true, position: 'sidebar', description: 'The deal in HubSpot.' },
+    },
+    {
+      name: 'hubspotResend',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: { Field: '@/components/admin/HubSpotResend#HubSpotResend' },
       },
     },
   ],

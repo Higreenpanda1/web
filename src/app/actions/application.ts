@@ -14,18 +14,15 @@ import {
   type CheckedDocument,
 } from '@/lib/documents'
 import { storeDocuments } from '@/lib/documents-store'
-import {
-  sendApplicationConfirmation,
-  sendApplicationNotification,
-  type NotificationRow,
-} from '@/lib/email'
+import { describeDetails, typeLabel } from '@/lib/application-rows'
+import { sendApplicationConfirmation, sendApplicationNotification } from '@/lib/email'
 import { syncApplicationToHubSpot } from '@/lib/hubspot'
 import { isApplicationType } from '@/lib/catalogue'
 import { checkFormGuard } from '@/lib/form-guard'
 import { getPayloadClient } from '@/lib/payload'
 import { consume, networkPrefix } from '@/lib/rate-limit'
 
-import type { FieldDef, FormDef } from '@/forms/definitions'
+import type { FormDef } from '@/forms/definitions'
 import type { Locale } from '@/i18n/routing'
 
 /**
@@ -43,7 +40,6 @@ export type ApplicationState =
 
 const RATE_LIMIT = 5
 const RATE_WINDOW_MS = 10 * 60 * 1000
-const CONTACT_FIELDS = ['name', 'country', 'whatsapp', 'email'] as const
 
 export async function submitApplication(
   _previous: ApplicationState,
@@ -154,7 +150,8 @@ export async function submitApplication(
       mime: doc.mime,
       content: doc.bytes,
     }))
-    const [notified] = await Promise.all([
+    const sourcePath = headerList.get('x-pathname')
+    const [notified, synced] = await Promise.all([
       sendApplicationNotification({
         reference,
         typeLabel: label,
@@ -165,7 +162,7 @@ export async function submitApplication(
         serviceTitle,
         headline,
         locale,
-        sourcePath: headerList.get('x-pathname'),
+        sourcePath,
         rows,
         attachments,
       }),
@@ -180,6 +177,9 @@ export async function submitApplication(
           whatsapp,
           email: email || null,
           headline,
+          details,
+          sourcePath,
+          referrer: headerList.get('referer'),
           rows,
         },
         attachments,
@@ -187,12 +187,16 @@ export async function submitApplication(
       email ? sendConfirmation({ to: email, name, reference, type, locale }) : false,
     ])
 
-    if (notified) {
+    if (notified || synced) {
+      const now = new Date().toISOString()
       await payload
         .update({
           collection: 'applications',
           id: application.id,
-          data: { notifiedAt: new Date().toISOString() },
+          data: {
+            ...(notified ? { notifiedAt: now } : {}),
+            ...(synced ? { hubspotSyncedAt: now, hubspotDealId: synced.dealId } : {}),
+          },
         })
         .catch((error) => {
           console.error(`[application ${reference}] could not record notifiedAt`, error)
@@ -246,59 +250,6 @@ async function checkItemFiles(
   return { sets, errors }
 }
 
-/**
- * The answers as label/value pairs for the notification email, in English:
- * the team reads Arabic and Chinese, but the email is also what gets
- * forwarded to a bank or a visa agent, and the option codes ("virtual-basic")
- * are meaningless to anyone.
- */
-async function describeDetails(
-  type: keyof typeof FORMS,
-  details: Record<string, unknown>,
-): Promise<NotificationRow[]> {
-  const t = await getTranslations({ locale: 'en', namespace: 'apply' })
-  const rows: NotificationRow[] = []
-
-  const describe = (
-    fields: readonly FieldDef[],
-    answers: Record<string, unknown>,
-    prefix: string,
-  ) => {
-    for (const field of fields) {
-      if ((CONTACT_FIELDS as readonly string[]).includes(field.name)) continue
-      const value = answers[field.name]
-      if (value === undefined || value === null || value === '') continue
-
-      const option = (code: string) =>
-        t.has(`options.${field.name}.${code}`)
-          ? t(`options.${field.name}.${code}`)
-          : t.has(`options.common.${code}`)
-            ? t(`options.common.${code}`)
-            : code
-
-      const rendered = Array.isArray(value)
-        ? value.map((v) => (field.kind === 'file' ? String(v) : option(String(v)))).join(', ')
-        : field.kind === 'select'
-          ? option(String(value))
-          : String(value)
-
-      rows.push({ label: prefix + t(`fields.${field.name}`), value: rendered })
-    }
-  }
-
-  describe(singleFields(FORMS[type]), details, '')
-  // One block of rows per item: "Product 2 · Quantity".
-  for (const step of FORMS[type].steps) {
-    const repeat = step.repeat
-    if (!repeat || !Array.isArray(details[repeat.name])) continue
-    for (const [index, item] of (details[repeat.name] as Record<string, unknown>[]).entries()) {
-      const label = t(`repeat.${repeat.name}.item` as 'repeat.products.item', { n: index + 1 })
-      describe(step.fields, item, `${label} · `)
-    }
-  }
-  return rows
-}
-
 /** The client's confirmation, in the language they filled the form in. */
 async function sendConfirmation(args: {
   to: string
@@ -327,11 +278,6 @@ async function sendConfirmation(args: {
       signoff: t('signoff', values),
     },
   })
-}
-
-async function typeLabel(type: keyof typeof FORMS): Promise<string> {
-  const t = await getTranslations({ locale: 'en', namespace: 'apply' })
-  return t(`types.${type}.title`)
 }
 
 /** Same shape as an enquiry reference, different prefix, so the two are never confused. */
