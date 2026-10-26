@@ -4,48 +4,57 @@ import { Languages } from 'lucide-react'
 import { useTransition } from 'react'
 
 import { Link, usePathname } from '@/i18n/navigation'
+import { locales, type Locale } from '@/i18n/routing'
 import { cn } from '@/lib/cn'
-import type { Locale } from '@/i18n/routing'
+
+/** Each language in its own script, the way a reader of it looks for it. */
+const NATIVE_NAMES: Record<Locale, string> = { ar: 'العربية', en: 'English', zh: '中文' }
 
 /**
  * The switcher stays on the equivalent page — a requirement in the build prompt
- * and the most common thing bilingual sites get wrong. `usePathname` from
+ * and the most common thing multilingual sites get wrong. `usePathname` from
  * next-intl returns the path *without* the locale prefix, and slugs are shared
- * across locales by design, so the same path is valid in both languages.
+ * across locales by design, so the same path is valid in every language.
+ *
+ * With three languages it offers the other two side by side rather than a
+ * menu: one tap, no JavaScript needed to open anything.
  */
 export function LocaleSwitcher({
   locale,
   label,
-  switchTo,
   className,
 }: {
   locale: Locale
   label: string
-  switchTo: string
   className?: string
 }) {
   const pathname = usePathname()
   const [isPending, startTransition] = useTransition()
-  const target: Locale = locale === 'ar' ? 'en' : 'ar'
+  const targets = locales.filter((other) => other !== locale)
 
   return (
-    <Link
-      href={pathname}
-      locale={target}
-      hrefLang={target}
-      lang={target}
-      onNavigate={() => startTransition(() => {})}
+    <nav
+      aria-label={label}
       className={cn(
-        'inline-flex min-h-11 items-center gap-2 rounded-full border border-border bg-surface px-3.5 py-1.5 text-caption font-semibold text-text no-underline transition-colors hover:border-brand-300 hover:bg-surface-tint-soft',
+        'inline-flex min-h-11 items-center gap-1 rounded-full border border-border bg-surface ps-3 pe-1.5 py-1 text-caption font-semibold text-text',
         isPending && 'opacity-60',
         className,
       )}
     >
       <Languages size={17} strokeWidth={1.75} aria-hidden="true" className="text-text-brand" />
-      {switchTo}
-      {/* WCAG 2.5.3 Label in Name: the accessible name has to contain the
-          visible text, so the purpose is appended rather than replacing it. */}
-      <span className="sr-only">&nbsp;{label}</span>
-    </Link>
+      {targets.map((target) => (
+        <Link
+          key={target}
+          href={pathname}
+          locale={target}
+          hrefLang={target}
+          lang={target}
+          onNavigate={() => startTransition(() => {})}
+          className="rounded-full px-2 py-1 text-text no-underline transition-colors hover:bg-surface-tint-soft hover:text-text-brand"
+        >
+          {NATIVE_NAMES[target]}
+        </Link>
+      ))}
+    </nav>
   )
 }

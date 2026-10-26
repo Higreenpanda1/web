@@ -126,7 +126,8 @@ export const getPosts = (
           _status: { equals: 'published' },
           publishedAt: { less_than_equal: new Date().toISOString() },
           // An Arabic-only article is not listed on the English site.
-          ...(locale === 'en' ? { localesAvailable: { contains: 'en' } } : {}),
+          // Chinese readers get the English articles; the blog is not translated to Chinese.
+          ...(locale !== 'ar' ? { localesAvailable: { contains: 'en' } } : {}),
           ...(options.category ? { 'categories.slug': { equals: options.category } } : {}),
         },
         locale,
@@ -224,6 +225,24 @@ export const getFieldMoments = (locale: Locale, options: { limit?: number } = {}
     { tags: [CACHE_TAGS.fieldMoments], revalidate: ONE_HOUR },
   )()
 
+/** One visit with its photos, or null when it doesn't exist or isn't cleared to show. */
+export const getFieldMoment = (id: number, locale: Locale) =>
+  unstable_cache(
+    async (): Promise<FieldMoment | null> => {
+      const payload = await getPayloadClient()
+      const result = await payload.find({
+        collection: 'field-moments',
+        where: { id: { equals: id }, consentConfirmed: { equals: true } },
+        locale,
+        limit: 1,
+        depth: 1,
+      })
+      return result.docs[0] ?? null
+    },
+    ['field-moment', locale, String(id)],
+    { tags: [CACHE_TAGS.fieldMoments], revalidate: ONE_HOUR },
+  )()
+
 export const getTeam = (locale: Locale) =>
   unstable_cache(
     async (): Promise<TeamMember[]> => {
@@ -312,7 +331,8 @@ export const getCategoryCounts = (locale: Locale) =>
         where: {
           _status: { equals: 'published' },
           publishedAt: { less_than_equal: new Date().toISOString() },
-          ...(locale === 'en' ? { localesAvailable: { contains: 'en' } } : {}),
+          // Chinese readers get the English articles; the blog is not translated to Chinese.
+          ...(locale !== 'ar' ? { localesAvailable: { contains: 'en' } } : {}),
         },
         limit: 1000,
         depth: 0,
@@ -392,7 +412,8 @@ export const getRelatedPosts = (post: Post, locale: Locale, limit = 3) =>
           _status: { equals: 'published' },
           publishedAt: { less_than_equal: new Date().toISOString() },
           id: { not_equals: post.id },
-          ...(locale === 'en' ? { localesAvailable: { contains: 'en' } } : {}),
+          // Chinese readers get the English articles; the blog is not translated to Chinese.
+          ...(locale !== 'ar' ? { localesAvailable: { contains: 'en' } } : {}),
           ...(categoryIds.length ? { categories: { in: categoryIds } } : {}),
         },
         locale,
@@ -416,7 +437,8 @@ export const getAllPosts = (locale: Locale, options: { depth?: number; limit?: n
         where: {
           _status: { equals: 'published' },
           publishedAt: { less_than_equal: new Date().toISOString() },
-          ...(locale === 'en' ? { localesAvailable: { contains: 'en' } } : {}),
+          // Chinese readers get the English articles; the blog is not translated to Chinese.
+          ...(locale !== 'ar' ? { localesAvailable: { contains: 'en' } } : {}),
         },
         locale,
         sort: '-publishedAt',

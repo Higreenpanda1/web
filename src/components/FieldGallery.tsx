@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { FieldSlideshow, type Slide } from '@/components/FieldSlideshow'
 import { FIELD_KINDS } from '@/collections/FieldMoments'
 import { formatMonth, isoDate } from '@/i18n/format'
+import { Link } from '@/i18n/navigation'
 import { cn } from '@/lib/cn'
 import { mediaSrc } from '@/lib/seo'
 
@@ -48,6 +49,7 @@ export function FieldGroups({
               ...image,
               caption: moment.title,
               note: moment.takenAt ? formatMonth(moment.takenAt, locale) : undefined,
+              href: moment.story ? `/field/${moment.id}` : undefined,
             },
           ]
         : []
@@ -102,7 +104,7 @@ export function FieldGallery({
         if (!image) return null
         return (
           <li key={moment.id} data-reveal>
-            <figure className="m-0">
+            <figure className="relative m-0">
               <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-surface-sunken">
                 <Image
                   src={image.src}
@@ -113,7 +115,17 @@ export function FieldGallery({
                 />
               </div>
               <figcaption className="mt-3 text-body leading-snug font-semibold text-heading">
-                {moment.title}
+                {moment.story ? (
+                  // The whole card is the link; the title names it.
+                  <Link
+                    href={`/field/${moment.id}`}
+                    className="after:absolute after:inset-0 hover:text-text-brand hover:underline"
+                  >
+                    {moment.title}
+                  </Link>
+                ) : (
+                  moment.title
+                )}
                 {moment.takenAt ? (
                   <span className="mt-1 block text-caption font-normal text-text-muted">
                     <bdi>

@@ -23,15 +23,21 @@ export async function Header({ locale, settings }: { locale: Locale; settings: S
       : [
           { label: t('nav.services'), href: '/services' },
           { label: t('nav.consultation'), href: '/apply/consultation' },
+          { label: t('nav.academy'), href: '/academy' },
           { label: t('nav.about'), href: '/about' },
           { label: t('nav.blog'), href: '/blog' },
           { label: t('nav.contact'), href: '/contact' },
         ]
+  // The course page always has a way in, even from a menu edited in Site
+  // settings before it existed: it goes just before the last item (Contact).
+  if (!items.some((item) => item.href === '/academy')) {
+    items.splice(Math.max(items.length - 1, 0), 0, { label: t('nav.academy'), href: '/academy' })
+  }
 
   const whatsapp = whatsappLink(settings.whatsappNumber, settings.whatsappPrefill ?? undefined)
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border-soft bg-surface/85 backdrop-blur-md">
+    <header className="theme-deep sticky top-0 z-40 border-b border-[rgb(224_163_46/0.18)] bg-[rgb(6_36_20/0.9)] backdrop-blur-md">
       <div className="container-page flex h-[var(--header-height)] items-center justify-between gap-3">
         <Link href="/" className="shrink-0 rounded-sm no-underline" aria-label={t('site.name')}>
           <Wordmark height={48} className="h-10 w-auto md:h-12" />
@@ -52,7 +58,6 @@ export async function Header({ locale, settings }: { locale: Locale; settings: S
           <LocaleSwitcher
             locale={locale}
             label={t('locale.label')}
-            switchTo={t('locale.switchTo')}
             className="hidden sm:inline-flex"
           />
           <a
@@ -81,12 +86,7 @@ export async function Header({ locale, settings }: { locale: Locale; settings: S
             whatsappLabel={t('cta.whatsapp')}
             whatsappHref={whatsapp}
           >
-            <LocaleSwitcher
-              locale={locale}
-              label={t('locale.label')}
-              switchTo={t('locale.switchTo')}
-              className="sm:hidden"
-            />
+            <LocaleSwitcher locale={locale} label={t('locale.label')} className="sm:hidden" />
           </MobileNav>
         </div>
       </div>

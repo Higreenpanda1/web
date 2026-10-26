@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 
 import { JsonLd } from '@/components/JsonLd'
+import { CourseSection } from '@/components/academy/CourseSection'
 import { RenderBlocks } from '@/components/blocks/RenderBlocks'
 import { DefaultHome } from '@/components/DefaultHome'
 import { ExploreChina } from '@/components/home/ExploreChina'
@@ -41,7 +42,12 @@ export default async function HomePage({ params }: { params: Promise<{ locale: L
     <>
       <JsonLd data={organisationJsonLd(settings, locale)} />
       {page?.layout && page.layout.length > 0 ? (
-        <RenderBlocks blocks={page.layout} locale={locale} />
+        // The course goes right under the hero, whichever layout the CMS holds.
+        <>
+          <RenderBlocks blocks={page.layout.slice(0, 1)} locale={locale} />
+          <CourseSection locale={locale} />
+          <RenderBlocks blocks={page.layout.slice(1)} locale={locale} />
+        </>
       ) : (
         // A fresh install with an empty CMS still gets a complete, sellable
         // homepage rather than a blank screen.

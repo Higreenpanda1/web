@@ -6,12 +6,15 @@ import { defineRouting } from 'next-intl/routing'
  * Arabic-speaking traders (brief §2), so Arabic is the site, not a translation
  * layer bolted onto an English original.
  *
+ * English lives at `/en` and Chinese at `/zh`; Chinese content the CMS has
+ * not been translated into falls back to English (src/payload.config.ts).
+ *
  * `localePrefix: 'as-needed'` is what produces `/services` (Arabic) and
  * `/en/services` (English) from a single route tree, which in turn is what lets
  * the language switcher stay on the equivalent page instead of bouncing home.
  */
 export const routing = defineRouting({
-  locales: ['ar', 'en'] as const,
+  locales: ['ar', 'en', 'zh'] as const,
   defaultLocale: 'ar',
   localePrefix: 'as-needed',
   // Do not sniff Accept-Language. A Gulf trader on an English-default phone
@@ -32,7 +35,7 @@ export function directionOf(locale: Locale): 'rtl' | 'ltr' {
 
 /** BCP-47 tag used in hreflang, OG locale and the html lang attribute. */
 export function htmlLangOf(locale: Locale): string {
-  return locale === 'ar' ? 'ar' : 'en'
+  return locale === 'zh' ? 'zh-CN' : locale
 }
 
 export function isLocale(value: string): value is Locale {

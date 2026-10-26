@@ -58,11 +58,63 @@ export const OTHER_COUNTRIES: Country[] = [
   { code: 'OTHER', ar: 'دولة أخرى', en: 'Another country' },
 ]
 
-export function countryName(country: Country, locale: 'ar' | 'en'): string {
-  return locale === 'ar' ? country.ar : country.en
+/**
+ * Chinese names, written out rather than taken from Intl.DisplayNames: the
+ * server's and each browser's ICU name some regions differently (PS), which
+ * breaks hydration of the country picker.
+ */
+const ZH_NAMES: Record<string, string> = {
+  SA: '沙特阿拉伯',
+  YE: '也门',
+  AE: '阿拉伯联合酋长国',
+  KW: '科威特',
+  QA: '卡塔尔',
+  OM: '阿曼',
+  BH: '巴林',
+  IQ: '伊拉克',
+  JO: '约旦',
+  EG: '埃及',
+  LY: '利比亚',
+  SD: '苏丹',
+  MA: '摩洛哥',
+  DZ: '阿尔及利亚',
+  TN: '突尼斯',
+  LB: '黎巴嫩',
+  SY: '叙利亚',
+  PS: '巴勒斯坦',
+  MR: '毛里塔尼亚',
+  SO: '索马里',
+  DJ: '吉布提',
+  TR: '土耳其',
+  CN: '中国',
+  IN: '印度',
+  PK: '巴基斯坦',
+  ID: '印度尼西亚',
+  MY: '马来西亚',
+  NG: '尼日利亚',
+  KE: '肯尼亚',
+  ET: '埃塞俄比亚',
+  ZA: '南非',
+  GB: '英国',
+  US: '美国',
+  CA: '加拿大',
+  DE: '德国',
+  FR: '法国',
+  ES: '西班牙',
+  IT: '意大利',
+  NL: '荷兰',
+  SE: '瑞典',
+  AU: '澳大利亚',
+  BR: '巴西',
+  OTHER: '其他国家',
 }
 
-/** The "another country" choice, offered whenever a search finds nothing better. */
+export function countryName(country: Country, locale: 'ar' | 'en' | 'zh'): string {
+  if (locale === 'ar') return country.ar
+  if (locale === 'zh') return ZH_NAMES[country.code] ?? country.en
+  return country.en
+}
+
 export const ANOTHER_COUNTRY = OTHER_COUNTRIES.find((country) => country.code === 'OTHER')!
 
 /** Other names people type for a country, beyond its Arabic and English names. */

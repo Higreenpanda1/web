@@ -3,10 +3,14 @@
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 
+import { Link } from '@/i18n/navigation'
 import { cn } from '@/lib/cn'
 
-/** `caption` is shown over the photo while it is the current slide. */
-export type Slide = { src: string; alt: string; caption?: string; note?: string }
+/**
+ * `caption` is shown over the photo while it is the current slide; with an
+ * `href` it links to that visit's own page.
+ */
+export type Slide = { src: string; alt: string; caption?: string; note?: string; href?: string }
 
 const INTERVAL_MS = 3500
 
@@ -109,7 +113,16 @@ export function FieldSlideshow({
       <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/35 to-transparent px-4 pt-16 pb-2 text-white">
         {slides[index]?.caption ? (
           <p aria-live="polite" className="m-0 text-body leading-snug font-semibold">
-            {slides[index]?.caption}
+            {slides[index]?.href ? (
+              <Link
+                href={slides[index]?.href ?? ''}
+                className="text-white underline decoration-white/60 underline-offset-4 hover:decoration-white"
+              >
+                {slides[index]?.caption}
+              </Link>
+            ) : (
+              slides[index]?.caption
+            )}
             {slides[index]?.note ? (
               <span className="mt-0.5 block text-caption font-normal text-white/80">
                 <bdi>{slides[index]?.note}</bdi>

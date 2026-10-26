@@ -32,8 +32,11 @@ type BuildArgs = {
   authors?: string[]
 }
 
+const OG_LOCALE: Record<Locale, string> = { ar: 'ar_AR', en: 'en_GB', zh: 'zh_CN' }
+
 export function fallbackOgImage(locale: Locale): string {
-  return `${serverURL}/brand/social/og-image-${locale}.png`
+  // There is no Chinese card yet; the English one carries the brand name in Latin.
+  return `${serverURL}/brand/social/og-image-${locale === 'zh' ? 'en' : locale}.png`
 }
 
 /**
@@ -99,8 +102,8 @@ export function buildMetadata({
       description: finalDescription,
       url: alternates.canonical,
       siteName: locale === 'ar' ? 'هاي جرين باندا' : 'HiGreenPanda',
-      locale: locale === 'ar' ? 'ar_AR' : 'en_GB',
-      alternateLocale: locale === 'ar' ? ['en_GB'] : ['ar_AR'],
+      locale: OG_LOCALE[locale],
+      alternateLocale: Object.values(OG_LOCALE).filter((value) => value !== OG_LOCALE[locale]),
       images: [{ url: ogImage, width: 1200, height: 630, alt: finalTitle }],
       ...(type === 'article' ? { publishedTime, modifiedTime, authors } : {}),
     },

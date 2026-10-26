@@ -18,6 +18,7 @@
     "primary": "Primary navigation",
     "footer": "Footer links",
     "consultation": "Consultation",
+    "academy": "Academy",
     "field": "From the field"
   },
   "locale": {
@@ -875,7 +876,9 @@
       "market": "In the markets"
     },
     "contactTitle": "Want the next visit to be yours?",
-    "count": "{count, plural, one {# visit} other {# visits}}"
+    "count": "{count, plural, one {# visit} other {# visits}}",
+    "back": "All visits",
+    "photos": "Photos from the visit"
   },
   "licences": {
     "title": "Licences and address",
@@ -932,5 +935,29 @@
     "search": "Type to search for a country",
     "noResults": "No country found",
     "example": "501234567"
+  },
+  "academy": {
+    "stripBadge": "New",
+    "stripText": "International Trade from A to Z",
+    "stripCta": "Open the file",
+    "eyebrow": "HIGREENPANDA ACADEMY · RECORDED PROGRAMME",
+    "title": "International Trade from A to Z",
+    "quote": "At every deal table, one side <em>reads</em>. The other is read.",
+    "lead": "A programme written from the Chinese exporter's own side: how he prices, what he fears, and how he reads the person across the table. For importers and exporters.",
+    "statsLabel": "The programme in numbers",
+    "stages": "stages",
+    "lessons": "recorded lessons",
+    "hours": "hours",
+    "lifetime": "Lifetime access",
+    "pricesLabel": "Enrolment",
+    "currency": "RMB",
+    "master": "Master",
+    "premium": "Premium",
+    "premiumNote": "plus a private session with Sami",
+    "cta": "Open the file",
+    "photoAlt": "Sami Al-Hajri, founder of HiGreenPanda",
+    "photoCaption": "Sami Al-Hajri · Founder of HiGreenPanda",
+    "fileLabel": "File",
+    "fileStamp": "CONFIDENTIAL"
   }
 }

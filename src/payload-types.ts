@@ -115,14 +115,14 @@ export interface Config {
   db: {
     defaultIDType: number;
   };
-  fallbackLocale: ('false' | 'none' | 'null') | false | null | ('ar' | 'en') | ('ar' | 'en')[];
+  fallbackLocale: ('false' | 'none' | 'null') | false | null | ('ar' | 'en' | 'zh') | ('ar' | 'en' | 'zh')[];
   globals: {
     'site-settings': SiteSetting;
   };
   globalsSelect: {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
   };
-  locale: 'ar' | 'en';
+  locale: 'ar' | 'en' | 'zh';
   widgets: {
     collections: CollectionsWidget;
   };
@@ -912,6 +912,10 @@ export interface FieldMoment {
    */
   title: string;
   /**
+   * Optional. What the visit was about, in a few short paragraphs. A visit with a story gets its own page, with the story above all its photos.
+   */
+  story?: string | null;
+  /**
    * The first photo is the cover. They rotate on the site in this order.
    */
   photos: (number | Media)[];
@@ -968,7 +972,7 @@ export interface Enquiry {
    * Captured automatically. Useful when judging whether a lead is genuine.
    */
   meta?: {
-    locale?: ('ar' | 'en') | null;
+    locale?: ('ar' | 'en' | 'zh') | null;
     sourcePath?: string | null;
     referrer?: string | null;
     userAgent?: string | null;
@@ -1122,7 +1126,7 @@ export interface Application {
    * Captured automatically. Useful when judging whether a request is genuine.
    */
   meta?: {
-    locale?: ('ar' | 'en') | null;
+    locale?: ('ar' | 'en' | 'zh') | null;
     sourcePath?: string | null;
     referrer?: string | null;
     userAgent?: string | null;
@@ -1670,6 +1674,7 @@ export interface TestimonialsSelect<T extends boolean = true> {
  */
 export interface FieldMomentsSelect<T extends boolean = true> {
   title?: T;
+  story?: T;
   photos?: T;
   kind?: T;
   takenAt?: T;

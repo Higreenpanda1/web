@@ -126,6 +126,7 @@ export const Enquiries: CollectionConfig = {
           options: [
             { label: 'العربية', value: 'ar' },
             { label: 'English', value: 'en' },
+            { label: '中文', value: 'zh' },
           ],
           admin: { readOnly: true },
         },

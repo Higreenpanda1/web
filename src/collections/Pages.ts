@@ -24,7 +24,7 @@ export const Pages: CollectionConfig = {
     group: 'Content',
     livePreview: {
       url: ({ data, locale }) => {
-        const prefix = locale?.code === 'en' ? '/en' : ''
+        const prefix = locale?.code && locale.code !== 'ar' ? `/${locale.code}` : ''
         const slug = data?.slug === 'home' ? '' : `/${data?.slug ?? ''}`
         return `${process.env.NEXT_PUBLIC_SERVER_URL}${prefix}${slug || '/'}`
       },
