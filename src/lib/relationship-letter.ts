@@ -1,6 +1,6 @@
 import { escapeHtml, type Issuer } from './billing-document'
 import type { HistoryRow } from './client-history'
-import { OTHER_COUNTRIES, PRIORITY_COUNTRIES } from './countries'
+import { countryName, OTHER_COUNTRIES, PRIORITY_COUNTRIES } from './countries'
 
 /**
  * The business relationship letter a client gives their bank with a transfer
@@ -9,14 +9,15 @@ import { OTHER_COUNTRIES, PRIORITY_COUNTRIES } from './countries'
  * the Gulf often ask for it before they release a payment to China.
  *
  * Served by GET /api/applications/:id/relationship, printed to PDF by the
- * team, signed and stamped. English and Arabic side by side: the reader is
- * the client's bank. Same letterhead and colours as the quote and invoices.
+ * team, signed and stamped. English and Chinese side by side, like the quote
+ * and invoices: the owner chose those two on 26 Oct 2026. Same letterhead
+ * and colours as the quote and invoices.
  */
 
 export type RelationshipLetter = {
   issuer: Issuer
   /** What the client pays this issuer for, e.g. "purchase of goods". */
-  purpose: { en: string; ar: string }
+  purpose: { en: string; zh: string }
   reference: string
   /** YYYY-MM-DD, the day it is printed. */
   date: string
@@ -35,29 +36,29 @@ export type RelationshipLetter = {
 
 const e = escapeHtml
 
-function countryNames(value: string | null | undefined): { en: string; ar: string } | null {
+function countryNames(value: string | null | undefined): { en: string; zh: string } | null {
   if (!value) return null
   const found = [...PRIORITY_COUNTRIES, ...OTHER_COUNTRIES].find((c) =>
     [c.ar, c.en].includes(value),
   )
-  return found ? { en: found.en, ar: found.ar } : { en: value, ar: value }
+  return found ? { en: found.en, zh: countryName(found, 'zh') } : { en: value, zh: value }
 }
 
 export function renderRelationshipLetter(doc: RelationshipLetter): string {
   const first = doc.history[0]?.date ?? doc.date
   const count = doc.history.length
   const country = countryNames(doc.client.country)
-  const wa = `<bdi dir="ltr" class="nowrap">${e(doc.client.whatsapp)}</bdi>`
-  const ref = (value: string) => `<bdi class="nowrap">${e(value)}</bdi>`
+  const wa = `<span class="nowrap">${e(doc.client.whatsapp)}</span>`
+  const ref = (value: string) => `<span class="nowrap">${e(value)}</span>`
   const who = {
     en: [doc.client.name, doc.client.company, country?.en]
       .filter(Boolean)
       .map((v) => e(v!))
       .join(', '),
-    ar: [doc.client.name, doc.client.company, country?.ar]
+    zh: [doc.client.name, doc.client.company, country?.zh]
       .filter(Boolean)
-      .map((v) => `<bdi>${e(v!)}</bdi>`)
-      .join('، '),
+      .map((v) => e(v!))
+      .join('，'),
   }
   const number = `REL-${doc.reference}`
 
@@ -65,49 +66,48 @@ export function renderRelationshipLetter(doc: RelationshipLetter): string {
     <p>To whom it may concern,</p>
     <p>This letter confirms that <b>${who.en}</b> (WhatsApp ${wa}) is a client of
     <b>${e(doc.issuer.en)}</b>, a HiGreenPanda group company.</p>
-    <p>Our records show the client's first request on <b>${first}</b>, and
+    <p>Our records show the client's first request on <b>${ref(first)}</b>, and
     ${count === 1 ? '<b>1</b> request' : `<b>${count}</b> requests`} with us since then, listed below.
     We remain in regular contact with the client.</p>
     <p>A transfer from this client to our account is payment for request
     <b>${ref(doc.current.reference)}</b>${doc.current.amount ? `, valued at <b>${ref(doc.current.amount)}</b>` : ''}:
     ${e(doc.purpose.en)}.</p>`
 
-  const arabic = `
-    <p>إلى من يهمه الأمر،</p>
-    <p>نشهد بأن <b>${who.ar}</b> (واتساب ${wa}) عميل لدى
-    <b><bdi>${e(doc.issuer.en)}</bdi></b>، إحدى شركات مجموعة HiGreenPanda.</p>
-    <p>وتُظهر سجلاتنا أن أول طلب من العميل كان بتاريخ <b>${ref(first)}</b>، وأن عدد طلباته لدينا منذ ذلك الحين
-    <b>${count}</b>، وهي مبيّنة في الجدول أدناه. ونحن على تواصل مستمر مع العميل.</p>
-    <p>وأي تحويل من هذا العميل إلى حسابنا هو دفعة عن الطلب <b>${ref(doc.current.reference)}</b>${
-      doc.current.amount ? ` بقيمة <b>${ref(doc.current.amount)}</b>` : ''
-    }: ${e(doc.purpose.ar)}.</p>`
+  const chinese = `
+    <p>致相关负责人：</p>
+    <p>兹证明 <b>${who.zh}</b>（WhatsApp ${wa}）为 <b>${e(doc.issuer.zh)}</b>（HiGreenPanda 集团旗下公司）的客户。</p>
+    <p>根据我方记录，该客户首次向我方提出需求的日期为 <b>${ref(first)}</b>，此后共向我方提交 <b>${count}</b> 项需求，详见下表。我方与该客户保持持续联系。</p>
+    <p>该客户向我方账户的转账为需求 <b>${ref(doc.current.reference)}</b>${
+      doc.current.amount ? `（金额 <b>${ref(doc.current.amount)}</b>）` : ''
+    }的付款：${e(doc.purpose.zh)}。</p>`
 
   const rows = doc.history
     .map(
       (row) => `<tr${row.reference === doc.current.reference ? ' class="current"' : ''}>
         <td class="nowrap">${row.date}</td>
         <td class="nowrap">${e(row.reference)}</td>
-        <td>${e(row.what.en)} <span class="ar">${e(row.what.ar)}</span>${
+        <td>${e(row.what.en)} <span class="zh">${e(row.what.zh)}</span>${
           row.products.length
             ? `<small>${e(row.products.slice(0, 4).join(', '))}${row.products.length > 4 ? ` +${row.products.length - 4}` : ''}</small>`
             : ''
         }</td>
         <td class="num">${row.amount ? e(row.amount) : '–'}</td>
-        <td>${e(row.status.en)} <span class="ar">${e(row.status.ar)}</span></td>
+        <td>${e(row.status.en)} <span class="zh">${e(row.status.zh)}</span></td>
       </tr>`,
     )
     .join('')
 
-  const head = (en: string, ar: string, cls = '') =>
-    `<th${cls ? ` class="${cls}"` : ''}>${en} <span class="ar">${ar}</span></th>`
+  const head = (en: string, zh: string, cls = '') =>
+    `<th${cls ? ` class="${cls}"` : ''}>${en} <span class="zh">${zh}</span></th>`
 
+  const phone = '<span class="nowrap">+86 130 2344 0305</span>'
   const verify = {
-    en: `For verification, the bank may contact us at contact@higreenpanda.com or on WhatsApp <span dir="ltr" class="nowrap">+86 130 2344 0305</span>.`,
-    ar: `وللتحقق يمكن للبنك التواصل معنا عبر <bdi>contact@higreenpanda.com</bdi> أو واتساب <bdi dir="ltr" class="nowrap">+86 130 2344 0305</bdi>.`,
+    en: `For verification, the bank may contact us at contact@higreenpanda.com or on WhatsApp ${phone}.`,
+    zh: `如需核实，银行可通过 contact@higreenpanda.com 或 WhatsApp ${phone} 与我方联系。`,
   }
 
   const printButton = doc.nonce
-    ? `<button type="button" id="print">Print / Save as PDF · طباعة</button>
+    ? `<button type="button" id="print">打印 / 保存为 PDF · Print / Save as PDF</button>
        <script nonce="${e(doc.nonce)}">document.getElementById('print').addEventListener('click',()=>window.print())</script>`
     : ''
 
@@ -125,36 +125,36 @@ ${printButton}
 <header>
   <img src="/brand/web/logo-wordmark@2x.png" alt="HiGreenPanda" class="logo">
   <div class="issuer">
-    <b>${e(doc.issuer.en)}</b><br>${e(doc.issuer.zh)}
-    <small>${e(doc.issuer.addressEn)}<br>${e(doc.issuer.contact)}</small>
+    <b>${e(doc.issuer.zh)}</b><br>${e(doc.issuer.en)}
+    <small>${e(doc.issuer.addressZh)}<br>${e(doc.issuer.addressEn)}<br>${e(doc.issuer.contact)}</small>
   </div>
 </header>
 <div class="head">
   <h1>Business Relationship Letter</h1>
-  <h1 class="ar" dir="rtl">خطاب إثبات تعامل تجاري</h1>
+  <h1 class="zh" lang="zh-CN">业务往来证明函</h1>
 </div>
 <table class="meta">
-  <tr><th>Letter No. <span class="ar">رقم الخطاب</span></th><td>${e(number)}</td>
-      <th>Date <span class="ar">التاريخ</span></th><td>${doc.date}</td></tr>
+  <tr><th>Letter No. <span class="zh">函号</span></th><td>${e(number)}</td>
+      <th>Date <span class="zh">日期</span></th><td>${doc.date}</td></tr>
 </table>
 <div class="cols">
   <section lang="en">${english}</section>
-  <section lang="ar" dir="rtl" class="ar-text">${arabic}</section>
+  <section lang="zh-CN" class="zh-text">${chinese}</section>
 </div>
 <table class="lines">
   <thead><tr>
-    ${head('Date', 'التاريخ')}${head('Request No.', 'رقم الطلب')}${head('Request', 'الطلب')}${head('Value', 'القيمة', 'num')}${head('Status', 'الحالة')}
+    ${head('Date', '日期')}${head('Request No.', '需求编号')}${head('Request', '需求内容')}${head('Value', '金额', 'num')}${head('Status', '状态')}
   </tr></thead>
   <tbody>${rows}</tbody>
 </table>
 <div class="cols small">
   <p lang="en">${verify.en}</p>
-  <p lang="ar" dir="rtl" class="ar-text">${verify.ar}</p>
+  <p lang="zh-CN" class="zh-text">${verify.zh}</p>
 </div>
 <div class="sign">
   <div class="line"></div>
-  <p>Authorised signature and company stamp <span class="ar">التوقيع المعتمد وختم الشركة</span><br>
-  <b>${e(doc.issuer.en)}</b><br>${e(doc.issuer.zh)}</p>
+  <p>Authorised signature and company stamp <span class="zh">授权签字及公司盖章</span><br>
+  <b>${e(doc.issuer.zh)}</b><br>${e(doc.issuer.en)}</p>
 </div>
 </body>
 </html>`
@@ -163,10 +163,10 @@ ${printButton}
 const STYLE = `
   @page { size: A4; margin: 14mm; }
   * { box-sizing: border-box; }
-  body { font-family: -apple-system, "Segoe UI", "Noto Sans", "Noto Naskh Arabic", Tahoma, Arial, sans-serif;
+  body { font-family: -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", Arial, sans-serif;
     color: #17221a; background: #fff; margin: 0 auto; max-width: 820px; padding: 24px 16px; line-height: 1.55; font-size: 13px; }
-  .ar { font-family: "Noto Naskh Arabic", "Geeza Pro", Tahoma, Arial, sans-serif; color: #4a5a4e; }
-  .ar-text { font-family: "Noto Naskh Arabic", "Geeza Pro", Tahoma, Arial, sans-serif; font-size: 14px; }
+  .zh { font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif; color: #4a5a4e; }
+  .zh-text { font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif; }
   .nowrap { white-space: nowrap; }
   header { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; border-bottom: 3px solid #378d42; padding-bottom: 12px; }
   .logo { height: 42px; width: auto; }
@@ -174,7 +174,7 @@ const STYLE = `
   .issuer small { display: block; color: #556; margin-top: 4px; }
   .head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin: 18px 0 6px; }
   h1 { font-size: 22px; margin: 0; color: #12341b; }
-  h1.ar { color: #276b34; }
+  h1.zh { color: #276b34; }
   table { width: 100%; border-collapse: collapse; }
   th, td { text-align: left; vertical-align: top; padding: 5px 8px; }
   .meta { width: auto; margin-bottom: 8px; }
@@ -185,9 +185,9 @@ const STYLE = `
   .cols.small { font-size: 12px; color: #445; margin-top: 12px; }
   .lines { margin-top: 10px; }
   .lines thead th { background: #12341b; color: #fff; font-weight: 600; }
-  .lines thead .ar { color: #cfe9d3; }
+  .lines thead .zh { color: #cfe9d3; }
   .lines tbody td { border-bottom: 1px solid #e3eee6; }
-  .lines .ar { display: block; }
+  .lines .zh { display: block; }
   .lines small { display: block; color: #667; }
   .lines tr.current td { background: #f3f7f4; font-weight: 600; }
   .num { text-align: right; white-space: nowrap; }
