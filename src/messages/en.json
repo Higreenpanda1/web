@@ -649,7 +649,9 @@
       "sizes": "Sizes",
       "sizesHint": "For example S, M, L, or 30×40 cm. If the quantity differs by size, write it here.",
       "colours": "Colours",
-      "coloursHint": "For example black and white, or a colour code. If the quantity differs by colour, write it here."
+      "coloursHint": "For example black and white, or a colour code. If the quantity differs by colour, write it here.",
+      "companyNameHint": "If you will pay from a company account, write its name exactly as the bank has it.",
+      "companyAddress": "Company address"
     },
     "options": {
       "common": {

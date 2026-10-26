@@ -649,7 +649,9 @@
       "sizes": "尺码",
       "sizesHint": "例如 S、M、L，或 30×40 厘米。如果各尺码数量不同，请写在这里。",
       "colours": "颜色",
-      "coloursHint": "例如黑色和白色，或色号。如果各颜色数量不同，请写在这里。"
+      "coloursHint": "例如黑色和白色，或色号。如果各颜色数量不同，请写在这里。",
+      "companyNameHint": "如果您将从公司账户付款，请按银行登记的名称填写。",
+      "companyAddress": "公司地址"
     },
     "options": {
       "common": {

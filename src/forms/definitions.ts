@@ -650,6 +650,9 @@ export const FORMS: Record<ApplicationType, FormDef> = {
       {
         key: 'delivery',
         fields: [
+          // For the proforma invoice: the bank matches the payer to its name.
+          { name: 'companyName', kind: 'text', width: 'half', hint: true, max: 160 },
+          { name: 'companyAddress', kind: 'text', width: 'half', max: 300 },
           { name: 'destinationCountry', kind: 'country', required: true, width: 'half' },
           {
             name: 'timeline',
