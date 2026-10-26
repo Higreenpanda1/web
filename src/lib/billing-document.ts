@@ -74,6 +74,39 @@ export const HIGP: Issuer = {
   ],
 }
 
+/**
+ * Copied from the owner's bank card for Nasher
+ * (/mnt/project-files/product-orders/nasher-bank-details.png, 26 Oct 2026).
+ * The card gives no street address for Nasher, so its letters carry the
+ * Shenzhen headquarters, where the group is run from. No payment codes:
+ * goods are paid by bank transfer.
+ */
+export const NASHER: Issuer = {
+  en: 'Nasher Electronic Commerce (Shanghai) Co., Ltd.',
+  zh: '那社尔电子商贸（上海）有限公司',
+  addressEn: (HEADQUARTERS.addressEn ?? []).join(', '),
+  addressZh: HEADQUARTERS.addressZh ?? '',
+  contact: HIGP.contact,
+  bank: [
+    { label: ['Account name', '户名'], value: 'Nasher Electronic Commerce (Shanghai) Co., Ltd.' },
+    {
+      label: ['Bank (China)', '开户行（中国）'],
+      value:
+        'Shanghai Rural Commercial Bank Co., Ltd.<br>No. 70, Zhongshan Road (East-2), Huangpu District, Shanghai, China',
+    },
+    { label: ['Account number', '账号'], value: '6812000012131' },
+    { label: ['SWIFT / BIC', 'SWIFT / BIC'], value: 'SHRCCNSHXXX' },
+    {
+      label: ['Bank (UAE)', '开户行（阿联酋）'],
+      value:
+        'Zand Bank<br>Al Hail Holding Building, Floor 1, Office 101, Mohammed Bin Rashid Boulevard, Dubai, United Arab Emirates',
+    },
+    { label: ['IBAN', 'IBAN'], value: 'AE44 0960 0006 9106 0019 813' },
+    { label: ['SWIFT / BIC', 'SWIFT / BIC'], value: 'ZANDAEAAXXX' },
+  ],
+  codes: [],
+}
+
 type Pair = readonly [string, string]
 
 const L = {
@@ -134,7 +167,7 @@ const L = {
   print: ['Print / Save as PDF', '打印 / 保存为 PDF'],
 } as const satisfies Record<string, Pair | Record<string, Pair>>
 
-function escapeHtml(value: string): string {
+export function escapeHtml(value: string): string {
   return value
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')

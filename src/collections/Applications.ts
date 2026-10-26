@@ -258,6 +258,56 @@ export const Applications: CollectionConfig = {
         })
       },
     },
+    {
+      // The business relationship letter for the client's bank:
+      // /api/applications/:id/relationship, or ?from=higp|nasher to pick the
+      // company the client is paying (by default Nasher for goods, HiGP otherwise).
+      path: '/:id/relationship',
+      method: 'get',
+      handler: async (req) => {
+        const application = await staffApplication(req)
+        if (application instanceof Response) return application
+        const { clientHistory, isGoods, requestAmount } = await import('@/lib/client-history')
+        const { HIGP, NASHER } = await import('@/lib/billing-document')
+        const { renderRelationshipLetter } = await import('@/lib/relationship-letter')
+        // A loose match by the last digits, then an exact one on all digits.
+        const tail = application.whatsapp.replace(/\D/g, '').slice(-8)
+        const { docs } = await req.payload.find({
+          collection: 'applications',
+          where: { whatsapp: { contains: tail } },
+          depth: 0,
+          limit: 500,
+          pagination: false,
+          req,
+        })
+        const history = clientHistory(application, docs)
+        const from = req.searchParams?.get('from')
+        const goods = from ? from === 'nasher' : isGoods(application.type)
+        const details = (application.details ?? {}) as Record<string, unknown>
+        const html = renderRelationshipLetter({
+          issuer: goods ? NASHER : HIGP,
+          purpose: goods
+            ? { en: 'purchase of goods', zh: '采购货物' }
+            : { en: 'business services in China', zh: '在华商务服务' },
+          reference: application.reference,
+          date: new Date().toISOString().slice(0, 10),
+          client: {
+            name: application.name,
+            company:
+              application.billing?.clientCompany ||
+              (typeof details.companyName === 'string' ? details.companyName : null),
+            country: application.country,
+            whatsapp: application.whatsapp,
+          },
+          history,
+          current: { reference: application.reference, amount: requestAmount(application) },
+          nonce: req.headers.get('x-nonce'),
+        })
+        return new Response(html, {
+          headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' },
+        })
+      },
+    },
   ],
   fields: [
     {
@@ -436,6 +486,15 @@ export const Applications: CollectionConfig = {
       ],
     },
 
+    {
+      // The business relationship letter for the client's bank, on every request.
+      name: 'relationshipLetter',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: { Field: '@/components/admin/RelationshipLetter#RelationshipLetter' },
+      },
+    },
     {
       // The quote and invoice buttons for a HiGP service request.
       name: 'billingDocuments',
