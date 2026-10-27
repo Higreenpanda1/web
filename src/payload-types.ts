@@ -1109,6 +1109,7 @@ export interface Application {
    */
   order?: {
     currency: 'usd' | 'cny' | 'aed' | 'sar';
+    paymentTerms: 'full' | '50-50' | '30-70';
     items?:
       | {
           productName: string;
@@ -1896,6 +1897,7 @@ export interface ApplicationsSelect<T extends boolean = true> {
     | T
     | {
         currency?: T;
+        paymentTerms?: T;
         items?:
           | T
           | {

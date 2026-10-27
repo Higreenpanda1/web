@@ -40,6 +40,24 @@ export type OrderItem = {
 export const ORDER_CURRENCIES = ['usd', 'cny', 'aed', 'sar'] as const
 export const ORDER_UNITS = ['pieces', 'sets', 'pairs', 'cartons', 'metres', 'kg'] as const
 
+/**
+ * How the client pays for the goods, as agreed with them order by order:
+ * everything at once, or a deposit now and the balance before shipment.
+ */
+export const PAYMENT_TERMS = ['full', '50-50', '30-70'] as const
+export type PaymentTerms = (typeof PAYMENT_TERMS)[number]
+
+/** The deposit due now and the balance before shipment, to the cent. */
+export function paymentSplit(
+  total: number,
+  terms: string | null | undefined,
+): { share: number; deposit: number; balance: number } {
+  const share = terms === '50-50' ? 0.5 : terms === '30-70' ? 0.3 : 1
+  const cents = Math.round(total * 100)
+  const deposit = Math.round(cents * share)
+  return { share, deposit: deposit / 100, balance: (cents - deposit) / 100 }
+}
+
 const text = (value: unknown): string | null =>
   typeof value === 'string' && value.trim() !== '' ? value.trim() : null
 
