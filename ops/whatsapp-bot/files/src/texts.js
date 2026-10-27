@@ -5,7 +5,7 @@
 module.exports = {
   ar: {
     salam: 'وعليكم السلام ورحمة الله وبركاته،',
-    welcome: 'أهلًا بك في *هاي جرين باندا* 🐼\n\nيسعدنا تواصلك. معك المساعد الرقمي لفريقنا في الصين، وأنا هنا لأجيب عن استفساراتك وأوصلك بالفريق المختص.',
+    welcome: 'أهلًا بك في *هاي جرين باندا*\n\nيسعدنا تواصلك. معك المساعد الرقمي لفريقنا في الصين، وأنا هنا لأجيب عن استفساراتك وأوصلك بالفريق المختص.',
     offer: 'كيف يمكننا خدمتك اليوم؟\n• التوريد والاستيراد من الصين\n• تأسيس الشركات والمحاسبة\n• الحسابات البنكية وحسابات علي باي\n• كرت العمل والتأشيرات\n• المتاجر الإلكترونية',
     menuHead: 'يسعدنا أن نضع بين يديك خدماتنا في الصين:',
     menuTail: 'اكتب اسم الخدمة التي تهمك، أو حدّثنا عن طلبك، وسنوضح لك التفاصيل كاملة.',
@@ -27,7 +27,7 @@ module.exports = {
   },
   en: {
     salam: 'Wa alaikum assalam,',
-    welcome: 'Hello, and welcome to *HiGreenPanda* 🐼\n\nThank you for reaching out. This is our team\'s digital assistant in China. I can answer your questions and connect you with the right specialist.',
+    welcome: 'Hello, and welcome to *HiGreenPanda*\n\nThank you for reaching out. This is our team\'s digital assistant in China. I can answer your questions and connect you with the right specialist.',
     offer: 'How may we help you today?\n• Sourcing and importing from China\n• Company formation and accounting\n• Bank accounts and Alipay\n• Work permits and visas\n• Online stores',
     menuHead: 'Here are our services in China:',
     menuTail: 'Tell us the service you are interested in, or describe your request, and we will explain the details in full.',

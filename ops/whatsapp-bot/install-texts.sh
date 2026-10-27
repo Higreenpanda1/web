@@ -37,10 +37,10 @@ declare -A OLD=(
 declare -A NEW=(
   [data/services.json]=5234b1199f2b6d3ffc86289dff7b21b48dd30b23f2dd59584cc95bebcf672340
   [data/business.json]=020772d481e6301cc21b7759c2a635bffd4d81525e1ec03808cc77a358bbd4dd
-  [src/texts.js]=40e79fd64429592fa6dea5c21dbc3cc136e3156c6cd51fc7cc91e64d1beea3dd
+  [src/texts.js]=20929d2c634f46d4a77c42906d4412d01d869be091d3841677abb4dd5d155ea1
   [src/data.js]=31c54aa2f424614cc3ef6b928da14651292a111ddc1b62500929a74b158bb4a5
   [src/brain.js]=041fc1c99a25bd3de2afb09e9a78705740a80bec1477308e0f61f46c56f565f5
-  [src/ai.js]=8fcfba5eb6c36502ce5257071540a339d7cbc8e3c140600d77fa6e4a15f12899
+  [src/ai.js]=5e4eb956a8a092195d69edef5f427a6d85a06f95a01d7f3851b25e45905bf87e
   [test.js]=08620db5dca960ef62704983a63c25da73e2e3308595e21430b806629ac0f5d6
 )
 # Only used by the AI mode (no Gemini key yet). If it was edited on the server,
