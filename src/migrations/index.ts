@@ -11,6 +11,7 @@ import * as migration_20261026_130018_product_order from './20261026_130018_prod
 import * as migration_20261026_133122_billing from './20261026_133122_billing'
 import * as migration_20261026_135750_portal_accounts from './20261026_135750_portal_accounts'
 import * as migration_20261026_141703_payment_terms from './20261026_141703_payment_terms'
+import * as migration_20261027_080812_hubspot_copies from './20261027_080812_hubspot_copies'
 
 export const migrations = [
   {
@@ -77,5 +78,10 @@ export const migrations = [
     up: migration_20261026_141703_payment_terms.up,
     down: migration_20261026_141703_payment_terms.down,
     name: '20261026_141703_payment_terms',
+  },
+  {
+    up: migration_20261027_080812_hubspot_copies.up,
+    down: migration_20261027_080812_hubspot_copies.down,
+    name: '20261027_080812_hubspot_copies',
   },
 ]
