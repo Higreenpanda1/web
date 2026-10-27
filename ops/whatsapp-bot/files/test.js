@@ -76,7 +76,7 @@ const CLOSED = new Date('2026-09-26T14:00:00Z'); // Saturday 22:00 China time
   await test('company formation shows ¥7,200 in person / ¥8,200 remote + confirmation note', () => {
     const r = B.reply('كم سعر تأسيس شركة', { now: OPEN });
     assert.ok(r.text.includes('7,200') && r.text.includes('8,200 يوان للتأسيس عن بُعد'), r.text);
-    assert.ok(r.text.includes('يؤكد لك الفريق السعر النهائي'));
+    assert.ok(r.text.includes('والسعر النهائي نؤكده لك'));
     assert.ok(B.reply('How much to register a company?', { now: OPEN }).text.includes('from ¥8,200 for remote formation'));
   });
   await test('work permit is "كرت العمل" at ¥7,600 plus ¥400 government fees', () => {
@@ -95,7 +95,7 @@ const CLOSED = new Date('2026-09-26T14:00:00Z'); // Saturday 22:00 China time
   });
   await test('sourcing has no fixed price and asks qualifying questions', () => {
     const r = B.reply('ابي مورد اثاث', { now: OPEN });
-    assert.ok(/تُحدَّد حسب المنتج/.test(r.text) && /الكمية/.test(r.text));
+    assert.ok(/تختلف حسب المنتج/.test(r.text) && /الكمية/.test(r.text));
   });
   await test('handoff text mentions working hours when office is closed', () => {
     assert.ok(B.reply('حولت المبلغ', { now: CLOSED }).text.includes('09:00'));
@@ -265,7 +265,7 @@ const CLOSED = new Date('2026-09-26T14:00:00Z'); // Saturday 22:00 China time
     assert.ok(B.reply('كم سعر تأسيس شركة', { now: OPEN }).text.includes('6,500'));
     assert.ok(eng.onCommand('!price company-formation reset').includes('7,200'));
     eng.onCommand('!price company-formation none');
-    assert.ok(/تُحدَّد حسب المنتج/.test(B.reply('كم سعر تأسيس شركة', { now: OPEN }).text));
+    assert.ok(/تختلف حسب المنتج/.test(B.reply('كم سعر تأسيس شركة', { now: OPEN }).text));
     eng.onCommand('!price company-formation reset');
   });
   await test('!learn / !notes / !forget', () => {
