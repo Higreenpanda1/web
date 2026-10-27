@@ -42,6 +42,8 @@ const CLOSED = new Date('2026-09-26T14:00:00Z'); // Saturday 22:00 China time
     ['تسجيل علامة تجارية', 'service:trademark-registration', false],
     ['ابغى اقامة عمل في الصين', 'service:work-visa-and-residence', false],
     ['متى دوامكم؟', 'contact', false],
+    ['وين مكتبكم؟', 'contact', false],
+    ['كم سعر كرت العمل؟', 'service:work-visa-and-residence', false],
     ['ابغى استشارة', 'consultation', false],
     ['مين صاحب الشركة؟ من انتم', 'founder', false],
     ['شكرا لك', 'thanks', false],
@@ -71,14 +73,29 @@ const CLOSED = new Date('2026-09-26T14:00:00Z'); // Saturday 22:00 China time
   }
 
   console.log('\nPrices come from data, with the owner note');
-  await test('company formation shows ¥6,000 starting price + confirmation note', () => {
+  await test('company formation shows ¥7,200 in person / ¥8,200 remote + confirmation note', () => {
     const r = B.reply('كم سعر تأسيس شركة', { now: OPEN });
-    assert.ok(r.text.includes('6,000'), r.text);
-    assert.ok(r.text.includes('السعر النهائي يؤكده'));
+    assert.ok(r.text.includes('7,200') && r.text.includes('8,200 يوان للتأسيس عن بُعد'), r.text);
+    assert.ok(r.text.includes('يؤكد لك الفريق السعر النهائي'));
+    assert.ok(B.reply('How much to register a company?', { now: OPEN }).text.includes('from ¥8,200 for remote formation'));
+  });
+  await test('work permit is "كرت العمل" at ¥7,600 plus ¥400 government fees', () => {
+    const r = B.reply('كم سعر كرت العمل؟', { now: OPEN });
+    assert.ok(r.text.includes('كرت العمل') && !r.text.includes('تأشيرة العمل'), r.text);
+    assert.ok(r.text.includes('7,600 يوان صيني (¥)، تُضاف إليها رسوم حكومية 400 يوان'), r.text);
+  });
+  await test('bank account shows mainland and Hong Kong prices', () => {
+    const r = B.reply('كم سعر فتح حساب بنكي؟', { now: OPEN });
+    assert.ok(r.text.includes('1,400') && r.text.includes('1,700 يوان لحساب في هونغ كونغ'), r.text);
+  });
+  await test('"where is your office" gives the KK100 head office, not the registered-address service', () => {
+    const r = B.reply('وين مكتبكم؟', { now: OPEN });
+    assert.ok(r.text.includes('KK100') && r.text.includes('contact@higreenpanda.com'), r.text);
+    assert.ok(B.reply('Where is your office?', { now: OPEN }).text.includes('Head office: 41F-35, Tower A, KK100'));
   });
   await test('sourcing has no fixed price and asks qualifying questions', () => {
     const r = B.reply('ابي مورد اثاث', { now: OPEN });
-    assert.ok(/يختلف حسب المنتج/.test(r.text) && /الكمية/.test(r.text));
+    assert.ok(/تُحدَّد حسب المنتج/.test(r.text) && /الكمية/.test(r.text));
   });
   await test('handoff text mentions working hours when office is closed', () => {
     assert.ok(B.reply('حولت المبلغ', { now: CLOSED }).text.includes('09:00'));
@@ -246,9 +263,9 @@ const CLOSED = new Date('2026-09-26T14:00:00Z'); // Saturday 22:00 China time
   await test('!price changes the quoted price, reset restores it, none removes it', async () => {
     assert.ok(eng.onCommand('!price company-formation 6500').includes('6,500'));
     assert.ok(B.reply('كم سعر تأسيس شركة', { now: OPEN }).text.includes('6,500'));
-    assert.ok(eng.onCommand('!price company-formation reset').includes('6,000'));
+    assert.ok(eng.onCommand('!price company-formation reset').includes('7,200'));
     eng.onCommand('!price company-formation none');
-    assert.ok(/يختلف/.test(B.reply('كم سعر تأسيس شركة', { now: OPEN }).text));
+    assert.ok(/تُحدَّد حسب المنتج/.test(B.reply('كم سعر تأسيس شركة', { now: OPEN }).text));
     eng.onCommand('!price company-formation reset');
   });
   await test('!learn / !notes / !forget', () => {
