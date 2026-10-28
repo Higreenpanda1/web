@@ -861,16 +861,26 @@ reported as down instead of looking healthy.
 2026.** Clients follow their requests there, with the stage read from the deal
 in HubSpot.
 
-- **Accounts are opened by the team** in the admin: Leads → Customer accounts →
-  Create. There is no public sign-up. A client's requests are found by the
-  account's email or WhatsApp number, so old requests show up too.
+- **Accounts open by themselves once the client pays** (since 28 October
+  2026): every hour the app looks in HubSpot for deals at a paid stage
+  (Deposit Paid and after, the Nasher 30% deposit and after, any live
+  renewal), opens an account for each of the deal's contacts that has none
+  yet, and emails them a welcome with the portal link (Arabic, English, or
+  both when the client never wrote to us through the site). Run it now, or
+  see who it would reach, with
+  `npm run automation -- portal-accounts [--dry-run]`. `HUBSPOT_AUTOMATION=off`
+  stops it with the other HubSpot jobs. The team can still open an account by
+  hand (Leads → Customer accounts → Create). There is no public sign-up. A
+  client's requests are found by the account's email or WhatsApp number, so
+  old requests show up too.
 - **Signing in:** the client types their email and gets a six-digit code
   (needs `RESEND_API_KEY`, like every other email). For a client without
   email, open their account and press **Copy WhatsApp sign-in link**; the link
   works once, within 24 hours.
 - **Owner and members:** an owner also sees the requests of every member whose
   "Company owner" is set to them.
-- **Disable account** signs the client out at once.
+- **Disable account** signs the client out at once. Do not delete an account
+  to shut a client out: the hourly job would open it again.
 - Nothing new in `.env`: sessions are signed with `PAYLOAD_SECRET`, and the
   stages come through the same `HUBSPOT_TOKEN` (contacts and deals read).
   Without HubSpot the site's own status is shown instead.

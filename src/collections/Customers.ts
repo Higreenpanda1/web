@@ -3,8 +3,9 @@ import { hasRole, isAdmin, isStaff } from '@/access'
 import type { CollectionBeforeChangeHook, CollectionConfig, FieldAccess } from 'payload'
 
 /**
- * Client portal accounts (/portal), opened by the team — there is no public
- * sign-up, so nobody outside the client list can get in.
+ * Client portal accounts (/portal). There is no public sign-up: an account is
+ * opened for a client once they have paid (src/lib/portal/auto-accounts.ts),
+ * or by the team by hand, so nobody outside the client list can get in.
  *
  * Until 26 October 2026 this was an empty Payload auth collection, kept so the
  * portal would not need a second table. The portal signs clients in without a
@@ -52,7 +53,7 @@ export const Customers: CollectionConfig = {
     defaultColumns: ['fullName', 'email', 'whatsapp', 'company', 'role', 'disabled'],
     group: 'Leads',
     description:
-      'Client portal accounts (/portal). The client signs in with a code sent to this email, or with a WhatsApp sign-in link you copy from the account. Their requests are found by this email or WhatsApp number.',
+      'Client portal accounts (/portal). An account opens by itself within the hour once the client’s HubSpot deal reaches a paid stage (Deposit Paid, or the Nasher 30% deposit), and the client gets a welcome email. The client signs in with a code sent to this email, or with a WhatsApp sign-in link you copy from the account. To shut a client out, tick "Disable account": a deleted account opens again.',
   },
   access: {
     read: isStaff,
