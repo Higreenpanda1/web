@@ -939,7 +939,7 @@
       },
       "nasher": {
         "title": "Nasher Trading licence",
-        "body": "Our sourcing and import company: finding factories, manufacturing, inspection, shipping and trade-fair accompaniment.",
+        "body": "Our sourcing and import company: finding factories, manufacturing, inspection and shipping.",
         "city": "Shanghai, China"
       },
       "accounting": {
@@ -1249,7 +1249,7 @@
         "4": "Inspected before shipping"
       },
       "pageTitle": "Yacht, boat and car parts from China",
-      "pageLead": "International trading specialised in every kind of <hl>yacht, boat and car part</hl>: finding factories, manufacturing, <hl>quality inspection</hl>, shipping, and accompanying you at trade fairs.",
+      "pageLead": "International trading specialised in every kind of <hl>yacht, boat and car part</hl>: finding factories, manufacturing, <hl>quality inspection</hl> and shipping.",
       "metaDescription": "Nasher International Trading: every kind of yacht, boat and car part sourced from China, from finding factories and manufacturing to quality inspection and shipping.",
       "viewLicence": "View the licence",
       "servicesEyebrow": "Nasher's services",
@@ -1259,8 +1259,7 @@
         "1": "Finding factories",
         "2": "Manufacturing",
         "3": "Quality inspection",
-        "4": "Shipping",
-        "5": "Trade fair accompaniment"
+        "4": "Shipping"
       },
       "processEyebrow": "How we work",
       "processTitle": "How the process runs",
