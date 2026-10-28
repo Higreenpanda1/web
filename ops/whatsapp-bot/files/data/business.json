@@ -12,16 +12,16 @@
  "email": "contact@higreenpanda.com",
  "secondaryEmail": "Sam@higreenpanda.com",
  "hours": {
-  "ar": "الأحد – الخميس، 09:00 – 18:00 بتوقيت الصين",
-  "en": "Sunday–Thursday, 09:00–18:00 China time"
+  "ar": "الاثنين – الجمعة، 09:00 – 18:00 بتوقيت الصين",
+  "en": "Monday–Friday, 09:00–18:00 China time"
  },
  "timezone": "Asia/Shanghai",
  "workDays": [
-  0,
   1,
   2,
   3,
-  4
+  4,
+  5
  ],
  "workStart": 9,
  "workEnd": 18,

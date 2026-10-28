@@ -101,9 +101,10 @@ const CLOSED = new Date('2026-09-26T14:00:00Z'); // Saturday 22:00 China time
     assert.ok(B.reply('حولت المبلغ', { now: CLOSED }).text.includes('09:00'));
     assert.ok(!B.reply('حولت المبلغ', { now: OPEN }).text.includes('09:00'));
   });
-  await test('office hours: Mon 11:00 open, Sat 22:00 closed, Fri closed', () => {
+  await test('office hours (Mon–Fri 09–18): Mon 11:00 open, Sat 22:00 closed, Fri 11:00 open, Sun 11:00 closed', () => {
     assert.ok(D.isOpen(OPEN)); assert.ok(!D.isOpen(CLOSED));
-    assert.ok(!D.isOpen(new Date('2026-09-25T03:00:00Z')));
+    assert.ok(D.isOpen(new Date('2026-09-25T03:00:00Z')));
+    assert.ok(!D.isOpen(new Date('2026-09-27T03:00:00Z')));
   });
 
   console.log('\nNumber guard');
