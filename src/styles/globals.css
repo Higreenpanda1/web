@@ -476,8 +476,34 @@
       transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
       box-shadow 0.4s ease;
   }
-  .journey-step.is-active .journey-node {
-    transform: scale(1.08);
+  /* Cards rest dim and light, calmly, once the thread reaches them. */
+  .journey-step {
+    opacity: 0.45;
+    filter: saturate(0.35);
+    transition:
+      opacity 0.9s ease,
+      filter 0.9s ease;
+  }
+  .journey-step.is-lit {
+    opacity: 1;
+    filter: none;
+  }
+  .journey-step.is-lit > div > button {
+    box-shadow: 0 0 28px rgb(79 167 91 / 0.14);
+  }
+  /* The soft light at the tip of the thread. */
+  .journey-tip {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 9px;
+    height: 9px;
+    margin: -4.5px 0 0 -4.5px;
+    border-radius: 9999px;
+    background: var(--color-brand-300);
+    box-shadow:
+      0 0 0 4px rgb(159 214 167 / 0.25),
+      0 0 16px 4px rgb(116 192 126 / 0.45);
   }
   .journey-panel {
     display: grid;

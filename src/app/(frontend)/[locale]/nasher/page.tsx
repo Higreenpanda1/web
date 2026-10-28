@@ -29,7 +29,7 @@ export async function generateMetadata({
   })
 }
 
-const SERVICES = [1, 2, 3, 4, 5] as const
+const SERVICES = [1, 2, 3, 4] as const
 const PROCESS = [1, 2, 3, 4] as const
 
 /**
@@ -82,7 +82,7 @@ export default async function NasherPage({ params }: { params: Promise<{ locale:
             lead={t.rich('companies.nasher.servicesLead', companyTags)}
           />
         </HighlightScope>
-        <ul className="grid list-none gap-4 p-0 sm:grid-cols-2 lg:grid-cols-5">
+        <ul className="grid list-none gap-4 p-0 sm:grid-cols-2 lg:grid-cols-4">
           {SERVICES.map((n) => (
             <li
               key={n}

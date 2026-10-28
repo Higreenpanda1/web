@@ -1,15 +1,15 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 
 import { CompanyHero } from '@/components/companies/CompanyHero'
-import { HighlightScope } from '@/components/companies/HighlightScope'
+import { Journey, type JourneyStep } from '@/components/companies/Journey'
 import { companyTags } from '@/components/companies/rich'
 import { JsonLd } from '@/components/JsonLd'
 import { Breadcrumb } from '@/components/ui/Breadcrumb'
 import { ButtonLink } from '@/components/ui/Button'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { Section, SectionHeading } from '@/components/ui/Section'
-import { cn } from '@/lib/cn'
 import { breadcrumbJsonLd } from '@/lib/jsonld'
+import { getServices } from '@/lib/queries'
 import { buildMetadata } from '@/lib/seo'
 
 import type { Locale } from '@/i18n/routing'
@@ -30,13 +30,29 @@ export async function generateMetadata({
   })
 }
 
-/** The fourteen steps in three phases; steps 10 to 14 come from the course. */
-const PHASES = [
-  { id: 1, steps: [1, 2, 3, 4] },
-  { id: 2, steps: [5, 6, 7, 8, 9] },
-  { id: 3, steps: [10, 11, 12, 13, 14] },
-] as const
-const COURSE_FROM = 10
+/**
+ * HIGP's road, in the design of the original homepage journey (the owner asked
+ * for it back on 28 October 2026, without Nasher's import steps). The first
+ * six steps keep their original wording (home.journeySteps); the rest are
+ * HIGP's other services, titled and summarised from the CMS so they always
+ * match their pages. A service that is not published drops out.
+ */
+const JOURNEY: { icon: JourneyStep['icon']; text?: 1 | 2 | 3 | 4 | 5 | 6; slug?: string }[] = [
+  { icon: 'idea', text: 1 },
+  { icon: 'research', text: 2 },
+  { icon: 'trademark', text: 3, slug: 'trademark-registration' },
+  { icon: 'company', text: 4, slug: 'company-formation' },
+  { icon: 'hongKong', slug: 'hong-kong-company-formation' },
+  { icon: 'address', slug: 'registered-address' },
+  { icon: 'bank', slug: 'bank-account-opening' },
+  { icon: 'payments', slug: 'alipay-wechat-business-accounts' },
+  { icon: 'residence', text: 5, slug: 'work-visa-and-residence' },
+  { icon: 'invitation', slug: 'business-invitation-letter' },
+  { icon: 'family', slug: 'family-reunion-visa' },
+  { icon: 'accounting', text: 6, slug: 'accounting-and-tax' },
+  { icon: 'licence', slug: 'business-licence-changes' },
+  { icon: 'store', slug: 'marketplace-store-setup' },
+]
 
 /**
  * HIGP Consulting & Accounting: the whole road in China from A to Z, from
@@ -46,8 +62,36 @@ const COURSE_FROM = 10
 export default async function HigpPage({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params
   setRequestLocale(locale)
-  const t = await getTranslations({ locale })
-  const pad = (n: number) => String(n).padStart(2, '0')
+  const [t, services] = await Promise.all([
+    getTranslations({ locale }),
+    getServices(locale, { limit: 60 }),
+  ])
+  const bySlug = new Map(services.map((service) => [service.slug, service]))
+  const steps: JourneyStep[] = JOURNEY.flatMap(({ icon, text, slug }) => {
+    const service = slug ? bySlug.get(slug) : undefined
+    if (slug && !service) return []
+    const type = service?.applicationType
+    return [
+      {
+        icon,
+        title: text
+          ? t(`home.journeySteps.${text}.title` as 'home.journeySteps.1.title')
+          : service!.title,
+        body: text
+          ? t(`home.journeySteps.${text}.body` as 'home.journeySteps.1.body')
+          : service!.summary,
+        href: service ? `/services/${service.slug}` : '/apply/consultation',
+        linkLabel: service ? t('cta.seeService') : t('cta.bookConsultation'),
+        apply:
+          service && type
+            ? {
+                href: `/apply/${type}?service=${service.slug}`,
+                label: t(`apply.types.${type}.cta` as 'apply.types.consultation.cta'),
+              }
+            : undefined,
+      },
+    ]
+  })
 
   return (
     <>
@@ -85,64 +129,10 @@ export default async function HigpPage({ params }: { params: Promise<{ locale: L
           id="higp-journey-heading"
           eyebrow={t('companies.higp.journeyEyebrow')}
           title={t('companies.higp.journeyTitle')}
-          lead={t('companies.higp.journeyLead')}
+          lead={t('home.journeyLead')}
+          align="center"
         />
-        <HighlightScope className="grid gap-12">
-          {PHASES.map((phase) => (
-            <div
-              key={phase.id}
-              className="grid items-start gap-6 lg:grid-cols-[14rem_1fr] lg:gap-8"
-            >
-              <div data-reveal className="border-s-[3px] border-brand-600 ps-4">
-                <p className="text-caption font-semibold text-text-brand">
-                  {t(`companies.higp.phases.${phase.id}.label`)}
-                </p>
-                <h3 className="mt-1">{t(`companies.higp.phases.${phase.id}.title`)}</h3>
-                <p className="mt-1 text-caption text-text-muted">
-                  {t(`companies.higp.phases.${phase.id}.body`)}
-                </p>
-              </div>
-              <ol
-                start={phase.steps[0]}
-                className="grid list-none gap-4 p-0 md:grid-cols-2"
-                aria-label={t(`companies.higp.phases.${phase.id}.title`)}
-              >
-                {phase.steps.map((step) => {
-                  const fromCourse = step >= COURSE_FROM
-                  return (
-                    <li
-                      key={step}
-                      data-reveal
-                      className={cn(
-                        'grid min-w-0 content-start gap-1.5 rounded-lg border border-border-soft bg-surface p-5 shadow-card',
-                        fromCourse && 'co-step-course',
-                      )}
-                    >
-                      <span className="ltr-nums font-semibold text-text-brand">
-                        <span className="sr-only">{t('companies.higp.stepLabel')} </span>
-                        {pad(step)}
-                      </span>
-                      <h4 className="text-h3">
-                        {t(`companies.higp.steps.${step}.title` as 'companies.higp.steps.1.title')}
-                      </h4>
-                      <p className="text-text-muted">
-                        {t.rich(
-                          `companies.higp.steps.${step}.body` as 'companies.higp.steps.1.body',
-                          companyTags,
-                        )}
-                      </p>
-                      {fromCourse ? (
-                        <span className="mt-1 w-fit rounded-full bg-[#fbf1dc] px-2.5 py-0.5 text-eyebrow font-semibold text-accent-text">
-                          {t('companies.higp.courseTag')}
-                        </span>
-                      ) : null}
-                    </li>
-                  )
-                })}
-              </ol>
-            </div>
-          ))}
-        </HighlightScope>
+        <Journey steps={steps} locale={locale} stepLabel={t('home.journeyStep')} />
         <div className="mt-12 flex flex-wrap gap-3">
           <ButtonLink href="/apply/consultation" size="lg">
             {t('cta.bookConsultation')}
