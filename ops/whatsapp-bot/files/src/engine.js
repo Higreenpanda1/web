@@ -9,6 +9,7 @@ const K = require('./knowledge');
 const B = require('./brain');
 const AI = require('./ai');
 const T = require('./texts');
+const Menu = require('./menu');
 const { createHubSpot } = require('./hubspot');
 const { detectLang } = require('./text');
 
@@ -56,7 +57,7 @@ function createEngine(cfg, opts = {}) {
     const s = l.service ? D.getService(l.service) : null;
     const rows = [
       ['الخدمة', s ? s.ar.title : l.service], ['الطلب', l.summary], ['المنتج', l.product], ['الكمية', l.quantity],
-      ['الدولة', l.country], ['الميزانية', l.budget], ['الموعد', l.timeline], ['الاسم', l.name],
+      ['الدولة', l.country], ['الميزانية', l.budget], ['الجنسية والإقامة', l.nationality], ['الموعد', l.timeline], ['الاسم', l.name],
     ].filter(r => r[1]);
     return rows.map(r => `• ${r[0]}: ${r[1]}`).join('\n') + (lang ? `\n• اللغة: ${lang === 'ar' ? 'عربي' : 'إنجليزي'}` : '');
   }
@@ -79,15 +80,13 @@ function createEngine(cfg, opts = {}) {
     return lines.join('\n');
   }
 
-  // Simple mode (no AI key): the fixed answers, plus Sami's own earlier answers
-  // for questions the fixed answers don't cover — that is how it learns without AI.
-  function ruleReply(text, lang, now) {
-    const r = B.reply(text, { lang, includeLinks: cfg.includeLinks, now: new Date(now) });
-    if (r.unanswered) {
-      const ex = K.relevantExamples(text, 1, 0.6)[0];
-      if (ex) return { text: ex.a, handoff: false, reason: 'owner answer reused' };
-    }
-    return { text: r.text, handoff: r.handoff, reason: r.reason, unsure: r.unanswered };
+  // Free text the menus did not understand (simple mode, or the AI is down):
+  // Sami's own earlier answer to a similar question if there is one — that is how
+  // it learns without AI — otherwise the team answers and the bot learns from it.
+  function ruleReply(text, lang) {
+    const ex = K.relevantExamples(text, 1, 0.6)[0];
+    if (ex) return { text: ex.a, handoff: false, reason: 'owner answer reused' };
+    return { text: T[lang].fallback, handoff: true, reason: 'not understood', unsure: true };
   }
 
   function pause(c, hours, now) { c.pausedUntil = Math.max(c.pausedUntil || 0, now + hours * H); }
@@ -103,7 +102,9 @@ function createEngine(cfg, opts = {}) {
     const c = chat(m.chatId);
     const text = String(m.text || '').trim();
     c.number = m.number; if (m.name) c.name = m.name;
-    const lang = detectLang(text) || c.lang || 'ar';
+    // A one-word reply in the other script ("HGP-1042", "OK") keeps the chat's language.
+    const det = detectLang(text);
+    const lang = det && !(c.lang && det !== c.lang && !/\s/.test(text)) ? det : (c.lang || 'ar');
     c.lang = lang;
     const W = who(c, m.number, m.name);
     const out = { reply: null, notify: null };
@@ -138,7 +139,11 @@ function createEngine(cfg, opts = {}) {
     stat(now, 'chat', m.chatId);
     let res;
 
-    if (m.media === 'voice') {
+    const inQuote = c.menu && c.menu.step === 'quote' && ['image', 'document'].includes(m.media);
+    if (inQuote) {
+      res = Menu.handle(c, m, lang);
+      record();
+    } else if (m.media === 'voice') {
       record();
       res = { text: T[lang].voice, handoff: false };
       out.notify = ownerNotice('voice', c, { who: W, text: 'رسالة صوتية — افتح المحادثة واسمعها' });
@@ -149,9 +154,15 @@ function createEngine(cfg, opts = {}) {
       return out;
     } else {
       const hand = B.mustHandoff(text);
+      const aiOn = !!(cfg.ai && cfg.ai.enabled && AI.hasKey(cfg));
+      const menu = hand ? null : Menu.handle(c, m, lang, { ai: aiOn }); // before record(): it looks at the history
       if (hand) {
         record();
+        c.menu = null;
         res = { text: B.handoffText(lang, new Date(now)), handoff: true, reason: hand };
+      } else if (menu) {
+        record();
+        res = menu;
       } else if (cfg.ai && cfg.ai.enabled && AI.hasKey(cfg)) {
         const history = c.history.slice();
         record();
@@ -167,11 +178,11 @@ function createEngine(cfg, opts = {}) {
         } catch (e) {
           stat(now, 'aiErrors');
           log('[ai] error, using rule mode:', e.message);
-          res = ruleReply(text, lang, now);
+          res = Menu.handle(c, m, lang) || ruleReply(text, lang);
         }
       } else {
         record();
-        res = ruleReply(text, lang, now);
+        res = ruleReply(text, lang);
       }
     }
 
