@@ -1011,7 +1011,7 @@ export interface User {
   collection: 'users';
 }
 /**
- * Client portal accounts (/portal). The client signs in with a code sent to this email, or with a WhatsApp sign-in link you copy from the account. Their requests are found by this email or WhatsApp number.
+ * Client portal accounts (/portal). An account opens by itself within the hour once the client’s HubSpot deal reaches a paid stage (Deposit Paid, or the Nasher 30% deposit), and the client gets a welcome email. The client signs in with a code sent to this email, or with a WhatsApp sign-in link you copy from the account. To shut a client out, tick "Disable account": a deleted account opens again.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "customers".
