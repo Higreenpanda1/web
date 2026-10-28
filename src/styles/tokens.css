@@ -127,7 +127,7 @@
 /* ---------------------------------------------------------------------------
    Chinese uses the reader's own system faces: Chinese web fonts run to
    several megabytes. Headings take a Song (serif) face, the classical
-   counterpart of Markazi; the text takes the platform's Hei (sans) face.
+   counterpart of Amiri; the text takes the platform's Hei (sans) face.
    --------------------------------------------------------------------------- */
 :root:lang(zh) {
   --font-zh-text:

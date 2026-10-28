@@ -3,56 +3,33 @@ import { getTranslations } from 'next-intl/server'
 
 import { CourseSection } from '@/components/academy/CourseSection'
 import { FieldGroups } from '@/components/FieldGallery'
+import { BrandHero } from '@/components/companies/BrandHero'
 import { ContactPanel } from '@/components/home/ContactPanel'
-import { Hero } from '@/components/home/Hero'
-import { Journey, type JourneyStep } from '@/components/home/Journey'
 import { TeamSection } from '@/components/home/TeamSection'
 import { WorldClocks } from '@/components/home/WorldClocks'
 import { PostCard } from '@/components/PostCard'
-import { CategoryTiles } from '@/components/services/CategoryTiles'
 import { ButtonLink } from '@/components/ui/Button'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { Section, SectionHeading } from '@/components/ui/Section'
-import { getFieldMoments, getPosts, getServices, getSiteSettings, getTeam } from '@/lib/queries'
-import { groupServices } from '@/lib/services'
+import { getFieldMoments, getPosts, getSiteSettings, getTeam } from '@/lib/queries'
 
 import type { Locale } from '@/i18n/routing'
 
 /**
- * Where each of the twelve steps sends the visitor. Services by slug; the
- * two steps that are conversations rather than services go to the
- * consultation form.
- */
-const JOURNEY_LINKS = [
-  '/apply/consultation',
-  '/apply/consultation',
-  '/services/trademark-registration',
-  '/services/company-formation',
-  '/services/work-visa-and-residence',
-  '/services/accounting-and-tax',
-  '/services/product-sourcing',
-  '/services/quality-inspection',
-  '/services/shipping-and-freight',
-  '/services/shipping-and-freight',
-  '/services/shipping-and-freight',
-  '/services/full-import-management',
-] as const
-
-/**
  * The homepage as it renders before anyone has touched the CMS.
  *
- * Rebuilt on 23 September 2026 around the owner's structure document: a
- * quieter hero, the twelve-step journey as the centrepiece, the consultation
- * offer, then the service areas, the blog and the team (founder first; his
- * full story lives on About). One accent colour,
+ * Rebuilt on 23 September 2026 around the owner's structure document, and
+ * opened on 28 October 2026 with the brand and its two companies (HIGP and
+ * Nasher, each with its own page; the journey moved to /higp). Then the
+ * course, the consultation offer, the field, the blog and the team (founder
+ * first; his full story lives on About). One accent colour,
  * white surfaces, and motion only on entrance. Every word comes from the
  * message catalogues; a CMS `home` Page still replaces all of this.
  */
 export async function DefaultHome({ locale }: { locale: Locale }) {
-  const [t, settings, services, { docs: posts }, team, fieldMoments] = await Promise.all([
+  const [t, settings, { docs: posts }, team, fieldMoments] = await Promise.all([
     getTranslations({ locale }),
     getSiteSettings(locale),
-    getServices(locale, { limit: 60 }),
     getPosts(locale, { limit: 3 }),
     getTeam(locale),
     getFieldMoments(locale),
@@ -61,18 +38,11 @@ export async function DefaultHome({ locale }: { locale: Locale }) {
   const Arrow = locale === 'ar' ? ArrowLeft : ArrowRight
   const founder = team.find((member) => member.isFounder) ?? team[0] ?? null
   const others = team.filter((member) => member.id !== founder?.id)
-  const groups = groupServices(services)
-  const steps: JourneyStep[] = JOURNEY_LINKS.map((href, index) => ({
-    href,
-    title: t(`home.journeySteps.${index + 1}.title` as 'home.journeySteps.1.title'),
-    body: t(`home.journeySteps.${index + 1}.body` as 'home.journeySteps.1.body'),
-    linkLabel: href.startsWith('/apply') ? t('cta.bookConsultation') : t('cta.seeService'),
-  }))
 
   return (
     <>
       <ScrollReveal />
-      <Hero locale={locale} settings={settings} />
+      <BrandHero locale={locale} />
       <CourseSection locale={locale} />
       <WorldClocks
         locale={locale}
@@ -87,17 +57,6 @@ export async function DefaultHome({ locale }: { locale: Locale }) {
           ],
         }}
       />
-
-      <Section id="journey" labelledBy="home-journey-heading" className="scroll-mt-20">
-        <SectionHeading
-          id="home-journey-heading"
-          eyebrow={t('home.journeyEyebrow')}
-          title={t('home.journeyTitle')}
-          lead={t('home.journeyLead')}
-          align="center"
-        />
-        <Journey steps={steps} locale={locale} stepLabel={t('home.journeyStep')} />
-      </Section>
 
       <Section tone="sunken" labelledBy="home-consult-heading" className="py-12 md:py-16">
         <div
@@ -148,24 +107,6 @@ export async function DefaultHome({ locale }: { locale: Locale }) {
           </ul>
         </div>
       </Section>
-
-      {groups.length > 1 ? (
-        <Section labelledBy="home-services-heading">
-          <SectionHeading
-            id="home-services-heading"
-            eyebrow={t('home.servicesEyebrow')}
-            title={t('home.servicesTitle')}
-            lead={t('home.servicesLead')}
-            action={
-              <ButtonLink href="/services" variant="secondary">
-                {t('cta.allServices')}
-                <Arrow size={18} strokeWidth={2} aria-hidden="true" />
-              </ButtonLink>
-            }
-          />
-          <CategoryTiles groups={groups} locale={locale} />
-        </Section>
-      ) : null}
 
       {fieldMoments.length > 0 ? (
         <Section tone="tint" labelledBy="home-field-heading">

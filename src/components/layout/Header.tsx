@@ -33,6 +33,13 @@ export async function Header({ locale, settings }: { locale: Locale; settings: S
   if (!items.some((item) => item.href === '/academy')) {
     items.splice(Math.max(items.length - 1, 0), 0, { label: t('nav.academy'), href: '/academy' })
   }
+  // The two companies lead the menu (owner, 28 October 2026), HIGP first,
+  // whatever Site settings holds.
+  const companies = [
+    { label: t('companies.higp.short'), href: '/higp' },
+    { label: t('companies.nasher.short'), href: '/nasher' },
+  ].filter((company) => !items.some((item) => item.href === company.href))
+  items.unshift(...companies)
 
   const whatsapp = whatsappLink(settings.whatsappNumber, settings.whatsappPrefill ?? undefined)
   // The portal is in Arabic and English; the Chinese site's link opens the English one.
@@ -46,8 +53,8 @@ export async function Header({ locale, settings }: { locale: Locale; settings: S
           <span className="sr-only">{t('site.name')}</span>
         </Link>
 
-        <nav aria-label={t('nav.primary')} className="hidden lg:block">
-          <ul className="flex items-center gap-1">
+        <nav aria-label={t('nav.primary')} className="hidden xl:block">
+          <ul className="flex items-center">
             {items.map((item) => (
               <li key={item.href}>
                 <NavLink href={item.href} label={item.label} />
@@ -56,10 +63,10 @@ export async function Header({ locale, settings }: { locale: Locale; settings: S
           </ul>
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <a
             href={portalHref}
-            className="hidden rounded-[3px] px-3 py-2 text-caption font-semibold text-brand-100 no-underline transition-colors hover:bg-white/10 hover:text-white lg:inline-flex"
+            className="hidden whitespace-nowrap rounded-[3px] px-3 py-2 text-caption font-semibold text-brand-100 no-underline transition-colors hover:bg-white/10 hover:text-white xl:inline-flex"
           >
             {t('nav.clientLogin')}
           </a>
@@ -82,7 +89,9 @@ export async function Header({ locale, settings }: { locale: Locale; settings: S
               itself: both would set `display` and Tailwind's emission order
               would decide the winner. */}
           <span className="hidden sm:block">
-            <ButtonLink href="/apply/company-registration">{t('cta.startCompany')}</ButtonLink>
+            <ButtonLink href="/apply/company-registration" className="whitespace-nowrap">
+              {t('cta.startCompany')}
+            </ButtonLink>
           </span>
           <MobileNav
             items={items}
