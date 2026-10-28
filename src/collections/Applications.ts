@@ -1,5 +1,5 @@
 import { hasRole, isAdmin, isStaff, noone } from '@/access'
-import { INVOICE_STAGES, type BillingItem, type InvoiceStage } from '@/lib/billing'
+import { type BillingItem } from '@/lib/billing'
 import { APPLICATION_TYPES } from '@/lib/catalogue'
 import { PRICE_LIST, priceListItem } from '@/lib/price-list'
 import {
@@ -11,6 +11,7 @@ import {
   type OrderItem,
 } from '@/lib/product-order'
 
+import type { DocumentChoice } from '@/lib/application-documents'
 import type { Application } from '@/payload-types'
 import type { CollectionBeforeChangeHook, CollectionConfig, PayloadRequest } from 'payload'
 
@@ -75,6 +76,25 @@ async function staffApplication(req: PayloadRequest): Promise<Application | Resp
         .catch(() => null)
     : null
   return application ?? Response.json({ error: 'Not found.' }, { status: 404 })
+}
+
+/** A quote, invoice or proforma page, with a print button that also copies it to HubSpot. */
+async function printedDocument(req: PayloadRequest, choice: DocumentChoice): Promise<Response> {
+  const application = await staffApplication(req)
+  if (application instanceof Response) return application
+  // Loaded here, not at the top: the CLI (migrations) reads this file too.
+  const { buildDocument } = await import('@/lib/application-documents')
+  const query = new URLSearchParams({ doc: choice.doc })
+  if (choice.doc === 'invoice') query.set('stage', choice.stage)
+  const built = buildDocument(application, choice, {
+    date: new Date().toISOString().slice(0, 10),
+    nonce: req.headers.get('x-nonce'),
+    copyUrl: `${req.payload.config.routes.api}/applications/${application.id}/hubspot-copy?${query}`,
+  })
+  if ('error' in built) return Response.json({ error: built.error }, { status: 400 })
+  return new Response(built.html, {
+    headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' },
+  })
 }
 
 const TYPE_LABELS: Record<(typeof APPLICATION_TYPES)[number], string> = {
@@ -232,48 +252,7 @@ export const Applications: CollectionConfig = {
       // The Nasher proforma invoice of a product order, from "Order and prices".
       path: '/:id/proforma',
       method: 'get',
-      handler: async (req) => {
-        const application = await staffApplication(req)
-        if (application instanceof Response) return application
-        if (!isProductRequest(application)) {
-          return Response.json(
-            { error: 'Only product requests have a proforma invoice.' },
-            { status: 400 },
-          )
-        }
-        const { renderProforma } = await import('@/lib/proforma-document')
-        const details = (application.details ?? {}) as Record<string, unknown>
-        const text = (value: unknown) => (typeof value === 'string' && value.trim()) || null
-        const html = renderProforma({
-          reference: application.reference,
-          date: new Date().toISOString().slice(0, 10),
-          currency: application.order?.currency ?? 'usd',
-          terms: application.order?.paymentTerms,
-          items: (application.order?.items ?? []) as OrderItem[],
-          buyer: {
-            name: application.name,
-            company: text(details.companyName),
-            address: text(details.companyAddress),
-            country: application.country,
-            whatsapp: application.whatsapp,
-            email: application.email,
-          },
-          destination: text(details.destinationCountry),
-          nonce: req.headers.get('x-nonce'),
-        })
-        if (!html) {
-          return Response.json(
-            {
-              error:
-                'Enter a quantity and a unit price for every product under "Order and prices" and save first.',
-            },
-            { status: 400 },
-          )
-        }
-        return new Response(html, {
-          headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' },
-        })
-      },
+      handler: (req) => printedDocument(req, { doc: 'proforma' }),
     },
     {
       // The printable quote and invoices of a HiGP service request:
@@ -281,53 +260,22 @@ export const Applications: CollectionConfig = {
       path: '/:id/document',
       method: 'get',
       handler: async (req) => {
+        const { billingChoice } = await import('@/lib/application-documents')
+        return printedDocument(req, billingChoice(req.searchParams))
+      },
+    },
+    {
+      // The print button on those pages also calls this: a PDF of the same
+      // page goes into the request's HubSpot deal, once per version.
+      // ?doc=quote|invoice|proforma&stage=deposit|balance|full.
+      path: '/:id/hubspot-copy',
+      method: 'post',
+      handler: async (req) => {
         const application = await staffApplication(req)
         if (application instanceof Response) return application
-        if (!isServiceRequest(application)) {
-          return Response.json({ error: 'Only service requests have a quote.' }, { status: 400 })
-        }
-        const { billLines } = await import('@/lib/billing')
-        const lines = billLines((application.billing?.items ?? []) as BillingItem[])
-        if (lines.length === 0) {
-          return Response.json(
-            { error: 'Add the services under "Quote and invoice" and save first.' },
-            { status: 400 },
-          )
-        }
-        const kind = req.searchParams?.get('kind') === 'invoice' ? 'invoice' : 'quote'
-        const asked = req.searchParams?.get('stage') ?? ''
-        const stage: InvoiceStage = (INVOICE_STAGES as readonly string[]).includes(asked)
-          ? (asked as InvoiceStage)
-          : 'deposit'
-        const paidOn = {
-          deposit: application.billing?.paidDeposit,
-          balance: application.billing?.paidBalance,
-          full: application.billing?.paidFull,
-        }[stage]
-        const { renderBillingDocument, HIGP } = await import('@/lib/billing-document')
-        const details = (application.details ?? {}) as Record<string, unknown>
-        const html = renderBillingDocument({
-          issuer: HIGP,
-          kind,
-          stage,
-          reference: application.reference,
-          date: new Date().toISOString().slice(0, 10),
-          client: {
-            name: application.name,
-            company:
-              application.billing?.clientCompany ||
-              (typeof details.companyName === 'string' ? details.companyName : null),
-            country: application.country,
-            whatsapp: application.whatsapp,
-            email: application.email,
-          },
-          lines,
-          paidOn: kind === 'invoice' ? (paidOn?.slice(0, 10) ?? null) : null,
-          nonce: req.headers.get('x-nonce'),
-        })
-        return new Response(html, {
-          headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' },
-        })
+        const { copyDocumentToHubSpot } = await import('@/lib/hubspot-copy')
+        const result = await copyDocumentToHubSpot(req, application)
+        return Response.json(result, { status: result.ok ? 200 : 400 })
       },
     },
     {
@@ -755,6 +703,13 @@ export const Applications: CollectionConfig = {
       label: 'HubSpot deal id',
       type: 'text',
       admin: { readOnly: true, position: 'sidebar', description: 'The deal in HubSpot.' },
+    },
+    {
+      // Which printed documents are already in the deal: { "Q-…": "<hash>" }.
+      // Kept so printing the same page twice does not add a second copy.
+      name: 'hubspotCopies',
+      type: 'json',
+      admin: { hidden: true },
     },
     {
       name: 'hubspotResend',

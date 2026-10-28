@@ -89,6 +89,7 @@ export type ProformaDocument = {
   }
   destination?: string | null
   nonce: string | null
+  copyUrl?: string
 }
 
 /** Null while a product has no quantity or price: there is nothing to print yet. */
@@ -166,5 +167,6 @@ export function renderProforma(doc: ProformaDocument): string | null {
   <p class="note">${both(L.transferNote)} ${both(CURRENCIES[doc.currency] ?? [code, code])}</p>
 </section>`,
     nonce: doc.nonce,
+    copyUrl: doc.copyUrl,
   })
 }

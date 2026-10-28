@@ -207,6 +207,8 @@ const L = {
     '感谢您选择 HiGreenPanda。如有疑问，请通过 WhatsApp 联系我们。',
   ],
   print: ['Print / Save as PDF', '打印 / 保存为 PDF'],
+  copied: ['Copied to HubSpot', '已保存到 HubSpot'],
+  alreadyCopied: ['Already in HubSpot', '已在 HubSpot'],
 } as const satisfies Record<string, Pair | Record<string, Pair>>
 
 export function escapeHtml(value: string): string {
@@ -261,6 +263,8 @@ export function documentPage(page: {
   /** Extra notes under the bank accounts. */
   payNotes?: Pair[]
   nonce: string | null
+  /** Where the print button also sends the page, for the client's HubSpot deal. */
+  copyUrl?: string
 }): string {
   const { issuer } = page
   const accounts = issuer.banks.map(
@@ -297,9 +301,15 @@ export function documentPage(page: {
       }
     </section>`
 
+  // Printing is when the team hands the page to the client, so that is when
+  // a copy goes to HubSpot. The copy never holds up the print dialog, and the
+  // answer shows next to the button.
+  const copy = page.copyUrl
+    ? `fetch(${JSON.stringify(page.copyUrl)},{method:'POST',credentials:'include'}).then(r=>r.json()).then(j=>{s.textContent=j.ok?(j.copied?${JSON.stringify('✓ ' + inline(L.copied))}:${JSON.stringify('✓ ' + inline(L.alreadyCopied))}):(j.error||'HubSpot: error')}).catch(e=>{s.textContent='HubSpot: '+e.message});`
+    : ''
   const printButton = page.nonce
-    ? `<button type="button" id="print">${inline(L.print)}</button>
-       <script nonce="${escapeHtml(page.nonce)}">document.getElementById('print').addEventListener('click',()=>window.print())</script>`
+    ? `<div id="print"><span id="copy-status"></span><button type="button">${inline(L.print)}</button></div>
+       <script nonce="${escapeHtml(page.nonce)}">const s=document.getElementById('copy-status');document.querySelector('#print button').addEventListener('click',()=>{${copy}window.print()})</script>`
     : ''
 
   return `<!doctype html>
@@ -356,6 +366,7 @@ export type BillingDocument = {
   /** Invoices only: YYYY-MM-DD when this payment came in. */
   paidOn?: string | null
   nonce: string | null
+  copyUrl?: string
 }
 
 export function renderBillingDocument(doc: BillingDocument): string {
@@ -439,6 +450,7 @@ export function renderBillingDocument(doc: BillingDocument): string {
 ${terms}
 <p class="note">${both(L.prices)}</p>`,
     nonce: doc.nonce,
+    copyUrl: doc.copyUrl,
   })
 }
 
@@ -493,7 +505,9 @@ const STYLE = `
   figure { margin: 0; width: 128px; text-align: center; font-size: 10.5px; color: #445; }
   figure img { width: 128px; height: 128px; object-fit: contain; display: block; }
   footer { margin-top: 18px; font-size: 12px; border-top: 1px solid #e3eee6; padding-top: 8px; text-align: center; }
-  #print { position: fixed; right: 16px; bottom: 16px; font: inherit; padding: 10px 18px; border-radius: 6px; border: 0; background: #276b34; color: #fff; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+  #print { position: fixed; right: 16px; bottom: 16px; display: flex; align-items: center; gap: 10px; }
+  #print button { font: inherit; padding: 10px 18px; border-radius: 6px; border: 0; background: #276b34; color: #fff; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+  #copy-status:not(:empty) { background: #fff; border: 1px solid #e3eee6; border-radius: 6px; padding: 6px 10px; font-size: 12px; }
   @media (max-width: 640px) { .pay, .head, header, .banks { display: block; } .facts { grid-template-columns: 1fr 1fr; } .client.columns p { columns: 1; } .issuer { text-align: left; margin-top: 8px; } }
   @media print {
     #print { display: none; }

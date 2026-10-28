@@ -36,8 +36,12 @@ FROM node:22.20.0-bookworm-slim AS runtime
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000 HOSTNAME=0.0.0.0
 WORKDIR /app
 
+# Chromium and the Chinese and Arabic fonts turn a printed quote, invoice or
+# proforma into the PDF that is copied into the client's HubSpot deal
+# (src/lib/pdf.ts).
 RUN apt-get update \
  && apt-get install -y --no-install-recommends postgresql-client tini \
+    chromium fonts-noto-cjk fonts-noto-core \
  && rm -rf /var/lib/apt/lists/* \
  && groupadd --system --gid 1001 nodejs \
  && useradd --system --uid 1001 --gid nodejs nextjs
