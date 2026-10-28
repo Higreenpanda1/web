@@ -6,8 +6,8 @@ import React from 'react'
 import { orderProducts } from '@/lib/product-order'
 
 /**
- * A product request as the team reads it: each product with its photos and
- * answers, and the two printable briefs — the full one for the office, and
+ * A product request as the team reads it: each product with its photos, any
+ * Excel or PDF file, and answers, and the two printable briefs — the full one for the office, and
  * one without the client's details or prices that can go to a factory as
  * it is — and the Nasher proforma invoice, printed from the prices under
  * "Order and prices" once they are saved. The raw answers stay in "Details"
@@ -23,6 +23,7 @@ export function ProductOrder() {
   const products = orderProducts(details, reference)
   const base = `${config.routes.api}/applications/${id}`
   const photo = (file: string) => `${base}/photo/${encodeURIComponent(file)}`
+  const download = (file: string) => `${base}/file/${encodeURIComponent(file)}`
 
   return (
     <div style={{ marginBottom: '2rem' }}>
@@ -91,6 +92,17 @@ export function ProductOrder() {
             </div>
           ) : (
             <p style={{ margin: '0 0 0.75rem', color: 'var(--theme-elevation-500)' }}>No photos.</p>
+          )}
+          {product.files.length > 0 && (
+            <ul style={{ margin: '0 0 0.75rem', paddingInlineStart: '1.25rem' }}>
+              {product.files.map((file) => (
+                <li key={file}>
+                  <a href={download(file)} download>
+                    {file.slice(reference.length + 1)}
+                  </a>
+                </li>
+              ))}
+            </ul>
           )}
           <dl
             style={{

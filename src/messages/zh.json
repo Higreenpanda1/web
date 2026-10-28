@@ -418,7 +418,11 @@
       "fileTooBig": "文件超过 10 MB，请发送较小的照片。",
       "fileType": "请上传 JPG、PNG 或 PDF 文件。",
       "tooManyFiles": "每个产品最多上传 5 张图片。",
-      "photoType": "请上传 JPG、PNG 或 WebP 格式的图片。"
+      "photoType": "请上传 JPG、PNG 或 WebP 格式的图片。",
+      "photosRequired": "请为该产品至少添加一张图片。",
+      "sheetType": "请上传 Excel 或 PDF 文件。",
+      "tooManySheets": "每个产品最多上传 3 个文件。",
+      "sheetTooBig": "文件超过 10 MB，请上传较小的文件。"
     },
     "types": {
       "consultation": {
@@ -572,7 +576,9 @@
       "productName": "产品",
       "productNameHint": "尽量使用英文，并附上阿拉伯语名称。",
       "photos": "产品图片",
-      "photosHint": "最多 5 张：产品本身、截图或产品目录页。",
+      "photosHint": "至少 1 张，最多 5 张：产品本身、截图或产品目录页。",
+      "productFiles": "附加文件",
+      "productFilesHint": "如有 Excel 或 PDF 文件（产品清单、规格或报价单），请在此上传。最多 3 个文件。",
       "productLink": "参考链接",
       "productLinkHint": "阿里巴巴、亚马逊或其他平台上能说明您需求的商品链接。",
       "specs": "其他细节",

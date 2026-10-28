@@ -72,6 +72,18 @@ export type FieldDef = {
   multiple?: number
   /** For `select` fields: the option chosen before the visitor touches it. */
   initial?: string
+  /**
+   * For `file` fields: catalogue keys under `apply.errors.*` to say instead
+   * of the general ones, so photos and spreadsheets each get their own words.
+   */
+  errorKeys?: Partial<Record<FileErrorKey, string>>
+}
+
+export type FileErrorKey = 'required' | 'fileType' | 'fileTooBig' | 'tooManyFiles'
+
+/** The error key to report for a file field, when the field names its own. */
+export function errorKey(field: FieldDef, key: FileErrorKey): string {
+  return field.errorKeys?.[key] ?? key
 }
 
 /**
@@ -115,6 +127,20 @@ export const DOCUMENT_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'applica
 
 /** A portrait photo: images only, never a PDF. */
 export const PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const
+
+/**
+ * A product list or a specification sheet: Excel (new and old) or PDF. The
+ * extensions are for the file picker, which on some phones knows no MIME
+ * type for a spreadsheet; the server decides by the file's bytes.
+ */
+export const SHEET_TYPES = [
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'application/vnd.ms-excel',
+  'application/pdf',
+  '.xlsx',
+  '.xls',
+  '.pdf',
+] as const
 
 const WORK = { field: 'visaType', in: ['work'] } as const
 
@@ -604,11 +630,27 @@ export const FORMS: Record<ApplicationType, FormDef> = {
         fields: [
           { name: 'productName', kind: 'text', required: true, hint: true, max: 160 },
           {
+            // Required since October 2026: a factory cannot quote without
+            // seeing the product.
             name: 'photos',
             kind: 'file',
+            required: true,
             hint: true,
             accept: PHOTO_TYPES,
             multiple: 5,
+            errorKeys: { required: 'photosRequired', fileType: 'photoType' },
+          },
+          {
+            name: 'productFiles',
+            kind: 'file',
+            hint: true,
+            accept: SHEET_TYPES,
+            multiple: 3,
+            errorKeys: {
+              fileType: 'sheetType',
+              fileTooBig: 'sheetTooBig',
+              tooManyFiles: 'tooManySheets',
+            },
           },
           { name: 'productLink', kind: 'url', hint: true, max: 500 },
           {
