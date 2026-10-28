@@ -8,7 +8,7 @@ import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon'
 import { Link, usePathname } from '@/i18n/navigation'
 import { cn } from '@/lib/cn'
 
-type NavItem = { label: string; href: string }
+type NavItem = { label: string; href: string; sub?: { label: string; href: string }[] }
 
 /**
  * The mobile menu: a full-height sheet under the header. Closes on route
@@ -114,6 +114,24 @@ export function MobileNav({
                       >
                         {item.label}
                       </Link>
+                      {item.sub ? (
+                        <ul className="-mt-2 mb-2 flex flex-col border-b border-border-soft pb-2">
+                          {item.sub.map((sub) => (
+                            <li key={sub.href}>
+                              <Link
+                                href={sub.href}
+                                className="flex min-h-11 items-center gap-2.5 ps-4 font-semibold text-text no-underline"
+                              >
+                                <span
+                                  aria-hidden="true"
+                                  className="size-1.5 shrink-0 rounded-full bg-accent"
+                                />
+                                {sub.label}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
                     </li>
                   ))}
                 </ul>

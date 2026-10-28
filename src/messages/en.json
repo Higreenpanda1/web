@@ -231,7 +231,26 @@
     "requirementsTitle": "What you need to prepare",
     "documentsNote": "We ask for documents by email or WhatsApp after reviewing your request. Nothing is uploaded on this site.",
     "startApplication": "Start your application",
-    "applicationLead": "A short form, a few minutes. We reply on WhatsApp within one working day."
+    "applicationLead": "A short form, a few minutes. We reply on WhatsApp within one working day.",
+    "company": {
+      "chooseLead": "Choose a company to see its services.",
+      "title": "{name} services",
+      "back": "Back to choosing a company",
+      "switchLabel": "Choose a company",
+      "all": "All {name} services",
+      "view": {
+        "higp": "See HIGP's services",
+        "nasher": "See Nasher's services"
+      },
+      "line": {
+        "higp": "Company formation, bank accounts, accounting and tax, trademarks, visas, e-commerce and consulting.",
+        "nasher": "Every kind of yacht, boat and car part: finding factories, manufacturing, quality inspection and shipping."
+      },
+      "lead": {
+        "higp": "Company formation, bank accounts, accounting and tax, trademarks, visas, e-commerce and consulting.",
+        "nasher": "Specialised in yacht, boat and car parts."
+      }
+    }
   },
   "about": {
     "title": "About us",

@@ -8,6 +8,7 @@ import { LocaleSwitcher } from './LocaleSwitcher'
 import { Wordmark } from './Logo'
 import { MobileNav } from './MobileNav'
 import { NavLink } from './NavLink'
+import { ServicesMenu } from './ServicesMenu'
 
 import type { Locale } from '@/i18n/routing'
 import type { SiteSetting } from '@/payload-types'
@@ -57,7 +58,11 @@ export async function Header({ locale, settings }: { locale: Locale; settings: S
           <ul className="flex items-center">
             {items.map((item) => (
               <li key={item.href}>
-                <NavLink href={item.href} label={item.label} />
+                {item.href === '/services' ? (
+                  <ServicesMenu locale={locale} label={item.label} />
+                ) : (
+                  <NavLink href={item.href} label={item.label} />
+                )}
               </li>
             ))}
           </ul>
@@ -94,7 +99,23 @@ export async function Header({ locale, settings }: { locale: Locale; settings: S
             </ButtonLink>
           </span>
           <MobileNav
-            items={items}
+            items={items.map((item) =>
+              item.href === '/services'
+                ? {
+                    ...item,
+                    sub: [
+                      {
+                        label: t('services.company.view.higp'),
+                        href: '/services?company=higp',
+                      },
+                      {
+                        label: t('services.company.view.nasher'),
+                        href: '/services?company=nasher',
+                      },
+                    ],
+                  }
+                : item,
+            )}
             openLabel={t('nav.openMenu')}
             closeLabel={t('nav.closeMenu')}
             navLabel={t('nav.primary')}

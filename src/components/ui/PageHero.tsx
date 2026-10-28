@@ -17,6 +17,7 @@ export function PageHero({
   breadcrumb,
   icon,
   children,
+  after,
   className,
   size = 'md',
 }: {
@@ -26,6 +27,8 @@ export function PageHero({
   breadcrumb?: ReactNode
   icon?: ReactNode
   children?: ReactNode
+  /** Full container width, below the text column (the services page's company cards). */
+  after?: ReactNode
   className?: string
   size?: 'md' | 'lg'
 }) {
@@ -53,6 +56,7 @@ export function PageHero({
           ) : null}
           {children ? <div className="mt-8">{children}</div> : null}
         </div>
+        {after ? <div className="mt-10">{after}</div> : null}
       </Container>
     </section>
   )

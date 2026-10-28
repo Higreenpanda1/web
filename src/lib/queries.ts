@@ -1,6 +1,7 @@
 import { unstable_cache } from 'next/cache'
 
 import { getPayloadClient } from './payload'
+import { isRetiredService } from './service-company'
 
 import type { Locale } from '@/i18n/routing'
 import type {
@@ -83,7 +84,7 @@ export const getServices = (
         limit: options.limit ?? 50,
         depth: 1,
       })
-      return result.docs
+      return result.docs.filter((service) => !isRetiredService(service.slug))
     },
     ['services', locale, String(options.featuredOnly ?? false), String(options.limit ?? 50)],
     { tags: [CACHE_TAGS.services], revalidate: ONE_HOUR },
@@ -100,7 +101,8 @@ export const getServiceBySlug = (slug: string, locale: Locale) =>
         depth: 2,
         limit: 1,
       })
-      return result.docs[0] ?? null
+      const service = result.docs[0] ?? null
+      return service && !isRetiredService(service.slug) ? service : null
     },
     ['service', slug, locale],
     { tags: [CACHE_TAGS.services], revalidate: ONE_HOUR },

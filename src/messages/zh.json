@@ -231,7 +231,26 @@
     "requirementsTitle": "您需要准备的材料",
     "documentsNote": "审核您的申请后，我们会通过电子邮件或 WhatsApp 向您索取文件。本网站不上传任何文件。",
     "startApplication": "开始申请",
-    "applicationLead": "简短的表单，只需几分钟。我们会在一个工作日内通过 WhatsApp 回复。"
+    "applicationLead": "简短的表单，只需几分钟。我们会在一个工作日内通过 WhatsApp 回复。",
+    "company": {
+      "chooseLead": "请选择公司，查看其服务。",
+      "title": "{name}服务",
+      "back": "返回选择公司",
+      "switchLabel": "选择公司",
+      "all": "{name}全部服务",
+      "view": {
+        "higp": "查看 HIGP 的服务",
+        "nasher": "查看 Nasher 的服务"
+      },
+      "line": {
+        "higp": "公司注册、银行开户、会计与税务、商标、签证、电子商务和咨询。",
+        "nasher": "各类游艇、船舶和汽车配件：寻找工厂、生产、验货和运输。"
+      },
+      "lead": {
+        "higp": "公司注册、银行开户、会计与税务、商标、签证、电子商务和咨询。",
+        "nasher": "专注于游艇、船舶和汽车配件。"
+      }
+    }
   },
   "about": {
     "title": "关于我们",
