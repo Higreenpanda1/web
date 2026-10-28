@@ -1300,6 +1300,67 @@
           "title": "We ship and follow up",
           "body": "Sea or air freight, customs clearance and delivery to your warehouse. We stay with you until you receive it."
         }
+      },
+      "story": {
+        "hint": "Scroll down",
+        "heroSub": "Every part we choose first passes one standard: <hl>quality</hl>.",
+        "seaSay": "From the engine to the smallest fitting, we supply <hl>every component of the yacht</hl>.",
+        "seaAlt": "A yacht that opens, as you scroll, into its main parts: the engine, the drive and propeller, the outboard motor, the electrics and wiring, the helm and the anchor.",
+        "landEyebrow": "From sea to road",
+        "landTitle": "From sea to road, <hl>the same precision</hl> in every part.",
+        "landSay": "From the engine to the tyre, we supply <hl>every component of the car</hl>.",
+        "landAlt": "A luxury car that opens, as you scroll, into its main parts: the chassis, the transmission, the suspension, the electrics and wiring, the tyre, the rim and the brake disc, then the engine and its parts.",
+        "stepsTitle": "Four clear steps",
+        "payEyebrow": "Receiving payments",
+        "payTitle": "Pay <hl>quickly and easily</hl> from an account near you",
+        "payLead": "We hold bank accounts in most countries of the world, so you pay from an account close to you, in your country or region.",
+        "mapAlt": "World map: from Shenzhen, lines reach the countries where we hold bank accounts, one country after another.",
+        "hub": "Shenzhen",
+        "allConnected": "Connected to all our accounts",
+        "parts": {
+          "engine": "Engine",
+          "propulsion": "Drive and propeller",
+          "outboard": "Outboard motor",
+          "wiring": "Electrics and wiring",
+          "helm": "Helm",
+          "anchor": "Anchor",
+          "chassis": "Chassis",
+          "transmission": "Transmission",
+          "suspension": "Suspension",
+          "tyre": "Tyre",
+          "rim": "Rim",
+          "brakeDisc": "Brake disc"
+        },
+        "benefits": {
+          "1": {
+            "title": "Faster",
+            "body": "A local transfer arrives sooner than an international wire."
+          },
+          "2": {
+            "title": "Easier",
+            "body": "An ordinary transfer from your bank, without the steps of an international wire."
+          },
+          "3": {
+            "title": "Clearer",
+            "body": "A receipt in our company’s name, and a confirmation of receipt from us."
+          },
+          "4": {
+            "title": "Lower cost",
+            "body": "You save intermediary bank fees."
+          },
+          "5": {
+            "title": "In your currency",
+            "body": "You pay in your country’s local currency."
+          }
+        },
+        "regions": {
+          "asia": "Asia",
+          "middleEast": "Middle East",
+          "africa": "Africa",
+          "europe": "Europe",
+          "americas": "The Americas",
+          "oceania": "Oceania"
+        }
       }
     }
   }
