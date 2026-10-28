@@ -3,7 +3,7 @@ import { call } from '@/lib/hubspot'
 import { getPayloadClient } from '@/lib/payload'
 import { absoluteUrl } from '@/lib/url'
 import { STAGES, isPaidStage, referenceIn } from './stages'
-import { welcomeEmail, type WelcomeLanguage } from './welcome'
+import { welcomeEmail, type WelcomeCompany, type WelcomeLanguage } from './welcome'
 
 import type { Payload, Where } from 'payload'
 
@@ -39,6 +39,22 @@ export type PaidClient = {
   whatsapp: string | null
   reference: string | null
   deal: string
+  /** The company serving them, which signs the welcome. */
+  company: WelcomeCompany
+}
+
+type DealProps = {
+  dealname?: string | null
+  dealstage?: string | null
+  our_company?: string | null
+}
+
+/** Nasher when the deal says so or sits in Nasher's stages; HiGP otherwise. */
+function companyOf(deal: DealProps): WelcomeCompany {
+  if (deal.our_company === 'nasher') return 'nasher'
+  if (deal.our_company === 'higp') return 'higp'
+  const stage = deal.dealstage ? STAGES[deal.dealstage] : undefined
+  return stage?.track === 'nasher' ? 'nasher' : 'higp'
 }
 
 /** "+<digits>", the form Customers stores (see its beforeChange hook). */
@@ -53,7 +69,7 @@ const PAID_STAGES = Object.keys(STAGES).filter((id) => isPaidStage(id))
 
 /** Every contact on a paid deal, once, with the deal that has a reference first. */
 export async function paidClients(): Promise<PaidClient[]> {
-  const deals: Array<{ id: string; properties: { dealname?: string | null } }> = []
+  const deals: Array<{ id: string; properties: DealProps }> = []
   let after: string | undefined
   for (let page = 0; page < 20; page++) {
     const result = await call<{
@@ -68,7 +84,7 @@ export async function paidClients(): Promise<PaidClient[]> {
           ],
         },
       ],
-      properties: ['dealname'],
+      properties: ['dealname', 'dealstage', 'our_company'],
       limit: 100,
       ...(after ? { after } : {}),
     })
@@ -132,6 +148,7 @@ export async function paidClients(): Promise<PaidClient[]> {
         whatsapp,
         reference: referenceIn(name),
         deal: name,
+        company: companyOf(deal.properties),
       })
     }
   }
@@ -177,7 +194,7 @@ export async function openAccountsForPaidClients(
 
   const payload = await getPayloadClient()
   for (const client of await paidClients()) {
-    const label = `${client.name} <${client.email ?? client.whatsapp}> (${client.reference ?? client.deal})`
+    const label = `${client.name} <${client.email ?? client.whatsapp}> (${client.reference ?? client.deal}; ${client.company})`
     try {
       if (await hasAccount(payload, client)) continue
       const language = await languageOf(payload, client)
@@ -206,9 +223,11 @@ export async function openAccountsForPaidClients(
         name: client.name,
         reference: client.reference,
         language,
+        company: client.company,
         urls: { ar: absoluteUrl('ar', '/portal/login'), en: absoluteUrl('en', '/portal/login') },
       })
       await payload.sendEmail({
+        from: `"${mail.fromName}" <${emailConfig.from}>`,
         to: client.email,
         replyTo: emailConfig.notifyTo[0],
         subject: mail.subject,
