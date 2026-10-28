@@ -1,3 +1,4 @@
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 
 import { CompanyHero } from '@/components/companies/CompanyHero'
@@ -8,8 +9,10 @@ import { Breadcrumb } from '@/components/ui/Breadcrumb'
 import { ButtonLink } from '@/components/ui/Button'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { Section, SectionHeading } from '@/components/ui/Section'
+import { Link } from '@/i18n/navigation'
 import { cn } from '@/lib/cn'
 import { breadcrumbJsonLd } from '@/lib/jsonld'
+import { getServices } from '@/lib/queries'
 import { buildMetadata } from '@/lib/seo'
 
 import type { Locale } from '@/i18n/routing'
@@ -39,6 +42,25 @@ const PHASES = [
 const COURSE_FROM = 10
 
 /**
+ * The services each step opens, by slug. Titles come from the CMS so they
+ * always match the service pages; a slug that is not published is skipped.
+ * Course steps (10 and up) without a service link to the academy instead.
+ */
+const STEP_SERVICES: Record<number, string[]> = {
+  1: ['business-consulting'],
+  2: ['business-consulting'],
+  3: ['business-consulting'],
+  4: ['business-consulting'],
+  5: ['trademark-registration'],
+  6: ['company-formation', 'hong-kong-company-formation', 'registered-address', 'business-licence-changes'],
+  7: ['bank-account-opening', 'alipay-wechat-business-accounts'],
+  8: ['work-visa-and-residence', 'business-invitation-letter', 'family-reunion-visa'],
+  9: ['accounting-and-tax'],
+  10: ['shipping-and-freight'],
+  11: ['marketplace-store-setup', 'ecommerce-launch'],
+}
+
+/**
  * HIGP Consulting & Accounting: the whole road in China from A to Z, from
  * the market study to growth, in the owner's fourteen steps (28 October
  * 2026). The journey that used to sit on the homepage lives here now.
@@ -46,7 +68,12 @@ const COURSE_FROM = 10
 export default async function HigpPage({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params
   setRequestLocale(locale)
-  const t = await getTranslations({ locale })
+  const [t, services] = await Promise.all([
+    getTranslations({ locale }),
+    getServices(locale, { limit: 60 }),
+  ])
+  const serviceTitle = new Map(services.map((s) => [s.slug, s.title]))
+  const Arrow = locale === 'ar' ? ArrowLeft : ArrowRight
   const pad = (n: number) => String(n).padStart(2, '0')
 
   return (
@@ -109,6 +136,10 @@ export default async function HigpPage({ params }: { params: Promise<{ locale: L
               >
                 {phase.steps.map((step) => {
                   const fromCourse = step >= COURSE_FROM
+                  const links = (STEP_SERVICES[step] ?? []).flatMap((slug) => {
+                    const title = serviceTitle.get(slug)
+                    return title ? [[slug, title] as const] : []
+                  })
                   return (
                     <li
                       key={step}
@@ -131,10 +162,31 @@ export default async function HigpPage({ params }: { params: Promise<{ locale: L
                           companyTags,
                         )}
                       </p>
+                      {links.length ? (
+                        <ul className="mt-2 grid list-none gap-1.5 p-0">
+                          {links.map(([slug, title]) => (
+                            <li key={slug}>
+                              <Link
+                                href={`/services/${slug}`}
+                                className="group inline-flex items-center gap-1.5 font-semibold text-text-brand underline-offset-4 hover:underline"
+                              >
+                                {title}
+                                <Arrow
+                                  aria-hidden="true"
+                                  className="size-4 shrink-0 transition-transform group-hover:-translate-x-0.5 ltr:group-hover:translate-x-0.5"
+                                />
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
                       {fromCourse ? (
-                        <span className="mt-1 w-fit rounded-full bg-[#fbf1dc] px-2.5 py-0.5 text-eyebrow font-semibold text-accent-text">
+                        <Link
+                          href="/academy"
+                          className="mt-1 w-fit rounded-full bg-[#fbf1dc] px-2.5 py-0.5 text-eyebrow font-semibold text-accent-text hover:underline"
+                        >
                           {t('companies.higp.courseTag')}
-                        </span>
+                        </Link>
                       ) : null}
                     </li>
                   )
