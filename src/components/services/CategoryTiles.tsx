@@ -4,6 +4,7 @@ import { getTranslations } from 'next-intl/server'
 import { CATEGORY_ICON, ServiceIcon } from '@/components/ServiceIcon'
 import { Link } from '@/i18n/navigation'
 import { cn } from '@/lib/cn'
+import { categoryHref } from '@/lib/service-company'
 
 import type { Locale } from '@/i18n/routing'
 import type { ServiceGroup } from '@/lib/services'
@@ -46,7 +47,7 @@ export async function CategoryTiles({
             <div className="min-w-0">
               <h3 className="text-h3">
                 <Link
-                  href={`/services#${category}`}
+                  href={categoryHref(category)}
                   className="text-heading no-underline hover:text-text-brand"
                 >
                   {t(`services.categories.${category}.title`)}
@@ -76,7 +77,7 @@ export async function CategoryTiles({
           </ul>
 
           <Link
-            href={`/services#${category}`}
+            href={categoryHref(category)}
             className="mt-5 inline-flex items-center gap-1.5 self-start font-semibold text-text-brand no-underline"
           >
             {t('cta.allServices')}

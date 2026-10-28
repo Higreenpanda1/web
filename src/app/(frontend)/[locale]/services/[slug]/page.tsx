@@ -1,7 +1,7 @@
 import { ArrowLeft, ArrowRight, CheckCircle2, ClipboardList } from 'lucide-react'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import Image from 'next/image'
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 
 import { EnquiryFormSection } from '@/components/forms/EnquiryFormSection'
 import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon'
@@ -20,7 +20,8 @@ import { breadcrumbJsonLd, faqJsonLd, serviceJsonLd } from '@/lib/jsonld'
 import { hasPrice } from '@/lib/price'
 import { getServiceBySlug, getServices, getSiteSettings } from '@/lib/queries'
 import { buildMetadata, mediaSrc } from '@/lib/seo'
-import { whatsappLink } from '@/lib/url'
+import { isRetiredService, serviceCompany } from '@/lib/service-company'
+import { localePath, whatsappLink } from '@/lib/url'
 
 import type { Locale } from '@/i18n/routing'
 import type { Media } from '@/payload-types'
@@ -62,6 +63,10 @@ export default async function ServicePage({
   const { locale, slug } = await params
   setRequestLocale(locale)
 
+  // A service no longer offered sends old links and search results to the
+  // services index rather than to a dead page.
+  if (isRetiredService(slug)) permanentRedirect(localePath(locale, '/services'))
+
   const service = await getServiceBySlug(slug, locale)
   if (!service) notFound()
 
@@ -80,11 +85,19 @@ export default async function ServicePage({
   const requirements = service.requirements ?? []
   const applicationType = service.applicationType ?? null
   const applyHref = applicationType ? `/apply/${applicationType}?service=${service.slug}` : null
-  // Siblings from the same area first; the rest of the catalogue after.
+  // Siblings from the same area first, then the rest of the same company's
+  // services: a Nasher page never suggests a visa, a HIGP page never freight.
+  const company = serviceCompany(service)
   const others = [
     ...all.filter((entry) => entry.id !== service.id && entry.category === service.category),
-    ...all.filter((entry) => entry.id !== service.id && entry.category !== service.category),
+    ...all.filter(
+      (entry) =>
+        entry.id !== service.id &&
+        entry.category !== service.category &&
+        serviceCompany(entry) === company,
+    ),
   ].slice(0, 6)
+  const companyServicesHref = `/services?company=${company}`
   const Arrow = locale === 'ar' ? ArrowLeft : ArrowRight
   const whatsapp = whatsappLink(
     settings.whatsappNumber,
@@ -114,6 +127,7 @@ export default async function ServicePage({
             items={[
               { name: t('nav.home'), href: '/' },
               { name: t('services.title'), href: '/services' },
+              { name: t(`companies.${company}.short`), href: companyServicesHref },
               { name: service.title },
             ]}
           />

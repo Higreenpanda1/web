@@ -3,6 +3,7 @@ import { mediaUrl } from '@/lib/seo'
 import { absoluteUrl } from '@/lib/url'
 
 import { APPLICATION_TYPES } from '@/lib/catalogue'
+import { isRetiredService } from '@/lib/service-company'
 
 import type { Locale } from '@/i18n/routing'
 import type { MetadataRoute } from 'next'
@@ -65,6 +66,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   )
 
   for (const { slug, updatedAt } of services) {
+    if (isRetiredService(slug)) continue
     entries.push(localisedEntry(`/services/${slug}`, updatedAt, 0.8, 'monthly'))
   }
 

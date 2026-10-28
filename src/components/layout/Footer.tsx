@@ -7,6 +7,7 @@ import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon'
 import { Link } from '@/i18n/navigation'
 import { SERVICE_CATEGORIES } from '@/lib/catalogue'
 import { HEADQUARTERS } from '@/lib/company'
+import { categoryHref } from '@/lib/service-company'
 import { localePath, whatsappLink } from '@/lib/url'
 import { Wordmark } from './Logo'
 
@@ -34,7 +35,7 @@ export async function Footer({ locale, settings }: { locale: Locale; settings: S
             links: SERVICE_CATEGORIES.map((category) => ({
               id: `area-${category}`,
               label: t(`services.categories.${category}.title`),
-              href: `/services#${category}`,
+              href: categoryHref(category),
             })),
           },
           {

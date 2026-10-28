@@ -570,7 +570,7 @@ async function fallbackService(
     'shipping-logistics': 'shipping-and-freight',
     'quality-inspection': 'quality-inspection',
     'company-setup': 'company-formation',
-    'trade-fairs': 'trade-fair-support',
+    'trade-fairs': 'product-sourcing',
     ecommerce: 'ecommerce-launch',
     investment: 'business-consulting',
     industries: 'product-sourcing',
