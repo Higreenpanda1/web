@@ -64,12 +64,19 @@ export const plexLatin = localFont({
   ],
 })
 
-export const plexArabic = localFont({
+/**
+ * The Arabic text face, Noto Kufi Arabic: lighter and more refined than Plex,
+ * chosen by the owner (28 October 2026) to sit under the Amiri headings. Three
+ * weights: 300 for leads, 400 for text, 600 for anything set bold (the browser
+ * resolves 700 to 600). The Latin text on Arabic pages stays IBM Plex.
+ */
+export const bodyArabic = localFont({
   src: [
-    { path: '../fonts/plex-arabic-400.woff2', weight: '400', style: 'normal' },
-    { path: '../fonts/plex-arabic-700.woff2', weight: '700', style: 'normal' },
+    { path: '../fonts/kufi-arabic-300.woff2', weight: '300', style: 'normal' },
+    { path: '../fonts/kufi-arabic-400.woff2', weight: '400', style: 'normal' },
+    { path: '../fonts/kufi-arabic-600.woff2', weight: '600', style: 'normal' },
   ],
-  variable: '--font-plex-arabic',
+  variable: '--font-body-arabic',
   display: 'swap',
   preload: false,
   fallback: [],
@@ -82,17 +89,13 @@ export const plexArabic = localFont({
 })
 
 /**
- * The heading face, Markazi Text: a classical Arabic text face with a matching
- * Latin, chosen by the owner (23 October 2026) so headings read apart from the
- * IBM Plex text. Its small x-height is evened out with `font-size-adjust` in
- * globals.css. Small files (10 to 20 KB each), same split and no preload as
- * above.
+ * The heading face, Amiri: the classical naskh of the course page, chosen by
+ * the owner (28 October 2026) for every heading on the site, replacing
+ * Markazi. One weight, 700; the Arabic file is the larger of the two (98 KB),
+ * same split and no preload as above.
  */
 export const displayLatin = localFont({
-  src: [
-    { path: '../fonts/markazi-latin-600.woff2', weight: '600', style: 'normal' },
-    { path: '../fonts/markazi-latin-700.woff2', weight: '700', style: 'normal' },
-  ],
+  src: [{ path: '../fonts/amiri-latin-700.woff2', weight: '700', style: 'normal' }],
   variable: '--font-display-latin',
   display: 'swap',
   preload: false,
@@ -108,10 +111,7 @@ export const displayLatin = localFont({
 })
 
 export const displayArabic = localFont({
-  src: [
-    { path: '../fonts/markazi-arabic-600.woff2', weight: '600', style: 'normal' },
-    { path: '../fonts/markazi-arabic-700.woff2', weight: '700', style: 'normal' },
-  ],
+  src: [{ path: '../fonts/amiri-arabic-700.woff2', weight: '700', style: 'normal' }],
   variable: '--font-display-arabic',
   display: 'swap',
   preload: false,

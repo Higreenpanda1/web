@@ -76,7 +76,7 @@ export function MobileNav({
   }, [open])
 
   return (
-    <div className="lg:hidden">
+    <div className="xl:hidden">
       <button
         ref={triggerRef}
         type="button"
@@ -100,7 +100,7 @@ export function MobileNav({
               ref={panelRef}
               hidden={!open}
               className={cn(
-                'fixed inset-x-0 top-[var(--header-height)] bottom-0 z-40 overflow-y-auto bg-surface lg:hidden',
+                'fixed inset-x-0 top-[var(--header-height)] bottom-0 z-40 overflow-y-auto bg-surface xl:hidden',
                 open && 'animate-fade-in',
               )}
             >

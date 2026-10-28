@@ -58,7 +58,7 @@ export function SectionHeading({
   id?: string
   eyebrow?: string | null
   title: string
-  lead?: string | null
+  lead?: ReactNode
   inverse?: boolean
   action?: ReactNode
   align?: 'start' | 'center'

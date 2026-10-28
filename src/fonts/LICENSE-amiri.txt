@@ -1,0 +1,2 @@
+Amiri is by Khaled Hosny, licensed under the SIL Open Font License, Version 1.1.
+https://github.com/aliftype/amiri  —  https://openfontlicense.org

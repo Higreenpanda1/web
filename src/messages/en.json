@@ -1130,5 +1130,159 @@
       "paid": "Paid",
       "unpaid": "Awaiting payment"
     }
+  },
+  "companies": {
+    "brand": {
+      "titleMain": "One brand",
+      "titleTail": ", two specialist companies",
+      "titleFull": "One brand, two specialist companies",
+      "lead": "HiGreenPanda is a brand that runs two specialist companies from its head office: <name>HIGP Consulting & Accounting</name>, and <name>Nasher International Trading</name> for <hl>yacht, boat and car parts</hl>.",
+      "enter": "Enter",
+      "back": "Back to the homepage",
+      "enterAria": "Enter {name}"
+    },
+    "higp": {
+      "name": "HIGP Consulting & Accounting",
+      "short": "HIGP",
+      "cardBody": "Business and accounting advice that puts your business in China on a sound footing: from <hl>market research</hl> and <hl>company formation</hl> to the <hl>bank account</hl> and <hl>tax compliance</hl>.",
+      "filmKicker": "HIGP",
+      "film": {
+        "1": "Market research",
+        "2": "Company formation",
+        "3": "Bank account",
+        "4": "Accounting and tax compliance"
+      },
+      "pageTitle": "Your journey in China, from A to Z",
+      "pageLead": "From <hl>market and product research</hl> to the <hl>trademark</hl>, the <hl>company</hl>, the <hl>bank account</hl> and the <hl>accounts</hl>, then everything you need to trade safely.",
+      "metaDescription": "HIGP Consulting & Accounting: your journey in China, from market research and company formation to the bank account, accounting and tax compliance.",
+      "viewLicence": "View the licence",
+      "journeyEyebrow": "The journey",
+      "journeyTitle": "Fourteen steps, from the idea to growth",
+      "journeyLead": "Start wherever you are. The steps shaded green come from the course «International Trade from A to Z».",
+      "courseTag": "From the course",
+      "stepLabel": "Step",
+      "phases": {
+        "1": {
+          "label": "Stage one",
+          "title": "Research",
+          "body": "Before any money moves."
+        },
+        "2": {
+          "label": "Stage two",
+          "title": "Set-up",
+          "body": "A company in good standing with the authorities."
+        },
+        "3": {
+          "label": "Stage three",
+          "title": "Trade and growth",
+          "body": "From the first deal to a company with a system."
+        }
+      },
+      "steps": {
+        "1": {
+          "title": "The idea",
+          "body": "You come with a product or a plan. We discuss it with you frankly: what it costs, how long it takes, and whether China is the right place to do it."
+        },
+        "2": {
+          "title": "Target market study",
+          "body": "The real size of your market in the country you will sell in, from <hl>port and customs data</hl> rather than impressions: demand, competitors and price levels."
+        },
+        "3": {
+          "title": "Source market study",
+          "body": "Who makes your product in China, who is buying it today, at what price and when."
+        },
+        "4": {
+          "title": "Product study and selection",
+          "body": "Choosing the product <hl>on the numbers</hl>, before any money moves."
+        },
+        "5": {
+          "title": "Trademark",
+          "body": "China works on <hl>first to file</hl>. Registering your mark before a factory or competitor does is the cheapest protection you can buy."
+        },
+        "6": {
+          "title": "Company formation",
+          "body": "A registered company with a licence and a registered address, in the city that suits your business."
+        },
+        "7": {
+          "title": "Bank account and payments",
+          "body": "A corporate bank account, plus business Alipay and WeChat Pay accounts."
+        },
+        "8": {
+          "title": "Structure and residence",
+          "body": "Who signs, who owns what, and the work permit and residence card if you or your staff will live in China."
+        },
+        "9": {
+          "title": "Accounting and compliance",
+          "body": "Monthly books, tax returns and the annual report, handled by <hl>licensed accountants</hl>, so the company stays in good standing."
+        },
+        "10": {
+          "title": "Logistics and Incoterms",
+          "body": "Exactly where your responsibility ends on every shipment."
+        },
+        "11": {
+          "title": "Reaching buyers",
+          "body": "Who buys, from whom, how much and when, from <hl>customs data</hl>. Your competitor's customers too."
+        },
+        "12": {
+          "title": "Payment security",
+          "body": "Assessing the buyer before negotiating, <hl>letters of credit</hl>, marine insurance, and protection from business email fraud."
+        },
+        "13": {
+          "title": "Documents",
+          "body": "The product file, the <hl>bill of lading</hl> and the export tax rebate."
+        },
+        "14": {
+          "title": "Growth",
+          "body": "From one successful deal to a company with a system, and a moat that protects it."
+        }
+      }
+    },
+    "nasher": {
+      "name": "Nasher International Trading",
+      "short": "Nasher",
+      "cardBody": "International trading specialised in every kind of <hl>yacht, boat and car part</hl>: finding factories, manufacturing, <hl>quality inspection</hl> and <hl>shipping</hl>.",
+      "filmKicker": "Parts for",
+      "film": {
+        "1": "Yachts",
+        "2": "Boats",
+        "3": "Cars",
+        "4": "Inspected before shipping"
+      },
+      "pageTitle": "Yacht, boat and car parts from China",
+      "pageLead": "International trading specialised in every kind of <hl>yacht, boat and car part</hl>: finding factories, manufacturing, <hl>quality inspection</hl>, shipping, and accompanying you at trade fairs.",
+      "metaDescription": "Nasher International Trading: every kind of yacht, boat and car part sourced from China, from finding factories and manufacturing to quality inspection and shipping.",
+      "viewLicence": "View the licence",
+      "servicesEyebrow": "Nasher's services",
+      "servicesTitle": "Everything you need to source parts from China",
+      "servicesLead": "Specialised in <hl>yacht, boat and car parts</hl>.",
+      "services": {
+        "1": "Finding factories",
+        "2": "Manufacturing",
+        "3": "Quality inspection",
+        "4": "Shipping",
+        "5": "Trade fair accompaniment"
+      },
+      "processEyebrow": "How we work",
+      "processTitle": "How the process runs",
+      "processLead": "No surprises. At every stage you know where your goods are and what you have paid.",
+      "process": {
+        "1": {
+          "title": "You tell us what you need",
+          "body": "The part, the quantity, the budget and the destination country. We reply on WhatsApp within one working day."
+        },
+        "2": {
+          "title": "We search and price",
+          "body": "We find the right factories, negotiate the price and send you a detailed quote with the full cost."
+        },
+        "3": {
+          "title": "We inspect before you pay",
+          "body": "A visit to the factory and inspection of the sample and the goods before shipping. You receive the photos and the report."
+        },
+        "4": {
+          "title": "We ship and follow up",
+          "body": "Sea or air freight, customs clearance and delivery to your warehouse. We stay with you until you receive it."
+        }
+      }
+    }
   }
 }
