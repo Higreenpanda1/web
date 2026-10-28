@@ -76,8 +76,9 @@ export function Journey({
   className?: string
 }) {
   const [open, setOpen] = useState(0)
-  const [active, setActive] = useState(0)
+  const [reached, setReached] = useState(1)
   const spineRef = useRef<SVGLineElement>(null)
+  const tipRef = useRef<HTMLSpanElement>(null)
   const sectionRef = useRef<HTMLOListElement>(null)
   const Arrow = locale === 'ar' ? ArrowLeft : ArrowRight
 
@@ -88,31 +89,27 @@ export function Journey({
     if (!line || !list) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       line.style.strokeDashoffset = '0'
+      setReached(Number.MAX_SAFE_INTEGER)
       return
     }
     const length = 2000
     line.style.strokeDasharray = `${length}`
     const onScroll = () => {
       const rect = list.getBoundingClientRect()
-      const total = rect.height + window.innerHeight * 0.4
-      const passed = Math.min(Math.max(window.innerHeight * 0.7 - rect.top, 0), total)
+      // The thread runs to the same line (60% down the screen) that lights the cards.
+      const total = rect.height
+      const passed = Math.min(Math.max(window.innerHeight * 0.6 - rect.top, 0), total)
       line.style.strokeDashoffset = `${length * (1 - passed / total)}`
+      // The soft light at the tip of the thread travels with it.
+      if (tipRef.current) tipRef.current.style.top = `${(passed / total) * 100}%`
     }
-    // The step whose node is nearest the middle of the viewport is "active".
+    // Every card rests dim; a card lights once the thread reaches it (its top
+    // passes the middle of the screen) and stays lit to the end of the road.
     const items = Array.from(list.querySelectorAll<HTMLElement>('.journey-step'))
     const pick = () => {
-      const mid = window.innerHeight * 0.45
-      let best = 0
-      let bestDist = Infinity
-      items.forEach((item, index) => {
-        const r = item.getBoundingClientRect()
-        const d = Math.abs(r.top + Math.min(r.height, 120) / 2 - mid)
-        if (d < bestDist) {
-          bestDist = d
-          best = index
-        }
-      })
-      setActive(best)
+      const mid = window.innerHeight * 0.6
+      const count = items.filter((item) => item.getBoundingClientRect().top < mid).length
+      setReached(Math.max(1, count))
     }
     const onScrollAll = () => {
       onScroll()
@@ -132,23 +129,29 @@ export function Journey({
       {/* The spine. Positioned along the start edge on phones, centred on lg. */}
       <svg
         aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 start-[1.375rem] w-px lg:start-1/2 lg:-translate-x-1/2"
-        width="2"
+        className="pointer-events-none absolute inset-y-0 start-[1.375rem] h-full w-px lg:start-1/2 lg:-translate-x-1/2"
+        width="1"
         height="100%"
         preserveAspectRatio="none"
       >
-        <line x1="1" y1="0" x2="1" y2="100%" className="stroke-border" strokeWidth="2" />
+        <line x1="0.5" y1="0" x2="0.5" y2="100%" className="stroke-border-soft" strokeWidth="1" />
         <line
           ref={spineRef}
-          x1="1"
+          x1="0.5"
           y1="0"
-          x2="1"
+          x2="0.5"
           y2="100%"
-          className="journey-line stroke-brand-600"
-          strokeWidth="2"
+          className="journey-line stroke-brand-400"
+          strokeWidth="1"
           pathLength={2000}
         />
       </svg>
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-0 start-[1.375rem] z-20 w-px lg:start-1/2 lg:-translate-x-1/2"
+      >
+        <span ref={tipRef} className="journey-tip" />
+      </span>
 
       <ol ref={sectionRef} className="relative m-0 list-none space-y-4 p-0 lg:space-y-6">
         {steps.map((step, index) => {
@@ -159,10 +162,9 @@ export function Journey({
           return (
             <li
               key={step.href + index}
-              data-reveal={left ? 'left' : 'right'}
               className={cn(
                 'journey-step relative ps-14 lg:grid lg:grid-cols-[1fr_3.5rem_1fr] lg:items-start lg:gap-0 lg:ps-0',
-                active === index && 'is-active',
+                (index < reached || isOpen) && 'is-lit',
               )}
             >
               {/* Node on the spine */}
@@ -170,8 +172,8 @@ export function Journey({
                 aria-hidden="true"
                 className={cn(
                   'journey-node absolute top-3 start-0 z-10 inline-flex size-11 items-center justify-center rounded-full border-2 lg:static lg:col-start-2 lg:mx-auto lg:size-14',
-                  isOpen || active === index
-                    ? 'border-brand-700 bg-brand-700 text-white shadow-glow'
+                  isOpen || index < reached
+                    ? 'border-brand-500 bg-brand-600 text-white'
                     : 'border-border bg-surface text-text-muted',
                 )}
               >
@@ -193,7 +195,9 @@ export function Journey({
                     'group w-full rounded-lg border bg-surface p-5 text-start transition-[border-color,box-shadow,transform] duration-300',
                     isOpen
                       ? 'border-brand-300 shadow-card'
-                      : 'border-border-soft hover:border-brand-300 hover:shadow-card',
+                      : index < reached
+                        ? 'border-brand-200 bg-brand-50'
+                        : 'border-border-soft hover:border-brand-300 hover:shadow-card',
                   )}
                 >
                   <span className="ltr-nums text-eyebrow font-bold ltr:tracking-[0.14em] text-text-brand uppercase">
