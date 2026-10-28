@@ -4,7 +4,8 @@
  *
  * The form (src/forms/definitions.ts, 'product-search') stores the answers
  * in `details.products`, one object per product, and each photo as
- * "<file name> (<size>)" in that product's `photos`. Requests sent before
+ * "<file name> (<size>)" in that product's `photos` (and, since late
+ * October 2026, any Excel or PDF file in its `productFiles`). Requests sent before
  * October 2026 had one product with its answers at the top level of
  * `details`; they read as a request for one product without photos.
  *
@@ -25,6 +26,8 @@ export type OrderProduct = {
   specs: string | null
   /** Stored photo file names, in the order the client chose them. */
   photos: string[]
+  /** Stored Excel or PDF files sent with the product, such as a product list. */
+  files: string[]
 }
 
 /** A line of the team's final prices, as the `order.items` array stores it. */
@@ -72,15 +75,30 @@ const number = (value: unknown): number | null => {
  * server could not save says so after the size, and is only in the email).
  */
 export function photoFileName(entry: unknown, reference: string): string | null {
+  const name = storedName(entry)
+  return name && isPhotoFileName(name, reference) ? name : null
+}
+
+/** The same for a product's Excel or PDF file. */
+export function productFileName(entry: unknown, reference: string): string | null {
+  const name = storedName(entry)
+  return name && isProductFileName(name, reference) ? name : null
+}
+
+function storedName(entry: unknown): string | null {
   if (typeof entry !== 'string' || entry.includes('not saved on the server')) return null
-  const name = entry.split(' (')[0]?.trim() ?? ''
-  return isPhotoFileName(name, reference) ? name : null
+  return entry.split(' (')[0]?.trim() ?? null
 }
 
 /** Only names the form itself writes; nothing with a slash or dots to climb. */
 export function isPhotoFileName(name: string, reference: string): boolean {
   if (!name.startsWith(`${reference}-`)) return false
   return /^product\d{1,2}-photos-\d{1,2}\.(jpg|png|webp)$/.test(name.slice(reference.length + 1))
+}
+
+export function isProductFileName(name: string, reference: string): boolean {
+  if (!name.startsWith(`${reference}-`)) return false
+  return /^product\d{1,2}-productFiles-\d\.(pdf|xlsx|xls)$/.test(name.slice(reference.length + 1))
 }
 
 export function orderProducts(details: unknown, reference: string): OrderProduct[] {
@@ -107,6 +125,9 @@ export function orderProducts(details: unknown, reference: string): OrderProduct
     specs: text(item.specs),
     photos: (Array.isArray(item.photos) ? item.photos : [])
       .map((entry) => photoFileName(entry, reference))
+      .filter((name): name is string => name !== null),
+    files: (Array.isArray(item.productFiles) ? item.productFiles : [])
+      .map((entry) => productFileName(entry, reference))
       .filter((name): name is string => name !== null),
   }))
 }

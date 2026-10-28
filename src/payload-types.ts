@@ -1209,6 +1209,15 @@ export interface Application {
    * The deal in HubSpot.
    */
   hubspotDealId?: string | null;
+  hubspotCopies?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1944,6 +1953,7 @@ export interface ApplicationsSelect<T extends boolean = true> {
   notifiedAt?: T;
   hubspotSyncedAt?: T;
   hubspotDealId?: T;
+  hubspotCopies?: T;
   updatedAt?: T;
   createdAt?: T;
 }

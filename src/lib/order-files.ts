@@ -3,7 +3,7 @@ import path from 'node:path'
 
 import { sniffMime } from './documents'
 import { DOCUMENTS_DIR } from './documents-store'
-import { documentMonths, isPhotoFileName } from './product-order'
+import { documentMonths, isPhotoFileName, isProductFileName } from './product-order'
 
 /**
  * One product photo of a request, read from the private documents folder
@@ -21,7 +21,29 @@ export async function readOrderPhoto(
     try {
       const content = new Uint8Array(await readFile(path.join(DOCUMENTS_DIR, month, file)))
       const mime = sniffMime(content)
-      return mime && mime !== 'application/pdf' ? { content, mime } : null
+      return mime && mime.startsWith('image/') ? { content, mime } : null
+    } catch {
+      // Not in this month's folder; try the one before.
+    }
+  }
+  return null
+}
+
+/**
+ * One Excel or PDF file sent with a product, with the same care as the
+ * photos: only the names the form writes for this request, typed by bytes.
+ */
+export async function readOrderFile(
+  reference: string,
+  createdAt: string,
+  file: string,
+): Promise<{ content: Uint8Array; mime: string } | null> {
+  if (!isProductFileName(file, reference)) return null
+  for (const month of documentMonths(createdAt)) {
+    try {
+      const content = new Uint8Array(await readFile(path.join(DOCUMENTS_DIR, month, file)))
+      const mime = sniffMime(content)
+      return mime && !mime.startsWith('image/') ? { content, mime } : null
     } catch {
       // Not in this month's folder; try the one before.
     }

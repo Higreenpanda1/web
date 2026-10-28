@@ -230,3 +230,29 @@ export async function syncApplicationToHubSpot(
     return null
   }
 }
+
+/**
+ * A copy of a quote, invoice or proforma the team printed, as a note with the
+ * PDF attached on the request's deal. Throws when HubSpot is not connected or
+ * says no, so the team sees why next to the print button.
+ */
+export async function attachToDeal(
+  dealId: string,
+  reference: string,
+  doc: HubSpotDocument,
+  note: string,
+): Promise<void> {
+  if (!hubspotConfig.configured) throw new Error('HubSpot is not connected.')
+  const fileId = await uploadDocument(reference, doc)
+  if (!fileId)
+    throw new Error('HubSpot did not take the file (does the key have the files scope?).')
+  await call<Created>('POST', '/crm/v3/objects/notes', {
+    properties: {
+      hs_timestamp: new Date().toISOString(),
+      hs_note_body: note,
+      hs_attachment_ids: fileId,
+      ...owner(),
+    },
+    associations: [assoc(dealId, ASSOC.noteToDeal)],
+  })
+}

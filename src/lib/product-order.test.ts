@@ -10,6 +10,7 @@ import {
   orderTotal,
   paymentSplit,
   photoFileName,
+  productFileName,
 } from './product-order.ts'
 
 const REF = 'HGA-20261026-ABC123'
@@ -35,6 +36,28 @@ test('only names the form writes are photo names', () => {
   assert.equal(isPhotoFileName(`${REF}-passportPhoto.jpg`, REF), false)
   assert.equal(isPhotoFileName(`${REF}-product1-photos-1.jpg/../../x`, REF), false)
   assert.equal(isPhotoFileName(`${REF}-product1-photos-1.pdf`, REF), false)
+})
+
+test('an Excel or PDF file of a product is read back by the names the form writes', () => {
+  assert.equal(
+    productFileName(`${REF}-product2-productFiles-1.xlsx (40 KB)`, REF),
+    `${REF}-product2-productFiles-1.xlsx`,
+  )
+  assert.equal(
+    productFileName(`${REF}-product2-productFiles-1.pdf (1 MB)`, REF),
+    `${REF}-product2-productFiles-1.pdf`,
+  )
+  assert.equal(productFileName(`${REF}-product1-photos-1.jpg (1 MB)`, REF), null)
+  assert.equal(productFileName(`${REF}-product1-productFiles-1.html (1 KB)`, REF), null)
+  const [product] = orderProducts(
+    {
+      products: [
+        { productName: 'Mug', productFiles: [`${REF}-product1-productFiles-1.xls (9 KB)`] },
+      ],
+    },
+    REF,
+  )
+  assert.deepEqual(product?.files, [`${REF}-product1-productFiles-1.xls`])
 })
 
 test('products are read from a request with several', () => {

@@ -418,7 +418,11 @@
       "fileTooBig": "This file is larger than 10 MB. Please send a smaller photo.",
       "fileType": "Please upload a JPG, PNG or PDF file.",
       "tooManyFiles": "Upload at most 5 photos per product.",
-      "photoType": "Please upload a JPG, PNG or WebP photo."
+      "photoType": "Please upload a JPG, PNG or WebP photo.",
+      "photosRequired": "Add at least one photo of this product.",
+      "sheetType": "Please upload an Excel or PDF file.",
+      "tooManySheets": "Upload at most 3 files per product.",
+      "sheetTooBig": "This file is larger than 10 MB. Please send a smaller file."
     },
     "types": {
       "consultation": {
@@ -572,7 +576,9 @@
       "productName": "Product",
       "productNameHint": "In English if possible, plus the Arabic name.",
       "photos": "Product photos",
-      "photosHint": "Up to 5 photos: the product itself, a screenshot or a catalogue page.",
+      "photosHint": "At least 1 and up to 5 photos: the product itself, a screenshot or a catalogue page.",
+      "productFiles": "Additional file",
+      "productFilesHint": "If you have an Excel or PDF file (a product list, specifications or a quotation), upload it here. Up to 3 files.",
       "productLink": "Reference link",
       "productLinkHint": "A listing on Alibaba, Amazon or anywhere else that shows what you mean.",
       "specs": "Other details",
