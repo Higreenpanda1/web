@@ -426,6 +426,112 @@ const CLOSED = new Date('2026-09-26T14:00:00Z'); // Saturday 22:00 China time
     assert.ok(e.onCommand('!hubspot').includes('503'));
   });
 
+  console.log('\nMenus and quote requests (28 Oct 2026)');
+  let menuN = 0;
+  function menuChat(file, opts = {}) {
+    const hs = fakeHubSpot();
+    const e = createEngine(opts.cfg || hsCfg, { chatsFile: path.join(tmp, file), log: () => {}, hubspotFetch: hs.f, hubspotToken: 't' });
+    let t = OPEN.getTime();
+    const id = `9665110000${String(++menuN).padStart(2, '0')}@c.us`;
+    const say = async (text, media = null) => { t += 60000; return (await e.onCustomer({ chatId: id, number: id.split('@')[0], name: 'Test', text, media, now: t })) || {}; };
+    const wait = h => { t += h * 3600 * 1000; };
+    return { e, hs, id, say, wait };
+  }
+  await test('a greeting gets the numbered main menu, without business visa anywhere', async () => {
+    const { say } = menuChat('m1.json');
+    const r = await say('السلام عليكم');
+    assert.ok(r.reply.includes('اكتب رقم ما يهمك'), r.reply);
+    assert.ok(/^1\. /m.test(r.reply) && /^7\. متابعة طلب قائم/m.test(r.reply) && /^8\. التحدث مع أحد الزملاء/m.test(r.reply), r.reply);
+    const v = await say('4');
+    assert.ok(!/تأشيرة الأعمال|business visa/i.test(v.reply), v.reply);
+    assert.ok(v.reply.includes('0. القائمة الرئيسية'));
+  });
+  await test('goods quote: 1 → service → 1 → four questions → summary, team notified, HubSpot deal', async () => {
+    const { e, hs, id, say } = menuChat('m2.json');
+    await say('مرحبا');
+    const cat = await say('1');
+    assert.ok(/^1\. /m.test(cat.reply) && cat.reply.includes('0. القائمة الرئيسية'), cat.reply);
+    const card = await say('1');
+    assert.ok(card.reply.includes('1. طلب عرض سعر'), card.reply);
+    const q1 = await say('1');
+    assert.ok(q1.reply.includes('ما المنتج'), q1.reply);
+    await say('كراسي مكتب');
+    await say('', 'image'); // a photo of the product is kept with the answer
+    await say('500 قطعة');
+    await say('السعودية، جدة');
+    const done = await say('10 آلاف دولار');
+    assert.ok(done.reply.includes('ملخص طلبك') && done.reply.includes('كراسي مكتب') && done.reply.includes('(صورة مرفقة)') && done.reply.includes('500 قطعة'), done.reply);
+    assert.ok(done.notify, 'the team is told');
+    await e.hubspot.syncSoon(id);
+    const deal = hs.calls.find(c => c.p === '/crm/v3/objects/deals');
+    assert.ok(deal, 'a HubSpot deal is created');
+    const note = hs.calls.find(c => c.p === '/crm/v3/objects/notes');
+    assert.ok(note.body.properties.hs_note_body.includes('Ready for a quote'));
+  });
+  await test('company quote asks nationality, then details', async () => {
+    const { say } = menuChat('m3.json');
+    await say('السلام عليكم');
+    const cat = await say('2');
+    const line = cat.reply.split('\n').find(l => /تأسيس/.test(l));
+    assert.ok(line, cat.reply);
+    await say(line.split('.')[0]);
+    const q = await say('1');
+    assert.ok(q.reply.includes('ما جنسيتك'), q.reply);
+    await say('سعودي، مقيم في الرياض');
+    const done = await say('شركة تجارة عامة، شريكين');
+    assert.ok(done.reply.includes('ملخص طلبك') && done.reply.includes('سعودي'), done.reply);
+  });
+  await test('a wrong number gets a polite hint; 0 goes back to the main menu', async () => {
+    const { say } = menuChat('m4.json');
+    await say('مرحبا');
+    const bad = await say('42');
+    assert.ok(bad.reply.includes('لم أتمكن من تحديد اختيارك'), bad.reply);
+    await say('3');
+    const back = await say('0');
+    assert.ok(back.reply.includes('8. التحدث مع أحد الزملاء'), back.reply);
+  });
+  await test('7 shows the client portal; the next message goes to the team', async () => {
+    const { say } = menuChat('m5.json');
+    await say('مرحبا');
+    const f = await say('7');
+    assert.ok(f.reply.includes('higreenpanda.com/portal/login'), f.reply);
+    const r = await say('HGA-20261020-ABC123');
+    assert.ok(r.notify, 'the team is told');
+  });
+  await test('8 hands over to a colleague (open hours)', async () => {
+    const { say } = menuChat('m6.json');
+    await say('مرحبا');
+    const r = await say('8');
+    assert.ok(r.reply.includes('سيتواصل معك أحد زملائنا') && r.notify, r.reply);
+  });
+  await test('asking for a business visa goes to a colleague, never a price', async () => {
+    const { say } = menuChat('m7.json');
+    const r = await say('ابي تأشيرة اعمال للصين');
+    assert.ok(r.notify && !/\d,\d{3}|¥|يوان/.test(r.reply), r.reply);
+  });
+  await test('a customer back after more than a day gets "welcome back" and the menu', async () => {
+    const { say, wait } = menuChat('m8.json');
+    await say('مرحبا');
+    await say('2');
+    wait(30);
+    const r = await say('مرحبا');
+    assert.ok(r.reply.includes('أهلًا بك مجددًا') && r.reply.includes('1. '), r.reply);
+  });
+  await test('English customers get the English menu and quote flow', async () => {
+    const { say } = menuChat('m9.json');
+    const r = await say('Hello');
+    assert.ok(r.reply.includes('reply with the number'), r.reply);
+    await say('1');
+    await say('1');
+    const q = await say('1');
+    assert.ok(q.reply.includes('What product'), q.reply);
+  });
+  await test('with AI on, a greeting still gets the menu (no AI call)', async () => {
+    const { say } = menuChat('m10.json', { cfg });
+    const r = await say('السلام عليكم');
+    assert.ok(r.reply.includes('اكتب رقم ما يهمك'), r.reply);
+  });
+
   eng.flush();
   console.log(`\n${pass} passed, ${fail} failed\n`);
   process.exit(fail ? 1 : 0);

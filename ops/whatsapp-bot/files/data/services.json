@@ -37,7 +37,8 @@
     "Followed through to your warehouse"
    ],
    "faqs": []
-  }
+  },
+  "order": 10
  },
  {
   "slug": "product-sourcing",
@@ -73,7 +74,8 @@
     "A sample before you commit"
    ],
    "faqs": []
-  }
+  },
+  "order": 20
  },
  {
   "slug": "manufacturing",
@@ -109,7 +111,8 @@
     "Photographed progress at each production stage"
    ],
    "faqs": []
-  }
+  },
+  "order": 30
  },
  {
   "slug": "quality-inspection",
@@ -145,7 +148,8 @@
     "The decision stays with you"
    ],
    "faqs": []
-  }
+  },
+  "order": 40
  },
  {
   "slug": "shipping-and-freight",
@@ -181,7 +185,8 @@
     "Tracked to delivery, not to departure"
    ],
    "faqs": []
-  }
+  },
+  "order": 50
  },
  {
   "slug": "company-formation",
@@ -221,7 +226,8 @@
   "priceExtra": {
    "ar": "للتأسيس بالحضور، ومن 8,200 يوان للتأسيس عن بُعد",
    "en": "for in-person formation, and from ¥8,200 for remote formation"
-  }
+  },
+  "order": 60
  },
  {
   "slug": "ecommerce-launch",
@@ -257,7 +263,8 @@
     "Product photography and listing copy"
    ],
    "faqs": []
-  }
+  },
+  "order": 70
  },
  {
   "slug": "business-consulting",
@@ -293,7 +300,8 @@
     "Advice before you commit any money"
    ],
    "faqs": []
-  }
+  },
+  "order": 80
  },
  {
   "slug": "trade-fair-support",
@@ -329,7 +337,8 @@
     "Suppliers followed up once you are home"
    ],
    "faqs": []
-  }
+  },
+  "order": 90
  },
  {
   "slug": "registered-address",
@@ -365,7 +374,8 @@
     "A renewal reminder before the lease ends"
    ],
    "faqs": []
-  }
+  },
+  "order": 110
  },
  {
   "slug": "business-licence-changes",
@@ -403,7 +413,8 @@
     "Tax and bank records updated after the change"
    ],
    "faqs": []
-  }
+  },
+  "order": 120
  },
  {
   "slug": "accounting-and-tax",
@@ -441,7 +452,8 @@
     "Tax advice when you need it"
    ],
    "faqs": []
-  }
+  },
+  "order": 130
  },
  {
   "slug": "trademark-registration",
@@ -497,7 +509,8 @@
      "answer": "We tell you after the initial search, before any fee is paid, and explain the options: a different class, a distinctive Chinese name, or a non-use cancellation request where that is possible."
     }
    ]
-  }
+  },
+  "order": 140
  },
  {
   "slug": "bank-account-opening",
@@ -539,7 +552,8 @@
   "priceExtra": {
    "ar": "لحساب في الصين، ومن 1,700 يوان لحساب في هونغ كونغ",
    "en": "for a mainland account, and from ¥1,700 for a Hong Kong account"
-  }
+  },
+  "order": 200
  },
  {
   "slug": "alipay-wechat-business-accounts",
@@ -577,7 +591,8 @@
     "Verification file prepared to pass first time"
    ],
    "faqs": []
-  }
+  },
+  "order": 210
  },
  {
   "slug": "marketplace-store-setup",
@@ -615,7 +630,8 @@
     "Initial guidance on running the store and shipping"
    ],
    "faqs": []
-  }
+  },
+  "order": 310
  },
  {
   "slug": "business-invitation-letter",
@@ -663,7 +679,8 @@
      "answer": "No; the embassy decides. But an official, recognised invitation is the requirement without which most applications are refused, and we check your details to avoid the common causes of refusal."
     }
    ]
-  }
+  },
+  "order": 400
  },
  {
   "slug": "business-visa",
@@ -701,7 +718,9 @@
     "Multiple-entry visas where possible"
    ],
    "faqs": []
-  }
+  },
+  "order": 410,
+  "retired": true
  },
  {
   "slug": "work-visa-and-residence",
@@ -753,7 +772,8 @@
   "priceExtra": {
    "ar": "، تُضاف إليها رسوم حكومية 400 يوان",
    "en": ", plus ¥400 government fees"
-  }
+  },
+  "order": 420
  },
  {
   "slug": "family-reunion-visa",
@@ -791,6 +811,7 @@
     "Help with school registration for children"
    ],
    "faqs": []
-  }
+  },
+  "order": 430
  }
 ]

@@ -91,7 +91,7 @@ function priceText(s, lang = 'ar') {
     : `from ¥${fmtNum(p)} (Chinese yuan)${unit}${extra}`.replace(' ,', ',');
 }
 
-function visible() { return services.filter(s => !state.hidden[s.slug]); }
+function visible() { return services.filter(s => !s.retired && !state.hidden[s.slug]); }
 
 function scoreService(s, qTokens) {
   const hay = new Set(tokens([s.slug.replace(/-/g, ' '), s.ar.title, s.en.title, KEYWORDS[s.slug] || ''].join(' ')));
@@ -224,5 +224,5 @@ function isOpen(date = new Date()) {
 
 module.exports = {
   services, business, getService, priceText, priceOf, searchServices, serviceCard, listServices,
-  searchArticles, businessInfo, setPrice, setHidden, isOpen, normalize,
+  searchArticles, businessInfo, setPrice, setHidden, isOpen, normalize, visible,
 };

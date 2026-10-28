@@ -53,13 +53,31 @@ it is until the owner sends `!test off`.
 - When the site's prices or service texts change, regenerate
   `files/data/services.json` from the seed and update the hashes in the script.
 
+## Numbered menus (28 Oct 2026)
+
+The same `install-texts.sh` also installs the menus the owner approved on
+28 Oct 2026 (`src/menu.js`, called by `src/engine.js` before the rules or AI):
+
+- A greeting, "menu", a short first message or a customer back after 24 h gets
+  the main menu: the six website categories, `7` follow up on a request (client
+  portal link, then the next message goes to the team), `8` speak with a
+  colleague. `0` always goes back.
+- Category → service card (price, link) → `1` quote request or `2` a colleague.
+  Goods services ask product (a photo is kept with it), quantity, country and
+  budget; the others ask nationality/residence and details. The summary goes to
+  the customer, the team gets a "ready lead" notice, and HubSpot gets a deal.
+- Business visa is retired (`"retired": true` in `services.json`): it is not
+  listed, and asking for it goes to a colleague without a price.
+- Free questions still go to the rules (or AI when it is on).
+
 ## Files
 
 | File                        | Change                                                                 |
 | --------------------------- | ---------------------------------------------------------------------- |
 | `files/src/hubspot.js`      | New: the sync.                                                         |
-| `files/src/engine.js`       | Records each line and each handoff for HubSpot; `!hubspot`.            |
-| `files/test.js`             | HubSpot tests with a fake HubSpot; tests for the 27 Oct wording/prices. |
+| `files/src/engine.js`       | Records each line and each handoff for HubSpot; `!hubspot`; menus.     |
+| `files/src/menu.js`         | New (28 Oct): numbered menus and the quote-request questions.          |
+| `files/test.js`             | HubSpot tests; 27 Oct wording/prices; 28 Oct menus.                    |
 | `files/scripts/chat.js`     | The terminal simulator never writes to the real HubSpot.               |
 | `files/src/texts.js`        | 27 Oct wording.                                                        |
 | `files/src/brain.js`        | New greeting layout; "where is your office" → contact details.         |
