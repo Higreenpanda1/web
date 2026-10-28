@@ -177,6 +177,29 @@ export const Applications: CollectionConfig = {
       },
     },
     {
+      // An Excel or PDF file sent with a product, under the same rules as
+      // the photos. Downloaded, never shown in the page.
+      path: '/:id/file/:file',
+      method: 'get',
+      handler: async (req) => {
+        const application = await staffApplication(req)
+        if (application instanceof Response) return application
+        // Loaded here, not at the top: the CLI (migrations) reads this file too.
+        const { readOrderFile } = await import('@/lib/order-files')
+        const name = String(req.routeParams?.file ?? '')
+        const file = await readOrderFile(application.reference, application.createdAt, name)
+        if (!file) return Response.json({ error: 'Not found.' }, { status: 404 })
+        return new Response(file.content as BodyInit, {
+          headers: {
+            'Content-Type': file.mime,
+            'Cache-Control': 'private, max-age=3600',
+            'Content-Disposition': `attachment; filename="${name}"`,
+            'X-Content-Type-Options': 'nosniff',
+          },
+        })
+      },
+    },
+    {
       // The printable brief: /api/applications/:id/brief, or ?for=factory
       // for the version without the client's details and our prices.
       path: '/:id/brief',
@@ -195,6 +218,8 @@ export const Applications: CollectionConfig = {
           {
             photoUrl: (file) =>
               `${api}/applications/${application.id}/photo/${encodeURIComponent(file)}`,
+            fileUrl: (file) =>
+              `${api}/applications/${application.id}/file/${encodeURIComponent(file)}`,
             nonce: req.headers.get('x-nonce'),
           },
         )

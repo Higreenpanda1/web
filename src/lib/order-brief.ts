@@ -113,7 +113,15 @@ function rows(items: Array<[string, string]>): string {
 export function renderBrief(
   application: Application,
   audience: BriefAudience,
-  { photoUrl, nonce }: { photoUrl: (file: string) => string; nonce: string | null },
+  {
+    photoUrl,
+    fileUrl,
+    nonce,
+  }: {
+    photoUrl: (file: string) => string
+    fileUrl: (file: string) => string
+    nonce: string | null
+  },
 ): string {
   const details = (application.details ?? {}) as Record<string, unknown>
   const products = orderProducts(details, application.reference)
@@ -153,6 +161,11 @@ export function renderBrief(
         team && product.targetPrice !== null
           ? money(product.targetPrice, product.priceCurrency ?? 'usd')
           : ''
+      // The client's own sheet may carry their prices, so only the team's
+      // brief lists it.
+      const files = product.files
+        .map((file) => `<a href="${escapeHtml(fileUrl(file))}">${escapeHtml(file)}</a>`)
+        .join('<br>')
       const link =
         team && product.productLink
           ? `<a href="${escapeHtml(product.productLink)}">${escapeHtml(product.productLink)}</a>`
@@ -178,6 +191,7 @@ export function renderBrief(
             [field('specs'), multiline(product.specs ?? '')],
             [field('targetPrice'), target],
             [field('productLink'), link],
+            [field('productFiles'), team ? files : ''],
           ])}</table>
         </section>`
     })

@@ -1,4 +1,4 @@
-import type { FieldDef } from '@/forms/definitions'
+import type { FieldDef, FileErrorKey } from '@/forms/definitions'
 
 /**
  * Identity documents uploaded with an application — the passport photo page
@@ -22,7 +22,16 @@ import type { FieldDef } from '@/forms/definitions'
 
 export const MAX_DOCUMENT_BYTES = 10 * 1024 * 1024
 
-export type DocumentMime = 'image/jpeg' | 'image/png' | 'image/webp' | 'application/pdf'
+export const XLSX_MIME = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+export const XLS_MIME = 'application/vnd.ms-excel'
+
+export type DocumentMime =
+  | 'image/jpeg'
+  | 'image/png'
+  | 'image/webp'
+  | 'application/pdf'
+  | typeof XLSX_MIME
+  | typeof XLS_MIME
 
 export type CheckedDocument = {
   field: string
@@ -42,6 +51,8 @@ const EXTENSIONS: Record<DocumentMime, string> = {
   'image/png': 'png',
   'image/webp': 'webp',
   'application/pdf': 'pdf',
+  [XLSX_MIME]: 'xlsx',
+  [XLS_MIME]: 'xls',
 }
 
 /** What the file really is, from its signature. Null when it is none of ours. */
@@ -52,7 +63,37 @@ export function sniffMime(bytes: Uint8Array): DocumentMime | null {
   if (at(0, 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a)) return 'image/png'
   if (at(0, 0x52, 0x49, 0x46, 0x46) && at(8, 0x57, 0x45, 0x42, 0x50)) return 'image/webp'
   if (at(0, 0x25, 0x50, 0x44, 0x46, 0x2d)) return 'application/pdf'
+  // An .xlsx is a ZIP whose parts are named in the clear; it must hold a
+  // workbook, so a Word file or any other ZIP is refused.
+  if (at(0, 0x50, 0x4b, 0x03, 0x04) && contains(bytes, 'xl/workbook')) return XLSX_MIME
+  // An old .xls is an OLE container with a "Workbook" (or "Book") stream,
+  // its name written in UTF-16.
+  if (
+    at(0, 0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1) &&
+    (contains(bytes, 'Workbook', true) || contains(bytes, 'Book', true))
+  ) {
+    return XLS_MIME
+  }
   return null
+}
+
+/**
+ * The field's own error key, when it names one. The same rule as `errorKey`
+ * in src/forms/definitions.ts, repeated so this module imports types only
+ * and the unit tests can load it.
+ */
+const errorKey = (field: FieldDef, key: FileErrorKey): string => field.errorKeys?.[key] ?? key
+
+/** Whether the ASCII text appears in the bytes, optionally as UTF-16LE. */
+function contains(bytes: Uint8Array, text: string, utf16 = false): boolean {
+  const needle = Array.from(text).flatMap((char) =>
+    utf16 ? [char.charCodeAt(0), 0] : [char.charCodeAt(0)],
+  )
+  outer: for (let i = 0; i <= bytes.length - needle.length; i++) {
+    for (let j = 0; j < needle.length; j++) if (bytes[i + j] !== needle[j]) continue outer
+    return true
+  }
+  return false
 }
 
 /** The minimal shape of a browser File that this needs; FormData gives real Files. */
@@ -86,7 +127,7 @@ export async function checkDocuments(
     const given = isUploadedFile(value) && value.size > 0
 
     if (!given) {
-      if (field.required) errors[field.name] = 'required'
+      if (field.required) errors[field.name] = errorKey(field, 'required')
       continue
     }
     const checked = await checkFile(field, value, field.name)
@@ -110,8 +151,12 @@ export async function checkFileSet(
   const given = values.filter(
     (value): value is UploadedFile => isUploadedFile(value) && value.size > 0,
   )
-  if (given.length === 0) return { documents: [], error: field.required ? 'required' : null }
-  if (given.length > (field.multiple ?? 1)) return { documents: [], error: 'tooManyFiles' }
+  if (given.length === 0) {
+    return { documents: [], error: field.required ? errorKey(field, 'required') : null }
+  }
+  if (given.length > (field.multiple ?? 1)) {
+    return { documents: [], error: errorKey(field, 'tooManyFiles') }
+  }
 
   const documents: CheckedDocument[] = []
   for (const [index, value] of given.entries()) {
@@ -128,12 +173,12 @@ async function checkFile(
   value: UploadedFile,
   name: string,
 ): Promise<CheckedDocument | string> {
-  if (value.size > MAX_DOCUMENT_BYTES) return 'fileTooBig'
+  if (value.size > MAX_DOCUMENT_BYTES) return errorKey(field, 'fileTooBig')
   const bytes = new Uint8Array(await value.arrayBuffer())
   const mime = sniffMime(bytes)
   const allowed = field.accept ?? Object.keys(EXTENSIONS)
   if (!mime || !allowed.includes(mime)) {
-    return field.multiple ? 'photoType' : 'fileType'
+    return errorKey(field, 'fileType')
   }
   return {
     field: name,

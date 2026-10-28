@@ -6,7 +6,7 @@ import { useActionState, useEffect, useId, useRef, useState } from 'react'
 
 import { submitApplication, type ApplicationState } from '@/app/actions/application'
 import { Button, ButtonLink } from '@/components/ui/Button'
-import { FORMS, itemFieldName } from '@/forms/definitions'
+import { errorKey, FORMS, itemFieldName } from '@/forms/definitions'
 import { cn } from '@/lib/cn'
 import { HONEYPOT_FIELD, TIMESTAMP_FIELD } from '@/lib/form-fields'
 import { CountrySelect } from './CountrySelect'
@@ -525,13 +525,23 @@ function FieldControl({
           multiple={field.multiple ? true : undefined}
           onChange={(event) => {
             const input = event.currentTarget
-            // Too many photos is told at once, not after the upload.
+            // Too many files is told at once, not after the upload.
             input.setCustomValidity(
               field.multiple && (input.files?.length ?? 0) > field.multiple
-                ? t('errors.tooManyFiles')
+                ? t(`errors.${errorKey(field, 'tooManyFiles')}` as 'errors.generic')
                 : '',
             )
             void shrinkPhotos(input)
+          }}
+          onInvalid={(event) => {
+            // The browser's own "select a file" is in the browser's language;
+            // say it in ours, with the field's own words.
+            const input = event.currentTarget
+            if (input.validity.valueMissing) {
+              input.setCustomValidity(
+                t(`errors.${errorKey(field, 'required')}` as 'errors.generic'),
+              )
+            }
           }}
           className={cn(
             inputClass(Boolean(error)),
