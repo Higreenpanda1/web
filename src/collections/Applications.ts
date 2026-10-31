@@ -92,14 +92,15 @@ async function printedDocument(req: PayloadRequest, choice: DocumentChoice): Pro
     copyUrl: `${req.payload.config.routes.api}/applications/${application.id}/hubspot-copy?${query}`,
   })
   if ('error' in built) return Response.json({ error: built.error }, { status: 400 })
-  if (req.searchParams?.get('download') === 'pdf') {
+  if (['pdf', 'png'].includes(req.searchParams?.get('download') || '')) {
     try {
       const { htmlToPdf } = await import('@/lib/pdf')
-      const pdf = await htmlToPdf(built.html)
+      const png = req.searchParams?.get('download') === 'png'
+      const pdf = png ? await (await import('@/lib/document-image')).htmlToPng(built.html) : await htmlToPdf(built.html)
       return new Response(new Uint8Array(pdf), {
         headers: {
-          'Content-Type': 'application/pdf',
-          'Content-Disposition': `attachment; filename="${built.number}.pdf"`,
+          'Content-Type': png ? 'image/png' : 'application/pdf',
+          'Content-Disposition': `attachment; filename="${built.number}.${png ? 'png' : 'pdf'}"`,
           'Cache-Control': 'private, no-store',
         },
       })
@@ -111,7 +112,11 @@ async function printedDocument(req: PayloadRequest, choice: DocumentChoice): Pro
   const downloadParams = new URLSearchParams(req.searchParams)
   downloadParams.set('download', 'pdf')
   const downloadUrl = `?${downloadParams.toString().replaceAll('&', '&amp;')}`
-  const html = built.html.replace('window.print()', `window.location.assign(${JSON.stringify('?' + downloadParams.toString())})`).replace('Print / Save as PDF', 'Download PDF').replace('打印 / 保存为 PDF', '下载 PDF').replace('</body>', `<a href="${downloadUrl}" style="position:fixed;left:16px;bottom:16px;padding:12px 18px;background:#276b34;color:white;border-radius:6px;text-decoration:none" class="pdf-download">下载 PDF / Download PDF</a><style>@media print{.pdf-download{display:none}}</style></body>`)
+  const imageParams = new URLSearchParams(downloadParams)
+  imageParams.set('download', 'png')
+  const imageUrl = '?' + imageParams.toString().replaceAll('&', '&amp;')
+  const html = built.html.replace('</body>', `<div class="document-downloads" style="position:fixed;left:16px;bottom:16px;display:flex;gap:8px"><a href="${downloadUrl}" style="padding:12px;background:#276b34;color:white;border-radius:6px;text-decoration:none">تنزيل PDF / Download PDF</a><a href="${imageUrl}" style="padding:12px;background:#276b34;color:white;border-radius:6px;text-decoration:none">تنزيل صورة / Download PNG</a></div><style>@media print{.document-downloads{display:none}}</style></body>`)
+
   return new Response(html, {
     headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' },
   })
