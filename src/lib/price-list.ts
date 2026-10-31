@@ -35,6 +35,7 @@ const item = (
 ): PriceListItem => ({ sku, en, zh, price, yearly: false, passThrough: false, ...extra })
 
 export const PRICE_LIST: readonly PriceListItem[] = [
+  item('HGP-REG-SHAREHOLDER', 'Additional shareholder (per person)', '新增股东（每人）', 1200),
   item('HGP-REG-INPERSON', 'Company Registration – In person', '公司注册 – 现场办理', 7200),
   item('HGP-REG-REMOTE', 'Company Registration – Remote', '公司注册 – 远程办理', 8200),
   item(
