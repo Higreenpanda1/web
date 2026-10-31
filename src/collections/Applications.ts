@@ -170,6 +170,38 @@ export const Applications: CollectionConfig = {
   hooks: { beforeChange: [draftOrder, fillListPrices] },
   endpoints: [
     {
+      path: '/:id/customer-account',
+      method: 'post',
+      handler: async (req) => {
+        const application = await staffApplication(req)
+        if (application instanceof Response) return application
+        const email = application.email?.trim().toLowerCase() || null
+        const digits = (application.whatsapp || '').replace(/[٠-٩]/g, d => String(d.charCodeAt(0) - 0x0660)).replace(/\D/g, '')
+        const whatsapp = digits ? '+' + digits : null
+        if (!email && !whatsapp) return Response.json({ error: 'أضف إيميل العميل أو رقم واتسابه أولاً.' }, { status: 400 })
+        const findExisting = () => req.payload.find({
+          collection: 'customers', depth: 0, limit: 3, req, overrideAccess: false,
+          where: { or: [...(email ? [{ email: { equals: email } }] : []), ...(whatsapp ? [{ whatsapp: { equals: whatsapp } }] : [])] },
+        })
+        const existing = await findExisting()
+        if (existing.docs.length > 1) return Response.json({ error: 'الإيميل والهاتف مرتبطان بحسابات مختلفة. راجع الحسابات قبل المتابعة.' }, { status: 409 })
+        if (existing.docs[0]) return Response.json({ id: existing.docs[0].id, created: false })
+        try {
+          const customer = await req.payload.create({
+            collection: 'customers', req, overrideAccess: false,
+            data: { fullName: application.name, email, whatsapp, role: 'owner', preferredLocale: 'ar' },
+          })
+          return Response.json({ id: customer.id, created: true }, { status: 201 })
+        } catch (error) {
+          const retry = await findExisting()
+          if (retry.docs.length === 1 && retry.docs[0]) return Response.json({ id: retry.docs[0].id, created: false })
+          console.error('Create customer account failed', error)
+          return Response.json({ error: 'تعذر إنشاء الحساب. راجع البيانات وحاول مجدداً.' }, { status: 400 })
+        }
+      },
+    },
+
+    {
       // The "Resend to HubSpot" button: POST /api/applications/:id/hubspot.
       path: '/:id/hubspot',
       method: 'post',
@@ -350,6 +382,7 @@ export const Applications: CollectionConfig = {
     },
   ],
   fields: [
+    { name: 'createCustomerAccount', type: 'ui', admin: { position: 'sidebar', components: { Field: '@/components/admin/CreateCustomerAccount#CreateCustomerAccount' } } },
     {
       name: 'reference',
       type: 'text',
