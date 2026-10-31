@@ -9,6 +9,7 @@ import { Button, ButtonLink } from '@/components/ui/Button'
 import { errorKey, FORMS, itemFieldName } from '@/forms/definitions'
 import { cn } from '@/lib/cn'
 import { HONEYPOT_FIELD, TIMESTAMP_FIELD } from '@/lib/form-fields'
+import { MultiCountrySelect } from './MultiCountrySelect'
 import { CountrySelect } from './CountrySelect'
 import { PhoneInput } from './PhoneInput'
 import { FieldError, FormAlert, Hint, inputClass, Label, SubmitButton } from './fields'
@@ -139,10 +140,14 @@ export function ApplicationForm({
     // check it by hand and land the focus on its first box.
     const emptyGroup = def.steps[step]?.fields.find(
       (field) =>
-        field.kind === 'checkboxes' &&
+        (field.kind === 'checkboxes' || field.kind === 'countries') &&
         field.required &&
         isVisible(field) &&
-        !inputs.some((input) => input.name === field.name && (input as HTMLInputElement).checked),
+        !(field.kind === 'countries'
+          ? new FormData(formRef.current!).getAll(field.name).length
+          : inputs.some(
+              (input) => input.name === field.name && (input as HTMLInputElement).checked,
+            )),
     )
     if (invalid || emptyGroup) {
       setStepError(true)
@@ -478,6 +483,23 @@ function FieldControl({
         </select>
       )
       break
+    case 'countries':
+      control = (
+        <MultiCountrySelect
+          id={id}
+          name={name ?? field.name}
+          locale={locale}
+          disabled={disabled}
+          required={field.required}
+          defaultValue={Array.isArray(defaultValue) ? defaultValue : []}
+          label={label}
+          searchLabel={t('countrySearch')}
+          className={common.className}
+          describedBy={describedBy}
+          invalid={Boolean(error)}
+        />
+      )
+      break
     case 'country':
       control = (
         <CountrySelect
@@ -608,6 +630,7 @@ function FieldControl({
           dir={ltr ? 'ltr' : undefined}
           inputMode={field.kind === 'number' ? 'decimal' : undefined}
           autoComplete={AUTOCOMPLETE[field.name]}
+          pattern={field.chineseName ? '[\\p{Script=Han}·•\\s]+' : undefined}
           maxLength={field.kind === 'number' ? undefined : field.max}
           min={field.kind === 'number' ? field.min : undefined}
           max={field.kind === 'number' ? field.max : undefined}
@@ -633,6 +656,21 @@ function FieldControl({
           </span>
         </Hint>
       ) : null}
+      {field.illustration && (
+        <figure className="my-4 max-w-lg overflow-hidden rounded-xl border border-[var(--border-soft)]">
+          <img
+            src={field.illustration}
+            alt={t('passportPhotoExample')}
+            width={800}
+            height={600}
+            loading="lazy"
+            className="h-auto w-full"
+          />
+          <figcaption className="p-3 text-caption text-[var(--text-muted)]">
+            {t('passportPhotoExample')}
+          </figcaption>
+        </figure>
+      )}
       {control}
       <FieldError id={errorId} message={error} />
     </div>

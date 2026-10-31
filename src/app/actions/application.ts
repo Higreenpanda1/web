@@ -69,7 +69,7 @@ export async function submitApplication(
   const files = await checkDocuments(
     singleFields(def),
     (name) => formData.get(name),
-    (field) => isVisible(field, read),
+    (field) => isVisible(field, read, singleFields(def)),
   )
   const itemFiles = await checkItemFiles(def, read, formData)
   if (!result.ok || !files.ok || Object.keys(itemFiles.errors).length > 0) {

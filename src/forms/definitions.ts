@@ -30,6 +30,7 @@ export type FieldKind =
   | 'select'
   | 'checkboxes'
   | 'country'
+  | 'countries'
   | 'tel'
   | 'email'
   | 'url'
@@ -39,6 +40,11 @@ export type FieldDef = {
   name: string
   kind: FieldKind
   required?: boolean
+  /** Require the external accountant’s name in Chinese characters. */
+  chineseName?: boolean
+  /** The products must be named, rather than a generic trading description. */
+  specificProducts?: boolean
+  illustration?: string
   /** Option codes for select / checkboxes. Labels come from the catalogue. */
   options?: readonly string[]
   /** There is an `apply.fields.<name>Hint` message to show under the label. */
@@ -957,6 +963,198 @@ export const FORMS: Record<ApplicationType, FormDef> = {
     ],
     headline: (d) => [str(d, 'brandName'), str(d, 'applicantType')].filter(Boolean).join(' · '),
   },
+}
+
+/** Shared bank intake: estimates are annual payment flows, never registered capital. */
+const HK_BANK_FIELDS: readonly FieldDef[] = [
+  { name: 'receivingCountries', kind: 'countries', required: true, hint: true },
+  {
+    name: 'hkAnnualInflow',
+    kind: 'select',
+    required: true,
+    hint: true,
+    options: ['under-50k', '50k-100k', '100k-500k', '500k-1m', '1m-5m', 'over-5m'],
+  },
+  {
+    name: 'passportHoldingPhoto',
+    kind: 'file',
+    required: true,
+    hint: true,
+    accept: PHOTO_TYPES,
+    illustration: '/brand/guides/passport-date-guide.webp',
+  },
+]
+const accountingStep: StepDef = {
+  key: 'accountingService',
+  fields: [
+    { name: 'accountingProvider', kind: 'select', required: true, options: ['existing', 'higp'] },
+    {
+      name: 'accountantName',
+      kind: 'text',
+      required: true,
+      max: 120,
+      chineseName: true,
+      hint: true,
+      showIf: { field: 'accountingProvider', in: ['existing'] },
+    },
+    {
+      name: 'accountantPhone',
+      kind: 'tel',
+      required: true,
+      hint: true,
+      showIf: { field: 'accountingProvider', in: ['existing'] },
+    },
+    {
+      name: 'accountingAnnualFlow',
+      kind: 'select',
+      required: true,
+      hint: true,
+      options: ['under-100k', '100k-500k', '500k-1m', '1m-5m', '5m-20m', 'over-20m'],
+      showIf: { field: 'accountingProvider', in: ['higp'] },
+    },
+    {
+      name: 'accountingMonthlyTransactions',
+      kind: 'select',
+      required: true,
+      hint: true,
+      options: ['zero', '1-20', '21-50', '51-100', '101-300', 'over-300'],
+      showIf: { field: 'accountingProvider', in: ['higp'] },
+    },
+    {
+      name: 'accountingMonthlyInvoices',
+      kind: 'select',
+      required: true,
+      hint: true,
+      options: ['zero', '1-10', '11-30', '31-100', '101-300', 'over-300'],
+      showIf: { field: 'accountingProvider', in: ['higp'] },
+    },
+  ],
+}
+
+// Reuse the actual work-residence and bank application fields inside registration.
+// This is still one application, reference and submission, not a linked second form.
+const registration = FORMS['company-registration']
+const visaFields = singleFields(FORMS.visa)
+const workNames = [
+  'passportExpiry',
+  'plannedArrival',
+  'education',
+  'experienceYears',
+  'personalPhoto',
+  'degreeCertificate',
+  'experienceCertificate',
+  'policeClearance',
+  'medicalCertificate',
+]
+const workStep: StepDef = {
+  key: 'workResidenceService',
+  fields: [
+    { name: 'needResidence', kind: 'select', required: true, hint: true, options: YES_NO },
+    ...visaFields
+      .filter((f) => workNames.includes(f.name))
+      .map((f) => ({ ...f, showIf: { field: 'needResidence', in: ['yes'] } })),
+  ],
+}
+const account = FORMS['account-opening']
+const accountFields = singleFields(account)
+const bankProfileNames = [
+  'hasChineseCompany',
+  'legalRepInChina',
+  'companyName',
+  'companyCity',
+  'mainProducts',
+]
+const hkStep: StepDef = {
+  key: 'hkBankService',
+  fields: [
+    { name: 'needHkBank', kind: 'select', required: true, options: YES_NO },
+    ...accountFields
+      .filter((f) => bankProfileNames.includes(f.name))
+      .map((f) => ({
+        ...f,
+        ...(f.name === 'mainProducts'
+          ? { kind: 'textarea' as const, rows: 3, max: 1500, hint: true, specificProducts: true }
+          : {}),
+        showIf: f.showIf ?? { field: 'needHkBank', in: ['yes'] },
+      })),
+    ...HK_BANK_FIELDS.map((f) => ({ ...f, showIf: { field: 'needHkBank', in: ['yes'] } })),
+  ],
+}
+FORMS['company-registration'] = {
+  ...registration,
+  steps: [
+    ...registration.steps
+      .filter((step) => step.key !== 'extras')
+      .map((step) => ({ ...step, fields: step.fields.filter((f) => f.name !== 'needResidence') })),
+    accountingStep,
+    workStep,
+    hkStep,
+    {
+      key: 'extras',
+      fields: [
+        {
+          name: 'extras',
+          kind: 'checkboxes',
+          hint: true,
+          options: [
+            'bank-account',
+            'bank-registrant',
+            'alipay-wechat',
+            'financial-officer',
+            'trademark',
+          ],
+        },
+        NOTES,
+      ],
+    },
+  ],
+}
+FORMS['account-opening'] = {
+  ...account,
+  steps: account.steps.map((step) =>
+    step.key !== 'account'
+      ? step
+      : {
+          ...step,
+          fields: [
+            ...step.fields
+              .filter((f) => f.name !== 'notes')
+              .map((f) =>
+                f.name === 'mainProducts'
+                  ? {
+                      ...f,
+                      kind: 'textarea' as const,
+                      rows: 3,
+                      max: 1500,
+                      hint: true,
+                      specificProducts: true,
+                    }
+                  : ['tradingCountries', 'monthlyVolume'].includes(f.name)
+                    ? {
+                        ...f,
+                        showIf: {
+                          field: 'accountType',
+                          in: ['china-bank', 'alipay', 'wechat-pay'],
+                        },
+                      }
+                    : f,
+              ),
+            ...HK_BANK_FIELDS.map((f) => ({
+              ...f,
+              showIf: { field: 'accountType', in: ['hk-bank'] },
+            })),
+            {
+              name: 'passport',
+              kind: 'file',
+              required: true,
+              hint: true,
+              accept: DOCUMENT_TYPES,
+              showIf: { field: 'accountType', in: ['hk-bank'] },
+            },
+            NOTES,
+          ],
+        },
+  ),
 }
 
 /** Every field in a form, in order, contact step included. */

@@ -1,3 +1,4 @@
+import { PRIORITY_COUNTRIES, OTHER_COUNTRIES, countryName } from './countries'
 import { getTranslations } from 'next-intl/server'
 
 import { FORMS, singleFields, type FieldDef } from '@/forms/definitions'
@@ -10,6 +11,11 @@ import type { NotificationRow } from './email'
  * (email and HubSpot) and the "Resend to HubSpot" button, so a resent
  * request reads exactly like the first send.
  */
+
+const countryLabel = (code: string, locale: 'ar' | 'en' | 'zh') => {
+  const found = [...PRIORITY_COUNTRIES, ...OTHER_COUNTRIES].find((c) => c.code === code)
+  return found ? countryName(found, locale) : code
+}
 
 const CONTACT_FIELDS = ['name', 'country', 'whatsapp', 'email'] as const
 
@@ -47,7 +53,15 @@ export async function describeDetails(
             : code
 
       const rendered = Array.isArray(value)
-        ? value.map((v) => (field.kind === 'file' ? String(v) : option(String(v)))).join(', ')
+        ? value
+            .map((v) =>
+              field.kind === 'countries'
+                ? countryLabel(String(v), locale)
+                : field.kind === 'file'
+                  ? String(v)
+                  : option(String(v)),
+            )
+            .join(', ')
         : field.kind === 'select'
           ? option(String(value))
           : String(value)

@@ -441,7 +441,9 @@
       "photosRequired": "Add at least one photo of this product.",
       "sheetType": "Please upload an Excel or PDF file.",
       "tooManySheets": "Upload at most 3 files per product.",
-      "sheetTooBig": "This file is larger than 10 MB. Please send a smaller file."
+      "sheetTooBig": "This file is larger than 10 MB. Please send a smaller file.",
+      "specificProducts": "Name specific products, not a generic trading description.",
+      "chineseName": "Enter the accountant’s name in Chinese characters, e.g. 张伟."
     },
     "types": {
       "consultation": {
@@ -497,7 +499,7 @@
       "legalRep": "The legal representative",
       "company": "The company",
       "shareholders": "Ownership",
-      "extras": "Additional services",
+      "extras": "Other additional services",
       "applicant": "The applicant",
       "trip": "The trip",
       "visa": "The visa",
@@ -509,7 +511,10 @@
       "account": "The account",
       "store": "The store",
       "brand": "The trademark",
-      "documents": "Passport and entry stamp"
+      "documents": "Passport and entry stamp",
+      "accountingService": "Accounting and tax filing",
+      "workResidenceService": "Work and residence permit",
+      "hkBankService": "Hong Kong corporate bank account"
     },
     "fields": {
       "name": "Full name",
@@ -558,7 +563,7 @@
       "decisionMaker": "Who makes the major decisions?",
       "decisionMakerHint": "The person with authority to sign for the company.",
       "extras": "Would you also like us to arrange…",
-      "extrasHint": "Optional. Each is quoted separately.",
+      "extrasHint": "These remaining services are optional and priced separately. Accounting, residence and the Hong Kong account were specified in the preceding steps.",
       "familyName": "Family name",
       "familyNameHint": "As shown in the passport.",
       "givenNames": "Given names",
@@ -626,7 +631,7 @@
       "legalRepInChina": "Can the legal representative travel to China?",
       "legalRepInChinaHint": "Most banks require the legal representative in person. Some accept remote opening.",
       "companyCity": "Company city",
-      "mainProducts": "Main products or services",
+      "mainProducts": "Specific products the company will trade",
       "tradingCountries": "Main trading countries",
       "tradingCountriesHint": "Where you export to or import from.",
       "monthlyVolume": "Expected monthly transactions (USD)",
@@ -677,7 +682,26 @@
       "colours": "Colours",
       "coloursHint": "For example black and white, or a colour code. If the quantity differs by colour, write it here.",
       "companyNameHint": "If you will pay from a company account, write its name exactly as the bank has it.",
-      "companyAddress": "Company address"
+      "companyAddress": "Company address",
+      "accountingProvider": "Who will handle the company accounting?",
+      "accountantName": "Accountant’s name in Chinese",
+      "accountantPhone": "Accountant’s phone number",
+      "accountantPhoneHint": "Select the country code, then enter the accountant’s phone number.",
+      "accountingAnnualFlow": "Estimated annual money flow (CNY)",
+      "accountingAnnualFlowHint": "Select estimated total incoming and outgoing funds over one year. This is not registered capital.",
+      "accountingMonthlyTransactions": "Estimated financial transactions per month",
+      "accountingMonthlyTransactionsHint": "Count each receipt or payment as one transaction; choose the closest estimate.",
+      "accountingMonthlyInvoices": "Estimated invoices per month",
+      "accountingMonthlyInvoicesHint": "Total issued and received invoices per month; choose the closest estimate.",
+      "needHkBank": "Do you want a corporate bank account in Hong Kong?",
+      "receivingCountries": "From which countries will the company receive funds?",
+      "receivingCountriesHint": "Select one or more countries. Tick all expected countries of origin.",
+      "hkAnnualInflow": "Estimated total funds received per year (USD)",
+      "hkAnnualInflowHint": "Choose the annual incoming funds range, not the company’s registered capital.",
+      "mainProductsHint": "Used for the bank application. Name exact products, e.g. automatic door motors or marine engine spare parts. Several specific products are allowed, one per line. Do not write “general trading” or “various goods”, and do not enter registered capital here.",
+      "passportHoldingPhoto": "Photo holding passport and a dated sheet",
+      "passportHoldingPhotoHint": "Upload a clear original photo with your face unobstructed and no sunglasses: hold the passport open at the details page in one hand and a sheet showing the actual photo date (YYYY-MM-DD) in the other. Keep face, passport and date visible without covering passport details with fingers. The illustration is guidance only; submit your real, unedited photo.",
+      "accountantNameHint": "Enter the accountant’s name in Chinese characters, e.g. 张伟."
     },
     "options": {
       "common": {
@@ -859,6 +883,42 @@
         "cny": "Chinese yuan",
         "sar": "Saudi riyal",
         "aed": "UAE dirham"
+      },
+      "accountingProvider": {
+        "existing": "I have an accountant — provide their details",
+        "higp": "I need HiGreenPanda to handle accounting"
+      },
+      "accountingAnnualFlow": {
+        "under-100k": "Under 100,000",
+        "100k-500k": "100,000 to under 500,000",
+        "500k-1m": "500,000 to under 1,000,000",
+        "1m-5m": "1,000,000 to under 5,000,000",
+        "5m-20m": "5,000,000 to under 20,000,000",
+        "over-20m": "20,000,000 or more"
+      },
+      "hkAnnualInflow": {
+        "under-50k": "Under 50,000",
+        "50k-100k": "50,000 to under 100,000",
+        "100k-500k": "100,000 to under 500,000",
+        "500k-1m": "500,000 to under 1,000,000",
+        "1m-5m": "1,000,000 to under 5,000,000",
+        "over-5m": "5,000,000 or more"
+      },
+      "accountingMonthlyTransactions": {
+        "zero": "None / new company",
+        "1-20": "1–20",
+        "21-50": "21–50",
+        "51-100": "51–100",
+        "101-300": "101–300",
+        "over-300": "More than 300"
+      },
+      "accountingMonthlyInvoices": {
+        "zero": "None / new company",
+        "1-10": "1–10",
+        "11-30": "11–30",
+        "31-100": "31–100",
+        "101-300": "101–300",
+        "over-300": "More than 300"
       }
     },
     "repeat": {
@@ -868,7 +928,9 @@
         "remove": "Remove this product",
         "note": "You can add up to 10 products in one request."
       }
-    }
+    },
+    "countrySearch": "Search for a country, then tick to select",
+    "passportPhotoExample": "Illustration only: use your own real photo and replace YYYY-MM-DD with the actual photo date."
   },
   "estimator": {
     "eyebrow": "Instant estimate",

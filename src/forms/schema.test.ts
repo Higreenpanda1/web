@@ -121,16 +121,20 @@ test('a hidden conditional field is neither required nor stored', () => {
       registeredCapital: '20000',
       capitalCurrency: 'usd',
       addressOption: 'virtual-work-visa',
-      needResidence: 'yes',
+      needResidence: 'no',
+      needHkBank: 'no',
+      accountingProvider: 'existing',
+      accountantName: '张伟',
+      accountantPhone: '+8613023440305',
       ownership: 'sole',
       shareholders: 'should be dropped',
-      extras: ['bank-account', 'accounting'],
+      extras: ['bank-account'],
     }),
   )
   assert.ok(sole.ok)
   assert.equal('shareholders' in sole.details, false)
   assert.equal('cityOther' in sole.details, false)
-  assert.deepEqual(sole.details.extras, ['bank-account', 'accounting'])
+  assert.deepEqual(sole.details.extras, ['bank-account'])
 
   const partners = validateApplication(
     FORMS['company-registration'],

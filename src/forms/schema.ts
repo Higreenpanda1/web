@@ -1,3 +1,4 @@
+import { PRIORITY_COUNTRIES, OTHER_COUNTRIES } from '../lib/countries.ts'
 import { asciiDigits, codeFieldName, whatsappNumber } from '../lib/phone.ts'
 import {
   itemFieldName,
@@ -61,10 +62,18 @@ export function reader(source: FormData | Record<string, string | string[]>): Re
 }
 
 /** Is this field currently in play, given the other answers? */
-export function isVisible(field: FieldDef, read: Reader): boolean {
+export function isVisible(
+  field: FieldDef,
+  read: Reader,
+  fields: readonly FieldDef[] = [],
+  seen = new Set<string>(),
+): boolean {
   if (!field.showIf) return true
-  const controller = read.get(field.showIf.field) ?? ''
-  return field.showIf.in.includes(controller)
+  if (seen.has(field.name)) return false
+  seen.add(field.name)
+  const parent = fields.find((f) => f.name === field.showIf?.field)
+  if (parent && !isVisible(parent, read, fields, seen)) return false
+  return field.showIf.in.includes(read.get(field.showIf.field) ?? '')
 }
 
 /**
@@ -100,7 +109,7 @@ export function validateApplication(def: FormDef, source: Reader): ValidationRes
   ) => {
     for (const field of fields) {
       // A hidden field is neither required nor kept. The visitor never saw it.
-      if (!isVisible(field, read)) continue
+      if (!isVisible(field, read, fields)) continue
       // Files are not text; the action reads and checks them separately
       // (src/lib/documents.ts) and adds the result to the details.
       if (field.kind === 'file') continue
@@ -139,6 +148,14 @@ export function validateApplication(def: FormDef, source: Reader): ValidationRes
 type Outcome = { value?: unknown; error?: string }
 
 function checkField(field: FieldDef, read: Reader): Outcome {
+  if (field.kind === 'countries') {
+    const chosen = [...new Set(read.getAll(field.name).map((v) => v.trim()))]
+    const allowed = new Set([...PRIORITY_COUNTRIES, ...OTHER_COUNTRIES].map((c) => c.code))
+    if (chosen.length > allowed.size || chosen.some((v) => !allowed.has(v)))
+      return { error: 'invalid' }
+    if (field.required && !chosen.length) return { error: 'required' }
+    return chosen.length ? { value: chosen } : {}
+  }
   if (field.kind === 'checkboxes') {
     const chosen = read.getAll(field.name).map((v) => v.trim())
     const allowed = new Set(field.options ?? [])
@@ -159,6 +176,18 @@ function checkField(field: FieldDef, read: Reader): Outcome {
     case 'text':
     case 'textarea':
     case 'country':
+      if (
+        field.chineseName &&
+        (!/^[\p{Script=Han}·•\s]+$/u.test(raw) || !/\p{Script=Han}/u.test(raw))
+      )
+        return { error: 'chineseName' }
+      if (
+        field.specificProducts &&
+        /^(general (trade|trading|goods)|goods|products|various products|multiple products|trading|تجارة عامة|تجاره عامه|بضائع|منتجات|منتجات متنوعة|عام|رأس المال|راس المال|货物|商品|综合贸易|一般贸易)$/iu.test(
+          raw.replace(/[.،。!]+$/g, '').trim(),
+        )
+      )
+        return { error: 'specificProducts' }
       return { value: raw }
     case 'select':
       return field.options?.includes(raw) ? { value: raw } : { error: 'invalid' }

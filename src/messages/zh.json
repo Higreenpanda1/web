@@ -441,7 +441,9 @@
       "photosRequired": "请为该产品至少添加一张图片。",
       "sheetType": "请上传 Excel 或 PDF 文件。",
       "tooManySheets": "每个产品最多上传 3 个文件。",
-      "sheetTooBig": "文件超过 10 MB，请上传较小的文件。"
+      "sheetTooBig": "文件超过 10 MB，请上传较小的文件。",
+      "specificProducts": "请填写具体产品名称，而不是泛泛的贸易描述。",
+      "chineseName": "请使用汉字填写会计姓名，例如：张伟。"
     },
     "types": {
       "consultation": {
@@ -497,7 +499,7 @@
       "legalRep": "法定代表人",
       "company": "公司",
       "shareholders": "股权结构",
-      "extras": "附加服务",
+      "extras": "其他附加服务",
       "applicant": "申请人",
       "trip": "行程",
       "visa": "签证",
@@ -509,7 +511,10 @@
       "account": "账户",
       "store": "店铺",
       "brand": "商标",
-      "documents": "护照及入境章"
+      "documents": "护照及入境章",
+      "accountingService": "会计及纳税申报",
+      "workResidenceService": "工作许可及居留许可",
+      "hkBankService": "香港公司银行账户"
     },
     "fields": {
       "name": "全名",
@@ -558,7 +563,7 @@
       "decisionMaker": "谁负责重大决策？",
       "decisionMakerHint": "有权代表公司签字的人。",
       "extras": "您是否还需要我们安排……",
-      "extrasHint": "选填。每项单独报价。",
+      "extrasHint": "以下服务可选且单独报价。会计、居留许可及香港账户已在前面步骤中选择。",
       "familyName": "姓",
       "familyNameHint": "与护照一致。",
       "givenNames": "名",
@@ -626,7 +631,7 @@
       "legalRepInChina": "法定代表人能否来中国？",
       "legalRepInChinaHint": "大多数银行要求法定代表人亲自到场，部分银行接受远程开户。",
       "companyCity": "公司所在城市",
-      "mainProducts": "主要产品或服务",
+      "mainProducts": "公司拟经营的具体产品",
       "tradingCountries": "主要贸易国家",
       "tradingCountriesHint": "您出口到或进口自哪些国家。",
       "monthlyVolume": "预计每月交易额（美元）",
@@ -677,7 +682,26 @@
       "colours": "颜色",
       "coloursHint": "例如黑色和白色，或色号。如果各颜色数量不同，请写在这里。",
       "companyNameHint": "如果您将从公司账户付款，请按银行登记的名称填写。",
-      "companyAddress": "公司地址"
+      "companyAddress": "公司地址",
+      "accountingProvider": "谁负责公司的会计工作？",
+      "accountantName": "会计中文姓名",
+      "accountantPhone": "会计联系电话",
+      "accountantPhoneHint": "选择国家区号后填写会计联系电话。",
+      "accountingAnnualFlow": "预计年度资金流水（人民币）",
+      "accountingAnnualFlowHint": "选择一年预计收款与付款合计范围；此项不是注册资本。",
+      "accountingMonthlyTransactions": "预计每月资金交易笔数",
+      "accountingMonthlyTransactionsHint": "每笔收款或付款各计一笔，选择最接近的预计范围。",
+      "accountingMonthlyInvoices": "预计每月发票数量",
+      "accountingMonthlyInvoicesHint": "每月开出与收到的发票合计，选择最接近的预计范围。",
+      "needHkBank": "是否需要开立香港公司银行账户？",
+      "receivingCountries": "公司将从哪些国家收款？",
+      "receivingCountriesHint": "可多选，请勾选所有预计资金来源国家。",
+      "hkAnnualInflow": "预计年度收款总额（美元）",
+      "hkAnnualInflowHint": "选择一年内账户预计收款范围，不是公司注册资本。",
+      "mainProductsHint": "此信息用于银行申请。请写明具体产品，例如自动门电机或船用发动机配件。可填写多种具体产品，每行一种。请勿只写“综合贸易”或“各类商品”，也不要在此填写注册资本。",
+      "passportHoldingPhoto": "手持护照及拍摄日期纸张的照片",
+      "passportHoldingPhotoHint": "请上传清晰的本人原始照片，面部无遮挡且不戴墨镜：一手持打开至资料页的护照，另一手持写有实际拍摄日期（年-月-日）的纸张。面部、护照和日期均须清楚可见，手指勿遮挡资料。示意图仅作参考，请提交本人未经修改的真实照片。",
+      "accountantNameHint": "请填写会计的中文姓名，例如：张伟。"
     },
     "options": {
       "common": {
@@ -859,6 +883,42 @@
         "cny": "人民币",
         "sar": "沙特里亚尔",
         "aed": "阿联酋迪拉姆"
+      },
+      "accountingProvider": {
+        "existing": "已有会计，请填写其资料",
+        "higp": "没有会计，需要 HiGreenPanda 提供服务"
+      },
+      "accountingAnnualFlow": {
+        "under-100k": "少于100,000",
+        "100k-500k": "100,000至不足500,000",
+        "500k-1m": "500,000至不足1,000,000",
+        "1m-5m": "1,000,000至不足5,000,000",
+        "5m-20m": "5,000,000至不足20,000,000",
+        "over-20m": "20,000,000及以上"
+      },
+      "hkAnnualInflow": {
+        "under-50k": "少于50,000",
+        "50k-100k": "50,000至不足100,000",
+        "100k-500k": "100,000至不足500,000",
+        "500k-1m": "500,000至不足1,000,000",
+        "1m-5m": "1,000,000至不足5,000,000",
+        "over-5m": "5,000,000及以上"
+      },
+      "accountingMonthlyTransactions": {
+        "zero": "无／新成立公司",
+        "1-20": "1–20",
+        "21-50": "21–50",
+        "51-100": "51–100",
+        "101-300": "101–300",
+        "over-300": "超过300"
+      },
+      "accountingMonthlyInvoices": {
+        "zero": "无／新成立公司",
+        "1-10": "1–10",
+        "11-30": "11–30",
+        "31-100": "31–100",
+        "101-300": "101–300",
+        "over-300": "超过300"
       }
     },
     "repeat": {
@@ -868,7 +928,9 @@
         "remove": "删除此产品",
         "note": "一次申请最多可添加 10 个产品。"
       }
-    }
+    },
+    "countrySearch": "搜索国家后勾选",
+    "passportPhotoExample": "仅为示意图：请提交本人真实照片，将 YYYY-MM-DD 替换为实际拍摄日期。"
   },
   "estimator": {
     "eyebrow": "即时估价",

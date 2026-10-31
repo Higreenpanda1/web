@@ -17,6 +17,7 @@ import { allFields, FORMS } from './definitions.ts'
 
 const url = (locale: string) => new URL(`../messages/${locale}.json`, import.meta.url)
 const en = JSON.parse(readFileSync(url('en'), 'utf8')) as Record<string, unknown>
+const zh = JSON.parse(readFileSync(url('zh'), 'utf8')) as Record<string, unknown>
 const ar = JSON.parse(readFileSync(url('ar'), 'utf8')) as Record<string, unknown>
 
 function flatten(value: unknown, prefix = ''): Set<string> {
@@ -33,6 +34,7 @@ function flatten(value: unknown, prefix = ''): Set<string> {
 
 const enKeys = flatten(en)
 const arKeys = flatten(ar)
+const zhKeys = flatten(zh)
 
 test('the Arabic and English catalogues have identical keys', () => {
   const onlyEn = [...enKeys].filter((k) => !arKeys.has(k))
@@ -40,10 +42,10 @@ test('the Arabic and English catalogues have identical keys', () => {
   assert.deepEqual({ onlyEn, onlyAr }, { onlyEn: [], onlyAr: [] })
 })
 
-const has = (key: string) => enKeys.has(key) && arKeys.has(key)
+const has = (key: string) => enKeys.has(key) && arKeys.has(key) && zhKeys.has(key)
 
 for (const def of Object.values(FORMS)) {
-  test(`form "${def.type}" is fully labelled in both languages`, () => {
+  test(`form "${def.type}" is fully labelled in Arabic, English and Chinese`, () => {
     const missing: string[] = []
     for (const prefix of ['title', 'lead', 'cta']) {
       if (!has(`apply.types.${def.type}.${prefix}`))
