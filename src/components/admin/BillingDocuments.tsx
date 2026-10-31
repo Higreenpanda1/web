@@ -1,7 +1,8 @@
 'use client'
 
 import { useConfig, useDocumentInfo, useFormFields } from '@payloadcms/ui'
-import React from 'react'
+import React, { useState } from 'react'
+import { paymentSyncVersion } from '@/lib/payment-sync-data'
 import { reduceFieldsToValues } from 'payload/shared'
 import { billLines, billSums, type BillingItem, type Payment } from '@/lib/billing'
 
@@ -19,6 +20,7 @@ export function BillingDocuments() {
         payments?: Payment[]
         depositPlan?: string
         customDeposit?: number
+        clientCompany?: string
         paidFull?: string
       }
     | undefined
@@ -30,6 +32,34 @@ export function BillingDocuments() {
     fullDiscount: billing?.depositPlan === 'full' || Boolean(billing?.paidFull),
   })
 
+  const [sync, setSync] = useState<{ busy: boolean; message: string; error?: boolean }>({
+    busy: false,
+    message: '',
+  })
+  const confirmPayments = async () => {
+    setSync({ busy: true, message: 'جارٍ تأكيد الاستلام والمزامنة…' })
+    try {
+      const response = await fetch(`${config.routes.api}/applications/${id}/confirm-payments`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ version: paymentSyncVersion(billing) }),
+      })
+      const result = await response.json()
+      if (!response.ok || !result.ok)
+        throw new Error(result.error || 'تعذرت المزامنة. حاول مجدداً.')
+      setSync({
+        busy: false,
+        message: 'تم تأكيد الاستلام ومزامنة معلومات العميل والدفعات مع صفقة HubSpot.',
+      })
+    } catch (error) {
+      setSync({
+        busy: false,
+        error: true,
+        message: error instanceof Error ? error.message : 'تعذرت المزامنة.',
+      })
+    }
+  }
   if (!id) return null
   const base = `${config.routes.api}/applications/${id}/document`
 
@@ -56,6 +86,25 @@ export function BillingDocuments() {
           المستلم: CNY {received.toLocaleString('en-US')} · المتبقي: CNY{' '}
           {sums.balance.toLocaleString('en-US')}
         </p>
+      )}
+      {payments.length > 0 && (
+        <div style={{ marginBottom: '1rem' }}>
+          <button
+            type="button"
+            className="btn btn--style-primary btn--size-medium"
+            disabled={sync.busy}
+            onClick={confirmPayments}
+          >
+            {sync.busy ? 'جارٍ المزامنة…' : 'تأكيد الاستلام والمزامنة مع HubSpot'}
+          </button>
+          <p>
+            بالضغط تؤكد استلام الدفعات المحفوظة وترسل بيانات العميل والخدمات والمدفوع والمتبقي إلى
+            HubSpot.
+          </p>
+          <p role="status" style={{ color: sync.error ? 'var(--theme-error-500)' : undefined }}>
+            {sync.message}
+          </p>
+        </div>
       )}
       <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
         {links.map(([label, href, style]) => (
