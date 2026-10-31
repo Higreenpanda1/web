@@ -87,17 +87,47 @@ export type BillSums = {
   full: number
 }
 
-export function billSums(lines: readonly BillLine[]): BillSums {
+export type Payment = {
+  id?: string | null
+  amount: number
+  paidOn: string
+  method: 'cash' | 'bank' | 'wechat' | 'alipay' | 'other'
+  receivedBy: string
+  reference?: string | null
+}
+export type PaymentPlan = {
+  depositPercent?: number
+  depositAmount?: number
+  received?: number
+  fullDiscount?: boolean
+}
+
+export function billSums(lines: readonly BillLine[], plan: PaymentPlan = {}): BillSums {
   const passThrough = lines.filter((l) => l.passThrough).reduce((s, l) => s + cents(l.amount), 0)
   const fees = lines.filter((l) => !l.passThrough).reduce((s, l) => s + cents(l.amount), 0)
-  const half = Math.round(fees / 2)
+  const half =
+    plan.depositAmount === undefined
+      ? Math.round((fees * (plan.depositPercent ?? 50)) / 100)
+      : cents(plan.depositAmount) - passThrough
+  const deposit = Math.min(passThrough + fees, Math.max(0, passThrough + half))
   const discount = Math.round(fees * FULL_PAYMENT_DISCOUNT)
+  const payable = passThrough + fees - (plan.fullDiscount ? discount : 0)
   return {
     total: yuan(passThrough + fees),
     passThrough: yuan(passThrough),
     fees: yuan(fees),
-    deposit: yuan(passThrough + half),
-    balance: yuan(fees - half),
+    deposit: yuan(plan.fullDiscount ? payable : deposit),
+    balance: yuan(
+      Math.max(
+        0,
+        payable -
+          (plan.received === undefined
+            ? plan.fullDiscount
+              ? payable
+              : deposit
+            : cents(plan.received)),
+      ),
+    ),
     discount: yuan(discount),
     full: yuan(passThrough + fees - discount),
   }
