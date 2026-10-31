@@ -111,7 +111,7 @@ async function printedDocument(req: PayloadRequest, choice: DocumentChoice): Pro
   const downloadParams = new URLSearchParams(req.searchParams)
   downloadParams.set('download', 'pdf')
   const downloadUrl = `?${downloadParams.toString().replaceAll('&', '&amp;')}`
-  const html = built.html.replace('</body>', `<a href="${downloadUrl}" style="position:fixed;left:16px;bottom:16px;padding:12px 18px;background:#276b34;color:white;border-radius:6px;text-decoration:none" class="pdf-download">下载 PDF / Download PDF</a><style>@media print{.pdf-download{display:none}}</style></body>`)
+  const html = built.html.replace('window.print()', `window.location.assign(${JSON.stringify('?' + downloadParams.toString())})`).replace('Print / Save as PDF', 'Download PDF').replace('打印 / 保存为 PDF', '下载 PDF').replace('</body>', `<a href="${downloadUrl}" style="position:fixed;left:16px;bottom:16px;padding:12px 18px;background:#276b34;color:white;border-radius:6px;text-decoration:none" class="pdf-download">下载 PDF / Download PDF</a><style>@media print{.pdf-download{display:none}}</style></body>`)
   return new Response(html, {
     headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' },
   })
