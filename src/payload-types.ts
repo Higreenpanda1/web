@@ -1175,6 +1175,24 @@ export interface Application {
           id?: string | null;
         }[]
       | null;
+    depositPlan?: ('50' | '30' | 'full' | 'custom') | null;
+    /**
+     * المبلغ المطلوب فقط؛ تسجيل الاستلام يتم أدناه. Includes any address rent.
+     */
+    customDeposit?: number | null;
+    /**
+     * أضف دفعة بعد استلامها فعلياً. إذا استخدمت هذا السجل أدخل فيه جميع الدفعات السابقة أيضاً؛ سيحل محل تواريخ الدفع القديمة في حساب المدفوع.
+     */
+    payments?:
+      | {
+          amount: number;
+          paidOn: string;
+          method: 'cash' | 'bank' | 'wechat' | 'alipay' | 'other';
+          receivedBy: string;
+          reference?: string | null;
+          id?: string | null;
+        }[]
+      | null;
     paidDeposit?: string | null;
     paidBalance?: string | null;
     paidFull?: string | null;
@@ -1933,6 +1951,18 @@ export interface ApplicationsSelect<T extends boolean = true> {
               name?: T;
               nameZh?: T;
               description?: T;
+              id?: T;
+            };
+        depositPlan?: T;
+        customDeposit?: T;
+        payments?:
+          | T
+          | {
+              amount?: T;
+              paidOn?: T;
+              method?: T;
+              receivedBy?: T;
+              reference?: T;
               id?: T;
             };
         paidDeposit?: T;
