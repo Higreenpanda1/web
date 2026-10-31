@@ -186,6 +186,36 @@ export const Applications: CollectionConfig = {
   hooks: { beforeChange: [draftOrder, fillListPrices] },
   endpoints: [
     {
+      path: '/:id/confirm-payments',
+      method: 'post',
+      handler: async (req) => {
+        const application = await staffApplication(req)
+        if (application instanceof Response) return application
+        const body = await req.json?.().catch(() => null)
+        if (typeof body?.version !== 'string')
+          return Response.json({ ok: false, error: 'احفظ الطلب ثم حاول مجدداً.' }, { status: 400 })
+        try {
+          const { syncConfirmedPayments } = await import('@/lib/payment-hubspot')
+          const staff = req.user as { id: number | string; email?: string; name?: string }
+          return Response.json(
+            await syncConfirmedPayments(
+              req.payload,
+              application.id,
+              body.version,
+              `${staff.name || staff.email || 'Staff'} (${staff.id})`,
+            ),
+          )
+        } catch (error) {
+          console.error('Confirmed payment sync failed', error)
+          const message =
+            error instanceof Error && !error.message.startsWith('HubSpot ')
+              ? error.message
+              : 'تعذرت المزامنة مع HubSpot. الدفعات محفوظة في الموقع؛ حاول مجدداً.'
+          return Response.json({ ok: false, error: message }, { status: 400 })
+        }
+      },
+    },
+    {
       path: '/:id/customer-account',
       method: 'post',
       handler: async (req) => {
