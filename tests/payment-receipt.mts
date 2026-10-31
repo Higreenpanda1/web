@@ -30,12 +30,17 @@ const application = {
 } as unknown as Application
 const page = { date: '2026-11-01', nonce: null }
 test('cash receipt uses saved payment, escapes names and has no bank payment demand', () => {
-  const receipt = buildDocument(application, { doc: 'receipt', payment: 'abcdef123456' }, page)
+  const receipt = buildDocument(
+    application,
+    { doc: 'receipt', payment: 'abcdef123456' },
+    { ...page, nonce: 'test-nonce', copyUrl: '/api/hubspot-copy' },
+  )
   assert.ok(!('error' in receipt))
   assert.match(receipt.html, /Cash \/ 现金/)
   assert.match(receipt.html, /17,710/)
   assert.match(receipt.html, /Staff &lt;name&gt;/)
   assert.doesNotMatch(receipt.html, /Bank transfer \(SWIFT\)/)
+  assert.doesNotMatch(receipt.html, /fetch\(|hubspot-copy/)
 })
 test('receipt running balance includes only payments through that receipt', () => {
   const receipt = buildDocument(application, { doc: 'receipt', payment: 'abcdef654321' }, page)
