@@ -8,6 +8,7 @@ import {
   QUOTE_VALID_DAYS,
   type BillLine,
   type InvoiceStage,
+  type PaymentPlan,
 } from './billing'
 
 /**
@@ -262,6 +263,7 @@ export function documentPage(page: {
   body: string
   /** Extra notes under the bank accounts. */
   payNotes?: Pair[]
+  hidePaymentDetails?: boolean
   nonce: string | null
   /** Where the print button also sends the page, for the client's HubSpot deal. */
   copyUrl?: string
@@ -341,7 +343,7 @@ ${printButton}
   <p>${page.party.join('<br>')}</p>
 </section>
 ${page.body}
-${bank}
+${page.hidePaymentDetails ? '' : bank}
 <footer>${both(L.thanks)}</footer>
 </body>
 </html>`
@@ -363,6 +365,7 @@ export type BillingDocument = {
     email?: string | null
   }
   lines: BillLine[]
+  paymentPlan?: PaymentPlan
   /** Invoices only: YYYY-MM-DD when this payment came in. */
   paidOn?: string | null
   nonce: string | null
@@ -370,7 +373,15 @@ export type BillingDocument = {
 }
 
 export function renderBillingDocument(doc: BillingDocument): string {
-  const sums = billSums(doc.lines)
+  const sums = billSums(doc.lines, doc.paymentPlan)
+  const percent = doc.paymentPlan?.depositPercent ?? 50
+  const custom = doc.paymentPlan?.depositAmount !== undefined
+  const depositLabel: Pair = doc.paymentPlan?.fullDiscount
+    ? ['Full amount (3.5% off)', '全额（已减 3.5%）']
+    : custom
+      ? ['Custom payment', '自定义付款']
+      : [`${percent}% deposit`, `定金 ${percent}%`]
+  const balanceLabel: Pair = ['Remaining balance', '剩余应付']
   const isQuote = doc.kind === 'quote'
   const stage = doc.stage ?? 'deposit'
   const number = documentNumber(doc.reference, isQuote ? 'quote' : stage)
@@ -416,19 +427,20 @@ export function renderBillingDocument(doc: BillingDocument): string {
     ? `<section class="box">
         <h2>${both(L.terms)}</h2>
         <table class="sums">
-          ${sumRow(L.optionDeposit, sums.deposit, true)}
-          ${sumRow(L.optionDepositLater, sums.balance)}
+          ${sumRow(depositLabel, sums.deposit, true)}
+          ${sumRow(balanceLabel, sums.balance)}
           ${sumRow(L.optionFull, sums.full, true)}
         </table>
         ${hasPassThrough ? `<p class="note">${both(L.passThroughNote)}</p>` : ''}
       </section>`
     : `<section class="box">
-        <h2>${both(L.dueNow)}: ${both(L.stage[stage])}</h2>
+        <h2>${both(L.dueNow)}: ${both(stage === 'deposit' ? depositLabel : stage === 'balance' ? balanceLabel : L.stage.full)}</h2>
         <table class="sums">
-          ${stage !== 'balance' && hasPassThrough ? sumRow(L.passThrough, sums.passThrough) : ''}
+          ${stage !== 'balance' && hasPassThrough && (stage === 'full' || !custom) ? sumRow(L.passThrough, sums.passThrough) : ''}
           ${stage === 'full' ? sumRow(L.fees, sums.fees) : ''}
           ${stage === 'full' ? sumRow(L.discount, -sums.discount) : ''}
-          ${stage !== 'full' ? sumRow(L.half, stage === 'deposit' ? sums.deposit - sums.passThrough : sums.balance) : ''}
+          ${stage !== 'full' ? sumRow(stage === 'deposit' ? depositLabel : balanceLabel, stage === 'deposit' ? sums.deposit - (custom ? 0 : sums.passThrough) : sums.balance) : ''}
+          ${doc.paymentPlan?.received !== undefined ? sumRow(['Total received', '累计已收'], doc.paymentPlan.received) : ''}
           ${sumRow(L.amountDue, sums[stage], true)}
         </table>
         <p class="note">${both(L.transferNote)}</p>
