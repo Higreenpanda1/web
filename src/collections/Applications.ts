@@ -119,6 +119,7 @@ async function printedDocument(req: PayloadRequest, choice: DocumentChoice): Pro
     .replace('<div id="print">', `<div id="print"><a href="${downloadUrl}">تنزيل PDF / Download PDF</a><a href="${imageUrl}">تنزيل صورة / Download PNG</a>`)
     .replace('<body>', '<body><style>@media screen{#print{position:static!important;display:flex!important;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:10px;padding:14px 0;margin:0 0 24px;border-bottom:1px solid #d8e0da}#print a,#print button{display:inline-flex;align-items:center;font:inherit;font-size:14px;padding:10px 16px;border-radius:6px;background:#276b34;color:white;text-decoration:none;border:0;box-shadow:none}#copy-status:empty{display:none}}@media print{#print{display:none!important}}</style>')
 
+    .replace(/(<body>)([\s\S]*?)(<div id="print">[\s\S]*?<\/div>)/, '$1$3$2')
   return new Response(html, {
     headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' },
   })
