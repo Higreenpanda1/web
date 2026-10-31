@@ -1,5 +1,5 @@
 import { hasRole, isAdmin, isStaff, noone } from '@/access'
-import { type BillingItem } from '@/lib/billing'
+import { billLines, billSums, type BillingItem } from '@/lib/billing'
 import { APPLICATION_TYPES } from '@/lib/catalogue'
 import { PRICE_LIST, priceListItem } from '@/lib/price-list'
 import {
@@ -96,7 +96,9 @@ async function printedDocument(req: PayloadRequest, choice: DocumentChoice): Pro
     try {
       const { htmlToPdf } = await import('@/lib/pdf')
       const png = req.searchParams?.get('download') === 'png'
-      const pdf = png ? await (await import('@/lib/document-image')).htmlToPng(built.html) : await htmlToPdf(built.html)
+      const pdf = png
+        ? await (await import('@/lib/document-image')).htmlToPng(built.html)
+        : await htmlToPdf(built.html)
       return new Response(new Uint8Array(pdf), {
         headers: {
           'Content-Type': png ? 'image/png' : 'application/pdf',
@@ -116,8 +118,14 @@ async function printedDocument(req: PayloadRequest, choice: DocumentChoice): Pro
   imageParams.set('download', 'png')
   const imageUrl = '?' + imageParams.toString().replaceAll('&', '&amp;')
   const html = built.html
-    .replace(/<div id="print">[\s\S]*?<\/div>/, `<div id="print" dir="rtl"><button type="button">طباعة</button><a href="${downloadUrl}">تحميل PDF</a><a href="${imageUrl}">تحميل صورة</a><span id="copy-status" role="status"></span></div>`)
-    .replace('<body>', '<body><style>@media screen{#print{position:static!important;display:flex!important;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:10px;padding:14px 0;margin:0 0 24px;border-bottom:1px solid #d8e0da}#print a,#print button{display:inline-flex;align-items:center;font:inherit;font-size:14px;justify-content:center;min-width:110px;box-sizing:border-box;padding:10px 16px;border-radius:6px;background:#276b34;color:white;text-decoration:none;border:0;box-shadow:none}#copy-status:empty{display:none}}@media print{#print{display:none!important}}</style>')
+    .replace(
+      /<div id="print">[\s\S]*?<\/div>/,
+      `<div id="print" dir="rtl"><button type="button">طباعة</button><a href="${downloadUrl}">تحميل PDF</a><a href="${imageUrl}">تحميل صورة</a><span id="copy-status" role="status"></span></div>`,
+    )
+    .replace(
+      '<body>',
+      '<body><style>@media screen{#print{position:static!important;display:flex!important;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:10px;padding:14px 0;margin:0 0 24px;border-bottom:1px solid #d8e0da}#print a,#print button{display:inline-flex;align-items:center;font:inherit;font-size:14px;justify-content:center;min-width:110px;box-sizing:border-box;padding:10px 16px;border-radius:6px;background:#276b34;color:white;text-decoration:none;border:0;box-shadow:none}#copy-status:empty{display:none}}@media print{#print{display:none!important}}</style>',
+    )
 
     .replace(/(<body>)([\s\S]*?)(<div id="print">[\s\S]*?<\/div>)/, '$1$3$2')
   return new Response(html, {
@@ -184,27 +192,56 @@ export const Applications: CollectionConfig = {
         const application = await staffApplication(req)
         if (application instanceof Response) return application
         const email = application.email?.trim().toLowerCase() || null
-        const digits = (application.whatsapp || '').replace(/[٠-٩]/g, d => String(d.charCodeAt(0) - 0x0660)).replace(/\D/g, '')
+        const digits = (application.whatsapp || '')
+          .replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 0x0660))
+          .replace(/\D/g, '')
         const whatsapp = digits ? '+' + digits : null
-        if (!email && !whatsapp) return Response.json({ error: 'أضف إيميل العميل أو رقم واتسابه أولاً.' }, { status: 400 })
-        const findExisting = () => req.payload.find({
-          collection: 'customers', depth: 0, limit: 3, req, overrideAccess: false,
-          where: { or: [...(email ? [{ email: { equals: email } }] : []), ...(whatsapp ? [{ whatsapp: { equals: whatsapp } }] : [])] },
-        })
+        if (!email && !whatsapp)
+          return Response.json({ error: 'أضف إيميل العميل أو رقم واتسابه أولاً.' }, { status: 400 })
+        const findExisting = () =>
+          req.payload.find({
+            collection: 'customers',
+            depth: 0,
+            limit: 3,
+            req,
+            overrideAccess: false,
+            where: {
+              or: [
+                ...(email ? [{ email: { equals: email } }] : []),
+                ...(whatsapp ? [{ whatsapp: { equals: whatsapp } }] : []),
+              ],
+            },
+          })
         const existing = await findExisting()
-        if (existing.docs.length > 1) return Response.json({ error: 'الإيميل والهاتف مرتبطان بحسابات مختلفة. راجع الحسابات قبل المتابعة.' }, { status: 409 })
+        if (existing.docs.length > 1)
+          return Response.json(
+            { error: 'الإيميل والهاتف مرتبطان بحسابات مختلفة. راجع الحسابات قبل المتابعة.' },
+            { status: 409 },
+          )
         if (existing.docs[0]) return Response.json({ id: existing.docs[0].id, created: false })
         try {
           const customer = await req.payload.create({
-            collection: 'customers', req, overrideAccess: false,
-            data: { fullName: application.name, email, whatsapp, role: 'owner', preferredLocale: 'ar' },
+            collection: 'customers',
+            req,
+            overrideAccess: false,
+            data: {
+              fullName: application.name,
+              email,
+              whatsapp,
+              role: 'owner',
+              preferredLocale: 'ar',
+            },
           })
           return Response.json({ id: customer.id, created: true }, { status: 201 })
         } catch (error) {
           const retry = await findExisting()
-          if (retry.docs.length === 1 && retry.docs[0]) return Response.json({ id: retry.docs[0].id, created: false })
+          if (retry.docs.length === 1 && retry.docs[0])
+            return Response.json({ id: retry.docs[0].id, created: false })
           console.error('Create customer account failed', error)
-          return Response.json({ error: 'تعذر إنشاء الحساب. راجع البيانات وحاول مجدداً.' }, { status: 400 })
+          return Response.json(
+            { error: 'تعذر إنشاء الحساب. راجع البيانات وحاول مجدداً.' },
+            { status: 400 },
+          )
         }
       },
     },
@@ -390,7 +427,14 @@ export const Applications: CollectionConfig = {
     },
   ],
   fields: [
-    { name: 'createCustomerAccount', type: 'ui', admin: { position: 'sidebar', components: { Field: '@/components/admin/CreateCustomerAccount#CreateCustomerAccount' } } },
+    {
+      name: 'createCustomerAccount',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: { Field: '@/components/admin/CreateCustomerAccount#CreateCustomerAccount' },
+      },
+    },
     {
       name: 'reference',
       type: 'text',
@@ -670,12 +714,90 @@ export const Applications: CollectionConfig = {
           ],
         },
         {
+          name: 'depositPlan',
+          label: 'الدفعة المطلوبة / Deposit',
+          type: 'select',
+          defaultValue: '50',
+          options: [
+            { label: '50%', value: '50' },
+            { label: '30%', value: '30' },
+            { label: 'سداد كامل بخصم 3.5% / Full payment', value: 'full' },
+            { label: 'مبلغ مخصص / Custom amount', value: 'custom' },
+          ],
+        },
+        {
+          name: 'customDeposit',
+          label: 'مبلغ الدفعة المطلوبة (CNY)',
+          type: 'number',
+          min: 0.01,
+          validate: (
+            value: number | null | undefined,
+            { siblingData }: { siblingData?: { depositPlan?: string; items?: BillingItem[] } },
+          ) => {
+            if (siblingData?.depositPlan !== 'custom') return true
+            const total = billSums(billLines((siblingData?.items ?? []) as BillingItem[])).total
+            return (
+              (typeof value === 'number' &&
+                Number.isFinite(value) &&
+                value > 0 &&
+                value <= total &&
+                Math.abs(value * 100 - Math.round(value * 100)) < 0.00001) ||
+              'Enter a payment greater than zero, no more than the total, with at most two decimal places.'
+            )
+          },
+          admin: {
+            condition: (_data, siblingData) => siblingData?.depositPlan === 'custom',
+            description: 'المبلغ المطلوب فقط؛ تسجيل الاستلام يتم أدناه. Includes any address rent.',
+          },
+        },
+        {
+          name: 'payments',
+          label: 'المبالغ المستلمة / Payments received',
+          type: 'array',
+          labels: { singular: 'استلام مبلغ / Payment', plural: 'المبالغ المستلمة / Payments' },
+          admin: {
+            description:
+              'أضف دفعة بعد استلامها فعلياً. إذا استخدمت هذا السجل أدخل فيه جميع الدفعات السابقة أيضاً؛ سيحل محل تواريخ الدفع القديمة في حساب المدفوع.',
+          },
+          fields: [
+            {
+              name: 'amount',
+              label: 'المبلغ المستلم (CNY)',
+              type: 'number',
+              required: true,
+              min: 0.01,
+              validate: (value: number | null | undefined) =>
+                (typeof value === 'number' &&
+                  Number.isFinite(value) &&
+                  value > 0 &&
+                  Math.abs(value * 100 - Math.round(value * 100)) < 0.00001) ||
+                'Enter a positive amount with at most two decimal places.',
+            },
+            { name: 'paidOn', label: 'تاريخ الاستلام', type: 'date', required: true },
+            {
+              name: 'method',
+              label: 'طريقة الدفع',
+              type: 'select',
+              required: true,
+              options: [
+                { label: 'كاش / Cash', value: 'cash' },
+                { label: 'تحويل بنكي / Bank transfer', value: 'bank' },
+                { label: 'WeChat Pay', value: 'wechat' },
+                { label: 'Alipay', value: 'alipay' },
+                { label: 'أخرى / Other', value: 'other' },
+              ],
+            },
+            { name: 'receivedBy', label: 'اسم مستلم المبلغ', type: 'text', required: true },
+            { name: 'reference', label: 'مرجع التحويل أو ملاحظة تظهر في الإيصال', type: 'text' },
+          ],
+        },
+        {
           // A date here prints the green PAID stamp on that invoice.
           type: 'row',
           fields: [
             {
               name: 'paidDeposit',
-              label: '50% deposit paid on',
+              label: 'Deposit paid on (legacy)',
               type: 'date',
               admin: { width: '33%' },
             },
