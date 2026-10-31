@@ -14,6 +14,8 @@ import * as migration_20261026_135750_portal_accounts from './20261026_135750_po
 import * as migration_20261026_141703_payment_terms from './20261026_141703_payment_terms'
 import * as migration_20261027_080812_hubspot_copies from './20261027_080812_hubspot_copies'
 
+import * as flexiblePayments from './20261101_030000_flexible_payments'
+
 export const migrations = [
   {
     up: migration_20260920_072112_initial.up,
@@ -89,5 +91,10 @@ export const migrations = [
     up: migration_20261101_020000_add_shareholder_service.up,
     down: migration_20261101_020000_add_shareholder_service.down,
     name: '20261101_020000_add_shareholder_service',
+  },
+  {
+    up: flexiblePayments.up,
+    down: flexiblePayments.down,
+    name: '20261101_030000_flexible_payments',
   },
 ]
