@@ -176,7 +176,6 @@ export function buildDocument(
         body: `<section class="box"><table class="sums">${sumRow(['Amount received', '本次实收'], payment.amount, true)}${sumRow(['Total payable', '应付总额'], payable)}${sumRow(['Total received through this receipt', '截至本收据累计已收'], cumulative)}${sumRow(['Remaining balance', '剩余应付'], Math.max(0, payable - cumulative), true)}${cumulative > payable ? sumRow(['Overpayment / credit', '多付余额'], cumulative - payable) : ''}</table>${payment.reference ? `<p>${escapeHtml(payment.reference)}</p>` : ''}</section>`,
         hidePaymentDetails: true,
         nonce: page.nonce,
-        copyUrl: page.copyUrl,
       }),
     }
   }
