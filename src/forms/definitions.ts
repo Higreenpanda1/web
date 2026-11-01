@@ -1309,7 +1309,19 @@ FORMS['company-registration'] = {
     byStep.get('ownership')!,
     {
       ...CONTACT_STEP,
-      fields: CONTACT_STEP.fields.map((f) => (f.name === 'name' ? { ...f, hint: true } : f)),
+      fields: [
+        ...CONTACT_STEP.fields.map((f) => (f.name === 'name' ? { ...f, hint: true } : f)),
+        {
+          name: 'firstOwnerShare',
+          kind: 'select',
+          required: true,
+          options: Array.from({ length: 99 }, (_, i) => String(i + 1)),
+          showIf: {
+            field: 'shareholderCount',
+            in: Array.from({ length: 9 }, (_, i) => String(i + 2)),
+          },
+        },
+      ],
     },
     {
       key: 'applicant',

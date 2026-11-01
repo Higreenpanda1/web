@@ -185,6 +185,7 @@ test('two owner cards preserve independent contacts and enforce a 100 percent to
   const input = {
     ...base,
     shareholderCount: '2',
+    firstOwnerShare: '75',
     'owners.index': ['1'],
 
     'owners.1.ownerName': 'Second Owner',
@@ -254,7 +255,7 @@ test('low-volume accounting offers each count from one to ten and disjoint highe
   }
 })
 
-test('applicant is automatically the first owner with the remaining share', () => {
+test('applicant is the first owner and selects their share before additional owners', () => {
   const sole = validateApplication(
     form,
     reader({ ...base, 'owners.0.ownerShare': '5', 'owners.0.ownerName': 'Forged name' }),
@@ -268,6 +269,7 @@ test('applicant is automatically the first owner with the remaining share', () =
     reader({
       ...base,
       shareholderCount: '2',
+      firstOwnerShare: '99',
       'owners.index': ['1'],
       'owners.1.ownerName': 'Partner',
       'owners.1.ownerCountry': 'Kuwait',
@@ -319,11 +321,46 @@ test('three proposed English names are mandatory and certified remote copy is op
   const entry = fields.find((f) => f.name === 'entryStamp')!
   assert.equal(entry.required, true)
   assert.equal(isVisible(entry, reader({ ...base, inChinaNow: 'yes' }), fields), true)
-  assert.deepEqual(form.steps.slice(0, 5).map((s) => s.key), [
-    'registrationMethod', 'ownership', 'contact', 'applicant', 'documents',
-  ])
+  assert.deepEqual(
+    form.steps.slice(0, 5).map((s) => s.key),
+    ['registrationMethod', 'ownership', 'contact', 'applicant', 'documents'],
+  )
   assert.ok(
     form.steps.findIndex((s) => s.key === 'ownership') <
       form.steps.findIndex((s) => s.key === 'company'),
   )
+})
+
+test('three owners must complete the first selected share to exactly 100 percent', () => {
+  const input: Record<string, string | string[]> = {
+    ...base,
+    shareholderCount: '3',
+    firstOwnerShare: '60',
+    'owners.index': ['1', '2'],
+  }
+  for (const [index, share] of [
+    [1, '25'],
+    [2, '15'],
+  ] as const) {
+    Object.assign(input, {
+      [`owners.${index}.ownerName`]: `Partner ${index}`,
+      [`owners.${index}.ownerCountry`]: 'Kuwait',
+      [`owners.${index}.ownerPhone`]: '+96541030970',
+      [`owners.${index}.ownerEmail`]: `partner${index}@example.test`,
+      [`owners.${index}.ownerShare`]: share,
+      [`owners.${index}.ownerInChina`]: 'no',
+      [`owners.${index}.ownerHasChinesePhone`]: 'no',
+    })
+  }
+  const result = validateApplication(form, reader(input))
+  assert.ok(result.ok)
+  assert.deepEqual(
+    (result.details.owners as Record<string, unknown>[]).map((o) => o.ownerShare),
+    ['60', '25', '15'],
+  )
+  for (const last of ['14', '16']) {
+    const invalid = validateApplication(form, reader({ ...input, 'owners.2.ownerShare': last }))
+    assert.ok(!invalid.ok)
+    assert.equal(invalid.errors.owners, 'shareTotal')
+  }
 })

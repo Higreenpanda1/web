@@ -82,9 +82,17 @@ export function ApplicationForm({
   )
   useEffect(() => setEnhanced(true), [])
   const ownerCount = Math.max(1, Math.min(10, Number(controls.shareholderCount || 1)))
-  const firstShare =
+  const firstShare = ownerCount === 1 ? 100 : Number(controls.firstOwnerShare || 0)
+  const lastShare =
     100 -
+    firstShare -
     Object.entries(ownerShares)
+      .filter(([index]) => Number(index) < ownerCount - 1)
+      .reduce((sum, [, value]) => sum + value, 0)
+  const displayedShares = { ...ownerShares, [ownerCount - 1]: lastShare }
+  const shareTotal =
+    firstShare +
+    Object.entries(displayedShares)
       .filter(([index]) => Number(index) < ownerCount)
       .reduce((sum, [, value]) => sum + value, 0)
   const steps: (StepDef & { ownerIndex?: number })[] = def.steps.flatMap((step) =>
@@ -176,6 +184,7 @@ export function ApplicationForm({
   )
 
   controllers.add('shareholderCount')
+  controllers.add('firstOwnerShare')
 
   const goNext = () => {
     const fieldset = formRef.current?.querySelector<HTMLFieldSetElement>(`[data-step="${step}"]`)
@@ -201,7 +210,12 @@ export function ApplicationForm({
               (input) => input.name === field.name && (input as HTMLInputElement).checked,
             )),
     )
-    if (invalid || emptyGroup || (steps[step]?.key === 'ownershipSummary' && firstShare < 1)) {
+    if (
+      invalid ||
+      emptyGroup ||
+      (steps[step]?.key === 'ownershipSummary' &&
+        (shareTotal !== 100 || firstShare < 1 || lastShare < 1))
+    ) {
       setStepError(true)
       if (invalid) {
         invalid.reportValidity()
@@ -327,7 +341,7 @@ export function ApplicationForm({
                 {Array.from({ length: ownerCount }, (_, i) => (
                   <li key={i}>
                     {ownerNames[i] || t('repeat.owners.item', { n: i + 1 })}:{' '}
-                    <bdi>{i === 0 ? firstShare : ownerShares[i] || 0}%</bdi>
+                    <bdi>{i === 0 ? firstShare : displayedShares[i] || 0}%</bdi>
                   </li>
                 ))}
               </ul>
@@ -385,17 +399,26 @@ export function ApplicationForm({
                 {Array.from({ length: ownerCount }, (_, i) => (
                   <li key={i}>
                     {ownerNames[i] || t('repeat.owners.item', { n: i + 1 })}:{' '}
-                    <bdi>{i === 0 ? firstShare : ownerShares[i] || 0}%</bdi>
+                    <bdi>{i === 0 ? firstShare : displayedShares[i] || 0}%</bdi>
                   </li>
                 ))}
               </ul>
-              {firstShare < 1 && <FormAlert>{t('errors.shareTotal')}</FormAlert>}
+              {(shareTotal !== 100 || firstShare < 1 || lastShare < 1) && (
+                <FormAlert>{t('errors.shareTotal')}</FormAlert>
+              )}
             </div>
           )}
           {stepDef.repeat ? (
             <RepeatedItems
               repeat={stepDef.repeat}
               ownerIndex={stepDef.ownerIndex}
+              shareAvailable={
+                100 -
+                firstShare -
+                Object.entries(ownerShares)
+                  .filter(([index]) => Number(index) < (stepDef.ownerIndex ?? 0))
+                  .reduce((sum, [, value]) => sum + value, 0)
+              }
               count={
                 stepDef.repeat.countField
                   ? Number(controls[stepDef.repeat.countField] || 1)
@@ -420,15 +443,20 @@ export function ApplicationForm({
                   >
                     <FieldControl
                       field={
-                        field.name === 'decisionMakerIndex'
+                        field.name === 'firstOwnerShare'
                           ? {
                               ...field,
-                              options: field.options?.slice(
-                                0,
-                                Number(controls.shareholderCount || 1),
-                              ),
+                              options: field.options?.filter((v) => Number(v) <= 101 - ownerCount),
                             }
-                          : field
+                          : field.name === 'decisionMakerIndex'
+                            ? {
+                                ...field,
+                                options: field.options?.slice(
+                                  0,
+                                  Number(controls.shareholderCount || 1),
+                                ),
+                              }
+                            : field
                       }
                       optionLabels={
                         field.name === 'decisionMakerIndex'
@@ -502,6 +530,7 @@ type T = ReturnType<typeof useTranslations<'apply'>>
 function RepeatedItems({
   repeat,
   ownerIndex,
+  shareAvailable,
   count,
   fields,
   enhanced,
@@ -512,6 +541,7 @@ function RepeatedItems({
 }: {
   repeat: RepeatDef
   ownerIndex?: number
+  shareAvailable?: number
   count?: number
   fields: readonly FieldDef[]
   enhanced: boolean
@@ -633,20 +663,47 @@ function RepeatedItems({
                         <p>{t('fields.ownerShare')}: 100%</p>
                       </div>
                     )
+                  if (
+                    repeat.name === 'owners' &&
+                    field.name === 'ownerShare' &&
+                    ownerIndex !== undefined &&
+                    ownerIndex === (count || 1) - 1
+                  )
+                    return (
+                      <div key="final-share">
+                        <input type="hidden" name={name} value={shareAvailable ?? 0} />
+                        <p>
+                          {t('fields.ownerShare')}: {shareAvailable ?? 0}%
+                        </p>
+                        <p>{t('automaticShare')}</p>
+                      </div>
+                    )
+                  const maxShare =
+                    (shareAvailable ?? 100) - Math.max(0, (count || 1) - (ownerIndex ?? 0) - 1)
                   const itemField =
                     repeat.name === 'owners' && field.name === 'ownerShare'
-                      ? { ...field, options: field.options?.filter((value) => value !== '100') }
+                      ? {
+                          ...field,
+                          options: field.options?.filter(
+                            (value) => Number(value) <= Math.min(99, maxShare),
+                          ),
+                        }
                       : field
                   return (
                     <div
-                      key={`${field.name}-${field.name in (copied[key] || {}) ? copyVersion[key] || 0 : 0}`}
+                      key={`${field.name}-${field.name === 'ownerShare' ? maxShare : ''}-${field.name in (copied[key] || {}) ? copyVersion[key] || 0 : 0}`}
                       hidden={!visible}
                       className={cn(field.width !== 'half' && 'sm:col-span-2')}
                     >
                       <FieldControl
                         field={itemField}
                         name={name}
-                        defaultValue={copied[key]?.[field.name] ?? answers[`${key}.${field.name}`]}
+                        defaultValue={
+                          field.name === 'ownerShare' &&
+                          Number(answers[`${key}.${field.name}`]) > maxShare
+                            ? ''
+                            : (copied[key]?.[field.name] ?? answers[`${key}.${field.name}`])
+                        }
                         onControlChange={(value) =>
                           setAnswers((previous) => ({
                             ...previous,

@@ -161,8 +161,11 @@ export function validateApplication(def: FormDef, source: Reader): ValidationRes
     )
       errors.owners = 'ownerCount'
     const otherShares = additional.reduce((total, item) => total + Number(item.ownerShare || 0), 0)
+    const firstShare = count === 1 ? 100 : Number(details.firstOwnerShare || 0)
     if (
-      otherShares >= 100 ||
+      firstShare < 1 ||
+      firstShare > 100 ||
+      firstShare + otherShares !== 100 ||
       additional.some((item) => Number(item.ownerShare) < 1 || Number(item.ownerShare) > 99)
     )
       errors.owners = 'shareTotal'
@@ -172,7 +175,7 @@ export function validateApplication(def: FormDef, source: Reader): ValidationRes
         ownerCountry: details.nationality,
         ownerPhone: details.whatsapp,
         ownerEmail: details.email,
-        ownerShare: String(100 - otherShares),
+        ownerShare: String(firstShare),
         ownerInChina: details.inChinaNow,
         ownerHasChinesePhone: details.chinesePhone,
         ...(details.chinesePhoneNumber ? { ownerChinesePhone: details.chinesePhoneNumber } : {}),

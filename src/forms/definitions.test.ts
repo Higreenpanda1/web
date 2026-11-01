@@ -87,7 +87,9 @@ test('every form includes the shared contact step in its expected position', () 
     assert.equal(def.steps[def.type === 'company-registration' ? 2 : 0]?.key, 'contact')
     assert.deepEqual(
       def.steps[def.type === 'company-registration' ? 2 : 0]?.fields.map((f) => f.name),
-      ['name', 'country', 'whatsapp', 'email'],
+      def.type === 'company-registration'
+        ? ['name', 'country', 'whatsapp', 'email', 'firstOwnerShare']
+        : ['name', 'country', 'whatsapp', 'email'],
     )
   }
 })
