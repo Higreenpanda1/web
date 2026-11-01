@@ -1306,6 +1306,7 @@ FORMS['company-registration'] = {
   ...companyFlow,
   steps: [
     { key: 'registrationMethod', fields: [methodField] },
+    byStep.get('ownership')!,
     {
       ...CONTACT_STEP,
       fields: CONTACT_STEP.fields.map((f) => (f.name === 'name' ? { ...f, hint: true } : f)),
@@ -1330,7 +1331,6 @@ FORMS['company-registration'] = {
               : f,
         ),
     },
-    byStep.get('ownership')!,
     byStep.get('shareholders')!,
     { key: 'ownershipSummary', fields: [] },
     byStep.get('decisionMaker')!,

@@ -82,11 +82,11 @@ for (const def of Object.values(FORMS)) {
   })
 }
 
-test('every form starts with the shared contact step', () => {
+test('every form includes the shared contact step in its expected position', () => {
   for (const def of Object.values(FORMS)) {
-    assert.equal(def.steps[def.type === 'company-registration' ? 1 : 0]?.key, 'contact')
+    assert.equal(def.steps[def.type === 'company-registration' ? 2 : 0]?.key, 'contact')
     assert.deepEqual(
-      def.steps[def.type === 'company-registration' ? 1 : 0]?.fields.map((f) => f.name),
+      def.steps[def.type === 'company-registration' ? 2 : 0]?.fields.map((f) => f.name),
       ['name', 'country', 'whatsapp', 'email'],
     )
   }

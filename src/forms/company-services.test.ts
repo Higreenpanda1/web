@@ -319,7 +319,9 @@ test('three proposed English names are mandatory and certified remote copy is op
   const entry = fields.find((f) => f.name === 'entryStamp')!
   assert.equal(entry.required, true)
   assert.equal(isVisible(entry, reader({ ...base, inChinaNow: 'yes' }), fields), true)
-  assert.equal(form.steps[0]!.key, 'registrationMethod')
+  assert.deepEqual(form.steps.slice(0, 5).map((s) => s.key), [
+    'registrationMethod', 'ownership', 'contact', 'applicant', 'documents',
+  ])
   assert.ok(
     form.steps.findIndex((s) => s.key === 'ownership') <
       form.steps.findIndex((s) => s.key === 'company'),
