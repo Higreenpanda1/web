@@ -12,7 +12,7 @@ type NavItem = { label: string; href: string; sub?: { label: string; href: strin
 
 /**
  * The mobile menu: a full-height sheet under the header. Closes on route
- * change and on Escape, locks page scroll while open, moves focus to the first
+ * change, link selection, background/outside clicks and Escape; locks page scroll while open, moves focus to the first
  * link when it opens and back to the trigger when it closes.
  *
  * The language switcher is passed in as `children` so the same component
@@ -67,11 +67,24 @@ export function MobileNav({
         triggerRef.current?.focus()
       }
     }
+    const onPageClick = (event: MouseEvent) => {
+      const target = event.target
+      if (!(target instanceof Element) || triggerRef.current?.contains(target)) return
+      const link = target.closest('a')
+      const outside = !panelRef.current?.contains(target)
+      const emptySpace = !target.closest('button, input, select, textarea, [role="button"]')
+      if (link || outside || emptySpace) {
+        setOpen(false)
+        if (!link) triggerRef.current?.focus({ preventScroll: true })
+      }
+    }
+    document.addEventListener('click', onPageClick)
     document.addEventListener('keydown', onKeyDown)
     panelRef.current?.querySelector<HTMLAnchorElement>('a')?.focus()
     return () => {
       document.body.style.overflow = previous
       document.removeEventListener('keydown', onKeyDown)
+      document.removeEventListener('click', onPageClick)
     }
   }, [open])
 
