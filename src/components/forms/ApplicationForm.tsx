@@ -11,6 +11,8 @@ import { cn } from '@/lib/cn'
 import { whatsappNumber } from '@/lib/phone'
 import { HONEYPOT_FIELD, TIMESTAMP_FIELD } from '@/lib/form-fields'
 import { MultiCountrySelect } from './MultiCountrySelect'
+import { ApplicationSupport } from './ApplicationSupport'
+import { useSuccessNotice } from './useSuccessNotice'
 import { CountrySelect } from './CountrySelect'
 import { PhoneInput } from './PhoneInput'
 import { FieldError, FormAlert, Hint, inputClass, Label, SubmitButton } from './fields'
@@ -59,6 +61,7 @@ export function ApplicationForm({
   const t = useTranslations('apply')
   const [state, formAction] = useActionState(submitApplication, initialState)
   const formRef = useRef<HTMLFormElement>(null)
+  const successRef = useSuccessNotice(state.status === 'success')
   const ids = useId()
   const fieldId = (name: string) => `${ids}-${name}`
 
@@ -93,6 +96,9 @@ export function ApplicationForm({
   if (state.status === 'success') {
     return (
       <div
+        ref={successRef}
+        tabIndex={-1}
+        style={{ scrollMarginTop: '140px' }}
         role="status"
         className="rounded-[var(--radius-lg)] border border-[var(--brand-300)] bg-[var(--brand-100)] p-8 text-[var(--brand-900)]"
       >
@@ -104,6 +110,7 @@ export function ApplicationForm({
         />
         <h2 className="text-h3 text-[var(--brand-900)]">{t('successTitle')}</h2>
         <p className="mt-2">{t('successBody', { reference: state.reference })}</p>
+        <ApplicationSupport />
         <div className="mt-6 flex flex-wrap gap-3">
           <ButtonLink href="/services" variant="secondary">
             {t('backToServices')}

@@ -1117,7 +1117,11 @@
     "useApplicantData": "This owner is the applicant — copy their details",
     "ownerShareTotal": "Total ownership: {total}% of 100%.",
     "authenticationNotice": "Document authentication: your degree or police-clearance certificate may need authentication in its country of issue. Where the Apostille Convention applies between that country and China, an Apostille replaces Chinese embassy legalisation. An Apostille certifies the signature and seal, not the document’s contents. Otherwise, check the applicable foreign-ministry and Chinese embassy process. If you live outside the issuing country, consult the competent Chinese consulate before starting; do not assume both countries must authenticate it. Also confirm translation, validity and acceptance requirements with the work-permit authority.",
-    "remotePassportNotice": "For remote registration, provide a certified true passport copy in the form accepted by the registration authority. This may require notarisation and an Apostille where the Convention applies, or foreign-ministry and Chinese embassy legalisation as applicable. Check with us before starting. Courier the required paper copy by DHL only after we review it and confirm the delivery address. Do not send your original passport."
+    "remotePassportNotice": "For remote registration, provide a certified true passport copy in the form accepted by the registration authority. This may require notarisation and an Apostille where the Convention applies, or foreign-ministry and Chinese embassy legalisation as applicable. Check with us before starting. Courier the required paper copy by DHL only after we review it and confirm the delivery address. Do not send your original passport.",
+    "supportPrompt": "Have a question? Add us on WhatsApp or WeChat, or contact us at our official email address.",
+    "supportWhatsApp": "WhatsApp",
+    "supportWeChat": "WeChat — search the number without the country code",
+    "supportEmail": "Official email"
   },
   "estimator": {
     "eyebrow": "Instant estimate",

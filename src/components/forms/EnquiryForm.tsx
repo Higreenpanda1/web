@@ -6,6 +6,8 @@ import { useActionState, useId, useRef } from 'react'
 
 import { submitEnquiry, type EnquiryState } from '@/app/actions/enquiry'
 import { Button } from '@/components/ui/Button'
+import { ApplicationSupport } from './ApplicationSupport'
+import { useSuccessNotice } from './useSuccessNotice'
 import { CountrySelect } from './CountrySelect'
 import { PhoneInput } from './PhoneInput'
 import { FieldError, FormAlert, Hint, inputClass, Label, SubmitButton } from './fields'
@@ -45,6 +47,7 @@ export function EnquiryForm({
   const t = useTranslations('contact.form')
   const [state, formAction] = useActionState(submitEnquiry, initialState)
   const formRef = useRef<HTMLFormElement>(null)
+  const successRef = useSuccessNotice(state.status === 'success')
   const ids = useId()
 
   const fieldId = (name: string) => `${ids}-${name}`
@@ -56,6 +59,9 @@ export function EnquiryForm({
   if (state.status === 'success') {
     return (
       <div
+        ref={successRef}
+        tabIndex={-1}
+        style={{ scrollMarginTop: '140px' }}
         role="status"
         className="rounded-[var(--radius-lg)] border border-[var(--brand-300)] bg-[var(--brand-100)] p-8 text-[var(--brand-900)]"
       >
@@ -67,6 +73,7 @@ export function EnquiryForm({
         />
         <h3 className="text-h3 text-[var(--brand-900)]">{t('successTitle')}</h3>
         <p className="mt-2">{t('successBody', { reference: state.reference })}</p>
+        <ApplicationSupport />
         <Button
           type="button"
           variant="secondary"
