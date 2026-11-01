@@ -73,7 +73,7 @@ export function isVisible(
   seen.add(field.name)
   const parent = fields.find((f) => f.name === field.showIf?.field)
   if (parent && !isVisible(parent, read, fields, seen)) return false
-  return field.showIf.in.includes(read.get(field.showIf.field) ?? '')
+  return read.getAll(field.showIf.field).some((value) => field.showIf!.in.includes(value))
 }
 
 /**
@@ -129,7 +129,10 @@ export function validateApplication(def: FormDef, source: Reader): ValidationRes
     const repeat = step.repeat
     if (!repeat) continue
     const keys = itemKeys(repeat, source)
-    if (keys.length === 0) {
+    if (
+      keys.length === 0 &&
+      !(repeat.name === 'owners' && source.get('shareholderCount') === '1')
+    ) {
       errors[repeat.name] = 'required'
       continue
     }
@@ -143,21 +146,54 @@ export function validateApplication(def: FormDef, source: Reader): ValidationRes
   }
 
   if (def.type === 'company-registration') {
+    details.fullName = details.name
     const count = Number(details.shareholderCount)
-    const owners = (details.owners ?? []) as Record<string, unknown>[]
+    const additional = (details.owners ?? []) as Record<string, unknown>[]
     const rawKeys = source.getAll('owners.index')
     if (
       !Number.isInteger(count) ||
       count < 1 ||
       count > 10 ||
-      owners.length !== count ||
-      rawKeys.length !== count ||
-      new Set(rawKeys).size !== count
+      additional.length !== count - 1 ||
+      rawKeys.length !== count - 1 ||
+      new Set(rawKeys).size !== rawKeys.length ||
+      rawKeys.some((key, i) => key !== String(i + 1))
     )
-      errors['owners'] = 'ownerCount'
-    const sum = owners.reduce((total, item) => total + Number(item.ownerShare || 0), 0)
-    if (sum !== 100 || owners.some((item) => Number(item.ownerShare) > (count === 1 ? 100 : 99)))
-      errors['owners'] = 'shareTotal'
+      errors.owners = 'ownerCount'
+    const otherShares = additional.reduce((total, item) => total + Number(item.ownerShare || 0), 0)
+    if (
+      otherShares >= 100 ||
+      additional.some((item) => Number(item.ownerShare) < 1 || Number(item.ownerShare) > 99)
+    )
+      errors.owners = 'shareTotal'
+    const owners: Record<string, unknown>[] = [
+      {
+        ownerName: details.fullName || details.name,
+        ownerCountry: details.nationality,
+        ownerPhone: details.whatsapp,
+        ownerEmail: details.email,
+        ownerShare: String(100 - otherShares),
+        ownerInChina: details.inChinaNow,
+        ownerHasChinesePhone: details.chinesePhone,
+        ...(details.chinesePhoneNumber ? { ownerChinesePhone: details.chinesePhoneNumber } : {}),
+      },
+      ...additional,
+    ]
+    details.owners = owners
+    const proposed = [details.companyName1, details.companyName2, details.companyName3]
+      .filter((v): v is string => typeof v === 'string')
+      .map((v) => v.toLowerCase())
+    if (proposed.length === 3 && new Set(proposed).size !== 3)
+      errors.companyName2 = 'distinctCompanyNames'
+    details.companyNames = [details.companyName1, details.companyName2, details.companyName3]
+      .filter(Boolean)
+      .join(' / ')
+    details.businessScope = {
+      methods: details.businessMethods,
+      sectors: details.businessSectors,
+      otherServices: details.otherServices || null,
+      other: details.scopeOther || null,
+    }
     const selected = Number(details.decisionMakerIndex)
     if (
       details.decisionMakerIndex === undefined ||
@@ -166,7 +202,10 @@ export function validateApplication(def: FormDef, source: Reader): ValidationRes
       selected >= count
     )
       errors.decisionMakerIndex = 'invalid'
-    if (!errors.decisionMakerIndex) details.decisionMaker = owners[selected]?.ownerName
+    if (!errors.decisionMakerIndex) {
+      details.decisionMaker = owners[selected]?.ownerName
+      details.legalRepresentative = owners[selected]?.ownerName
+    }
     details.ownership = count === 1 ? 'sole' : 'partners'
   }
 
@@ -184,7 +223,7 @@ function checkField(field: FieldDef, read: Reader): Outcome {
     if (field.required && !chosen.length) return { error: 'required' }
     return chosen.length ? { value: chosen } : {}
   }
-  if (field.kind === 'checkboxes') {
+  if (field.kind === 'checkboxes' || field.kind === 'search-multi') {
     const chosen = read.getAll(field.name).map((v) => v.trim())
     const allowed = new Set(field.options ?? [])
     if (chosen.some((v) => !allowed.has(v))) return { error: 'invalid' }

@@ -17,8 +17,11 @@ const base = {
   chinesePhone: 'no',
   inChinaNow: 'no',
   city: 'yiwu',
-  companyNames: 'Example A / Example B',
-  businessScope: 'Marine engine spare parts',
+  companyName1: 'Example A',
+  companyName2: 'Example B',
+  companyName3: 'Example C',
+  businessMethods: ['import-export'],
+  businessSectors: ['marine'],
   registeredCapital: '30000',
   capitalCurrency: 'usd',
   addressOption: 'own-office',
@@ -26,14 +29,8 @@ const base = {
   decisionMakerIndex: '0',
   passportHasSignature: 'no',
   registrationMode: 'in-person',
-  'owners.index': ['0'],
-  'owners.0.ownerName': 'Owner One',
-  'owners.0.ownerCountry': 'Palestine',
-  'owners.0.ownerPhone': '+96541030970',
-  'owners.0.ownerEmail': 'owner@example.test',
-  'owners.0.ownerShare': '100',
-  'owners.0.ownerInChina': 'no',
-  'owners.0.ownerHasChinesePhone': 'no',
+  'owners.index': [],
+
   ownership: 'sole',
   accountingProvider: 'existing',
   accountantName: '张伟',
@@ -188,8 +185,8 @@ test('two owner cards preserve independent contacts and enforce a 100 percent to
   const input = {
     ...base,
     shareholderCount: '2',
-    'owners.index': ['0', '1'],
-    'owners.0.ownerShare': '75',
+    'owners.index': ['1'],
+
     'owners.1.ownerName': 'Second Owner',
     'owners.1.ownerCountry': 'Yemen',
     'owners.1.ownerPhone': '13023440305',
@@ -204,9 +201,11 @@ test('two owner cards preserve independent contacts and enforce a 100 percent to
   assert.ok(result.ok)
   const owners = result.details.owners as Record<string, unknown>[]
   assert.equal(owners[1]!.ownerPhone, '+8613023440305')
+  assert.equal(owners[0]!.ownerShare, '75')
+  assert.equal(owners[0]!.ownerName, base.name)
   assert.equal(result.details.decisionMaker, 'Second Owner')
   assert.equal(result.details.ownership, 'partners')
-  const invalid = validateApplication(form, reader({ ...input, 'owners.1.ownerShare': '24' }))
+  const invalid = validateApplication(form, reader({ ...input, 'owners.1.ownerShare': '100' }))
   assert.ok(!invalid.ok)
   assert.equal(invalid.errors.owners, 'shareTotal')
   const count = validateApplication(form, reader({ ...input, shareholderCount: '3' }))
@@ -240,10 +239,10 @@ test('owner entry stamp, Chinese phone and representative signature follow their
   )
   const invalid = validateApplication(
     form,
-    reader({ ...base, 'owners.0.ownerHasChinesePhone': 'yes' }),
+    reader({ ...base, chinesePhone: 'yes', chinesePhoneNumber: '' }),
   )
   assert.ok(!invalid.ok)
-  assert.equal(invalid.errors['owners.0.ownerChinesePhone'], 'required')
+  assert.equal(invalid.errors['chinesePhoneNumber'], 'required')
 })
 test('low-volume accounting offers each count from one to ten and disjoint higher ranges', () => {
   for (const name of ['accountingMonthlyTransactions', 'accountingMonthlyInvoices']) {
@@ -253,4 +252,76 @@ test('low-volume accounting offers each count from one to ten and disjoint highe
     assert.ok(field.options?.includes('16-25'))
     assert.equal(field.options?.includes('1-20'), false)
   }
+})
+
+test('applicant is automatically the first owner with the remaining share', () => {
+  const sole = validateApplication(
+    form,
+    reader({ ...base, 'owners.0.ownerShare': '5', 'owners.0.ownerName': 'Forged name' }),
+  )
+  assert.ok(sole.ok)
+  const first = (sole.details.owners as Record<string, unknown>[])[0]!
+  assert.equal(first.ownerName, base.name)
+  assert.equal(first.ownerShare, '100')
+  const pair = validateApplication(
+    form,
+    reader({
+      ...base,
+      shareholderCount: '2',
+      'owners.index': ['1'],
+      'owners.1.ownerName': 'Partner',
+      'owners.1.ownerCountry': 'Kuwait',
+      'owners.1.ownerPhone': '+96541030970',
+      'owners.1.ownerEmail': 'partner@example.test',
+      'owners.1.ownerShare': '1',
+      'owners.1.ownerInChina': 'no',
+      'owners.1.ownerHasChinesePhone': 'no',
+    }),
+  )
+  assert.ok(pair.ok)
+  assert.equal((pair.details.owners as Record<string, unknown>[])[0]!.ownerShare, '99')
+})
+test('other services requires a description even when it is not the first selected method', () => {
+  const missing = validateApplication(
+    form,
+    reader({ ...base, businessMethods: ['shipping-logistics', 'other-services'] }),
+  )
+  assert.ok(!missing.ok)
+  assert.equal(missing.errors.otherServices, 'required')
+  const ok = validateApplication(
+    form,
+    reader({
+      ...base,
+      businessMethods: ['shipping-logistics', 'other-services'],
+      otherServices: 'Export documentation support',
+    }),
+  )
+  assert.ok(ok.ok)
+  const hidden = validateApplication(
+    form,
+    reader({ ...base, otherServices: 'Should not be saved' }),
+  )
+  assert.ok(hidden.ok)
+  assert.equal('otherServices' in hidden.details, false)
+})
+test('three proposed English names are mandatory and certified remote copy is optional at intake', async () => {
+  const missing = validateApplication(form, reader({ ...base, companyName3: '' }))
+  assert.ok(!missing.ok)
+  assert.equal(missing.errors.companyName3, 'required')
+  const fields = singleFields(form)
+  const remote = fields.filter((f) => f.name === 'certifiedPassportCopy')
+  const files = await checkDocuments(
+    remote,
+    () => null,
+    (f) => isVisible(f, reader({ ...base, registrationMode: 'remote' }), fields),
+  )
+  assert.ok(files.ok)
+  const entry = fields.find((f) => f.name === 'entryStamp')!
+  assert.equal(entry.required, true)
+  assert.equal(isVisible(entry, reader({ ...base, inChinaNow: 'yes' }), fields), true)
+  assert.equal(form.steps[0]!.key, 'registrationMethod')
+  assert.ok(
+    form.steps.findIndex((s) => s.key === 'ownership') <
+      form.steps.findIndex((s) => s.key === 'company'),
+  )
 })

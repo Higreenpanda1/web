@@ -36,7 +36,7 @@ export function CostEstimator({ locale, className }: { locale: Locale; className
   const Arrow = locale === 'ar' ? ArrowLeft : ArrowRight
   const yuan = (n: number) => `¥${formatNumber(n, locale)}`
 
-  const applyHref = `/apply/company-registration?service=company-formation&city=${sel.city}&address=${sel.address}&extras=${sel.extras.join(',')}${sel.bank !== 'none' ? ',bank-account' : ''}`
+  const applyHref = `/apply/company-registration?service=company-formation&registration=${sel.registration}&city=${sel.city}&address=${sel.address}&extras=${sel.extras.join(',')}${sel.bank !== 'none' ? ',bank-account' : ''}`
 
   const toggleExtra = (key: keyof typeof QUOTE.extras) =>
     setSel((s) => ({

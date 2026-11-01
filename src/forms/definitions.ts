@@ -29,6 +29,7 @@ export type FieldKind =
   | 'date'
   | 'select'
   | 'checkboxes'
+  | 'search-multi'
   | 'country'
   | 'countries'
   | 'tel'
@@ -1292,6 +1293,146 @@ for (const step of FORMS['company-registration'].steps)
     if (['accountingMonthlyTransactions', 'accountingMonthlyInvoices'].includes(field.name))
       field.options = preciseCounts
   }
+
+/** Applicant is owner one; only additional owners repeat. */
+const companyFlow = FORMS['company-registration']
+const byStep = new Map(companyFlow.steps.map((step) => [step.key, step]))
+const oldDocuments = byStep.get('documents')!.fields
+const methodField = oldDocuments.find((f) => f.name === 'registrationMode')!
+const signatureFields = byStep
+  .get('legalRep')!
+  .fields.filter((f) => ['passportHasSignature', 'legalRepSignature'].includes(f.name))
+FORMS['company-registration'] = {
+  ...companyFlow,
+  steps: [
+    { key: 'registrationMethod', fields: [methodField] },
+    {
+      ...CONTACT_STEP,
+      fields: CONTACT_STEP.fields.map((f) => (f.name === 'name' ? { ...f, hint: true } : f)),
+    },
+    {
+      key: 'applicant',
+      fields: byStep
+        .get('legalRep')!
+        .fields.filter(
+          (f) => !['passportHasSignature', 'legalRepSignature', 'fullName'].includes(f.name),
+        ),
+    },
+    {
+      key: 'documents',
+      fields: oldDocuments
+        .filter((f) => f.name !== 'registrationMode')
+        .map((f) =>
+          f.name === 'entryStamp'
+            ? { ...f, required: true, showIf: { field: 'inChinaNow', in: ['yes'] } }
+            : f.name === 'certifiedPassportCopy'
+              ? { ...f, required: false }
+              : f,
+        ),
+    },
+    byStep.get('ownership')!,
+    byStep.get('shareholders')!,
+    { key: 'ownershipSummary', fields: [] },
+    byStep.get('decisionMaker')!,
+    { key: 'representativeSignature', fields: signatureFields },
+    {
+      ...byStep.get('company')!,
+      fields: byStep.get('company')!.fields.flatMap((f) =>
+        f.name === 'companyNames'
+          ? [1, 2, 3].flatMap(
+              (n) =>
+                [
+                  {
+                    name: `companyName${n}`,
+                    kind: 'text',
+                    required: true,
+                    max: 120,
+                    hint: n === 1,
+                  },
+                  { name: `companyNameZh${n}`, kind: 'text', max: 120, hint: n === 1 },
+                ] as FieldDef[],
+            )
+          : f.name === 'businessScope'
+            ? ([
+                {
+                  name: 'businessMethods',
+                  kind: 'search-multi',
+                  required: true,
+                  hint: true,
+                  options: [
+                    'import-export',
+                    'wholesale',
+                    'retail',
+                    'manufacturing',
+                    'assembly',
+                    'online-sales',
+                    'services',
+                    'shipping-logistics',
+                    'other-services',
+                  ],
+                },
+                {
+                  name: 'otherServices',
+                  kind: 'textarea',
+                  required: true,
+                  max: 1000,
+                  showIf: { field: 'businessMethods', in: ['other-services'] },
+                },
+                {
+                  name: 'businessSectors',
+                  kind: 'search-multi',
+                  required: true,
+                  hint: true,
+                  options: [
+                    'automotive',
+                    'marine',
+                    'machinery',
+                    'electronics',
+                    'electrical',
+                    'solar-energy',
+                    'construction',
+                    'furniture',
+                    'textiles',
+                    'apparel',
+                    'footwear',
+                    'cosmetics',
+                    'medical',
+                    'food',
+                    'agriculture',
+                    'packaging',
+                    'plastics',
+                    'metals',
+                    'chemicals',
+                    'household',
+                    'sports',
+                    'toys',
+                    'jewellery',
+                    'it-software',
+                    'consulting',
+                    'marketing',
+                    'design',
+                    'translation',
+                    'logistics',
+                    'other',
+                  ],
+                },
+                { name: 'scopeOther', kind: 'textarea', max: 1500 },
+              ] as FieldDef[])
+            : [f],
+      ),
+    },
+    ...companyFlow.steps.filter((step) =>
+      ['accountingService', 'workResidenceService', 'hkBankService', 'extras'].includes(step.key),
+    ),
+  ],
+  headline: (d) =>
+    [str(d, 'registrationMode'), str(d, 'city'), str(d, 'ownership')].filter(Boolean).join(' · '),
+}
+
+FORMS['company-registration'] = {
+  ...FORMS['company-registration'],
+  steps: [...FORMS['company-registration'].steps, { key: 'reviewApplication', fields: [] }],
+}
 
 /** Every field in a form, in order, contact step included. */
 /** Every field of the form, the fields of a repeated step included once. */

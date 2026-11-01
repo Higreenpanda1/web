@@ -444,8 +444,9 @@
       "sheetTooBig": "文件超过 10 MB，请上传较小的文件。",
       "specificProducts": "请填写具体产品名称，而不是泛泛的贸易描述。",
       "chineseName": "请使用汉字填写会计姓名，例如：张伟。",
-      "shareTotal": "持股比例合计须为100%；多位股东时每人须为1%至99%。",
-      "ownerCount": "请按所选人数填写每位股东资料。"
+      "shareTotal": "须为第一位股东保留至少1%，所有股东比例合计须为100%。",
+      "ownerCount": "请按所选总人数补充其他股东资料，申请人已自动计入。",
+      "distinctCompanyNames": "请提供三个不同的公司名称。"
     },
     "types": {
       "consultation": {
@@ -502,7 +503,7 @@
       "company": "公司",
       "shareholders": "股权结构",
       "extras": "其他附加服务",
-      "applicant": "申请人",
+      "applicant": "申请人资料（第一位股东）",
       "trip": "行程",
       "visa": "签证",
       "background": "您的情况",
@@ -518,7 +519,11 @@
       "workResidenceService": "工作许可及居留许可",
       "hkBankService": "香港公司银行账户",
       "ownership": "股东人数",
-      "decisionMaker": "决策负责人"
+      "decisionMaker": "决策负责人",
+      "registrationMethod": "公司注册办理方式",
+      "ownershipSummary": "股东及持股比例汇总",
+      "representativeSignature": "所选法定代表人签名",
+      "reviewApplication": "提交前核对"
     },
     "fields": {
       "name": "全名",
@@ -707,7 +712,7 @@
       "passportHoldingPhotoHint": "请上传清晰的本人原始照片，面部无遮挡且不戴墨镜：一手持打开至资料页的护照，另一手持写有实际拍摄日期（年-月-日）的纸张。面部、护照和日期均须清楚可见，手指勿遮挡资料。示意图仅作参考，请提交本人未经修改的真实照片。",
       "accountantNameHint": "请填写会计的中文姓名，例如：张伟。",
       "shareholderCount": "股东总人数",
-      "shareholderCountHint": "如申请人也是股东，请计入总人数。按所选人数显示独立资料卡（最多10人）。",
+      "shareholderCountHint": "申请人计为第一位股东。选择2人时仅需补充第二位股东资料，以此类推，最多10人。",
       "ownerName": "股东护照上的完整姓名",
       "ownerCountry": "股东国籍",
       "ownerPhone": "股东联系电话",
@@ -720,13 +725,28 @@
       "ownerEntryStampHint": "该股东在中国时须上传清晰的入境章。",
       "ownerHasChinesePhone": "该股东是否有中国手机号？",
       "ownerChinesePhone": "股东中国手机号",
-      "decisionMakerIndex": "谁负责主要决策？",
+      "decisionMakerIndex": "选择公司法定代表人",
       "passportHasSignature": "法定代表人的护照上是否有本人签名？",
       "legalRepSignature": "法定代表人签名照片",
       "legalRepSignatureHint": "请在白纸上用黑色笔签署与护照一致的签名，并上传清晰照片。",
       "registrationMode": "公司注册办理方式",
-      "certifiedPassportCopy": "远程注册所需经认证的护照公证副本",
-      "certifiedPassportCopyHint": "请上传护照公证副本及现有认证的清晰扫描件，供我们在寄送纸质文件前审核。"
+      "certifiedPassportCopy": "护照认证副本（如现已备妥）",
+      "certifiedPassportCopyHint": "目前可不上传。如公证认证副本尚未备妥，可使用前面上传的普通护照扫描件完成申请。我们后续会联系您准备所需认证副本。",
+      "companyName1": "拟用英文名称 1",
+      "companyNameZh1": "拟用中文名称 1",
+      "companyName2": "拟用英文名称 2",
+      "companyNameZh2": "拟用中文名称 2",
+      "companyName3": "拟用英文名称 3",
+      "companyNameZh3": "拟用中文名称 3",
+      "companyName1Hint": "请提供三个不同且有辨识度的名称。中国企业数量很多，拟用名称可能已被使用或与现有名称近似。慎重选择有助减少延误；所有名称均须经查重及审核。",
+      "companyNameZh1Hint": "中国境内营业执照使用中文名称。建议优先考虑与英文发音接近的音译，而非含义直译。也可由我们协助拟定并审核。",
+      "businessMethods": "业务经营方式",
+      "otherServices": "请说明拟提供的其他服务",
+      "businessSectors": "行业、产品及服务",
+      "scopeOther": "列表以外的其他业务（选填）",
+      "businessMethodsHint": "可多选。将业务列入经营范围不代表自动取得所有经营许可。制造、组装及医疗器械、化妆品等部分产品可能需按业务及产品办理额外许可、备案或审批。开展业务前我们将与您核实具体要求。",
+      "businessSectorsHint": "搜索并选择一个或多个行业。未列出的业务可在下方选填栏补充。",
+      "nameHint": "请按护照填写完整姓名。您将自动计为第一位股东，无需重复填写这些资料。"
     },
     "options": {
       "common": {
@@ -1096,6 +1116,49 @@
       "registrationMode": {
         "in-person": "现场办理",
         "remote": "远程办理"
+      },
+      "businessMethods": {
+        "import-export": "进出口贸易",
+        "wholesale": "批发",
+        "retail": "零售",
+        "manufacturing": "制造",
+        "assembly": "组装",
+        "online-sales": "网络销售及电子商务",
+        "services": "提供服务",
+        "shipping-logistics": "货运及物流服务",
+        "other-services": "其他服务（须说明）"
+      },
+      "businessSectors": {
+        "automotive": "汽车及配件",
+        "marine": "船艇及船用设备",
+        "machinery": "机械及工业设备",
+        "electronics": "电子产品",
+        "electrical": "电器及电气设备",
+        "solar-energy": "太阳能及可再生能源",
+        "construction": "建筑材料",
+        "furniture": "家具",
+        "textiles": "面料及纺织品",
+        "apparel": "服装",
+        "footwear": "鞋及箱包",
+        "cosmetics": "化妆品及个人护理",
+        "medical": "医疗器械及用品",
+        "food": "食品及饮料",
+        "agriculture": "农产品及农业设备",
+        "packaging": "包装",
+        "plastics": "塑料及橡胶",
+        "metals": "金属及金属制品",
+        "chemicals": "化工产品",
+        "household": "家居用品",
+        "sports": "体育器材",
+        "toys": "玩具",
+        "jewellery": "珠宝及饰品",
+        "it-software": "信息技术及软件",
+        "consulting": "咨询及商务服务",
+        "marketing": "营销及广告",
+        "design": "设计",
+        "translation": "翻译",
+        "logistics": "物流及仓储",
+        "other": "其他行业"
       }
     },
     "repeat": {
@@ -1121,7 +1184,11 @@
     "supportPrompt": "如有疑问，可添加我们的 WhatsApp 或微信，或通过官方电子邮箱联系我们。",
     "supportWhatsApp": "WhatsApp",
     "supportWeChat": "微信：搜索手机号，无需国家区号",
-    "supportEmail": "官方电子邮箱"
+    "supportEmail": "官方电子邮箱",
+    "applicantOwnerNote": "申请人为第一位股东，其持股比例按其他股东比例分配后的余额自动计算。",
+    "scopeSearch": "搜索并选择（可多选）",
+    "reviewNote": "请核对以下信息，提交前可返回任何步骤修改。",
+    "reviewFiles": "已上传文件"
   },
   "estimator": {
     "eyebrow": "即时估价",

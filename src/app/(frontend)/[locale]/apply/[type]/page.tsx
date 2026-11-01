@@ -24,7 +24,13 @@ import type { Locale } from '@/i18n/routing'
 import type { Metadata } from 'next'
 
 type Params = Promise<{ locale: Locale; type: string }>
-type Search = Promise<{ service?: string; city?: string; address?: string; extras?: string }>
+type Search = Promise<{
+  service?: string
+  registration?: string
+  city?: string
+  address?: string
+  extras?: string
+}>
 
 export function generateStaticParams() {
   return APPLICATION_TYPES.map((type) => ({ type }))
@@ -69,15 +75,17 @@ export default async function ApplyPage({
     physical: 'own-office',
   }
   const defaults: Record<string, string | string[]> = {}
+  if (query.registration === 'remote' || query.registration === 'inPerson')
+    defaults.registrationMode = query.registration === 'remote' ? 'remote' : 'in-person'
   if (query.city) defaults.city = query.city
   const addressOption = query.address ? ADDRESS[query.address] : undefined
   if (addressOption) defaults.addressOption = addressOption
   if (query.extras) {
     const map: Record<string, string> = {
-      accounting: 'accounting',
-      workPermit: 'work-visa',
       'bank-account': 'bank-account',
     }
+    if (query.extras.split(',').includes('accounting')) defaults.accountingProvider = 'higp'
+    if (query.extras.split(',').includes('workPermit')) defaults.needResidence = 'yes'
     defaults.extras = query.extras.split(',').flatMap((k) => (map[k] ? [map[k]] : []))
   }
   if (!isApplicationType(type)) notFound()

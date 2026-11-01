@@ -73,7 +73,13 @@ export async function describeDetails(
   describe(singleFields(FORMS[type]), details, '')
   // Keep older, free-text shareholder submissions readable after the card migration.
   if (type === 'company-registration' && !Array.isArray(details.owners)) {
-    for (const name of ['shareholders', 'decisionMaker'] as const) {
+    for (const name of [
+      'shareholders',
+      'decisionMaker',
+      'companyNames',
+      'businessScope',
+      'fullName',
+    ] as const) {
       if (typeof details[name] === 'string' && details[name])
         rows.push({ label: t(`fields.${name}`), value: String(details[name]) })
     }

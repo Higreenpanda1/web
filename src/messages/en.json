@@ -444,8 +444,9 @@
       "sheetTooBig": "This file is larger than 10 MB. Please send a smaller file.",
       "specificProducts": "Name specific products, not a generic trading description.",
       "chineseName": "Enter the accountant’s name in Chinese characters, e.g. 张伟.",
-      "shareTotal": "Ownership must total 100%; with multiple owners each share must be 1%–99%.",
-      "ownerCount": "Complete one card for every selected owner."
+      "shareTotal": "Leave at least 1% for the first owner. All ownership shares must total 100%.",
+      "ownerCount": "Complete each additional owner’s details for the selected count; the applicant is included automatically.",
+      "distinctCompanyNames": "Choose three different company names."
     },
     "types": {
       "consultation": {
@@ -502,7 +503,7 @@
       "company": "The company",
       "shareholders": "Ownership",
       "extras": "Other additional services",
-      "applicant": "The applicant",
+      "applicant": "Applicant details — first owner",
       "trip": "The trip",
       "visa": "The visa",
       "background": "Your situation",
@@ -518,7 +519,11 @@
       "workResidenceService": "Work and residence permit",
       "hkBankService": "Hong Kong corporate bank account",
       "ownership": "Number of owners",
-      "decisionMaker": "Decision maker"
+      "decisionMaker": "Decision maker",
+      "registrationMethod": "Company registration method",
+      "ownershipSummary": "Ownership summary",
+      "representativeSignature": "Selected legal representative’s signature",
+      "reviewApplication": "Review before submitting"
     },
     "fields": {
       "name": "Full name",
@@ -707,7 +712,7 @@
       "passportHoldingPhotoHint": "Upload a clear original photo with your face unobstructed and no sunglasses: hold the passport open at the details page in one hand and a sheet showing the actual photo date (YYYY-MM-DD) in the other. Keep face, passport and date visible without covering passport details with fingers. The illustration is guidance only; submit your real, unedited photo.",
       "accountantNameHint": "Enter the accountant’s name in Chinese characters, e.g. 张伟.",
       "shareholderCount": "Total number of owners",
-      "shareholderCountHint": "Include the applicant if they are an owner. Select the total to show one card per owner (up to 10).",
+      "shareholderCountHint": "Includes the applicant as the first owner. If you select two, only the second owner’s details are requested, and so on up to 10 owners.",
       "ownerName": "Owner’s full name as in passport",
       "ownerCountry": "Owner’s nationality",
       "ownerPhone": "Owner’s phone number",
@@ -720,13 +725,28 @@
       "ownerEntryStampHint": "Required if this owner is in China. Upload a clear entry stamp.",
       "ownerHasChinesePhone": "Does this owner have a Chinese phone number?",
       "ownerChinesePhone": "Owner’s Chinese mobile number",
-      "decisionMakerIndex": "Who makes the main decisions?",
+      "decisionMakerIndex": "Choose the company’s legal representative",
       "passportHasSignature": "Does the legal representative’s passport contain their signature?",
       "legalRepSignature": "Legal representative’s signature image",
       "legalRepSignatureHint": "Sign on plain white paper using a black pen, matching the signature in your passport, then upload a clear photo.",
       "registrationMode": "Company registration method",
-      "certifiedPassportCopy": "Certified true passport copy for remote registration",
-      "certifiedPassportCopyHint": "Upload a clear scan of the certified copy and available authentication for our review before couriering the paper document."
+      "certifiedPassportCopy": "Certified passport copy — if currently available",
+      "certifiedPassportCopyHint": "This upload is optional now. If the certified true copy is not ready, the ordinary passport copy uploaded earlier is sufficient to submit the request. We will contact you later to arrange the required certified copy.",
+      "companyName1": "Proposed English name 1",
+      "companyNameZh1": "Proposed Chinese name 1",
+      "companyName2": "Proposed English name 2",
+      "companyNameZh2": "Proposed Chinese name 2",
+      "companyName3": "Proposed English name 3",
+      "companyNameZh3": "Proposed Chinese name 3",
+      "companyName1Hint": "Provide three distinct, distinctive names. China has a very large number of companies, so a name may already be used or resemble an existing name. Choosing carefully can reduce delays; all suggestions remain subject to availability and approval.",
+      "companyNameZh1Hint": "The Chinese name is used on the licence in China. If you suggest one, a phonetic rendering of the English name is preferable to a literal translation of its meaning. You may leave this to our team to propose and review.",
+      "businessMethods": "How will the business operate?",
+      "otherServices": "Describe the other services you will provide",
+      "businessSectors": "Sectors, products and services",
+      "scopeOther": "Additional activity not listed",
+      "businessMethodsHint": "Select multiple activities if needed. Listing an activity in the business scope does not automatically grant all required permissions. Manufacturing, assembly and some products, such as medical devices and cosmetics, may require additional licences, filings or approvals depending on the activity and product. We will review the requirements with you before operations begin.",
+      "businessSectorsHint": "Search and select one or more sectors. If your activity is missing, describe it in the optional field below.",
+      "nameHint": "Enter your full name exactly as in your passport. You are counted as the first owner and will not need to enter these details again."
     },
     "options": {
       "common": {
@@ -1096,6 +1116,49 @@
       "registrationMode": {
         "in-person": "In person",
         "remote": "Remotely"
+      },
+      "businessMethods": {
+        "import-export": "Import and export",
+        "wholesale": "Wholesale",
+        "retail": "Retail",
+        "manufacturing": "Manufacturing",
+        "assembly": "Assembly",
+        "online-sales": "Online sales and e-commerce stores",
+        "services": "Providing services",
+        "shipping-logistics": "Shipping and logistics",
+        "other-services": "Other services — description required"
+      },
+      "businessSectors": {
+        "automotive": "Vehicles and auto parts",
+        "marine": "Boats and marine equipment",
+        "machinery": "Machinery and industrial equipment",
+        "electronics": "Electronics",
+        "electrical": "Electrical products and equipment",
+        "solar-energy": "Solar and renewable energy",
+        "construction": "Building materials",
+        "furniture": "Furniture",
+        "textiles": "Fabrics and textiles",
+        "apparel": "Clothing",
+        "footwear": "Footwear and bags",
+        "cosmetics": "Cosmetics and personal care",
+        "medical": "Medical devices and supplies",
+        "food": "Food and beverages",
+        "agriculture": "Agricultural products and equipment",
+        "packaging": "Packaging",
+        "plastics": "Plastics and rubber",
+        "metals": "Metals and metal products",
+        "chemicals": "Chemicals",
+        "household": "Household goods",
+        "sports": "Sports equipment",
+        "toys": "Toys",
+        "jewellery": "Jewellery and accessories",
+        "it-software": "IT and software",
+        "consulting": "Consulting and business services",
+        "marketing": "Marketing and advertising",
+        "design": "Design",
+        "translation": "Translation",
+        "logistics": "Logistics and warehousing",
+        "other": "Other sector"
       }
     },
     "repeat": {
@@ -1121,7 +1184,11 @@
     "supportPrompt": "Have a question? Add us on WhatsApp or WeChat, or contact us at our official email address.",
     "supportWhatsApp": "WhatsApp",
     "supportWeChat": "WeChat — search the number without the country code",
-    "supportEmail": "Official email"
+    "supportEmail": "Official email",
+    "applicantOwnerNote": "The applicant is the first owner. Their share is calculated automatically after the other owners’ shares.",
+    "scopeSearch": "Search and select — multiple choices allowed",
+    "reviewNote": "Review the information below. You can go back to edit any step before submitting.",
+    "reviewFiles": "Uploaded files"
   },
   "estimator": {
     "eyebrow": "Instant estimate",

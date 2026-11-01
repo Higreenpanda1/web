@@ -84,9 +84,9 @@ for (const def of Object.values(FORMS)) {
 
 test('every form starts with the shared contact step', () => {
   for (const def of Object.values(FORMS)) {
-    assert.equal(def.steps[0]?.key, 'contact')
+    assert.equal(def.steps[def.type === 'company-registration' ? 1 : 0]?.key, 'contact')
     assert.deepEqual(
-      def.steps[0]?.fields.map((f) => f.name),
+      def.steps[def.type === 'company-registration' ? 1 : 0]?.fields.map((f) => f.name),
       ['name', 'country', 'whatsapp', 'email'],
     )
   }

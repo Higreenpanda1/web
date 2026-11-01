@@ -113,6 +113,13 @@ export async function submitApplication(
     if (item) item[set.field] = set.documents.map(describe)
   }
 
+  if (type === 'company-registration' && Array.isArray(details.owners) && details.owners[0]) {
+    const applicant = details.owners[0] as Record<string, unknown>
+    applicant.ownerPassport = details.passport ? [details.passport] : []
+    if (details.inChinaNow === 'yes' && details.entryStamp)
+      applicant.ownerEntryStamp = [details.entryStamp]
+  }
+
   try {
     const application = await payload.create({
       collection: 'applications',
@@ -239,11 +246,16 @@ async function checkItemFiles(
         const { documents, error } = await checkFileSet(
           field,
           formData.getAll(name),
-          `${repeat.item}${position + 1}-${field.name}-`,
+          `${repeat.item}${repeat.name === 'owners' ? position + 2 : position + 1}-${field.name}-`,
         )
         if (error) errors[name] = error
         else if (documents.length > 0) {
-          sets.push({ repeat: repeat.name, position, field: field.name, documents })
+          sets.push({
+            repeat: repeat.name,
+            position: repeat.name === 'owners' ? position + 1 : position,
+            field: field.name,
+            documents,
+          })
         }
       }
     }

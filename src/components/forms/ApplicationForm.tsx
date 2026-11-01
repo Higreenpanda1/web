@@ -10,6 +10,7 @@ import { errorKey, FORMS, itemFieldName } from '@/forms/definitions'
 import { cn } from '@/lib/cn'
 import { whatsappNumber } from '@/lib/phone'
 import { HONEYPOT_FIELD, TIMESTAMP_FIELD } from '@/lib/form-fields'
+import { SearchMultiSelect } from './SearchMultiSelect'
 import { MultiCountrySelect } from './MultiCountrySelect'
 import { ApplicationSupport } from './ApplicationSupport'
 import { useSuccessNotice } from './useSuccessNotice'
@@ -69,7 +70,10 @@ export function ApplicationForm({
   const [enhanced, setEnhanced] = useState(false)
   const [step, setStep] = useState(0)
   const [stepError, setStepError] = useState(false)
+  const [reviewData, setReviewData] = useState<Record<string, string | string[]>>({})
   const [ownerNames, setOwnerNames] = useState<string[]>([])
+  const [ownerShares, setOwnerShares] = useState<Record<number, number>>({})
+  const [multiControls, setMultiControls] = useState<Record<string, string[]>>({})
   // The current value of every field another field depends on.
   const [controls, setControls] = useState<Record<string, string>>(() =>
     Object.fromEntries(
@@ -77,19 +81,51 @@ export function ApplicationForm({
     ),
   )
   useEffect(() => setEnhanced(true), [])
+  const ownerCount = Math.max(1, Math.min(10, Number(controls.shareholderCount || 1)))
+  const firstShare =
+    100 -
+    Object.entries(ownerShares)
+      .filter(([index]) => Number(index) < ownerCount)
+      .reduce((sum, [, value]) => sum + value, 0)
+  const steps: (StepDef & { ownerIndex?: number })[] = def.steps.flatMap((step) =>
+    step.repeat?.name === 'owners'
+      ? Array.from({ length: ownerCount - 1 }, (_, i) => ({
+          ...step,
+          key: `owner-${i + 1}`,
+          ownerIndex: i + 1,
+        }))
+      : [step],
+  )
+  useEffect(() => {
+    if (!enhanced || state.status === 'success') return
+    const frame = requestAnimationFrame(() => {
+      const fieldset = formRef.current?.querySelector<HTMLFieldSetElement>(`[data-step="${step}"]`)
+      fieldset?.focus({ preventScroll: true })
+      fieldset?.scrollIntoView({ behavior: 'auto', block: 'start' })
+      if (state.status === 'error') {
+        const invalid = fieldset?.querySelector<HTMLElement>('[aria-invalid="true"]')
+        invalid?.focus({ preventScroll: true })
+        invalid?.scrollIntoView({ behavior: 'auto', block: 'center' })
+      }
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [step, enhanced, state])
 
   // A server-side error takes the visitor back to the first step that has one.
   const fieldErrors = state.status === 'error' ? (state.fieldErrors ?? {}) : {}
   useEffect(() => {
     if (state.status !== 'error') return
-    const index = def.steps.findIndex((s) =>
+    const index = steps.findIndex((s) =>
       s.repeat
         ? Boolean(fieldErrors[s.repeat.name]) ||
-          Object.keys(fieldErrors).some((key) => key.startsWith(`${s.repeat?.name}.`))
+          Object.keys(fieldErrors).some((key) =>
+            key.startsWith(
+              s.ownerIndex !== undefined ? `owners.${s.ownerIndex}.` : `${s.repeat?.name}.`,
+            ),
+          )
         : s.fields.some((f) => fieldErrors[f.name]),
     )
     if (index >= 0) setStep(index)
-    formRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state])
 
@@ -125,17 +161,21 @@ export function ApplicationForm({
 
   // A field shown by a field that is itself hidden stays hidden: a hidden
   // control is disabled, so its old answer is never sent to the server.
-  const fieldsByName = new Map(def.steps.flatMap((s) => s.fields.map((f) => [f.name, f] as const)))
+  const fieldsByName = new Map(steps.flatMap((s) => s.fields.map((f) => [f.name, f] as const)))
   const isVisible = (field: FieldDef): boolean => {
     if (!field.showIf) return true
     const controller = fieldsByName.get(field.showIf.field)
     if (controller && !isVisible(controller)) return false
-    return field.showIf.in.includes(controls[field.showIf.field] ?? '')
+    return (multiControls[field.showIf.field] ?? [controls[field.showIf.field] ?? '']).some(
+      (value) => field.showIf!.in.includes(value),
+    )
   }
 
   const controllers = new Set(
-    def.steps.flatMap((s) => s.fields.flatMap((f) => (f.showIf ? [f.showIf.field] : []))),
+    steps.flatMap((s) => s.fields.flatMap((f) => (f.showIf ? [f.showIf.field] : []))),
   )
+
+  controllers.add('shareholderCount')
 
   const goNext = () => {
     const fieldset = formRef.current?.querySelector<HTMLFieldSetElement>(`[data-step="${step}"]`)
@@ -148,54 +188,84 @@ export function ApplicationForm({
     const invalid = inputs.find((input) => !input.disabled && !input.checkValidity())
     // A required checkbox group has no native "at least one" constraint, so
     // check it by hand and land the focus on its first box.
-    const emptyGroup = def.steps[step]?.fields.find(
+    const emptyGroup = steps[step]?.fields.find(
       (field) =>
-        (field.kind === 'checkboxes' || field.kind === 'countries') &&
+        (field.kind === 'checkboxes' ||
+          field.kind === 'countries' ||
+          field.kind === 'search-multi') &&
         field.required &&
         isVisible(field) &&
-        !(field.kind === 'countries'
+        !(field.kind === 'countries' || field.kind === 'search-multi'
           ? new FormData(formRef.current!).getAll(field.name).length
           : inputs.some(
               (input) => input.name === field.name && (input as HTMLInputElement).checked,
             )),
     )
-    const ownerShares =
-      def.steps[step]?.repeat?.name === 'owners'
-        ? inputs
-            .filter((input) => /owners\.\d+\.ownerShare$/.test(input.name))
-            .reduce((sum, input) => sum + Number(input.value || 0), 0)
-        : 100
-    if (invalid || emptyGroup || ownerShares !== 100) {
+    if (invalid || emptyGroup || (steps[step]?.key === 'ownershipSummary' && firstShare < 1)) {
       setStepError(true)
       if (invalid) {
         invalid.reportValidity()
         invalid.focus()
       } else {
-        inputs.find((input) => input.name === emptyGroup?.name)?.focus()
+        ;(
+          document.getElementById(fieldId(emptyGroup?.name || '')) ||
+          inputs.find((input) => input.name === emptyGroup?.name)
+        )?.focus()
       }
       return
     }
     setStepError(false)
-    setStep((current) => Math.min(current + 1, def.steps.length - 1))
-    formRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' })
+    setStep((current) => Math.min(current + 1, steps.length - 1))
   }
 
-  const last = step === def.steps.length - 1
+  const syncFormValues = () => {
+    if (!formRef.current || type !== 'company-registration') return
+    const data = new FormData(formRef.current)
+    setReviewData({
+      ...Object.fromEntries(
+        [
+          'registrationMode',
+          'decisionMakerIndex',
+          'companyName1',
+          'companyName2',
+          'companyName3',
+          'accountingProvider',
+          'needResidence',
+          'needHkBank',
+        ].map((name) => [name, String(data.get(name) || '')]),
+      ),
+      businessMethods: data.getAll('businessMethods').map(String),
+      businessSectors: data.getAll('businessSectors').map(String),
+      files: Array.from(data.entries())
+        .filter(([, value]) => value instanceof File && value.size > 0)
+        .map(([, value]) => (value as File).name),
+    })
+    setOwnerNames(
+      Array.from({ length: Number(controls.shareholderCount || 1) }, (_, i) =>
+        i === 0
+          ? String(data.get('fullName') || data.get('name') || '')
+          : String(data.get(`owners.${i}.ownerName`) || ''),
+      ),
+    )
+    setOwnerShares(
+      Object.fromEntries(
+        Array.from({ length: ownerCount - 1 }, (_, i) => [
+          i + 1,
+          Number(data.get(`owners.${i + 1}.ownerShare`) || 0),
+        ]),
+      ),
+    )
+  }
+
+  const last = step === steps.length - 1
   const Forward = locale === 'ar' ? ArrowLeft : ArrowRight
   const Backward = locale === 'ar' ? ArrowRight : ArrowLeft
 
   return (
     <form
       ref={formRef}
-      onInput={() => {
-        if (!formRef.current || type !== 'company-registration') return
-        const data = new FormData(formRef.current)
-        setOwnerNames(
-          Array.from({ length: Number(controls.shareholderCount || 1) }, (_, i) =>
-            String(data.get(`owners.${i}.ownerName`) || ''),
-          ),
-        )
-      }}
+      onInput={syncFormValues}
+      onChange={syncFormValues}
       action={formAction}
       noValidate={!enhanced ? false : undefined}
       className={cn('scroll-mt-28 space-y-8', className)}
@@ -215,7 +285,7 @@ export function ApplicationForm({
         />
       </div>
 
-      {enhanced ? <Progress steps={def.steps} current={step} t={t} /> : null}
+      {enhanced ? <Progress steps={steps} current={step} t={t} /> : null}
 
       <div aria-live="polite">
         {state.status === 'error' && !Object.keys(fieldErrors).length ? (
@@ -225,10 +295,12 @@ export function ApplicationForm({
         ) : null}
       </div>
 
-      {def.steps.map((stepDef, index) => (
+      {steps.map((stepDef, index) => (
         <fieldset
           key={stepDef.key}
           data-step={index}
+          tabIndex={-1}
+          style={{ scrollMarginTop: 140 }}
           hidden={enhanced && index !== step}
           className="m-0 min-w-0 border-0 p-0"
         >
@@ -236,11 +308,94 @@ export function ApplicationForm({
             {enhanced ? null : (
               <span className="ltr-nums me-2 text-[var(--text-brand)]">{index + 1}.</span>
             )}
-            {t(`steps.${stepDef.key}`)}
+            {stepDef.ownerIndex !== undefined
+              ? t('repeat.owners.item', { n: stepDef.ownerIndex + 1 })
+              : t(`steps.${stepDef.key}`)}
           </legend>
+          {stepDef.key === 'reviewApplication' && (
+            <div className="space-y-4">
+              <p>{t('reviewNote')}</p>
+              <p>
+                {t('fields.registrationMode')}:{' '}
+                {reviewData.registrationMode
+                  ? t(
+                      `options.registrationMode.${reviewData.registrationMode}` as 'options.common.yes',
+                    )
+                  : ''}
+              </p>
+              <ul>
+                {Array.from({ length: ownerCount }, (_, i) => (
+                  <li key={i}>
+                    {ownerNames[i] || t('repeat.owners.item', { n: i + 1 })}:{' '}
+                    <bdi>{i === 0 ? firstShare : ownerShares[i] || 0}%</bdi>
+                  </li>
+                ))}
+              </ul>
+              <p>
+                {t('fields.decisionMakerIndex')}:{' '}
+                {ownerNames[Number(reviewData.decisionMakerIndex || 0)]}
+              </p>
+              <ul>
+                {[1, 2, 3].map((n) => (
+                  <li key={n}>
+                    {t(`fields.companyName${n}` as 'fields.name')}: {reviewData[`companyName${n}`]}
+                  </li>
+                ))}
+              </ul>
+              <p>
+                {t('fields.businessMethods')}:{' '}
+                {Array.isArray(reviewData.businessMethods) &&
+                  reviewData.businessMethods
+                    .map((value) => t(`options.businessMethods.${value}` as 'options.common.yes'))
+                    .join(' · ')}
+              </p>
+              <p>
+                {t('fields.businessSectors')}:{' '}
+                {Array.isArray(reviewData.businessSectors) &&
+                  reviewData.businessSectors
+                    .map((value) => t(`options.businessSectors.${value}` as 'options.common.yes'))
+                    .join(' · ')}
+              </p>
+              <p>
+                {t('fields.accountingProvider')}:{' '}
+                {reviewData.accountingProvider
+                  ? t(
+                      `options.accountingProvider.${reviewData.accountingProvider}` as 'options.common.yes',
+                    )
+                  : ''}
+              </p>
+              <p>
+                {t('fields.needResidence')}:{' '}
+                {t(reviewData.needResidence === 'yes' ? 'options.common.yes' : 'options.common.no')}
+              </p>
+              <p>
+                {t('fields.needHkBank')}:{' '}
+                {t(reviewData.needHkBank === 'yes' ? 'options.common.yes' : 'options.common.no')}
+              </p>
+              <p>
+                {t('reviewFiles')}:{' '}
+                {Array.isArray(reviewData.files) && reviewData.files.join(' · ')}
+              </p>
+            </div>
+          )}
+          {stepDef.key === 'ownershipSummary' && (
+            <div role="status">
+              <p>{t('applicantOwnerNote')}</p>
+              <ul className="space-y-3">
+                {Array.from({ length: ownerCount }, (_, i) => (
+                  <li key={i}>
+                    {ownerNames[i] || t('repeat.owners.item', { n: i + 1 })}:{' '}
+                    <bdi>{i === 0 ? firstShare : ownerShares[i] || 0}%</bdi>
+                  </li>
+                ))}
+              </ul>
+              {firstShare < 1 && <FormAlert>{t('errors.shareTotal')}</FormAlert>}
+            </div>
+          )}
           {stepDef.repeat ? (
             <RepeatedItems
               repeat={stepDef.repeat}
+              ownerIndex={stepDef.ownerIndex}
               count={
                 stepDef.repeat.countField
                   ? Number(controls[stepDef.repeat.countField] || 1)
@@ -285,6 +440,9 @@ export function ApplicationForm({
                       id={fieldId(field.name)}
                       locale={locale}
                       defaultValue={defaults[field.name]}
+                      onSelectionChange={(value) =>
+                        setMultiControls((c) => ({ ...c, [field.name]: value }))
+                      }
                       disabled={!visible}
                       error={
                         fieldErrors[field.name]
@@ -343,6 +501,7 @@ type T = ReturnType<typeof useTranslations<'apply'>>
  */
 function RepeatedItems({
   repeat,
+  ownerIndex,
   count,
   fields,
   enhanced,
@@ -352,6 +511,7 @@ function RepeatedItems({
   t,
 }: {
   repeat: RepeatDef
+  ownerIndex?: number
   count?: number
   fields: readonly FieldDef[]
   enhanced: boolean
@@ -364,9 +524,12 @@ function RepeatedItems({
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [copied, setCopied] = useState<Record<number, Record<string, string>>>({})
   const [copyVersion, setCopyVersion] = useState<Record<number, number>>({})
-  const renderedKeys = repeat.countField
-    ? Array.from({ length: Math.max(1, Math.min(repeat.max, count || 1)) }, (_, i) => i)
-    : keys
+  const renderedKeys =
+    ownerIndex !== undefined
+      ? [ownerIndex]
+      : repeat.countField
+        ? Array.from({ length: Math.max(1, Math.min(repeat.max, count || 1)) }, (_, i) => i)
+        : keys
   const shareTotal =
     renderedKeys.length === 1
       ? 100
@@ -393,7 +556,9 @@ function RepeatedItems({
     <div className="space-y-5">
       <ol ref={listRef} className="m-0 list-none space-y-5 p-0">
         {renderedKeys.map((key, position) => {
-          const title = text('item', { n: position + 1 })
+          const title = text('item', {
+            n: ownerIndex !== undefined ? ownerIndex + 1 : position + 1,
+          })
           return (
             <li
               key={key}
@@ -416,7 +581,7 @@ function RepeatedItems({
                   </Button>
                 ) : null}
               </div>
-              {repeat.name === 'owners' && (
+              {repeat.name === 'owners' && ownerIndex === undefined && (
                 <Button
                   type="button"
                   variant="ghost"
@@ -458,6 +623,7 @@ function RepeatedItems({
                     field.showIf.in.includes(answers[`${key}.${field.showIf.field}`] || '')
                   if (
                     repeat.name === 'owners' &&
+                    ownerIndex === undefined &&
                     field.name === 'ownerShare' &&
                     renderedKeys.length === 1
                   )
@@ -480,7 +646,7 @@ function RepeatedItems({
                       <FieldControl
                         field={itemField}
                         name={name}
-                        defaultValue={copied[key]?.[field.name]}
+                        defaultValue={copied[key]?.[field.name] ?? answers[`${key}.${field.name}`]}
                         onControlChange={(value) =>
                           setAnswers((previous) => ({
                             ...previous,
@@ -501,7 +667,7 @@ function RepeatedItems({
           )
         })}
       </ol>
-      {repeat.name === 'owners' && (
+      {repeat.name === 'owners' && ownerIndex === undefined && (
         <p role="status">
           {t('ownerShareTotal', { total: shareTotal })}{' '}
           {shareTotal !== 100 ? t('errors.shareTotal') : ''}
@@ -563,6 +729,7 @@ function FieldControl({
   error,
   onControlChange,
   optionLabels,
+  onSelectionChange,
   t,
 }: {
   field: FieldDef
@@ -573,6 +740,7 @@ function FieldControl({
   defaultValue?: string | string[]
   disabled: boolean
   error?: string
+  onSelectionChange?: (values: string[]) => void
   optionLabels?: Record<string, string>
   onControlChange?: (value: string) => void
   t: T
@@ -618,6 +786,22 @@ function FieldControl({
             </option>
           ))}
         </select>
+      )
+      break
+    case 'search-multi':
+      control = (
+        <SearchMultiSelect
+          id={id}
+          invalid={Boolean(error)}
+          describedBy={describedBy}
+          name={name ?? field.name}
+          label={label}
+          options={(field.options ?? []).map((value) => ({ value, label: optionLabel(value) }))}
+          disabled={disabled}
+          searchLabel={t('scopeSearch')}
+          onChange={onSelectionChange}
+          defaultValue={Array.isArray(defaultValue) ? defaultValue : []}
+        />
       )
       break
     case 'countries':
