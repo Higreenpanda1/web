@@ -102,7 +102,11 @@ export function ApplicationForm({
           key: `owner-${i + 1}`,
           ownerIndex: i + 1,
         }))
-      : [step],
+      : type === 'company-registration' &&
+          ownerCount === 1 &&
+          ['ownershipSummary', 'decisionMaker'].includes(step.key)
+        ? []
+        : [step],
   )
   useEffect(() => {
     if (!enhanced || state.status === 'success') return
@@ -286,6 +290,9 @@ export function ApplicationForm({
     >
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="type" value={type} />
+      {type === 'company-registration' && ownerCount === 1 ? (
+        <input type="hidden" name="decisionMakerIndex" value="0" />
+      ) : null}
       {serviceId ? <input type="hidden" name="service" value={serviceId} /> : null}
       <input type="hidden" name={TIMESTAMP_FIELD} value={formToken} />
       <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">

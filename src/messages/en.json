@@ -503,7 +503,7 @@
       "company": "The company",
       "shareholders": "Ownership",
       "extras": "Other additional services",
-      "applicant": "Applicant details — first owner",
+      "applicant": "Applicant details",
       "trip": "The trip",
       "visa": "The visa",
       "background": "Your situation",
@@ -712,7 +712,7 @@
       "passportHoldingPhotoHint": "Upload a clear original photo with your face unobstructed and no sunglasses: hold the passport open at the details page in one hand and a sheet showing the actual photo date (YYYY-MM-DD) in the other. Keep face, passport and date visible without covering passport details with fingers. The illustration is guidance only; submit your real, unedited photo.",
       "accountantNameHint": "Enter the accountant’s name in Chinese characters, e.g. 张伟.",
       "shareholderCount": "Total number of owners",
-      "shareholderCountHint": "The applicant is the first owner. Include yourself in the total; your details will not be requested again.",
+      "shareholderCountHint": "Select the total number of owners, including yourself. With one owner, you own 100% and no additional owner fields appear.",
       "ownerName": "Owner’s full name as in passport",
       "ownerCountry": "Owner’s nationality",
       "ownerPhone": "Owner’s phone number",
@@ -746,7 +746,7 @@
       "scopeOther": "Additional activity not listed",
       "businessMethodsHint": "Select multiple activities if needed. Listing an activity in the business scope does not automatically grant all required permissions. Manufacturing, assembly and some products, such as medical devices and cosmetics, may require additional licences, filings or approvals depending on the activity and product. We will review the requirements with you before operations begin.",
       "businessSectorsHint": "Search and select one or more sectors. If your activity is missing, describe it in the optional field below.",
-      "nameHint": "Enter your full name exactly as in your passport. You are counted as the first owner and will not need to enter these details again.",
+      "nameHint": "Enter your full name exactly as in your passport.",
       "firstOwnerShare": "Your ownership share — applicant / first owner"
     },
     "options": {
