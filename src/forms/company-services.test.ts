@@ -22,6 +22,18 @@ const base = {
   registeredCapital: '30000',
   capitalCurrency: 'usd',
   addressOption: 'own-office',
+  shareholderCount: '1',
+  decisionMakerIndex: '0',
+  passportHasSignature: 'no',
+  registrationMode: 'in-person',
+  'owners.index': ['0'],
+  'owners.0.ownerName': 'Owner One',
+  'owners.0.ownerCountry': 'Palestine',
+  'owners.0.ownerPhone': '+96541030970',
+  'owners.0.ownerEmail': 'owner@example.test',
+  'owners.0.ownerShare': '100',
+  'owners.0.ownerInChina': 'no',
+  'owners.0.ownerHasChinesePhone': 'no',
   ownership: 'sole',
   accountingProvider: 'existing',
   accountantName: '张伟',
@@ -61,8 +73,8 @@ test('external accounting requires name and phone; ours requires all three range
       ...base,
       accountingProvider: 'higp',
       accountingAnnualFlow: '100k-500k',
-      accountingMonthlyTransactions: '21-50',
-      accountingMonthlyInvoices: '11-30',
+      accountingMonthlyTransactions: '2',
+      accountingMonthlyInvoices: '3',
     }),
   )
   assert.ok(complete.ok)
@@ -170,4 +182,75 @@ test('external accountant name must be written in Chinese characters', () => {
   const result = validateApplication(form, reader({ ...base, accountantName: 'John Smith' }))
   assert.ok(!result.ok)
   assert.equal(result.errors.accountantName, 'chineseName')
+})
+
+test('two owner cards preserve independent contacts and enforce a 100 percent total', () => {
+  const input = {
+    ...base,
+    shareholderCount: '2',
+    'owners.index': ['0', '1'],
+    'owners.0.ownerShare': '75',
+    'owners.1.ownerName': 'Second Owner',
+    'owners.1.ownerCountry': 'Yemen',
+    'owners.1.ownerPhone': '13023440305',
+    'owners.1.ownerPhoneCode': 'CN',
+    'owners.1.ownerEmail': 'second@example.test',
+    'owners.1.ownerShare': '25',
+    'owners.1.ownerInChina': 'no',
+    'owners.1.ownerHasChinesePhone': 'no',
+    decisionMakerIndex: '1',
+  }
+  const result = validateApplication(form, reader(input))
+  assert.ok(result.ok)
+  const owners = result.details.owners as Record<string, unknown>[]
+  assert.equal(owners[1]!.ownerPhone, '+8613023440305')
+  assert.equal(result.details.decisionMaker, 'Second Owner')
+  assert.equal(result.details.ownership, 'partners')
+  const invalid = validateApplication(form, reader({ ...input, 'owners.1.ownerShare': '24' }))
+  assert.ok(!invalid.ok)
+  assert.equal(invalid.errors.owners, 'shareTotal')
+  const count = validateApplication(form, reader({ ...input, shareholderCount: '3' }))
+  assert.ok(!count.ok)
+  assert.equal(count.errors.owners, 'ownerCount')
+  const decision = validateApplication(form, reader({ ...input, decisionMakerIndex: '2' }))
+  assert.ok(!decision.ok)
+  assert.equal(decision.errors.decisionMakerIndex, 'invalid')
+})
+test('owner entry stamp, Chinese phone and representative signature follow their own conditions', () => {
+  const fields = singleFields(form)
+  const signature = fields.find((f) => f.name === 'legalRepSignature')!
+  assert.equal(isVisible(signature, reader({ ...base, passportHasSignature: 'yes' }), fields), true)
+  assert.equal(isVisible(signature, reader({ ...base, passportHasSignature: 'no' }), fields), false)
+  const owners = form.steps.find((s) => s.repeat?.name === 'owners')!.fields
+  assert.equal(
+    isVisible(
+      owners.find((f) => f.name === 'ownerEntryStamp')!,
+      reader({ ownerInChina: 'yes' }),
+      owners,
+    ),
+    true,
+  )
+  assert.equal(
+    isVisible(
+      owners.find((f) => f.name === 'ownerEntryStamp')!,
+      reader({ ownerInChina: 'no' }),
+      owners,
+    ),
+    false,
+  )
+  const invalid = validateApplication(
+    form,
+    reader({ ...base, 'owners.0.ownerHasChinesePhone': 'yes' }),
+  )
+  assert.ok(!invalid.ok)
+  assert.equal(invalid.errors['owners.0.ownerChinesePhone'], 'required')
+})
+test('low-volume accounting offers each count from one to ten and disjoint higher ranges', () => {
+  for (const name of ['accountingMonthlyTransactions', 'accountingMonthlyInvoices']) {
+    const field = singleFields(form).find((f) => f.name === name)!
+    for (let n = 1; n <= 10; n++) assert.ok(field.options?.includes(String(n)))
+    assert.ok(field.options?.includes('11-15'))
+    assert.ok(field.options?.includes('16-25'))
+    assert.equal(field.options?.includes('1-20'), false)
+  }
 })

@@ -126,6 +126,18 @@ test('a hidden conditional field is neither required nor stored', () => {
       accountingProvider: 'existing',
       accountantName: '张伟',
       accountantPhone: '+8613023440305',
+      shareholderCount: '1',
+      decisionMakerIndex: '0',
+      passportHasSignature: 'no',
+      registrationMode: 'in-person',
+      'owners.index': ['0'],
+      'owners.0.ownerName': 'Owner One',
+      'owners.0.ownerCountry': 'Palestine',
+      'owners.0.ownerPhone': '+96541030970',
+      'owners.0.ownerEmail': 'owner@example.test',
+      'owners.0.ownerShare': '100',
+      'owners.0.ownerInChina': 'no',
+      'owners.0.ownerHasChinesePhone': 'no',
       ownership: 'sole',
       shareholders: 'should be dropped',
       extras: ['bank-account'],
@@ -141,8 +153,8 @@ test('a hidden conditional field is neither required nor stored', () => {
     reader({ ...contact, ownership: 'partners', city: 'other' }),
   )
   assert.ok(!partners.ok)
-  assert.equal(partners.errors.shareholders, 'required')
-  assert.equal(partners.errors.decisionMaker, 'required')
+  assert.equal(partners.errors.shareholderCount, 'required')
+  assert.equal(partners.errors.decisionMakerIndex, 'invalid')
   assert.equal(partners.errors.cityOther, 'required')
 })
 

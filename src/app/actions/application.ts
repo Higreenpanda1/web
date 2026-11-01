@@ -5,7 +5,7 @@ import { headers } from 'next/headers'
 import { getTranslations } from 'next-intl/server'
 
 import { FORMS, itemFieldName, singleFields } from '@/forms/definitions'
-import { isVisible, itemKeys, reader, validateApplication } from '@/forms/schema'
+import { isVisible, itemKeys, itemReader, reader, validateApplication } from '@/forms/schema'
 import {
   checkDocuments,
   checkFileSet,
@@ -233,7 +233,8 @@ async function checkItemFiles(
     if (!repeat) continue
     for (const [position, key] of itemKeys(repeat, read).entries()) {
       for (const field of step.fields) {
-        if (field.kind !== 'file') continue
+        if (field.kind !== 'file' || !isVisible(field, itemReader(read, repeat, key), step.fields))
+          continue
         const name = itemFieldName(repeat, key, field.name)
         const { documents, error } = await checkFileSet(
           field,

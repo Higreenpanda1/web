@@ -8,6 +8,7 @@ import { submitApplication, type ApplicationState } from '@/app/actions/applicat
 import { Button, ButtonLink } from '@/components/ui/Button'
 import { errorKey, FORMS, itemFieldName } from '@/forms/definitions'
 import { cn } from '@/lib/cn'
+import { whatsappNumber } from '@/lib/phone'
 import { HONEYPOT_FIELD, TIMESTAMP_FIELD } from '@/lib/form-fields'
 import { MultiCountrySelect } from './MultiCountrySelect'
 import { CountrySelect } from './CountrySelect'
@@ -65,6 +66,7 @@ export function ApplicationForm({
   const [enhanced, setEnhanced] = useState(false)
   const [step, setStep] = useState(0)
   const [stepError, setStepError] = useState(false)
+  const [ownerNames, setOwnerNames] = useState<string[]>([])
   // The current value of every field another field depends on.
   const [controls, setControls] = useState<Record<string, string>>(() =>
     Object.fromEntries(
@@ -79,7 +81,8 @@ export function ApplicationForm({
     if (state.status !== 'error') return
     const index = def.steps.findIndex((s) =>
       s.repeat
-        ? Object.keys(fieldErrors).some((key) => key.startsWith(`${s.repeat?.name}.`))
+        ? Boolean(fieldErrors[s.repeat.name]) ||
+          Object.keys(fieldErrors).some((key) => key.startsWith(`${s.repeat?.name}.`))
         : s.fields.some((f) => fieldErrors[f.name]),
     )
     if (index >= 0) setStep(index)
@@ -149,7 +152,13 @@ export function ApplicationForm({
               (input) => input.name === field.name && (input as HTMLInputElement).checked,
             )),
     )
-    if (invalid || emptyGroup) {
+    const ownerShares =
+      def.steps[step]?.repeat?.name === 'owners'
+        ? inputs
+            .filter((input) => /owners\.\d+\.ownerShare$/.test(input.name))
+            .reduce((sum, input) => sum + Number(input.value || 0), 0)
+        : 100
+    if (invalid || emptyGroup || ownerShares !== 100) {
       setStepError(true)
       if (invalid) {
         invalid.reportValidity()
@@ -171,6 +180,15 @@ export function ApplicationForm({
   return (
     <form
       ref={formRef}
+      onInput={() => {
+        if (!formRef.current || type !== 'company-registration') return
+        const data = new FormData(formRef.current)
+        setOwnerNames(
+          Array.from({ length: Number(controls.shareholderCount || 1) }, (_, i) =>
+            String(data.get(`owners.${i}.ownerName`) || ''),
+          ),
+        )
+      }}
       action={formAction}
       noValidate={!enhanced ? false : undefined}
       className={cn('scroll-mt-28 space-y-8', className)}
@@ -216,6 +234,11 @@ export function ApplicationForm({
           {stepDef.repeat ? (
             <RepeatedItems
               repeat={stepDef.repeat}
+              count={
+                stepDef.repeat.countField
+                  ? Number(controls[stepDef.repeat.countField] || 1)
+                  : undefined
+              }
               fields={stepDef.fields}
               enhanced={enhanced}
               fieldId={fieldId}
@@ -234,7 +257,24 @@ export function ApplicationForm({
                     className={cn(field.width !== 'half' && 'sm:col-span-2')}
                   >
                     <FieldControl
-                      field={field}
+                      field={
+                        field.name === 'decisionMakerIndex'
+                          ? {
+                              ...field,
+                              options: field.options?.slice(
+                                0,
+                                Number(controls.shareholderCount || 1),
+                              ),
+                            }
+                          : field
+                      }
+                      optionLabels={
+                        field.name === 'decisionMakerIndex'
+                          ? Object.fromEntries(
+                              ownerNames.map((name, i) => [String(i), `${i + 1} — ${name}`]),
+                            )
+                          : undefined
+                      }
                       id={fieldId(field.name)}
                       locale={locale}
                       defaultValue={defaults[field.name]}
@@ -296,6 +336,7 @@ type T = ReturnType<typeof useTranslations<'apply'>>
  */
 function RepeatedItems({
   repeat,
+  count,
   fields,
   enhanced,
   fieldId,
@@ -304,6 +345,7 @@ function RepeatedItems({
   t,
 }: {
   repeat: RepeatDef
+  count?: number
   fields: readonly FieldDef[]
   enhanced: boolean
   fieldId: (name: string) => string
@@ -312,6 +354,20 @@ function RepeatedItems({
   t: T
 }) {
   const [keys, setKeys] = useState<number[]>([0])
+  const [answers, setAnswers] = useState<Record<string, string>>({})
+  const [copied, setCopied] = useState<Record<number, Record<string, string>>>({})
+  const [copyVersion, setCopyVersion] = useState<Record<number, number>>({})
+  const renderedKeys = repeat.countField
+    ? Array.from({ length: Math.max(1, Math.min(repeat.max, count || 1)) }, (_, i) => i)
+    : keys
+  const shareTotal =
+    renderedKeys.length === 1
+      ? 100
+      : renderedKeys.reduce(
+          (sum, key) =>
+            sum + Number(answers[`${key}.ownerShare`] || (renderedKeys.length === 1 ? 100 : 0)),
+          0,
+        )
   const nextKey = useRef(1)
   const listRef = useRef<HTMLOListElement>(null)
   const text = (key: 'item' | 'add' | 'remove' | 'note', values?: { n: number }) =>
@@ -329,7 +385,7 @@ function RepeatedItems({
   return (
     <div className="space-y-5">
       <ol ref={listRef} className="m-0 list-none space-y-5 p-0">
-        {keys.map((key, position) => {
+        {renderedKeys.map((key, position) => {
           const title = text('item', { n: position + 1 })
           return (
             <li
@@ -340,7 +396,7 @@ function RepeatedItems({
               <input type="hidden" name={`${repeat.name}.index`} value={key} />
               <div className="mb-4 flex items-center justify-between gap-3">
                 <h3 className="ltr-nums text-body font-semibold text-[var(--heading)]">{title}</h3>
-                {enhanced && keys.length > 1 ? (
+                {enhanced && !repeat.countField && keys.length > 1 ? (
                   <Button
                     type="button"
                     variant="ghost"
@@ -353,18 +409,80 @@ function RepeatedItems({
                   </Button>
                 ) : null}
               </div>
+              {repeat.name === 'owners' && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={(event) => {
+                    const form = event.currentTarget.closest('form')!
+                    const data = new FormData(form)
+                    const values = {
+                      ownerName: String(data.get('fullName') || data.get('name') || ''),
+                      ownerCountry: String(data.get('nationality') || data.get('country') || ''),
+                      ownerPhone:
+                        whatsappNumber(
+                          String(data.get('whatsappCode') || ''),
+                          String(data.get('whatsapp') || ''),
+                        ) || String(data.get('whatsapp') || ''),
+                      ownerEmail: String(data.get('email') || ''),
+                      ownerInChina: String(data.get('inChinaNow') || ''),
+                      ownerHasChinesePhone: String(data.get('chinesePhone') || ''),
+                      ownerChinesePhone: String(data.get('chinesePhoneNumber') || ''),
+                    }
+                    setCopied((previous) => ({ ...previous, [key]: values }))
+                    setCopyVersion((previous) => ({ ...previous, [key]: (previous[key] || 0) + 1 }))
+                    setAnswers((previous) => ({
+                      ...previous,
+                      [`${key}.ownerInChina`]: values.ownerInChina,
+                      [`${key}.ownerHasChinesePhone`]: values.ownerHasChinesePhone,
+                    }))
+                    setTimeout(() => form.dispatchEvent(new Event('input', { bubbles: true })), 0)
+                  }}
+                >
+                  {t('useApplicantData')}
+                </Button>
+              )}
               <div className="grid gap-5 sm:grid-cols-2">
                 {fields.map((field) => {
                   const name = itemFieldName(repeat, String(key), field.name)
                   const error = fieldErrors[name]
+                  const visible =
+                    !field.showIf ||
+                    field.showIf.in.includes(answers[`${key}.${field.showIf.field}`] || '')
+                  if (
+                    repeat.name === 'owners' &&
+                    field.name === 'ownerShare' &&
+                    renderedKeys.length === 1
+                  )
+                    return (
+                      <div key="sole-share">
+                        <input type="hidden" name={name} value="100" />
+                        <p>{t('fields.ownerShare')}: 100%</p>
+                      </div>
+                    )
+                  const itemField =
+                    repeat.name === 'owners' && field.name === 'ownerShare'
+                      ? { ...field, options: field.options?.filter((value) => value !== '100') }
+                      : field
                   return (
-                    <div key={field.name} className={cn(field.width !== 'half' && 'sm:col-span-2')}>
+                    <div
+                      key={`${field.name}-${field.name in (copied[key] || {}) ? copyVersion[key] || 0 : 0}`}
+                      hidden={!visible}
+                      className={cn(field.width !== 'half' && 'sm:col-span-2')}
+                    >
                       <FieldControl
-                        field={field}
+                        field={itemField}
                         name={name}
+                        defaultValue={copied[key]?.[field.name]}
+                        onControlChange={(value) =>
+                          setAnswers((previous) => ({
+                            ...previous,
+                            [`${key}.${field.name}`]: value,
+                          }))
+                        }
                         id={fieldId(name)}
                         locale={locale}
-                        disabled={false}
+                        disabled={!visible}
                         error={error ? t(`errors.${error}` as 'errors.generic') : undefined}
                         t={t}
                       />
@@ -376,7 +494,16 @@ function RepeatedItems({
           )
         })}
       </ol>
-      {enhanced ? (
+      {repeat.name === 'owners' && (
+        <p role="status">
+          {t('ownerShareTotal', { total: shareTotal })}{' '}
+          {shareTotal !== 100 ? t('errors.shareTotal') : ''}
+        </p>
+      )}
+      {fieldErrors[repeat.name] && (
+        <FormAlert>{t(`errors.${fieldErrors[repeat.name]}` as 'errors.generic')}</FormAlert>
+      )}
+      {enhanced && !repeat.countField ? (
         <div className="flex flex-wrap items-center gap-3">
           <Button
             type="button"
@@ -428,6 +555,7 @@ function FieldControl({
   disabled,
   error,
   onControlChange,
+  optionLabels,
   t,
 }: {
   field: FieldDef
@@ -438,6 +566,7 @@ function FieldControl({
   defaultValue?: string | string[]
   disabled: boolean
   error?: string
+  optionLabels?: Record<string, string>
   onControlChange?: (value: string) => void
   t: T
 }) {
@@ -456,9 +585,10 @@ function FieldControl({
     className: inputClass(Boolean(error)),
   }
   const optionLabel = (code: string) =>
-    t.has(`options.${field.name}.${code}`)
+    optionLabels?.[code] ||
+    (t.has(`options.${field.name}.${code}`)
       ? t(`options.${field.name}.${code}` as 'options.common.yes')
-      : t(`options.common.${code}` as 'options.common.yes')
+      : t(`options.common.${code}` as 'options.common.yes'))
 
   let control: React.ReactNode
   switch (field.kind) {
@@ -517,6 +647,7 @@ function FieldControl({
           <input
             {...common}
             type="tel"
+            defaultValue={typeof defaultValue === 'string' ? defaultValue : undefined}
             dir="ltr"
             inputMode="tel"
             autoComplete={AUTOCOMPLETE[field.name]}
@@ -527,7 +658,7 @@ function FieldControl({
         control = (
           <PhoneInput
             id={id}
-            name={field.name}
+            name={name ?? field.name}
             locale={locale}
             required={field.required}
             disabled={disabled}
@@ -627,6 +758,8 @@ function FieldControl({
         <input
           {...common}
           type={type}
+          defaultValue={typeof defaultValue === 'string' ? defaultValue : undefined}
+          onChange={onControlChange ? (e) => onControlChange(e.target.value) : undefined}
           dir={ltr ? 'ltr' : undefined}
           inputMode={field.kind === 'number' ? 'decimal' : undefined}
           autoComplete={AUTOCOMPLETE[field.name]}
@@ -656,6 +789,11 @@ function FieldControl({
           </span>
         </Hint>
       ) : null}
+      {field.notice && (
+        <p className="my-3 rounded-lg border border-[var(--border-soft)] p-3 text-caption text-[var(--text-muted)]">
+          {t(field.notice as 'authenticationNotice')}
+        </p>
+      )}
       {field.illustration && (
         <figure className="my-4 max-w-lg overflow-hidden rounded-xl border border-[var(--border-soft)]">
           <img

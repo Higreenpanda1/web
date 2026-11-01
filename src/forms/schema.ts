@@ -142,6 +142,34 @@ export function validateApplication(def: FormDef, source: Reader): ValidationRes
     })
   }
 
+  if (def.type === 'company-registration') {
+    const count = Number(details.shareholderCount)
+    const owners = (details.owners ?? []) as Record<string, unknown>[]
+    const rawKeys = source.getAll('owners.index')
+    if (
+      !Number.isInteger(count) ||
+      count < 1 ||
+      count > 10 ||
+      owners.length !== count ||
+      rawKeys.length !== count ||
+      new Set(rawKeys).size !== count
+    )
+      errors['owners'] = 'ownerCount'
+    const sum = owners.reduce((total, item) => total + Number(item.ownerShare || 0), 0)
+    if (sum !== 100 || owners.some((item) => Number(item.ownerShare) > (count === 1 ? 100 : 99)))
+      errors['owners'] = 'shareTotal'
+    const selected = Number(details.decisionMakerIndex)
+    if (
+      details.decisionMakerIndex === undefined ||
+      !Number.isInteger(selected) ||
+      selected < 0 ||
+      selected >= count
+    )
+      errors.decisionMakerIndex = 'invalid'
+    if (!errors.decisionMakerIndex) details.decisionMaker = owners[selected]?.ownerName
+    details.ownership = count === 1 ? 'sole' : 'partners'
+  }
+
   return Object.keys(errors).length > 0 ? { ok: false, errors } : { ok: true, details }
 }
 

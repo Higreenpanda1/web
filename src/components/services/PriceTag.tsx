@@ -21,7 +21,7 @@ export async function PriceTag({
   countFrom,
   className,
 }: {
-  service: Pick<Service, 'priceFrom' | 'priceUnit'>
+  service: Pick<Service, 'priceFrom' | 'priceUnit'> & { slug?: string | null }
   locale: Locale
   size?: 'sm' | 'md' | 'lg'
   inverse?: boolean
@@ -58,6 +58,11 @@ export async function PriceTag({
         )}
       </strong>
       {unit ? <span>{unit}</span> : null}
+      {service.slug === 'accounting-and-tax' && (
+        <span className="mt-1 basis-full text-caption font-normal">
+          {t('estimator.accountingZeroNote')}
+        </span>
+      )}
     </span>
   )
 }

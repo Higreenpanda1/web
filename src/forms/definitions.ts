@@ -45,6 +45,7 @@ export type FieldDef = {
   /** The products must be named, rather than a generic trading description. */
   specificProducts?: boolean
   illustration?: string
+  notice?: string
   /** Option codes for select / checkboxes. Labels come from the catalogue. */
   options?: readonly string[]
   /** There is an `apply.fields.<name>Hint` message to show under the label. */
@@ -103,6 +104,7 @@ export type RepeatDef = {
   max: number
   /** Names an item's uploaded files: `<reference>-<item><n>-<field>-<k>.jpg`. */
   item: string
+  countField?: string
 }
 
 export type StepDef = { key: string; fields: readonly FieldDef[]; repeat?: RepeatDef }
@@ -1156,6 +1158,140 @@ FORMS['account-opening'] = {
         },
   ),
 }
+
+/** Explicit owner cards replace the old free-text shareholder list. */
+const ownerFields: readonly FieldDef[] = [
+  { name: 'ownerName', kind: 'text', required: true, max: 120 },
+  { name: 'ownerCountry', kind: 'country', required: true },
+  { name: 'ownerPhone', kind: 'tel', required: true },
+  { name: 'ownerEmail', kind: 'email', required: true },
+  {
+    name: 'ownerShare',
+    kind: 'select',
+    required: true,
+    options: Array.from({ length: 100 }, (_, i) => String(i + 1)),
+  },
+  { name: 'ownerPassport', kind: 'file', required: true, hint: true, accept: DOCUMENT_TYPES },
+  { name: 'ownerInChina', kind: 'select', required: true, options: YES_NO },
+  {
+    name: 'ownerEntryStamp',
+    kind: 'file',
+    required: true,
+    hint: true,
+    accept: DOCUMENT_TYPES,
+    showIf: { field: 'ownerInChina', in: ['yes'] },
+  },
+  { name: 'ownerHasChinesePhone', kind: 'select', required: true, options: YES_NO },
+  {
+    name: 'ownerChinesePhone',
+    kind: 'tel',
+    country: 'CN',
+    required: true,
+    showIf: { field: 'ownerHasChinesePhone', in: ['yes'] },
+  },
+]
+FORMS['company-registration'] = {
+  ...FORMS['company-registration'],
+  steps: FORMS['company-registration'].steps.flatMap((step) =>
+    step.key === 'shareholders'
+      ? ([
+          {
+            key: 'ownership',
+            fields: [
+              {
+                name: 'shareholderCount',
+                kind: 'select',
+                required: true,
+                hint: true,
+                options: Array.from({ length: 10 }, (_, i) => String(i + 1)),
+              },
+            ],
+          },
+          {
+            key: 'shareholders',
+            repeat: { name: 'owners', max: 10, item: 'owner', countField: 'shareholderCount' },
+            fields: ownerFields,
+          },
+          {
+            key: 'decisionMaker',
+            fields: [
+              {
+                name: 'decisionMakerIndex',
+                kind: 'select',
+                required: true,
+                options: Array.from({ length: 10 }, (_, i) => String(i)),
+              },
+            ],
+          },
+        ] as StepDef[])
+      : [
+          {
+            ...step,
+            fields:
+              step.key === 'legalRep'
+                ? [
+                    ...step.fields,
+                    {
+                      name: 'passportHasSignature',
+                      kind: 'select',
+                      required: true,
+                      options: YES_NO,
+                    },
+                    {
+                      name: 'legalRepSignature',
+                      kind: 'file',
+                      required: true,
+                      hint: true,
+                      accept: PHOTO_TYPES,
+                      showIf: { field: 'passportHasSignature', in: ['yes'] },
+                    },
+                  ]
+                : step.key === 'documents'
+                  ? [
+                      ...step.fields,
+                      {
+                        name: 'registrationMode',
+                        kind: 'select',
+                        required: true,
+                        options: ['in-person', 'remote'],
+                      },
+                      {
+                        name: 'certifiedPassportCopy',
+                        kind: 'file',
+                        required: true,
+                        hint: true,
+                        accept: DOCUMENT_TYPES,
+                        notice: 'remotePassportNotice',
+                        showIf: { field: 'registrationMode', in: ['remote'] },
+                      },
+                    ]
+                  : step.fields,
+          },
+        ],
+  ),
+}
+for (const def of Object.values(FORMS)) {
+  for (const step of def.steps)
+    for (const field of step.fields) {
+      if (['degreeCertificate', 'policeClearance'].includes(field.name))
+        field.notice = 'authenticationNotice'
+    }
+}
+const preciseCounts = [
+  'zero',
+  ...Array.from({ length: 10 }, (_, i) => String(i + 1)),
+  '11-15',
+  '16-25',
+  '26-35',
+  '36-50',
+  '51-100',
+  'over-100',
+]
+for (const step of FORMS['company-registration'].steps)
+  for (const field of step.fields) {
+    if (['accountingMonthlyTransactions', 'accountingMonthlyInvoices'].includes(field.name))
+      field.options = preciseCounts
+  }
 
 /** Every field in a form, in order, contact step included. */
 /** Every field of the form, the fields of a repeated step included once. */

@@ -141,6 +141,11 @@ export function CostEstimator({ locale, className }: { locale: Locale; className
                         {yuan(QUOTE.extras[k])}
                         {k === 'accounting' ? ` ${t('perYear')}` : ''}
                       </span>
+                      {k === 'accounting' && (
+                        <span className="mt-2 block text-caption text-[var(--text-muted)]">
+                          {t('accountingZeroNote')}
+                        </span>
+                      )}
                     </span>
                   </label>
                 )
