@@ -163,3 +163,20 @@ export function renewalKind(dealName: string): 'annual' | 'permit' {
 export function referenceIn(dealName: string): string | null {
   return dealName.match(/\b[A-Z]{2,4}-\d{4}-\d{3,6}\b/)?.[0] ?? null
 }
+
+/**
+ * Whether a deal at this stage belongs to a client who has paid us, which is
+ * when the portal opens their account by itself: from "Deposit Paid" on for
+ * a HiGP service, from the 30% deposit on for a Nasher order, and any live
+ * renewal (a renewal is only ever opened for a client who paid before).
+ * Stopped deals, and the stages every request shares before payment, are not.
+ */
+export function isPaidStage(stageId: string | null | undefined): boolean {
+  const info = stageId ? STAGES[stageId] : undefined
+  if (!info || !info.track || 'stopped' in info) return false
+  if (info.track === 'renewal') return true
+  const steps = stepsFor(info.track, null)
+  const from = steps.indexOf(info.track === 'nasher' ? 'deposit' : 'payment')
+  const at = steps.indexOf(info.step === 'established' ? 'submitted' : info.step)
+  return at >= from
+}

@@ -8,6 +8,7 @@ import {
   referenceIn,
   renewalKind,
   trackForType,
+  isPaidStage,
 } from './stages.ts'
 
 test('every stage of the services pipeline is mapped', () => {
@@ -68,4 +69,17 @@ test('renewal kind and hand-made references are read from deal names', () => {
   assert.equal(renewalKind('Annual Renewal – ACME / 年度续费'), 'annual')
   assert.equal(referenceIn('HGP-2026-0005 Company formation'), 'HGP-2026-0005')
   assert.equal(referenceIn('No reference here'), null)
+})
+
+test('an account opens from the first paid stage on, never before or once stopped', () => {
+  assert.equal(isPaidStage('4392706762'), false) // Quote Sent
+  assert.equal(isPaidStage('4392706763'), true) // Deposit Paid
+  assert.equal(isPaidStage('4392706768'), true) // Tax Account
+  assert.equal(isPaidStage('4392706771'), false) // Not Completed
+  assert.equal(isPaidStage('4394109643'), false) // Contract Stamped
+  assert.equal(isPaidStage('4394109644'), true) // 30% Deposit Paid
+  assert.equal(isPaidStage('4394109650'), false) // Lost
+  assert.equal(isPaidStage('4398430915'), true) // Active Service
+  assert.equal(isPaidStage('4398430920'), false) // Churned
+  assert.equal(isPaidStage(null), false)
 })
