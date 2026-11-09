@@ -39,6 +39,7 @@ export type PortalRequest = {
     | { kind: 'renewal'; renewal: 'annual' | 'permit' }
     | { kind: 'other' }
   createdAt: string
+  customerUpdate?: string | null
   updatedAt: string
   progress: Progress
   /** A renewal's date. */
@@ -49,6 +50,8 @@ export type PortalRequest = {
 type Deal = {
   id: string
   properties: {
+    hgp_portal_update?: string | null
+    hgp_portal_application_ref?: string | null
     dealname?: string | null
     dealstage?: string | null
     pipeline?: string | null
@@ -61,6 +64,8 @@ type Deal = {
 }
 
 const DEAL_PROPERTIES = [
+  'hgp_portal_update',
+  'hgp_portal_application_ref',
   'dealname',
   'dealstage',
   'pipeline',
@@ -144,6 +149,32 @@ async function readDeals(ids: string[]): Promise<Map<string, Deal>> {
   return deals
 }
 
+/** Only look up public messages for applications already in this account's scope. */
+async function updatesByReference(references: string[]): Promise<Map<string, string | null>> {
+  const updates = new Map<string, string | null>()
+  for (const batch of chunks(references, 50)) {
+    const { results, total } = await call<{ results: Deal[]; total: number }>(
+      'POST',
+      '/crm/v3/objects/deals/search',
+      {
+        filterGroups: [{ filters: [
+          { propertyName: 'hgp_portal_application_ref', operator: 'IN', values: batch.map((ref) => ref.toLowerCase()) },
+          { propertyName: 'pipeline', operator: 'EQ', value: hubspotConfig.pipelineId },
+        ] }],
+        properties: ['hgp_portal_application_ref', 'hgp_portal_update'],
+        limit: 100,
+      },
+    )
+    if (total > results.length) continue
+    for (const { properties } of results) {
+      const ref = properties.hgp_portal_application_ref
+      if (!ref || !batch.includes(ref)) continue
+      updates.set(ref, updates.has(ref) ? null : properties.hgp_portal_update?.trim() || null)
+    }
+  }
+  return updates
+}
+
 async function loadRequests(customer: Customer): Promise<PortalRequest[]> {
   const accounts = await accountsInScope(customer)
   const emails = [...new Set(accounts.map((a) => a.email).filter((v): v is string => !!v))]
@@ -189,6 +220,14 @@ async function loadRequests(customer: Customer): Promise<PortalRequest[]> {
     }
   }
 
+  let published = new Map<string, string | null>()
+  if (hubspotConfig.configured) {
+    try {
+      published = await updatesByReference(applications.map((app) => app.reference))
+    } catch (error) {
+      console.error('[portal] Customer update lookup failed', error)
+    }
+  }
   const requests: PortalRequest[] = []
   const used = new Set<string>()
 
@@ -198,6 +237,11 @@ async function loadRequests(customer: Customer): Promise<PortalRequest[]> {
     const track = trackForType(app.type)
     const service = deal?.properties.hgp_service ?? null
     requests.push({
+      customerUpdate: published.has(app.reference)
+        ? published.get(app.reference) ?? null
+        : deal?.properties.hgp_portal_application_ref && deal.properties.hgp_portal_application_ref !== app.reference
+          ? null
+          : deal?.properties.hgp_portal_update?.trim() || null,
       id: app.reference,
       reference: app.reference,
       title: { kind: 'application', type: app.type },
@@ -218,6 +262,7 @@ async function loadRequests(customer: Customer): Promise<PortalRequest[]> {
     const track = p.our_company === 'nasher' ? 'nasher' : 'higp'
     const progress = progressFor(p.dealstage ?? null, track, p.hgp_service ?? null)
     requests.push({
+      customerUpdate: p.hgp_portal_update?.trim(),
       id: `d${deal.id}`,
       reference: referenceIn(name),
       title:

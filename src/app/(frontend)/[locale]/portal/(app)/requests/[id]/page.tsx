@@ -104,6 +104,17 @@ export default async function PortalRequestPage({
             />
           </section>
 
+          {request.customerUpdate && (
+            <section className="rounded-xl border border-border bg-surface p-6 shadow-card md:p-8">
+              <h2 className="text-h3 text-heading">
+                {{ ar: 'آخر تحديث من فريقك', en: 'Latest update from your team', zh: '团队最新进展' }[locale]}
+              </h2>
+              <p dir="auto" className="mt-3 whitespace-pre-wrap break-words text-text">
+                {request.customerUpdate}
+              </p>
+            </section>
+          )}
+
           {answers.length > 0 ? (
             <section className="rounded-xl border border-border bg-surface p-6 shadow-card md:p-8">
               <h2 className="text-h3 text-heading">{t('request.yourRequest')}</h2>
