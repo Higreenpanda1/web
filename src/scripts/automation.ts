@@ -13,6 +13,7 @@ import 'dotenv/config'
  *   npm run posts:digest       the weekly summary email to the owner
  *   npm run automation -- hubspot-renewals   renewal deals + tasks due in 30 days
  *   npm run automation -- hubspot-report     the weekly HubSpot email to the owner
+ *   npm run automation -- portal-accounts    portal accounts + welcome email for paid clients
  *   npm run posts:plan-pack    the research brief, for a session without the API
  *   npm run posts:write-packs  writing briefs from .plan/topics.json
  *   npm run posts:write-apply  validate .write/out/*.json into src/seed/wp/posts.json
@@ -124,6 +125,15 @@ async function main() {
           : 'no renewals due',
       )
       if (failed.length) console.log(`failed:\n- ${failed.join('\n- ')}`)
+      break
+    }
+    case 'portal-accounts': {
+      const { openAccountsForPaidClients } = await import('@/lib/portal/auto-accounts')
+      const { opened, emailed, failed } = await openAccountsForPaidClients({ dryRun })
+      const verb = dryRun ? 'would' : 'did'
+      console.log(`${verb} open ${opened.length}:\n- ${opened.join('\n- ')}`)
+      console.log(`${verb} email ${emailed.length}:\n- ${emailed.join('\n- ')}`)
+      if (failed.length > 0) console.log(`failed:\n- ${failed.join('\n- ')}`)
       break
     }
     case 'hubspot-report': {

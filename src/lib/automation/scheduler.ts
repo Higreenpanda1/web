@@ -26,6 +26,13 @@ const CONTENT_JOBS_AFTER_HOUR = 3
 const HUBSPOT_JOBS_HOUR = 9
 const HUBSPOT_JOBS_UNTIL_HOUR = 12
 
+/**
+ * Portal accounts for clients who have paid (src/lib/portal/auto-accounts.ts):
+ * a few HubSpot calls an hour, so a client is welcomed within the hour of the
+ * team moving their deal to a paid stage.
+ */
+const PORTAL_ACCOUNTS_EVERY_MS = 60 * 60_000
+
 let started = false
 let lastContentRunDay = ''
 let lastHubSpotRunDay = ''
@@ -44,6 +51,12 @@ export function startScheduler(): void {
   setInterval(() => void tick('content', runDailyContentJobs), 60 * 60_000).unref()
 
   setInterval(() => void tick('hubspot', runHubSpotJobs), 15 * 60_000).unref()
+
+  setTimeout(() => void tick('portal-accounts', runPortalAccounts), 3 * 60_000).unref()
+  setInterval(
+    () => void tick('portal-accounts', runPortalAccounts),
+    PORTAL_ACCOUNTS_EVERY_MS,
+  ).unref()
 
   console.log('[automation] scheduler started')
 }
@@ -77,6 +90,15 @@ async function runHubSpotJobs(): Promise<void> {
   const { done } = await runRenewalReminders({ today })
   if (done.length > 0) console.log(`[automation] renewal reminders: ${done.join('; ')}`)
   if (chinaWeekday() === 'Mon') await sendHubSpotWeeklyReport({ today })
+}
+
+async function runPortalAccounts(): Promise<void> {
+  if (!process.env.HUBSPOT_TOKEN || process.env.HUBSPOT_AUTOMATION === 'off') return
+  const { openAccountsForPaidClients } = await import('@/lib/portal/auto-accounts')
+  const { opened, emailed, failed } = await openAccountsForPaidClients()
+  if (opened.length > 0) console.log(`[automation] portal accounts opened: ${opened.join('; ')}`)
+  if (emailed.length > 0) console.log(`[automation] portal welcome sent: ${emailed.join('; ')}`)
+  if (failed.length > 0) console.error(`[automation] portal accounts failed: ${failed.join('; ')}`)
 }
 
 async function tick(name: string, job: () => Promise<void>): Promise<void> {
