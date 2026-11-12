@@ -107,8 +107,7 @@ export default async function PostPage({
   // would show Arabic on an English URL. The language switcher still links to
   // this address, so send the reader to this language's blog, not a 404.
   // Temporary (307): the page may get a translation later.
-  // Chinese has no articles of its own and reads the English ones.
-  if (!locales.includes(locale === 'zh' ? 'en' : locale))
+  if (!locales.includes(locale))
     redirect(locale === 'ar' ? '/blog' : `/${locale}/blog`)
 
   const [t, settings, adjacent, chosenRelated] = await Promise.all([

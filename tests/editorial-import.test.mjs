@@ -67,3 +67,19 @@ test('edited batch draft cannot be silently published', async () => {
   await assert.rejects(importBatch(api, { posts: [post] }, { apply: true, publish: true }), /Editor changed draft/)
   assert.equal(writes.length, 0)
 })
+
+test('multilingual pack creates exactly six posts in each actual locale', async () => {
+  const multilingual = JSON.parse(readFileSync(path.join(batchRoot, 'posts-multilingual.json'), 'utf8'))
+  const { api, writes } = mock()
+  const result = await importBatch(api, multilingual, { apply: true })
+  assert.equal(result.length, 18)
+  for (const locale of ['ar', 'en', 'zh']) {
+    const created = writes.filter(x => x.collection === 'posts' && x.locale === locale)
+    assert.equal(created.length, 6)
+    assert.ok(created.every(x => x.data.localesAvailable.join() === locale))
+    assert.ok(created.every(x => x.data._status === 'draft'))
+  }
+  assert.equal(new Set(multilingual.posts.map(x => x.slug)).size, 18)
+  assert.ok(multilingual.posts.some(x => x.locale === 'en' && x.slug.includes('us-eu')))
+  assert.ok(!multilingual.posts.some(x => x.locale === 'en' && x.slug.includes('saudi')))
+})

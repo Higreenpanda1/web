@@ -127,9 +127,8 @@ export const getPosts = (
         where: {
           _status: { equals: 'published' },
           publishedAt: { less_than_equal: new Date().toISOString() },
-          // An Arabic-only article is not listed on the English site.
-          // Chinese readers get the English articles; the blog is not translated to Chinese.
-          ...(locale !== 'ar' ? { localesAvailable: { contains: 'en' } } : {}),
+          // List only articles actually authored for this locale.
+          localesAvailable: { contains: locale },
           ...(options.category ? { 'categories.slug': { equals: options.category } } : {}),
         },
         locale,
@@ -334,7 +333,7 @@ export const getCategoryCounts = (locale: Locale) =>
           _status: { equals: 'published' },
           publishedAt: { less_than_equal: new Date().toISOString() },
           // Chinese readers get the English articles; the blog is not translated to Chinese.
-          ...(locale !== 'ar' ? { localesAvailable: { contains: 'en' } } : {}),
+          localesAvailable: { contains: locale },
         },
         limit: 1000,
         depth: 0,
@@ -362,7 +361,7 @@ export const getAdjacentPosts = (post: Post, locale: Locale) =>
       const base = {
         _status: { equals: 'published' as const },
         publishedAt: { less_than_equal: new Date().toISOString() },
-        ...(locale === 'en' ? { localesAvailable: { contains: 'en' as const } } : {}),
+        localesAvailable: { contains: locale },
       }
       const [older, newer] = await Promise.all([
         payload.find({
@@ -415,7 +414,7 @@ export const getRelatedPosts = (post: Post, locale: Locale, limit = 3) =>
           publishedAt: { less_than_equal: new Date().toISOString() },
           id: { not_equals: post.id },
           // Chinese readers get the English articles; the blog is not translated to Chinese.
-          ...(locale !== 'ar' ? { localesAvailable: { contains: 'en' } } : {}),
+          localesAvailable: { contains: locale },
           ...(categoryIds.length ? { categories: { in: categoryIds } } : {}),
         },
         locale,
@@ -440,7 +439,7 @@ export const getAllPosts = (locale: Locale, options: { depth?: number; limit?: n
           _status: { equals: 'published' },
           publishedAt: { less_than_equal: new Date().toISOString() },
           // Chinese readers get the English articles; the blog is not translated to Chinese.
-          ...(locale !== 'ar' ? { localesAvailable: { contains: 'en' } } : {}),
+          localesAvailable: { contains: locale },
         },
         locale,
         sort: '-publishedAt',

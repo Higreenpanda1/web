@@ -20,9 +20,10 @@ export async function importBatch(payload, pack, options = {}) {
   const resolved = []
   // Preflight the whole pack before any mutation.
   for (const post of pack.posts) {
+    if (!['ar', 'en', 'zh'].includes(post.locale ?? 'ar')) throw new Error(`Invalid locale: ${post.locale}`)
     if (!existsSync(path.join(root, post.cover.file))) throw new Error(`Missing cover: ${post.slug}`)
     const [found, services, categories] = await Promise.all([
-      payload.find({ collection: 'posts', where: { slug: { equals: post.slug } }, limit: 1, depth: 0, locale: 'ar', draft: true }),
+      payload.find({ collection: 'posts', where: { slug: { equals: post.slug } }, limit: 1, depth: 0, locale: post.locale ?? 'ar', draft: true }),
       payload.find({ collection: 'services', where: { slug: { equals: post.service } }, limit: 1, depth: 0 }),
       payload.find({ collection: 'categories', where: { slug: { equals: post.category } }, limit: 1, depth: 0 }),
     ])
@@ -42,7 +43,7 @@ export async function importBatch(payload, pack, options = {}) {
   for (const { post, current, fingerprint, service, category } of resolved) {
     if (current) {
       if (apply && publish && current._status === 'draft') {
-        await payload.update({ collection: 'posts', id: current.id, locale: 'ar', data: { _status: 'published', publishedAt: new Date().toISOString() } })
+        await payload.update({ collection: 'posts', id: current.id, locale: post.locale ?? 'ar', data: { _status: 'published', publishedAt: new Date().toISOString() } })
         result.push({ slug: post.slug, action: 'published-existing-batch-draft', id: current.id })
       } else result.push({ slug: post.slug, action: 'already-imported', id: current.id })
       continue
@@ -51,15 +52,15 @@ export async function importBatch(payload, pack, options = {}) {
     const mediaName = path.basename(post.cover.file)
     const mediaResult = await payload.find({ collection: 'media', where: { filename: { equals: mediaName } }, limit: 1, depth: 0 })
     const media = mediaResult.docs[0] ?? await payload.create({
-      collection: 'media', locale: 'ar', filePath: path.join(root, post.cover.file),
+      collection: 'media', locale: post.locale ?? 'ar', filePath: path.join(root, post.cover.file),
       data: { alt: post.cover.alt, caption: post.cover.caption, credit: post.cover.credit },
     })
-    const created = await payload.create({ collection: 'posts', locale: 'ar', data: {
+    const created = await payload.create({ collection: 'posts', locale: post.locale ?? 'ar', data: {
       slug: post.slug, title: post.title, excerpt: post.excerpt, body: post.body,
       focusKeyword: post.focusKeyword, keyTakeaways: post.keyTakeaways.map(text => ({ text })),
       faqs: post.faqs, sources: post.sources, seo: { description: post.seoDescription },
       coverImage: media.id, categories: [category], ctaService: service,
-      localesAvailable: ['ar'], importKey: fingerprint,
+      localesAvailable: [post.locale ?? 'ar'], importKey: fingerprint,
       publishedAt: new Date().toISOString(), _status: publish ? 'published' : 'draft',
     } })
     result.push({ slug: post.slug, action: publish ? 'created-published' : 'created-draft', id: created.id })
@@ -73,7 +74,7 @@ async function main() {
   const { default: config } = await import('../payload.config.ts')
   const payload = await getPayload({ config })
   try {
-    const pack = JSON.parse(readFileSync(path.join(batchRoot, 'posts.json'), 'utf8'))
+    const pack = JSON.parse(readFileSync(path.join(batchRoot, process.argv.includes('--multilingual') ? 'posts-multilingual.json' : 'posts.json'), 'utf8'))
     const apply = process.argv.includes('--apply')
     const publish = process.argv.includes('--publish')
     if (publish && !apply) throw new Error('--publish requires --apply; use no flags for preflight')
