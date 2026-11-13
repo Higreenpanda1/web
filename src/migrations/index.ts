@@ -1,3 +1,4 @@
+import * as postChineseAvailability from './20261112_090000_post_chinese_availability'
 import * as migration_20261101_020000_add_shareholder_service from './20261101_020000_add_shareholder_service'
 import * as migration_20260920_072112_initial from './20260920_072112_initial'
 import * as migration_20260923_073515_add_catalogue_and_applications from './20260923_073515_add_catalogue_and_applications'
@@ -97,4 +98,5 @@ export const migrations = [
     down: flexiblePayments.down,
     name: '20261101_030000_flexible_payments',
   },
+  { up: postChineseAvailability.up, down: postChineseAvailability.down, name: '20261112_090000_post_chinese_availability' },
 ]

@@ -137,6 +137,7 @@ export const Posts: CollectionConfig = {
       options: [
         { label: 'العربية', value: 'ar' },
         { label: 'English', value: 'en' },
+        { label: '中文', value: 'zh' },
       ],
       admin: {
         position: 'sidebar',

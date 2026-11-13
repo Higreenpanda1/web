@@ -704,7 +704,7 @@ export interface Post {
   /**
    * Languages this article is actually written in. An article without English is not listed on the English site and carries no English hreflang.
    */
-  localesAvailable?: ('ar' | 'en')[] | null;
+  localesAvailable?: ('ar' | 'en' | 'zh')[] | null;
   /**
    * Calculated on save, per language.
    */
