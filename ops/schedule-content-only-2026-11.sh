@@ -7,7 +7,7 @@ fail(){ printf '%s\n' "$*" >&2; exit 1; }
 cd "$APP_DIR"
 [[ -f .env && -f docker-compose.prod.yml ]] || fail 'Existing application configuration not found.'
 dc(){ docker compose -p higreenpanda -f docker-compose.prod.yml "$@"; }
-IMAGE=$(dc images -q tools)
+IMAGE=$(docker image inspect higreenpanda-tools:latest --format "{{.Id}}")
 [[ -n "$IMAGE" ]] || fail 'The existing content tools image is unavailable. Nothing changed; no build was requested.'
 WORK=$(mktemp -d /tmp/higp-content-XXXXXX)
 trap 'rm -rf "$WORK"' EXIT
@@ -33,10 +33,12 @@ const fs=require('node:fs');const p=process.argv[2];let s=fs.readFileSync(p,'utf
       console.log('VERIFIED: all 18 article schedules, languages and covers match.')
       return
     }
-    const apply = process.argv.includes('--apply')`);fs.writeFileSync(p,s);
+    const apply = process.argv.includes('--apply')`);s=s.replace("} finally { await payload.destroy() }", "} finally { const cleanupTimer = setTimeout(() => process.exit(process.exitCode ?? 0), 5000); await payload.destroy(); clearTimeout(cleanupTimer) }");s=s.replace("main().catch(error => { console.error(error.message); process.exitCode = 1 })", "main().then(() => process.exit(0)).catch(error => { console.error(error.message); process.exit(1) })");fs.writeFileSync(p,s);
 JS
 run(){ dc run --rm --no-deps --pull never -T -v "$WORK:/batch:ro" -e EDITORIAL_BATCH_DIR=/batch/batch tools sh -c 'cp /batch/import.mjs /app/content-import.mjs; exec npx --no-install tsx /app/content-import.mjs "$@"' sh "$@" </dev/null; }
+printf '%s\n' 'STEP 1/4: checking all 18 articles...'
 run --multilingual
+printf '%s\n' 'STEP 2/4: backing up the database...'
 mkdir -p "$APP_DIR/backups"
 chmod 700 "$APP_DIR/backups"
 BACKUP="$APP_DIR/backups/before-content-$(date -u +%Y%m%dT%H%M%SZ).sql"
@@ -48,6 +50,8 @@ dc exec -T db sh -c 'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_D
 ALTER TYPE public.enum_posts_locales_available ADD VALUE IF NOT EXISTS 'zh';
 ALTER TYPE public.enum__posts_v_version_locales_available ADD VALUE IF NOT EXISTS 'zh';
 SQL
+printf '%s\n' 'STEP 3/4: saving all 18 publication dates...'
 run --multilingual --apply --publish
+printf '%s\n' 'STEP 4/4: reading back and verifying all 18 schedules...'
 run --multilingual --verify
 printf '%s\n' 'Content scheduling command completed. No website build, restart, billing edit, source checkout or general seed was run. Verify the 18 dates in CMS; Chinese display support is a separate website update.'
