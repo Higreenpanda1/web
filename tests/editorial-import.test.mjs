@@ -83,3 +83,16 @@ test('multilingual pack creates exactly six posts in each actual locale', async 
   assert.ok(multilingual.posts.some(x => x.locale === 'en' && x.slug.includes('us-eu')))
   assert.ok(!multilingual.posts.some(x => x.locale === 'en' && x.slug.includes('saudi')))
 })
+
+test('scheduled publication preserves future timestamps for every language', async () => {
+  const multilingual = JSON.parse(readFileSync(path.join(batchRoot, 'posts-multilingual.json'), 'utf8'))
+  const { api, writes } = mock()
+  await importBatch(api, multilingual, { apply: true, publish: true })
+  const created = writes.filter(x => x.collection === 'posts')
+  assert.equal(created.length, 18)
+  for (const item of created) {
+    const source = multilingual.posts.find(x => x.slug === item.data.slug)
+    assert.equal(item.data.publishedAt, source.publishedAt)
+    assert.ok(Date.parse(item.data.publishedAt) > Date.parse('2026-11-13T00:00:00Z'))
+  }
+})

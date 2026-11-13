@@ -20,6 +20,7 @@ export async function importBatch(payload, pack, options = {}) {
   const resolved = []
   // Preflight the whole pack before any mutation.
   for (const post of pack.posts) {
+    if (post.publishedAt && !Number.isFinite(Date.parse(post.publishedAt))) throw new Error(`Invalid publication date: ${post.slug}`)
     if (!['ar', 'en', 'zh'].includes(post.locale ?? 'ar')) throw new Error(`Invalid locale: ${post.locale}`)
     if (!existsSync(path.join(root, post.cover.file))) throw new Error(`Missing cover: ${post.slug}`)
     const [found, services, categories] = await Promise.all([
@@ -43,7 +44,7 @@ export async function importBatch(payload, pack, options = {}) {
   for (const { post, current, fingerprint, service, category } of resolved) {
     if (current) {
       if (apply && publish && current._status === 'draft') {
-        await payload.update({ collection: 'posts', id: current.id, locale: post.locale ?? 'ar', data: { _status: 'published', publishedAt: new Date().toISOString() } })
+        await payload.update({ collection: 'posts', id: current.id, locale: post.locale ?? 'ar', data: { _status: 'published', publishedAt: post.publishedAt ?? new Date().toISOString() } })
         result.push({ slug: post.slug, action: 'published-existing-batch-draft', id: current.id })
       } else result.push({ slug: post.slug, action: 'already-imported', id: current.id })
       continue
@@ -61,7 +62,7 @@ export async function importBatch(payload, pack, options = {}) {
       faqs: post.faqs, sources: post.sources, seo: { description: post.seoDescription },
       coverImage: media.id, categories: [category], ctaService: service,
       localesAvailable: [post.locale ?? 'ar'], importKey: fingerprint,
-      publishedAt: new Date().toISOString(), _status: publish ? 'published' : 'draft',
+      publishedAt: post.publishedAt ?? new Date().toISOString(), _status: publish ? 'published' : 'draft',
     } })
     result.push({ slug: post.slug, action: publish ? 'created-published' : 'created-draft', id: created.id })
   }

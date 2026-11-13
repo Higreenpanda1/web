@@ -918,7 +918,8 @@
         "alt": "تكلفة تأسيس شركة في الصين — التأسيس والسنة الأولى",
         "caption": "تصميم تحريري بهوية الموقع، لا يمثل مستنداً رسمياً.",
         "credit": "Editorial design: HIGP. Original brand artwork; no official-document representation."
-      }
+      },
+      "publishedAt": "2026-11-18T06:00:00.000Z"
     },
     {
       "slug": "china-vs-hong-kong-company-business-model",
@@ -1698,7 +1699,8 @@
         "alt": "الصين أم هونغ كونغ؟ — اختيار كيان الشركة",
         "caption": "تصميم تحريري بهوية الموقع، لا يمثل مستنداً رسمياً.",
         "credit": "Editorial design: HIGP. Original brand artwork; no official-document representation."
-      }
+      },
+      "publishedAt": "2026-11-25T06:00:00.000Z"
     },
     {
       "slug": "auto-parts-china-wholesale-rfq",
@@ -2390,7 +2392,8 @@
         "alt": "قطع غيار السيارات من الصين — تجهيز طلب الجملة",
         "caption": "صورة توضيحية حقيقية مستخدمة في الموقع؛ لا تمثل عرضاً لصنف محدد أو شحنة عميل.",
         "credit": "Editorial design: HIGP. Photograph reused from existing website: public/brand/companies/nasher-4.webp"
-      }
+      },
+      "publishedAt": "2026-11-16T06:00:00.000Z"
     },
     {
       "slug": "auto-parts-number-vin-matching",
@@ -3095,7 +3098,8 @@
         "alt": "رقم القطعة ورقم الهيكل — المطابقة قبل الشراء",
         "caption": "صورة توضيحية حقيقية مستخدمة في الموقع؛ لا تمثل عرضاً لصنف محدد أو شحنة عميل.",
         "credit": "Editorial design: HIGP. Photograph reused from existing website: public/brand/companies/nasher-3.webp"
-      }
+      },
+      "publishedAt": "2026-11-23T06:00:00.000Z"
     },
     {
       "slug": "auto-parts-pre-shipment-inspection-china",
@@ -3800,7 +3804,8 @@
         "alt": "فحص قطع غيار السيارات — قبل الشحن من الصين",
         "caption": "صورة توضيحية حقيقية مستخدمة في الموقع؛ لا تمثل عرضاً لصنف محدد أو شحنة عميل.",
         "credit": "Editorial design: HIGP. Photograph reused from existing website: public/brand/companies/nasher-4.webp"
-      }
+      },
+      "publishedAt": "2026-11-30T06:00:00.000Z"
     },
     {
       "slug": "auto-parts-china-saudi-import-checklist",
@@ -4524,7 +4529,8 @@
         "alt": "قطع غيار السيارات إلى السعودية — مراجعة الطلب قبل الشحن",
         "caption": "صورة توضيحية حقيقية مستخدمة في الموقع؛ لا تمثل عرضاً لصنف محدد أو شحنة عميل.",
         "credit": "Editorial design: HIGP. Photograph reused from existing website: src/seed/assets/post-import-costs.jpg"
-      }
+      },
+      "publishedAt": "2026-12-02T06:00:00.000Z"
     },
     {
       "locale": "en",
@@ -5081,7 +5087,8 @@
         "alt": "China company formation costs",
         "caption": "Brand editorial artwork.",
         "credit": "HIGP editorial design; existing website photography where shown."
-      }
+      },
+      "publishedAt": "2026-11-18T14:00:00.000Z"
     },
     {
       "locale": "en",
@@ -5551,7 +5558,8 @@
         "alt": "Mainland China or Hong Kong?",
         "caption": "Brand editorial artwork.",
         "credit": "HIGP editorial design; existing website photography where shown."
-      }
+      },
+      "publishedAt": "2026-11-25T14:00:00.000Z"
     },
     {
       "locale": "en",
@@ -6095,7 +6103,8 @@
         "alt": "Wholesale auto parts from China",
         "caption": "Illustrative photograph reused from the existing website; not a representation of supplied stock.",
         "credit": "HIGP editorial design; existing website photography where shown."
-      }
+      },
+      "publishedAt": "2026-11-16T14:00:00.000Z"
     },
     {
       "locale": "en",
@@ -6667,7 +6676,8 @@
         "alt": "Part number and VIN checks",
         "caption": "Illustrative photograph reused from the existing website; not a representation of supplied stock.",
         "credit": "HIGP editorial design; existing website photography where shown."
-      }
+      },
+      "publishedAt": "2026-11-23T14:00:00.000Z"
     },
     {
       "locale": "en",
@@ -7239,7 +7249,8 @@
         "alt": "Auto parts inspection in China",
         "caption": "Illustrative photograph reused from the existing website; not a representation of supplied stock.",
         "credit": "HIGP editorial design; existing website photography where shown."
-      }
+      },
+      "publishedAt": "2026-11-30T14:00:00.000Z"
     },
     {
       "locale": "en",
@@ -7673,7 +7684,8 @@
         "alt": "Auto parts: US, EU and UK",
         "caption": "Illustrative photograph reused from the existing website; not a representation of supplied stock.",
         "credit": "HIGP editorial design; existing website photography where shown."
-      }
+      },
+      "publishedAt": "2026-12-02T14:00:00.000Z"
     },
     {
       "locale": "zh",
@@ -8179,7 +8191,8 @@
         "alt": "中国公司设立成本",
         "caption": "品牌编辑设计，非官方文件。",
         "credit": "HIGP editorial design; existing website photography where shown."
-      }
+      },
+      "publishedAt": "2026-11-18T02:00:00.000Z"
     },
     {
       "locale": "zh",
@@ -8649,7 +8662,8 @@
         "alt": "内地公司还是香港公司？",
         "caption": "品牌编辑设计，非官方文件。",
         "credit": "HIGP editorial design; existing website photography where shown."
-      }
+      },
+      "publishedAt": "2026-11-25T02:00:00.000Z"
     },
     {
       "locale": "zh",
@@ -9193,7 +9207,8 @@
         "alt": "从中国采购汽车零配件",
         "caption": "现有网站图片，仅作说明，不代表特定库存或客户货物。",
         "credit": "HIGP editorial design; existing website photography where shown."
-      }
+      },
+      "publishedAt": "2026-11-16T02:00:00.000Z"
     },
     {
       "locale": "zh",
@@ -9765,7 +9780,8 @@
         "alt": "零件编号与 VIN 核对",
         "caption": "现有网站图片，仅作说明，不代表特定库存或客户货物。",
         "credit": "HIGP editorial design; existing website photography where shown."
-      }
+      },
+      "publishedAt": "2026-11-23T02:00:00.000Z"
     },
     {
       "locale": "zh",
@@ -10337,7 +10353,8 @@
         "alt": "汽车零配件出货前检验",
         "caption": "现有网站图片，仅作说明，不代表特定库存或客户货物。",
         "credit": "HIGP editorial design; existing website photography where shown."
-      }
+      },
+      "publishedAt": "2026-11-30T02:00:00.000Z"
     },
     {
       "locale": "zh",
@@ -10887,7 +10904,8 @@
         "alt": "汽车零配件出口沙特",
         "caption": "现有网站图片，仅作说明，不代表特定库存或客户货物。",
         "credit": "HIGP editorial design; existing website photography where shown."
-      }
+      },
+      "publishedAt": "2026-12-02T02:00:00.000Z"
     }
   ]
 }
